@@ -1,17 +1,24 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 
 import "@workspace/ui/globals.css";
 import { Providers } from "@/providers";
+import { Metadata } from "next";
 
-const fontSans = Geist({
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-const fontMono = Geist_Mono({
+const fontMono = Inter({
   subsets: ["latin"],
   variable: "--font-mono",
 });
+
+export const metadata: Metadata = {
+  title: "Unfaa Store",
+  description:
+    "Comprehensive e-commerce business solutions providing seamless online store management, inventory tracking, payment processing, and customer engagement tools for modern businesses",
+};
 
 export default function RootLayout({
   children,

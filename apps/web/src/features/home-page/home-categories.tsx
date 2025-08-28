@@ -1,0 +1,74 @@
+import { ShopThemeCategory } from "@/types/shop-type";
+
+export const HomeCategories = ({
+  categories,
+}: {
+  categories: ShopThemeCategory[];
+}) => {
+  return (
+    <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="flex items-center justify-center mb-3 sm:mb-4">
+            <div className="w-1 h-6 sm:h-8 bg-purple-600 rounded-full mr-2 sm:mr-3"></div>
+            <span className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">
+              Categories
+            </span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            Browse By Category
+          </h2>
+          <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
+            Discover our curated collection of products organized by category
+          </p>
+        </div>
+
+        {/* Categories Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 md:gap-6">
+          {categories.length === 0 ? (
+            // Show error state
+            <div className="col-span-full text-center py-12">
+              <div className="text-red-500 mb-4">
+                <svg
+                  className="w-16 h-16 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+                <p className="text-lg font-medium">No categories found</p>
+              </div>
+              <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Retrying...</span>
+                </div>
+              </button>
+            </div>
+          ) : (
+            categories.map((category) => (
+              <div key={category.id}>{category.category.name}</div>
+            ))
+          )}
+        </div>
+
+        {/* Loading indicator */}
+        {categories.length === 0 && (
+          <div className="text-center mt-8">
+            <div className="inline-flex items-center space-x-2 text-gray-500">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+              <span className="text-sm">Loading categories...</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};

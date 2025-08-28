@@ -1,12 +1,11 @@
-// import { ProductDetailPage } from "@/features/products/ProductDetailPage";
+import { ProductDetailPage } from "@/features/products/ProductDetailPage";
 
 const page = () => {
-    return (
-        <div>
-            {/* <ProductDetailPage /> */}
-            Product Detail Page
-        </div>
-    );
+  return (
+    <div>
+      <ProductDetailPage />
+    </div>
+  );
 };
 
 export default page;

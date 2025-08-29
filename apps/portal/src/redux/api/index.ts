@@ -1,6 +1,5 @@
 import config from "@/config";
-import { clearAuth } from "@/redux/slices/auth-slice";
-import { RootState, tagTypes } from "@/redux/type";
+import { METHOD, RootState, tagTypes } from "@/redux/type";
 import {
     BaseQueryFn,
     createApi,
@@ -9,11 +8,13 @@ import {
     FetchBaseQueryError,
     retry,
 } from "@reduxjs/toolkit/query/react";
+import { toast } from "sonner";
 
 export const API_TIMEOUT = 60_000;
+export const API_BASE_URL = config.serverUrl;
 
 export const baseQuery = fetchBaseQuery({
-    baseUrl: config.serverUrl,
+    baseUrl: API_BASE_URL,
     timeout: API_TIMEOUT,
 
     prepareHeaders: (headers, { getState }) => {
@@ -26,20 +27,46 @@ export const baseQuery = fetchBaseQuery({
     },
 });
 
+const baseQueryWithoutAuth = fetchBaseQuery({
+    baseUrl: API_BASE_URL,
+    timeout: API_TIMEOUT,
+});
+
 export const baseQueryWithReAuth: BaseQueryFn<
     string | FetchArgs,
     unknown,
     FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-    const result = await baseQuery(args, api, extraOptions);
+    let result = await baseQuery(args, api, extraOptions);
 
-    if (
-        result.error &&
-        (result.error.status === 401 ||
-            // result.error.status === 403 ||
-            result.error.status === 500)
-    ) {
-        api.dispatch(clearAuth());
+    if (result.error && result.error.status === 401) {
+        const refreshToken = (api.getState() as RootState).auth.refreshToken;
+
+        if (refreshToken) {
+            const refreshResult = await baseQueryWithoutAuth(
+                {
+                    url: "/auth/refresh-token",
+                    method: METHOD.POST,
+                    body: { refresh_token: refreshToken },
+                },
+                api,
+                extraOptions
+            );
+
+            if (refreshResult.data) {
+                api.dispatch({
+                    type: "auth/setAuth",
+                    payload: refreshResult.data,
+                });
+
+                result = await baseQuery(args, api, extraOptions);
+            } else {
+                api.dispatch({ type: "auth/logout" });
+                toast.error("Session expired");
+            }
+        } else {
+            api.dispatch({ type: "auth/logout" });
+        }
     }
 
     return result;

@@ -1,12 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const OTPVerifyForm = dynamic(() => import("@/features/auth/otp-form"), {
-    ssr: false,
-});
-
-import { Card, CardContent } from "@repo/ui/components/ui/card";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import OTPVerifyForm from "@/features/auth/otp-form";
 
 export default function VerifyEmail() {
     return (

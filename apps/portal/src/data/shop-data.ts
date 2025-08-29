@@ -1,54 +1,54 @@
 export const shopCategories = [
     {
         label: "Clothing & Apparel",
-        value: "clothing-apparel",
+        value: "clothing_apparel",
     },
     {
         label: "Shoes & Footwear",
-        value: "shoes-footwear",
+        value: "shoes_footwear",
     },
     {
         label: "Accessories & Jewelry",
-        value: "accessories-jewelry",
+        value: "accessories_jewelry",
     },
     {
         label: "Beauty & Cosmetics",
-        value: "beauty-cosmetics",
+        value: "beauty_cosmetics",
     },
     {
         label: "Electronics & Gadgets",
-        value: "electronics-gadgets",
+        value: "electronics_gadgets",
     },
     {
         label: "Health & Wellness",
-        value: "health-wellness",
+        value: "health_wellness",
     },
     {
         label: "Home & Furniture",
-        value: "home-furniture",
+        value: "home_furniture",
     },
     {
         label: "Books & Media",
-        value: "books-media",
+        value: "books_media",
     },
     {
         label: "Toys & Games",
-        value: "toys-games",
+        value: "toys_games",
     },
     {
         label: "Sports & Outdoors",
-        value: "sports-outdoors",
+        value: "sports_outdoors",
     },
     {
         label: "Food & Beverages",
-        value: "food-beverages",
+        value: "food_beverages",
     },
     {
         label: "Pet Supplies & Equipment",
-        value: "pet-supplies-equipment",
+        value: "pet_supplies_equipment",
     },
     {
         label: "Groceries & Household",
-        value: "groceries-household",
+        value: "groceries_household",
     },
 ];

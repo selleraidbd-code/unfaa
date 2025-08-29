@@ -84,3 +84,9 @@ export type CreateOrder = {
     notes: string;
     deliveryZoneId: string;
 };
+
+export interface CustomItem {
+    name: string;
+    price: number;
+    quantity: number;
+}

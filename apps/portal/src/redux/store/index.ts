@@ -20,7 +20,7 @@ const persistConfig = {
     auth: {
         key: "auth",
         storage: storage,
-        whitelist: ["accessToken", "user"],
+        whitelist: ["accessToken", "user", "refreshToken"],
     },
     components: {
         key: "components",

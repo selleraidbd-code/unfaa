@@ -9,37 +9,20 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { CustomButton } from "@/components/ui/custom-button";
 import { useSignInMutation } from "@/redux/api/auth-api";
-import CustomFormError from "@repo/ui/components/custom-ui/custom-form-error";
-import { CustomFormInput } from "@repo/ui/components/custom-ui/custom-form-input";
-import { Button } from "@repo/ui/components/ui/button";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@repo/ui/components/ui/card";
-import { Form } from "@repo/ui/components/ui/form";
+} from "@workspace/ui/components/card";
+import { CustomFormError } from "@workspace/ui/components/custom/custom-form-error";
+import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
+import { Form } from "@workspace/ui/components/form";
 import Image from "next/image";
 import logo from "../../assets/images/logo.png";
-// const items = [
-//   {
-//     id: 1,
-//     image: logo,
-//     alt: "A scenic mountain view",
-//   },
-//   {
-//     id: 2,
-//     image: logo,
-//     alt: "Beautiful beach during sunset",
-//   },
-//   {
-//     id: 3,
-//     image: logo,
-//     alt: "Night city skyline",
-//   },
-// ];
 
 const SignInForm = () => {
     const dispatch = useAppDispatch();
@@ -125,13 +108,13 @@ const SignInForm = () => {
 
                                 <CustomFormError message={message} />
 
-                                <Button
+                                <CustomButton
                                     type="submit"
                                     className="w-full  "
                                     isLoading={isLoading}
                                 >
                                     Sign In
-                                </Button>
+                                </CustomButton>
                             </div>
 
                             <div className="text-center text-blue-500 text-sm">

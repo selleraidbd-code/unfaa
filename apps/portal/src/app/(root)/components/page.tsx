@@ -1,0 +1,196 @@
+"use client";
+
+import Image from "next/image";
+
+import {
+    useDeleteComponentMutation,
+    useGetComponentsQuery,
+} from "@/redux/api/component-api";
+import { ColumnDef, PaginationState } from "@tanstack/react-table";
+import { Trash } from "lucide-react";
+
+import { useAlert } from "@/hooks/useAlert";
+import { DataTable } from "@repo/ui/components/table/data-table";
+import { DataTableColumnHeader } from "@repo/ui/components/table/data-table-column-header";
+import { DataTableRowActions } from "@repo/ui/components/table/data-table-row-actions";
+import { Checkbox } from "@repo/ui/components/ui/checkbox";
+import { formatDate } from "@repo/ui/lib/formateDate";
+import { Component } from "@repo/ui/type/index";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+
+const ComponentsPage = () => {
+    const router = useRouter();
+    const { fire } = useAlert();
+    const searchParams = useSearchParams();
+    const page = searchParams.get("page") || 1;
+
+    const { data, isLoading, isFetching, isError } = useGetComponentsQuery({
+        type: undefined,
+        page: Number(page),
+    });
+
+    const [deleteComponentById] = useDeleteComponentMutation();
+
+    const handleSearch = (value: string) => {
+        console.log(value);
+    };
+
+    const handlePaginationChange = (state: PaginationState) => {
+        console.log(state);
+    };
+
+    const handleEdit = (data: Component) => {
+        router.push(`/components/${data.id}`);
+    };
+
+    const handleBulkDelete = () => {
+        console.log("Bulk delete");
+    };
+
+    const handleDelete = (data: Component) => {
+        fire({
+            title: "Are you sure?",
+            text: "You are about to delete this component",
+            onConfirm: async () => {
+                await deleteComponentById(data.id)
+                    .unwrap()
+                    .then((res) => {
+                        console.log(res);
+                        toast.success("Component deleted successfully");
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        toast.error("Component deletion failed");
+                    });
+            },
+        });
+    };
+
+    const componentsColumns: ColumnDef<Component>[] = [
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) =>
+                        table.toggleAllPageRowsSelected(!!value)
+                    }
+                    aria-label="Select all"
+                    className="translate-y-[2px]"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                    className="translate-y-[2px]"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+        },
+
+        {
+            accessorKey: "imgURL",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Image" />
+            ),
+            cell: ({ row }) => {
+                return (
+                    <Image
+                        src={row.original.imgURL}
+                        alt={row.original.name}
+                        className="h-10 w-20 rounded-sm object-cover"
+                        width={100}
+                        height={100}
+                    />
+                );
+            },
+        },
+        {
+            accessorKey: "name",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Name" />
+            ),
+            cell: ({ row }) => {
+                return (
+                    <span className="truncate font-medium">
+                        {row.getValue("name")}
+                    </span>
+                );
+            },
+        },
+        {
+            accessorKey: "type",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Type" />
+            ),
+            cell: ({ row }) => {
+                return (
+                    <span className="truncate font-medium">
+                        {row.original.type}
+                    </span>
+                );
+            },
+        },
+        {
+            accessorKey: "createdAt",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Created At" />
+            ),
+            cell: ({ row }) => {
+                return (
+                    <span className="truncate font-medium">
+                        {formatDate(row.getValue("createdAt"))}
+                    </span>
+                );
+            },
+        },
+        {
+            id: "actions",
+            cell: ({ row }) => (
+                <DataTableRowActions
+                    row={row}
+                    actions={[
+                        { label: "Edit", onClick: handleEdit },
+                        { label: "Delete", onClick: handleDelete },
+                    ]}
+                />
+            ),
+        },
+    ];
+
+    return (
+        <DataTable
+            title="Components"
+            data={data?.data || []}
+            columns={componentsColumns}
+            showViewOptions={true}
+            onSearch={handleSearch}
+            pagination={true}
+            paginationMeta={data?.meta}
+            onPaginationChange={handlePaginationChange}
+            createButtonInfo={{
+                label: "Create Component",
+                href: "/components/create",
+            }}
+            bulkActions={[
+                {
+                    label: "Delete Selected",
+                    onClick: handleBulkDelete,
+                    variant: "destructive",
+                    icon: Trash,
+                },
+            ]}
+            isLoading={isLoading || isFetching}
+            isError={isError}
+        />
+    );
+};
+
+export default ComponentsPage;

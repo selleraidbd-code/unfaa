@@ -19,7 +19,7 @@ import {
     type VisibilityState,
 } from "@tanstack/react-table";
 
-import { Skeleton } from "@repo/ui/components/ui/skeleton";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
     Table,
     TableBody,
@@ -27,8 +27,8 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@repo/ui/components/ui/table";
-import { Button } from "../ui/button";
+} from "@workspace/ui/components/table";
+import { Button } from "@workspace/ui/components/button";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 

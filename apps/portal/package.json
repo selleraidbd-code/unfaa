@@ -15,6 +15,10 @@
     "@hookform/resolvers": "^5.2.1",
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-table": "^8.21.3",
+    "@tiptap/extension-text-align": "^3.3.0",
+    "@tiptap/extension-underline": "^3.3.0",
+    "@tiptap/react": "^3.3.0",
+    "@tiptap/starter-kit": "^3.3.0",
     "@workspace/landing": "workspace:*",
     "@workspace/ui": "workspace:*",
     "lucide-react": "^0.542.0",
@@ -26,6 +30,7 @@
     "react-hook-form": "^7.62.0",
     "react-qr-code": "^2.0.18",
     "react-redux": "^9.2.0",
+    "recharts": "2.15.4",
     "redux-persist": "^6.0.0",
     "sonner": "^2.0.7",
     "zod": "^3.25.76"

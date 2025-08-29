@@ -10,19 +10,19 @@ import { setToken, setUser } from "@/redux/slices/auth-slice";
 import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
 import { ErrorResponse } from "@/redux/type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { REGEXP_ONLY_DIGITS } from "@workspace/ui/components/input-otp";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { CustomButton } from "@/components/ui/custom-button";
 import useTimeCounter from "@/hooks/useTimeCounter";
-import { Button } from "@repo/ui/components/ui/button";
-import { Form } from "@repo/ui/components/ui/form";
-import { CustomLoading } from "@repo/ui/components/custom-ui/custom-loading";
-import CustomOTPFormInput from "@repo/ui/components/custom-ui/custom-OTP-form-input";
-import { CardDescription, CardTitle } from "@repo/ui/components/ui/card";
-import logo from "../../assets/images/logo.png";
+import { CardDescription, CardTitle } from "@workspace/ui/components/card";
+import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
+import CustomOTPFormInput from "@workspace/ui/components/custom/custom-OTP-form-input";
+import { Form } from "@workspace/ui/components/form";
 import Image from "next/image";
+import logo from "../../assets/images/logo.png";
 const FormSchema = z.object({
     otp: z.string().min(4, {
         message: "ওটিপি কোড দিতে হবে।",
@@ -118,13 +118,13 @@ const OTPVerifyForm = () => {
                     placeholder="*"
                 />
 
-                <Button
-                    disabled={isLoading}
+                <CustomButton
+                    isLoading={isLoading}
                     className="mt-6 w-full"
                     type="submit"
                 >
                     Next
-                </Button>
+                </CustomButton>
 
                 <div className="mt-4 flex items-center justify-end gap-3">
                     <button

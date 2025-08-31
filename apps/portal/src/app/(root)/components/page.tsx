@@ -10,12 +10,12 @@ import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { Trash } from "lucide-react";
 
 import { useAlert } from "@/hooks/useAlert";
-import { DataTable } from "@repo/ui/components/table/data-table";
-import { DataTableColumnHeader } from "@repo/ui/components/table/data-table-column-header";
-import { DataTableRowActions } from "@repo/ui/components/table/data-table-row-actions";
-import { Checkbox } from "@repo/ui/components/ui/checkbox";
-import { formatDate } from "@repo/ui/lib/formateDate";
-import { Component } from "@repo/ui/type/index";
+import { DataTable } from "@/components/table/data-table";
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { DataTableRowActions } from "@/components/table/data-table-row-actions";
+import { Checkbox } from "@workspace/ui/components/checkbox";
+import { formatDate } from "@workspace/ui/lib/formateDate";
+import { Component } from "@workspace/ui/landing/types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 

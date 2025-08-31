@@ -12,12 +12,13 @@ import { toast } from "sonner";
 
 import { FileUpload } from "@/components/file-upload";
 import { useThemeContext } from "@/components/theme/theme-data-provider";
+import { CustomButton } from "@/components/ui/custom-button";
 import { ShowSelectedSection } from "@/features/builder/components/ShowSelectedSection";
 import { useCreateLandingPageMutation } from "@/redux/api/landing-page-api";
 import { useGetSiteCategoriesQuery } from "@/redux/api/site-category-api";
 import { SiteType } from "@/types/site-type";
-import { Button } from "@repo/ui/components/ui/button";
-import { Switch } from "@repo/ui/components/ui/switch";
+import { Button } from "@workspace/ui/components/button";
+import { Switch } from "@workspace/ui/components/switch";
 import { useTheme } from "next-themes";
 
 const CreateTemplate = () => {
@@ -90,12 +91,12 @@ const CreateTemplate = () => {
                             }}
                         ></Switch>
                     </div>
-                    <Button variant="outline" href="/templates">
+                    <CustomButton variant="outline" href="/templates">
                         Discard
-                    </Button>
-                    <Button type="button" onClick={handleSave}>
+                    </CustomButton>
+                    <CustomButton type="button" onClick={handleSave}>
                         Save Template
-                    </Button>
+                    </CustomButton>
                 </div>
             </div>
 
@@ -149,9 +150,9 @@ const CreateTemplate = () => {
             {isEditing && <AddSectionComponent />}
 
             <div className="flex items-center justify-end gap-2 md:hidden">
-                <Button variant="outline" href="/templates">
+                <CustomButton variant="outline" href="/templates">
                     Discard
-                </Button>
+                </CustomButton>
                 <Button onClick={handleSave}>Save Template</Button>
             </div>
         </div>

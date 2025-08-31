@@ -1,27 +1,19 @@
 "use client";
 
-import { ArrowBackButton } from "@repo/ui/components/CustomBackButton";
-import { Button } from "@repo/ui/components/ui/button";
-import { Card, CardContent, CardHeader } from "@repo/ui/components/ui/card";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
 
 const SocialMediaLinks = () => {
     return (
         <Card>
             <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                    <ArrowBackButton
-                        href="/manage-shop"
-                        className="bg-blue-500/10 hover:bg-blue-500/20 border-blue-200 hover:border-blue-300 text-blue-600"
-                    />
-                    <h1 className="text-xl font-semibold">Social Links</h1>
-                </div>
+                <HeaderBackButton title="Social Links" href="/manage-shop" />
             </CardHeader>
             <CardContent className="space-y-6">
                 <div>
-                    <h2 className="text-lg font-medium mb-6">Social Links</h2>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Left Column */}
                         <div className="space-y-4">

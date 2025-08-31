@@ -28,9 +28,7 @@ const categoryFormSchema = z.object({
         message: "Category name must be at least 3 characters.",
     }),
     description: z.string().optional(),
-    keywords: z.string().min(5, {
-        message: "Category keywords must be at least 5 characters.",
-    }),
+    keywords: z.string().optional(),
     thumbnailImg: z.string().optional(),
     coverImg: z.string().optional(),
 });
@@ -61,7 +59,7 @@ export const CreateCategoryDialog = () => {
 
         const payload: CreateCategory = {
             name: data.name,
-            keywords: data.keywords,
+            keywords: data.keywords || "",
             shopId: user.shop.id,
             ...(data.description && { description: data.description }),
             ...(data.thumbnailImg && { thumbnailImg: data.thumbnailImg }),
@@ -100,12 +98,6 @@ export const CreateCategoryDialog = () => {
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                         <DialogContainer className="space-y-4">
-                            <CustomFormImage
-                                label="Cover Image"
-                                name="coverImg"
-                                control={form.control}
-                            />
-
                             <CustomFormInput
                                 label="Name"
                                 name="name"
@@ -122,22 +114,27 @@ export const CreateCategoryDialog = () => {
                                 control={form.control}
                             />
 
-                            <CustomFormTextarea
-                                label="Keywords"
-                                name="keywords"
-                                placeholder="Enter category keywords"
-                                required={true}
-                                control={form.control}
-                            />
-
                             <CustomFormImage
                                 label="Thumbnail Image"
                                 name="thumbnailImg"
                                 control={form.control}
                             />
+
+                            <CustomFormImage
+                                label="Cover Image"
+                                name="coverImg"
+                                control={form.control}
+                            />
+
+                            <CustomFormTextarea
+                                label="Keywords"
+                                name="keywords"
+                                placeholder="Enter category keywords"
+                                control={form.control}
+                            />
                         </DialogContainer>
 
-                        <div className="flex justify-end gap-4 mt-4">
+                        <div className="flex justify-end gap-4">
                             <DialogClose asChild>
                                 <CustomButton type="button" variant="outline">
                                     Cancel

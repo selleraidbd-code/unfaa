@@ -7,14 +7,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { CustomFormImage } from "@/components/shared/custom-form-image";
-import { CustomFormInput } from "@repo/ui/components/custom-ui/custom-form-input";
-import { CustomFormSearchSelect } from "@repo/ui/components/custom-ui/custom-form-search-select";
-import CustomRadioGroup from "@repo/ui/components/custom-ui/custom-radio-group";
-import { BackHeader } from "@repo/ui/components/shared/BackHeader";
-import { Button } from "@repo/ui/components/ui/button";
-import { Form } from "@repo/ui/components/ui/form";
-import { EComponentType } from "@repo/ui/type/index";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
+import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
+import CustomRadioGroup from "@workspace/ui/components/custom/custom-radio-group";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { Button } from "@workspace/ui/components/button";
+import { Form } from "@workspace/ui/components/form";
+import { EComponentType } from "@workspace/ui/landing/types";
 import { toast } from "sonner";
 
 enum ERequiredFiled {
@@ -215,7 +215,10 @@ const AddComponent = () => {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid gap-4">
-                    <BackHeader title="Create Component" href="/components" />
+                    <HeaderBackButton
+                        title="Create Component"
+                        href="/components"
+                    />
 
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">

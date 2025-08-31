@@ -74,7 +74,7 @@ export const CreateTutorialDialog = () => {
                     <Plus className="w-4 h-4" /> Upload Tutorial
                 </CustomButton>
             </DialogTrigger>
-            <DialogContent className="sm:!w-[80vw] lg:!w-[60vw] xl:!w-[40vw]">
+            <DialogContent className="lg:max-w-2xl">
                 <DialogHeader className="pb-3">
                     <DialogTitle className="text-xl font-bold">
                         Upload Tutorial
@@ -123,7 +123,7 @@ export const CreateTutorialDialog = () => {
                                 </CustomButton>
                             </DialogClose>
                             <CustomButton type="submit" isLoading={isLoading}>
-                                Save Brand
+                                Upload Tutorial
                             </CustomButton>
                         </div>
                     </form>

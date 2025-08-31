@@ -9,14 +9,6 @@ export interface Category {
     updatedAt: string;
 }
 
-export interface CategoryFormSchema {
-    name: string;
-    keywords: string;
-    description?: string;
-    thumbnailImg?: string;
-    coverImg?: string;
-}
-
 export interface CreateCategory {
     name: string;
     keywords: string;

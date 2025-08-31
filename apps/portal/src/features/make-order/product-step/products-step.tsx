@@ -15,6 +15,7 @@ interface ProductsStepProps {
     addProductToOrder: (product: Product) => void;
     setActiveStep: (step: OrderStepIndicator) => void;
     calculateTotal: () => number;
+    shopId: string;
 }
 
 export const ProductsStep = ({
@@ -24,12 +25,14 @@ export const ProductsStep = ({
     removeOrderItem,
     setActiveStep,
     calculateTotal,
+    shopId,
 }: ProductsStepProps) => {
     const [searchTerm, setSearchTerm] = useState("");
 
     const { data } = useGetProductsQuery({
         searchTerm: searchTerm || undefined,
         limit: 100,
+        shopId,
     });
 
     return (

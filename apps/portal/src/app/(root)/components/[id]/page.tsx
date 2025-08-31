@@ -12,13 +12,13 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { FileUpload } from "@/components/file-upload";
-import { CustomFormInput } from "@repo/ui/components/custom-ui/custom-form-input";
-import { CustomFormSearchSelect } from "@repo/ui/components/custom-ui/custom-form-search-select";
-import CustomRadioGroup from "@repo/ui/components/custom-ui/custom-radio-group";
-import { BackHeader } from "@repo/ui/components/shared/BackHeader";
-import { Button } from "@repo/ui/components/ui/button";
-import { Form } from "@repo/ui/components/ui/form";
-import { EComponentType } from "@repo/ui/type/index";
+import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
+import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
+import CustomRadioGroup from "@workspace/ui/components/custom/custom-radio-group";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { Button } from "@workspace/ui/components/button";
+import { Form } from "@workspace/ui/components/form";
+import { EComponentType } from "@workspace/ui/landing/types";
 import { useEffect } from "react";
 
 enum ERequiredFiled {
@@ -233,7 +233,10 @@ const EditComponent = () => {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid gap-4">
-                    <BackHeader title="Edit Component" href="/components" />
+                    <HeaderBackButton
+                        title="Edit Component"
+                        href="/components"
+                    />
 
                     <div className="grid gap-4">
                         <div className="grid grid-cols-2 gap-4">

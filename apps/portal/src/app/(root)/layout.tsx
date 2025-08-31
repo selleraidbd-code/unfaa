@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <AppSidebar />
                 <SidebarInset>
                     <SidebarNavbar />
-                    <div className="p-4 xl:!p-6 2xl:!p-8">{children}</div>
+                    <div className="p-4 xl:p-6 2xl:p-8">{children}</div>
                 </SidebarInset>
             </SidebarProvider>
         </VerificationProvider>

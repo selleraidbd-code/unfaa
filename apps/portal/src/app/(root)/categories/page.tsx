@@ -1,5 +1,7 @@
 "use client";
 
+import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { CategorySkeleton } from "@/features/categories/category-skeleton";
 import { CategoryCard } from "@/features/category/category-card";
 import { CategoryDetailsDialog } from "@/features/category/category-details-dialog";
 import { CreateCategoryDialog } from "@/features/category/create-category-dialog";
@@ -11,8 +13,6 @@ import {
     useGetCategoriesQuery,
 } from "@/redux/api/category-api";
 import { Category } from "@/types/category-type";
-import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-import { FolderOpen } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -24,7 +24,7 @@ const Page = () => {
         null
     );
 
-    const { data, isLoading, error } = useGetCategoriesQuery({
+    const { data, isLoading, isError } = useGetCategoriesQuery({
         shopId: user?.shop.id,
         page: 1,
         limit: 50,
@@ -64,60 +64,32 @@ const Page = () => {
         setCategory(category);
     };
 
-    if (isLoading) {
-        return (
-            <div className="space-y-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                        <div key={i} className="animate-pulse">
-                            <div className="bg-muted rounded-lg p-6 space-y-3">
-                                <div className="h-6 bg-muted-foreground/20 rounded w-3/4"></div>
-                                <div className="h-4 bg-muted-foreground/20 rounded w-full"></div>
-                                <div className="h-4 bg-muted-foreground/20 rounded w-2/3"></div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
-    if (error)
-        return (
-            <CustomErrorOrEmpty title="Failed to load categories. Please try again later." />
-        );
-
     return (
         <>
             <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between">
                     <h1 className="title">Categories</h1>
                     <CreateCategoryDialog />
                 </div>
 
-                {/* Categories Grid */}
-                <div className="flex flex-wrap gap-6">
-                    {data?.data?.length ? (
-                        data.data.map((category: Category) => (
-                            <CategoryCard
-                                key={category.id}
-                                category={category}
-                                onEdit={() => onUpdate(category)}
-                                onView={() => onView(category)}
-                                onDelete={() => onDelete(category.id)}
-                            />
-                        ))
-                    ) : (
-                        <div className="col-span-full text-center py-16">
-                            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                                <FolderOpen className="w-8 h-8 text-muted-foreground" />
-                            </div>
-                            <p className="text-muted-foreground">
-                                No categories found.
-                            </p>
-                        </div>
-                    )}
-                </div>
+                <EmptyErrorLoadingHandler
+                    className="flex flex-wrap gap-6"
+                    isError={isError}
+                    errorTitle="Failed to load categories. Please try again later."
+                    isEmpty={data?.data?.length === 0}
+                    isLoading={isLoading}
+                    loadingComponent={<CategorySkeleton />}
+                >
+                    {data?.data?.map((category: Category) => (
+                        <CategoryCard
+                            key={category.id}
+                            category={category}
+                            onEdit={() => onUpdate(category)}
+                            onView={() => onView(category)}
+                            onDelete={() => onDelete(category.id)}
+                        />
+                    ))}
+                </EmptyErrorLoadingHandler>
             </div>
 
             {/* Update Category Dialog */}

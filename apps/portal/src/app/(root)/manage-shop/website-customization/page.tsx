@@ -1,5 +1,6 @@
 "use client";
 
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { ShopTheme, shopThemeType } from "@/features/manage-shop/types";
 import { ManageBanner } from "@/features/manage-shop/website-customization/manage-banner";
 import { ManageCategories } from "@/features/manage-shop/website-customization/manage-categories";
@@ -9,8 +10,8 @@ import {
     useGetShopThemeQuery,
 } from "@/redux/api/shop-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@repo/ui/components/ui/button";
-import { Form } from "@repo/ui/components/ui/form";
+import { Button } from "@workspace/ui/components/button";
+import { Form } from "@workspace/ui/components/form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -70,7 +71,11 @@ const WebsiteCustomization = () => {
     }
 
     return (
-        <div>
+        <div className="space-y-6">
+            <HeaderBackButton
+                title="Website Customization"
+                href="/manage-shop"
+            />
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}

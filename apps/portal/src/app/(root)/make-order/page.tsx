@@ -161,6 +161,7 @@ const Page = () => {
                         selectedCustomer={selectedCustomer}
                         setSelectedCustomer={setSelectedCustomer}
                         setActiveStep={setActiveStep}
+                        shopId={user?.shop.id || ""}
                     />
                 )}
 
@@ -172,6 +173,7 @@ const Page = () => {
                         removeOrderItem={removeOrderItem}
                         setActiveStep={setActiveStep}
                         calculateTotal={calculateTotal}
+                        shopId={user?.shop.id || ""}
                     />
                 )}
 

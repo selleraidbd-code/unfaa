@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
+import { CustomButton } from "@/components/ui/custom-button";
 
 interface CustomErrorOrEmptyProps {
     title?: string;
@@ -10,6 +11,8 @@ interface CustomErrorOrEmptyProps {
     isTryAgain?: boolean;
     onRetry?: () => void;
     className?: string;
+    href?: string;
+    buttonText?: string;
 }
 
 export const CustomErrorOrEmpty = ({
@@ -19,6 +22,8 @@ export const CustomErrorOrEmpty = ({
     isTryAgain = false,
     onRetry,
     className,
+    href,
+    buttonText = "Go to",
 }: CustomErrorOrEmptyProps) => {
     return (
         <div className={cn("center h-[60vh] flex-col", className)}>
@@ -52,6 +57,11 @@ export const CustomErrorOrEmpty = ({
                 >
                     Try Again
                 </Button>
+            )}
+            {href && (
+                <CustomButton className="mt-6 w-[160px]" href={href}>
+                    {buttonText}
+                </CustomButton>
             )}
         </div>
     );

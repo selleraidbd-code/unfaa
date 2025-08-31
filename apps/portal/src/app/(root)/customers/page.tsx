@@ -19,13 +19,16 @@ import { Checkbox } from "@workspace/ui/components/checkbox";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 import { useState } from "react";
 import { toast } from "sonner";
+import useGetUser from "@/hooks/useGetUser";
 
 const CustomersPage = () => {
+    const user = useGetUser();
     const [customer, setCustomer] = useState<Customer | null>(null);
 
     const { data, isLoading, isError } = useGetCustomersQuery({
         page: 1,
         limit: 10,
+        shopId: user?.shop?.id,
     });
 
     const [deleteCustomer] = useDeleteCustomerMutation();

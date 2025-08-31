@@ -32,7 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </Link>
             </SidebarHeader>
 
-            <SidebarContent className="no-scrollbar">
+            <SidebarContent>
                 {data.navItems.map((item, index) => (
                     <NavMain
                         key={index}

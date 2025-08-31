@@ -1,17 +1,17 @@
 "use client";
 
+import { CustomButton } from "@/components/ui/custom-button";
 import { TemplateCard } from "@/features/templates/template-card";
 import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";
 import { useGetSiteCategoriesQuery } from "@/redux/api/site-category-api";
 import { SiteType } from "@/types/site-type";
-import { CustomSearch } from "@repo/ui/components/custom-ui/custom-search";
-import { Button } from "@repo/ui/components/ui/button";
+import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger,
-} from "@repo/ui/components/ui/tabs";
+} from "@workspace/ui/components/tabs";
 import { Plus, SlidersHorizontal } from "lucide-react";
 
 const Templates = () => {
@@ -41,10 +41,10 @@ const Templates = () => {
                 <div className="flex items-center gap-4">
                     <CustomSearch placeholder="Search templates..." />
 
-                    <Button href="/templates/create">
+                    <CustomButton href="/templates/create">
                         <Plus />
                         Create Template
-                    </Button>
+                    </CustomButton>
                 </div>
             </div>
 
@@ -63,10 +63,10 @@ const Templates = () => {
                             ))}
                         </TabsList>
 
-                        <Button variant="outline" size="sm">
+                        <CustomButton variant="outline" size="sm">
                             <SlidersHorizontal className="h-4 w-4 mr-2" />
                             Filters
-                        </Button>
+                        </CustomButton>
                     </div>
 
                     <TabsContent value="all" className="mt-6">

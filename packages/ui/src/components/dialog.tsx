@@ -139,7 +139,7 @@ function DialogContainer({
         <div
             {...props}
             className={cn(
-                "scrollbar-thin max-h-[70vh] overflow-y-auto",
+                "scrollbar-thin max-h-[70vh] pb-4 mb-4 overflow-y-auto",
                 props.className
             )}
         />

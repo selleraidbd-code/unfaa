@@ -20,6 +20,7 @@ export const ProductListInProductStep = ({
     return (
         <div className="col-span-5 space-y-4 py-4">
             <h2 className="sub-title">Products</h2>
+
             <div className="space-y-6">
                 <CustomSearch
                     onSearch={onSearch}
@@ -83,7 +84,11 @@ export const ProductListInProductStep = ({
                         </table>
                     </div>
                 ) : (
-                    <CustomErrorOrEmpty description="No products found" />
+                    <CustomErrorOrEmpty
+                        title="No products found"
+                        href="/products/create"
+                        buttonText="Add Products"
+                    />
                 )}
             </div>
         </div>

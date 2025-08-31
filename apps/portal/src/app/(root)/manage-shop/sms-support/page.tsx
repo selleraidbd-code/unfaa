@@ -1,22 +1,16 @@
-import { ArrowBackButton } from "@repo/ui/components/CustomBackButton";
-import { Badge } from "@repo/ui/components/ui/badge";
-import { Button } from "@repo/ui/components/ui/button";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { Badge } from "@workspace/ui/components/badge";
+import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
 import { Check, Plus } from "lucide-react";
 
 const SmsSupport = () => {
     return (
         <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
-            <div className="flex items-center gap-3">
-                <ArrowBackButton
-                    href="/manage-shop"
-                    className="bg-blue-500/10 hover:bg-blue-500/20 border-blue-200 hover:border-blue-300 text-blue-600"
-                />
-                <h1 className="text-xl font-semibold">SMS Support</h1>
-            </div>
+            <HeaderBackButton title="SMS Support" href="/manage-shop" />
 
             {/* Main Content */}
             <Card>

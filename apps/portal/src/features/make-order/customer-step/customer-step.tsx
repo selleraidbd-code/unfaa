@@ -23,12 +23,14 @@ interface CustomerStepProps {
     selectedCustomer: Customer | null;
     setSelectedCustomer: (customer: Customer | null) => void;
     setActiveStep: (step: OrderStepIndicator) => void;
+    shopId: string;
 }
 
 export const CustomerStep = ({
     selectedCustomer,
     setSelectedCustomer,
     setActiveStep,
+    shopId,
 }: CustomerStepProps) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showNewCustomerForm, setShowNewCustomerForm] = useState(false);
@@ -36,6 +38,7 @@ export const CustomerStep = ({
     const { data, isLoading } = useGetCustomersQuery({
         searchTerm: searchTerm ? searchTerm : undefined,
         limit: 100,
+        shopId,
     });
 
     const handleSelectCustomer = (customer: Customer) => {

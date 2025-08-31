@@ -1,14 +1,13 @@
 import { api } from "@/redux/api";
 import {
-    PaginatedResponse,
-    ResponseObject,
     METHOD,
-    TagType,
+    PaginatedResponse,
     QueryParams,
+    ResponseObject,
+    TagType,
 } from "@/redux/type";
 
 import { CreateShop, Shop } from "@/types/shop-type";
-import { ShopTheme } from "@/features/manage-shop/types";
 
 const shopApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -43,20 +42,6 @@ const shopApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Shop],
         }),
-        getShopTheme: builder.query<PaginatedResponse<ShopTheme>, void>({
-            query: () => ({
-                url: `/shop-theme`,
-                method: METHOD.GET,
-            }),
-            providesTags: [TagType.Shop],
-        }),
-        createShopTheme: builder.mutation<void, ShopTheme>({
-            query: (payload) => ({
-                url: `/shop-theme`,
-                method: METHOD.POST,
-                body: payload,
-            }),
-        }),
         deleteShop: builder.mutation<void, string>({
             query: (id) => ({
                 url: `/shop/${id}`,
@@ -70,9 +55,7 @@ const shopApi = api.injectEndpoints({
 export const {
     useCreateShopMutation,
     useGetShopsQuery,
-    useGetShopThemeQuery,
     useGetMyShopQuery,
     useUpdateShopMutation,
     useDeleteShopMutation,
-    useCreateShopThemeMutation,
 } = shopApi;

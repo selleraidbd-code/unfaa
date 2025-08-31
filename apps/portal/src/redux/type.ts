@@ -6,6 +6,7 @@ export type AppDispatch = typeof store.dispatch;
 export enum TagType {
     User = "User",
     Shop = "Shop",
+    ShopTheme = "ShopTheme",
     Product = "Product",
     Category = "Category",
     Brand = "Brand",

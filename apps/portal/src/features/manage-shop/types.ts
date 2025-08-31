@@ -5,9 +5,14 @@ export enum shopThemeType {
 }
 
 export type ShopTheme = {
+    id: string;
     shopId: string;
     shopThemeType: shopThemeType;
     bannerImg: string[];
     categories: string[];
     // shopSection: ShopSection[];
+};
+
+export type updateCoreThemePayload = {
+    bannerImg: string[];
 };

@@ -1,45 +1,84 @@
-import { Button } from "@workspace/ui/components/button";
-import { CustomFormImages } from "@/components/ui/custom-form-images";
 import { ShopTheme } from "@/features/manage-shop/types";
-import { UseFormReturn } from "react-hook-form";
+import { WebCustomizationEmptyMessage } from "@/features/manage-shop/website-customization/web-customization-empty-message";
+import { WebCustomizationHeader } from "@/features/manage-shop/website-customization/web-customization-header";
+import { UploadBannerDialog } from "@/features/manage-shop/website-customization/upload-banner-dialog";
+import { useAlert } from "@/hooks/useAlert";
+import { useUpdateCoreThemeMutation } from "@/redux/api/shop-theme-api";
+import { Button } from "@workspace/ui/components/button";
+import { Trash2 } from "lucide-react";
+import Image from "next/image";
+import { toast } from "sonner";
 
-export const ManageBanner = ({
-  theme,
-  form,
-}: {
-  theme: ShopTheme;
-  form: UseFormReturn<{
-    bannerImg: string[];
-    categories: string[];
-  }>;
-}) => {
-  return (
-    <div className="w-full flex flex-col border-2 border-dashed border-slate-300 rounded-lg p-6">
-      <div className="flex justify-between w-full flex-wrap">
-        <div>
-          <h2 className="text-lg font-semibold">Homepage Banners</h2>
-          <p className="text-sm font-normal text-gray-500 mt-1 max-w-[600px] text-wrap">
-            Select upto 5 items to get a better visual impact on your website
-          </p>
+export const ManageBanner = ({ theme }: { theme: ShopTheme }) => {
+    const bannerImg = theme.bannerImg || [];
+    const { fire } = useAlert();
+
+    const [updateCoreTheme, { isLoading }] = useUpdateCoreThemeMutation();
+
+    const handleDeleteBanner = async (imgUrl: string) => {
+        fire({
+            title: "Delete Banner",
+            text: "Are you sure you want to delete this banner?",
+            onConfirm: async () => {
+                await updateCoreTheme({
+                    id: theme.id,
+                    payload: {
+                        bannerImg: bannerImg.filter((img) => img !== imgUrl),
+                    },
+                })
+                    .unwrap()
+                    .then(() => {
+                        toast.success("Banner deleted successfully");
+                    })
+                    .catch((error) => {
+                        toast.error(
+                            error.data.message || "Something went wrong"
+                        );
+                    });
+            },
+        });
+    };
+
+    return (
+        <div className="w-full flex flex-col border-2 border-dashed border-slate-300 rounded-lg p-6">
+            <WebCustomizationHeader
+                title="Homepage Banners"
+                description="Select upto 5 items to get a better visual impact on your
+                website"
+                button={<UploadBannerDialog bannerImg={bannerImg} />}
+            />
+
+            <br />
+
+            {bannerImg.length === 0 ? (
+                <WebCustomizationEmptyMessage
+                    title="No banners uploaded yet"
+                    description="Upload up to 5 banner images to create an engaging homepage experience for your customers."
+                />
+            ) : (
+                <div className="grid lg:grid-cols-2 gap-5">
+                    {bannerImg.map((img) => (
+                        <div key={img} className="w-full relative rounded-lg">
+                            <Image
+                                src={img}
+                                alt="banner"
+                                className="w-full rounded-lg"
+                                width={800}
+                                height={400}
+                            />
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-3 right-3"
+                                onClick={() => handleDeleteBanner(img)}
+                                disabled={isLoading}
+                            >
+                                <Trash2 />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-        <Button>Upload Banner(0/5)</Button>
-      </div>
-
-      <br />
-
-      {theme.bannerImg.length === 0 ? (
-        <div className="text-center text-sm text-gray-500">
-          ***No items selected****
-        </div>
-      ) : (
-        <CustomFormImages
-          name="bannerImg"
-          control={form.control}
-          label="Banner Image"
-          className="w-full"
-          limit={5}
-        />
-      )}
-    </div>
-  );
+    );
 };

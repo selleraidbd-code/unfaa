@@ -8,7 +8,7 @@ import useGetUser from "@/hooks/useGetUser";
 import {
     useCreateShopThemeMutation,
     useGetShopThemeQuery,
-} from "@/redux/api/shop-api";
+} from "@/redux/api/shop-theme-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
@@ -25,7 +25,13 @@ const formSchema = z.object({
 
 const WebsiteCustomization = () => {
     const user = useGetUser();
-    const { data, isLoading: isLoadingTheme } = useGetShopThemeQuery();
+    const shopId = user?.shop?.id as string;
+    console.log("shopId :>> ", shopId);
+    const { data, isLoading: isLoadingTheme } = useGetShopThemeQuery({
+        shopId,
+    });
+    const theme = data?.data;
+
     const [createShopTheme, { isLoading: isCreating }] =
         useCreateShopThemeMutation();
     console.log("data :>> ", data);
@@ -43,24 +49,22 @@ const WebsiteCustomization = () => {
 
         console.log("data :>> ", data);
 
-        const payload: ShopTheme = {
-            shopId: user?.shop?.id,
-            shopThemeType: shopThemeType.MINIMAL,
-            bannerImg: data.bannerImg,
-            categories: data.categories,
-        };
+        // const payload: ShopTheme = {
+        //     shopId: user?.shop?.id,
+        //     shopThemeType: shopThemeType.MINIMAL,
+        //     bannerImg: data.bannerImg,
+        //     categories: data.categories,
+        // };
 
-        await createShopTheme(payload)
-            .unwrap()
-            .then(() => {
-                toast.success("Shop theme created successfully");
-            })
-            .catch((error) => {
-                toast.error(error.data.message);
-            });
+        // await createShopTheme(payload)
+        //     .unwrap()
+        //     .then(() => {
+        //         toast.success("Shop theme created successfully");
+        //     })
+        //     .catch((error) => {
+        //         toast.error(error.data.message);
+        //     });
     };
-
-    const theme = data?.data[0];
 
     const formData = form.watch();
     const selectedCategoriesCount = formData.categories?.length || 0;
@@ -81,7 +85,7 @@ const WebsiteCustomization = () => {
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                 >
-                    {theme && <ManageBanner theme={theme} form={form} />}
+                    {theme && <ManageBanner theme={theme} />}
 
                     <ManageCategories form={form} />
 

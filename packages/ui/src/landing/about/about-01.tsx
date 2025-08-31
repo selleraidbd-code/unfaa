@@ -1,4 +1,4 @@
-import { ComponentProps } from "@workspace/ui/landing/types.js";
+import { ComponentProps } from "@workspace/ui/landing/types";
 
 export const About01 = ({ data, Image }: ComponentProps) => {
   const ImageComponent = Image || "img";

@@ -1,25 +1,30 @@
-import { Installment } from "@/types/sale-type";
-import { Customer } from "@/app/(root)/sales/create/page";
+import { Customer } from "@/types/customer-type";
 
 export const handlePrintReceipt = (
-    orderNumber: string,
-    companyInfo: { name: string; address: string; phone: string; email: string; website: string; taxId: string },
-    selectedCustomer: Customer | null,
-    orderItems: { name: string; price: number; quantity: number }[],
-    calculateSubtotal: () => number,
-    calculateTax: () => number,
-    calculateTotal: () => number,
-    paymentMethod: string,
-    cardLastDigits: string,
-    isPaid: boolean,
-    partialPaymentAmount: number,
-    installmentPlan: Installment[],
-    deliveryAddress: string,
-    discountAmount: number
+  orderNumber: string,
+  companyInfo: {
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    website: string;
+    taxId: string;
+  },
+  selectedCustomer: Customer | null,
+  orderItems: { name: string; price: number; quantity: number }[],
+  calculateSubtotal: () => number,
+  calculateTax: () => number,
+  calculateTotal: () => number,
+  paymentMethod: string,
+  cardLastDigits: string,
+  isPaid: boolean,
+  partialPaymentAmount: number,
+  deliveryAddress: string,
+  discountAmount: number
 ) => {
-    const printWindow = window.open("", "_blank");
+  const printWindow = window.open("", "_blank");
 
-    printWindow?.document.write(`
+  printWindow?.document.write(`
       <html>
         <head>
           <title>Order Receipt - ${orderNumber}</title>
@@ -60,7 +65,7 @@ export const handlePrintReceipt = (
               <h3>Customer Information</h3>
               <p><strong>Name:</strong> ${selectedCustomer?.name}</p>
               <p><strong>Email:</strong> ${selectedCustomer?.email}</p>
-              <p><strong>Phone:</strong> ${selectedCustomer?.phone}</p>
+              <p><strong>Phone:</strong> ${selectedCustomer?.phoneNumber}</p>
               <p><strong>Address:</strong> ${deliveryAddress || selectedCustomer?.address}</p>
             </div>
 
@@ -76,11 +81,11 @@ export const handlePrintReceipt = (
               </thead>
               <tbody>
                 ${orderItems
-                    .map((item) => {
-                        const itemTotal = item.price * item.quantity;
-                        const itemSubtotal = itemTotal;
+                  .map((item) => {
+                    const itemTotal = item.price * item.quantity;
+                    const itemSubtotal = itemTotal;
 
-                        return `
+                    return `
                     <tr>
                       <td>${item.name}</td>
                       <td>$${item.price}</td>
@@ -88,8 +93,8 @@ export const handlePrintReceipt = (
                       <td>$${itemSubtotal.toFixed(2)}</td>
                     </tr>
                   `;
-                    })
-                    .join("")}
+                  })
+                  .join("")}
               </tbody>
             </table>
 
@@ -104,14 +109,14 @@ export const handlePrintReceipt = (
                   <td>$${calculateTax().toFixed(2)}</td>
                 </tr>
                 ${
-                    discountAmount > 0
-                        ? `
+                  discountAmount > 0
+                    ? `
                   <tr>
                     <td><strong>Discount:</strong></td>
                     <td>-$${discountAmount.toFixed(2)}</td>
                   </tr>
                 `
-                        : ""
+                    : ""
                 }
                 <tr>
                   <td><strong>Total:</strong></td>
@@ -121,8 +126,8 @@ export const handlePrintReceipt = (
             </div>
 
             ${
-                paymentMethod === "installment"
-                    ? `
+              paymentMethod === "installment"
+                ? `
               <h3>Installment Plan</h3>
               <table class="items-table">
                 <thead>
@@ -134,22 +139,11 @@ export const handlePrintReceipt = (
                   </tr>
                 </thead>
                 <tbody>
-                  ${installmentPlan
-                      .map(
-                          (installment) => `
-                    <tr>
-                      <td>${installment.id}</td>
-                      <td>$${installment.amount.toFixed(2)}</td>
-                      <td>${new Date(installment.dueDate).toLocaleDateString()}</td>
-                      <td>${installment.status.charAt(0).toUpperCase() + installment.status.slice(1)}</td>
-                    </tr>
-                  `
-                      )
-                      .join("")}
+                
                 </tbody>
               </table>
             `
-                    : ""
+                : ""
             }
 
             <div class="footer">
@@ -161,33 +155,38 @@ export const handlePrintReceipt = (
       </html>
     `);
 
-    printWindow?.document.close();
-    printWindow?.focus();
-    setTimeout(() => {
-        printWindow?.print();
-        printWindow?.close();
-    }, 250);
+  printWindow?.document.close();
+  printWindow?.focus();
+  setTimeout(() => {
+    printWindow?.print();
+    printWindow?.close();
+  }, 250);
 };
 
 export const handleDownloadInvoice = (
-    orderNumber: string,
-    companyInfo: { name: string; address: string; phone: string; email: string; website: string; taxId: string },
-    selectedCustomer: Customer | null,
-    orderItems: { name: string; price: number; quantity: number }[],
-    calculateSubtotal: () => number,
-    calculateTax: () => number,
-    calculateTotal: () => number,
-    paymentMethod: string,
-    cardLastDigits: string,
-    isPaid: boolean,
-    partialPaymentAmount: number,
-    installmentPlan: Installment[],
-    deliveryAddress: string,
-    discountAmount: number
+  orderNumber: string,
+  companyInfo: {
+    name: string;
+    address: string;
+    phone: string;
+    email: string;
+    website: string;
+    taxId: string;
+  },
+  selectedCustomer: Customer | null,
+  orderItems: { name: string; price: number; quantity: number }[],
+  calculateSubtotal: () => number,
+  calculateTax: () => number,
+  calculateTotal: () => number,
+  paymentMethod: string,
+  cardLastDigits: string,
+  isPaid: boolean,
+  deliveryAddress: string,
+  discountAmount: number
 ) => {
-    const printWindow = window.open("", "_blank");
+  const printWindow = window.open("", "_blank");
 
-    printWindow?.document.write(`
+  printWindow?.document.write(`
       <html>
         <head>
           <title>Invoice - ${orderNumber}</title>
@@ -247,7 +246,6 @@ export const handleDownloadInvoice = (
                 <h3>To:</h3>
                 <p><strong>${selectedCustomer?.name}</strong></p>
                 <p>${selectedCustomer?.email}</p>
-                <p>${selectedCustomer?.phone}</p>
                 <p>${deliveryAddress || selectedCustomer?.address}</p>
               </div>
             </div>
@@ -263,11 +261,11 @@ export const handleDownloadInvoice = (
               </thead>
               <tbody>
                 ${orderItems
-                    .map((item) => {
-                        const itemTotal = item.price * item.quantity;
-                        const itemSubtotal = itemTotal;
+                  .map((item) => {
+                    const itemTotal = item.price * item.quantity;
+                    const itemSubtotal = itemTotal;
 
-                        return `
+                    return `
                     <tr>
                       <td>${item.name}</td>
                       <td>$${item.price}</td>
@@ -275,8 +273,8 @@ export const handleDownloadInvoice = (
                       <td>$${itemSubtotal.toFixed(2)}</td>
                     </tr>
                   `;
-                    })
-                    .join("")}
+                  })
+                  .join("")}
               </tbody>
             </table>
 
@@ -291,14 +289,14 @@ export const handleDownloadInvoice = (
                   <td>$${calculateTax().toFixed(2)}</td>
                 </tr>
                 ${
-                    discountAmount > 0
-                        ? `
+                  discountAmount > 0
+                    ? `
                   <tr>
                     <td><strong>Discount:</strong></td>
                     <td>-$${discountAmount.toFixed(2)}</td>
                   </tr>
                 `
-                        : ""
+                    : ""
                 }
                 <tr>
                   <td><strong>Total:</strong></td>
@@ -308,8 +306,8 @@ export const handleDownloadInvoice = (
             </div>
 
             ${
-                paymentMethod === "installment"
-                    ? `
+              paymentMethod === "installment"
+                ? `
               <div class="payment-info">
                 <h3>Installment Plan</h3>
                 <table class="items-table">
@@ -322,30 +320,18 @@ export const handleDownloadInvoice = (
                     </tr>
                   </thead>
                   <tbody>
-                    ${installmentPlan
-                        .map(
-                            (installment) => `
-                      <tr>
-                        <td>${installment.id}</td>
-                        <td>$${installment.amount.toFixed(2)}</td>
-                        <td>${new Date(installment.dueDate).toLocaleDateString()}</td>
-                        <td>${installment.status.charAt(0).toUpperCase() + installment.status.slice(1)}</td>
-                      </tr>
-                    `
-                        )
-                        .join("")}
+                   
                   </tbody>
                 </table>
               </div>
             `
-                    : ""
+                : ""
             }
 
             <div class="payment-info">
               <h3>Payment Information</h3>
               <p><strong>Payment Method:</strong> ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}</p>
               ${paymentMethod === "card" ? `<p><strong>Card:</strong> **** **** **** ${cardLastDigits}</p>` : ""}
-              ${!isPaid && paymentMethod !== "installment" ? `<p><strong>Payment Status:</strong> Partially Paid ($${partialPaymentAmount})</p>` : ""}
               ${paymentMethod === "installment" ? `<p><strong>Payment Status:</strong> First installment paid, remaining installments due as scheduled</p>` : ""}
             </div>
 
@@ -359,10 +345,10 @@ export const handleDownloadInvoice = (
       </html>
     `);
 
-    printWindow?.document.close();
-    printWindow?.focus();
-    setTimeout(() => {
-        printWindow?.print();
-        printWindow?.close();
-    }, 250);
+  printWindow?.document.close();
+  printWindow?.focus();
+  setTimeout(() => {
+    printWindow?.print();
+    printWindow?.close();
+  }, 250);
 };

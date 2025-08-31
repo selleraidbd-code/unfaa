@@ -1,9 +1,9 @@
-import { Banner01 } from "./banner-01.js";
-import { Banner02 } from "./banner-02.js";
-import { Banner03 } from "./banner-03.js";
-import { Banner04 } from "./banner-04.js";
-import { Banner05 } from "./banner-05.js";
-import { Banner06 } from "./banner-06.js";
+import { Banner01 } from "./banner-01";
+import { Banner02 } from "./banner-02";
+import { Banner03 } from "./banner-03";
+import { Banner04 } from "./banner-04";
+import { Banner05 } from "./banner-05";
+import { Banner06 } from "./banner-06";
 import {
   banner01Data,
   banner02Data,
@@ -11,7 +11,7 @@ import {
   banner04Data,
   banner05Data,
   banner06Data,
-} from "./data.js";
+} from "./data";
 
 export {
   Banner01,

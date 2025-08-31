@@ -1,23 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { Component } from "@repo/ui/type/index";
+import { Component } from "@workspace/ui/landing/types";
 
 export interface ComponentState {
-    components: Component[] | [];
+  components: Component[] | [];
 }
 
 const initialState: ComponentState = {
-    components: [],
+  components: [],
 };
 
 const componentsSlice = createSlice({
-    name: "components",
-    initialState,
-    reducers: {
-        setComponents: (state, action: PayloadAction<Component[]>) => {
-            state.components = action.payload;
-        },
+  name: "components",
+  initialState,
+  reducers: {
+    setComponents: (state, action: PayloadAction<Component[]>) => {
+      state.components = action.payload;
     },
+  },
 });
 
 export const { setComponents } = componentsSlice.actions;

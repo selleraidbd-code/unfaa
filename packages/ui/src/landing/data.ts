@@ -1,4 +1,4 @@
-import { About01, about01Data } from "./about/index.js";
+import { About01, about01Data } from "./about/index";
 import {
   Banner01,
   banner01Data,
@@ -12,9 +12,9 @@ import {
   banner05Data,
   Banner06,
   banner06Data,
-} from "./banner/index.js";
+} from "./banner/index";
 
-import { EComponentType } from "./types.js";
+import { EComponentType } from "./types";
 import {
   Features01,
   features01Data,
@@ -28,9 +28,9 @@ import {
   features05Data,
   Features06,
   features06Data,
-} from "./features/index.js";
-import { Footer01, footer01Data } from "./footer/index.js";
-import { Testimonial01, testimonial01Data } from "./testimonials/index.js";
+} from "./features/index";
+import { Footer01, footer01Data } from "./footer/index";
+import { Testimonial01, testimonial01Data } from "./testimonials/index";
 
 export const data = [
   {

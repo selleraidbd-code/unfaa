@@ -3,109 +3,93 @@
 import { CustomButton } from "@/components/ui/custom-button";
 import { TemplateCard } from "@/features/templates/template-card";
 import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";
-import { useGetSiteCategoriesQuery } from "@/redux/api/site-category-api";
 import { SiteType } from "@/types/site-type";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { Plus, SlidersHorizontal } from "lucide-react";
+import { shopCategories } from "@/data/shop-data";
 
 const Templates = () => {
-    const { data: categoryData } = useGetSiteCategoriesQuery({
-        limit: 200,
-    });
+  const { data } = useGetLandingPagesQuery({
+    siteType: SiteType.PORTFOLIO,
+  });
 
-    const { data } = useGetLandingPagesQuery({
-        siteType: SiteType.PORTFOLIO,
-    });
+  const templates = data?.data || [];
 
-    const templates = data?.data || [];
+  console.log(data);
 
-    console.log(data);
-
-    return (
+  return (
+    <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="title">Templates</h1>
-                    <p className="text-muted-foreground mt-1">
-                        Browse our collection of professionally designed
-                        templates
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <CustomSearch placeholder="Search templates..." />
-
-                    <CustomButton href="/templates/create">
-                        <Plus />
-                        Create Template
-                    </CustomButton>
-                </div>
-            </div>
-
-            <div className="mb-8">
-                <Tabs defaultValue="all">
-                    <div className="flex items-center justify-between">
-                        <TabsList>
-                            <TabsTrigger value="all">All</TabsTrigger>
-                            {categoryData?.data.map((category) => (
-                                <TabsTrigger
-                                    key={category.id}
-                                    value={category.id}
-                                >
-                                    {category.name}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-
-                        <CustomButton variant="outline" size="sm">
-                            <SlidersHorizontal className="h-4 w-4 mr-2" />
-                            Filters
-                        </CustomButton>
-                    </div>
-
-                    <TabsContent value="all" className="mt-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {templates.map((template) => (
-                                <TemplateCard
-                                    key={template.id}
-                                    template={template}
-                                />
-                            ))}
-                        </div>
-                    </TabsContent>
-
-                    {categoryData?.data.map((category) => (
-                        <TabsContent
-                            key={category.id}
-                            value={category.id}
-                            className="mt-6"
-                        >
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {templates
-                                    .filter(
-                                        (template) =>
-                                            template.siteCategoryId ===
-                                            category.id
-                                    )
-                                    .map((template) => (
-                                        <TemplateCard
-                                            key={template.id}
-                                            template={template}
-                                        />
-                                    ))}
-                            </div>
-                        </TabsContent>
-                    ))}
-                </Tabs>
-            </div>
+          <h1 className="title">Templates</h1>
+          <p className="text-muted-foreground mt-1">
+            Browse our collection of professionally designed templates
+          </p>
         </div>
-    );
+
+        <div className="flex items-center gap-4">
+          <CustomSearch placeholder="Search templates..." />
+
+          <CustomButton href="/templates/create">
+            <Plus />
+            Create Template
+          </CustomButton>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <Tabs defaultValue="all">
+          <div className="flex items-center justify-between">
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              {shopCategories.map((category) => (
+                <TabsTrigger key={category.value} value={category.value}>
+                  {category.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            <CustomButton variant="outline" size="sm">
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              Filters
+            </CustomButton>
+          </div>
+
+          <TabsContent value="all" className="mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {templates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </TabsContent>
+
+          {shopCategories.map((category) => (
+            <TabsContent
+              key={category.value}
+              value={category.value}
+              className="mt-6"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {templates
+                  .filter(
+                    (template) => template.siteCategoryId === category.value
+                  )
+                  .map((template) => (
+                    <TemplateCard key={template.id} template={template} />
+                  ))}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+    </div>
+  );
 };
 
 export default Templates;

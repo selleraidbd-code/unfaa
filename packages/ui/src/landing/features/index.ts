@@ -1,9 +1,9 @@
-import { Features01 } from "./features-01.js";
-import { Features02 } from "./features-02.js";
-import { Features03 } from "./features-03.js";
-import { Features04 } from "./features-04.js";
-import { Features05 } from "./features-05.js";
-import { Features06 } from "./features-06.js";
+import { Features01 } from "./features-01";
+import { Features02 } from "./features-02";
+import { Features03 } from "./features-03";
+import { Features04 } from "./features-04";
+import { Features05 } from "./features-05";
+import { Features06 } from "./features-06";
 import {
   features01Data,
   features02Data,
@@ -11,7 +11,7 @@ import {
   features04Data,
   features05Data,
   features06Data,
-} from "./data.js";
+} from "./data";
 
 export {
   Features01,

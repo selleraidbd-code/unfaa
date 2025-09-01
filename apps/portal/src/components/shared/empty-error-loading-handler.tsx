@@ -29,6 +29,22 @@ export const EmptyErrorLoadingHandler = ({
     errorDescription,
     loadingComponent,
 }: TEmptyErrorLoadingHandler) => {
+    if (isLoading) {
+        if (loadingComponent) {
+            return loadingComponent;
+        }
+        return (
+            <div
+                className={cn(
+                    "flex items-center justify-center py-20",
+                    loadingClassName
+                )}
+            >
+                <Loader className="size-7 animate-spin text-primary" />
+            </div>
+        );
+    }
+
     if (isError) {
         return (
             <CustomErrorOrEmpty
@@ -38,21 +54,7 @@ export const EmptyErrorLoadingHandler = ({
             />
         );
     }
-    if (isLoading) {
-        if (loadingComponent) {
-            return loadingComponent;
-        }
-        return (
-            <div
-                className={cn(
-                    "flex items-center justify-center",
-                    loadingClassName
-                )}
-            >
-                <Loader className="size-7 animate-spin text-primary" />
-            </div>
-        );
-    }
+
     if (isEmpty) {
         return (
             <CustomErrorOrEmpty

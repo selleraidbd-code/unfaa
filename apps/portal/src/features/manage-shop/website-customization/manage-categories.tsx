@@ -1,9 +1,9 @@
 "use client";
 
 import { useGetCategoriesQuery } from "@/redux/api/category-api";
+import { ShopTheme, ShopThemeCategory } from "@/types/shop-type";
 import { Category } from "@/types/category-type";
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent } from "@workspace/ui/components/card";
 import {
   Dialog,
   DialogHeader,
@@ -13,42 +13,25 @@ import {
   DialogDescription,
 } from "@workspace/ui/components/dialog";
 import { Loader2, X } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import Image from "next/image";
+import { useUpdateShopThemeCategoryMutation } from "@/redux/api/shop-theme-api";
+import { toast } from "sonner";
+import { useAlert } from "@/hooks/useAlert";
 
 interface ManageCategoriesProps {
-  form: UseFormReturn<{
-    bannerImg: string[];
-    categories: string[];
-  }>;
+  theme: ShopTheme;
 }
 
-export const ManageCategories = ({ form }: ManageCategoriesProps) => {
+export const ManageCategories = ({ theme }: ManageCategoriesProps) => {
+  const categories = theme.categories || [];
+  const categoryIds = categories.map((category) => category.category.id);
+  const { fire } = useAlert();
+
+  const [updateShopThemeCategory, { isLoading: isUpdating }] =
+    useUpdateShopThemeCategoryMutation();
+
+  console.log("categories :>> ", categories);
   const { data: categoriesData, isLoading, error } = useGetCategoriesQuery({});
-
-  const selectedCategories = form.watch("categories") || [];
-
-  const handleSelectCategory = (categoryId: string) => {
-    if (!selectedCategories.includes(categoryId)) {
-      form.setValue("categories", [...selectedCategories, categoryId]);
-    }
-  };
-
-  const handleDeselectCategory = (categoryId: string) => {
-    const updatedCategories = selectedCategories.filter(
-      (id) => id !== categoryId
-    );
-    form.setValue("categories", updatedCategories);
-  };
-
-  const getSelectedCategoryNames = () => {
-    if (!categoriesData?.data) return [];
-    return selectedCategories
-      .map((id) => {
-        const category = categoriesData.data.find((cat) => cat.id === id);
-        return category?.name || "";
-      })
-      .filter(Boolean);
-  };
 
   if (isLoading) {
     return (
@@ -69,10 +52,6 @@ export const ManageCategories = ({ form }: ManageCategoriesProps) => {
     );
   }
 
-  const categories = categoriesData?.data || [];
-  const selectedCount = selectedCategories.length;
-  const minRequired = 8;
-
   if (categories.length === 0) {
     return (
       <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
@@ -81,61 +60,52 @@ export const ManageCategories = ({ form }: ManageCategoriesProps) => {
     );
   }
 
+  const handleRemoveCategory = (categoryId: string) => {
+    fire({
+      title: "Remove Category",
+      text: "Are you sure you want to remove this category?",
+      onConfirm: async () => {
+        await updateShopThemeCategory({
+          shopThemeId: theme.id,
+          categoryIds: categoryIds.filter(
+            (categoryId) => categoryId !== categoryId
+          ),
+        })
+          .unwrap()
+          .then(() => {
+            toast.success("Category removed successfully");
+          })
+          .catch((error) => {
+            toast.error(
+              error.data.message ||
+                "Something went wrong while removing category"
+            );
+          });
+      },
+    });
+  };
+
   return (
     <div className="w-full flex flex-col border-2 border-dashed border-slate-300 rounded-lg p-6">
       <div className="flex justify-between w-full flex-wrap">
         <div>
           <h2 className="text-lg font-semibold">Add Categories</h2>
           <p className="text-sm font-normal text-gray-500 mt-1 max-w-[600px] text-wrap">
-            Select at least {minRequired} categories (more is better) for better
-            visual impact.
+            Select at least 8 categories (more is better) for better visual
+            impact.
           </p>
         </div>
         <CategoryDialog />
       </div>
 
-      <div className="grid mt-6 grid-cols-5 gap-4">
-        {categories.map((category: Category) => {
-          const isSelected = selectedCategories.includes(category.id);
-
-          return (
-            <Card
-              key={category.id}
-              className={`cursor-pointer transition-all hover:shadow-md ${
-                isSelected ? "ring-2 ring-purple-500" : ""
-              }`}
-              onClick={() => handleSelectCategory(category.id)}
-            >
-              <CardContent className="p-4 relative">
-                {isSelected && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="absolute top-2 right-2 h-6 w-6 p-0 rounded-full bg-purple-600 text-white hover:bg-purple-700"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeselectCategory(category.id);
-                    }}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
-
-                <div className="text-center space-y-2">
-                  <div className="w-12 h-12 mx-auto bg-gray-100 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-500 text-xs">📷</span>
-                  </div>
-                  <div className="text-sm font-medium text-gray-900">
-                    {category.name}
-                  </div>
-                  <div className="text-lg font-semibold text-gray-900">
-                    {category.name}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      <div className="flex flex-wrap mt-6 gap-5">
+        {categories.map((category: ShopThemeCategory) => (
+          <CategoryCard
+            key={category.id}
+            category={category.category}
+            onRemove={handleRemoveCategory}
+          />
+        ))}
       </div>
     </div>
   );
@@ -166,5 +136,35 @@ const CategoryDialog = () => {
         </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const CategoryCard = ({
+  category,
+  onRemove,
+}: {
+  category: Category;
+  onRemove?: (categoryId: string) => void;
+}) => {
+  return (
+    <div className="border relative w-40 space-y-2 text-center rounded-md p-4">
+      {onRemove && (
+        <button
+          className="absolute -top-2.5 -right-2.5 bg-primary text-primary-foreground rounded-full p-1"
+          onClick={() => onRemove?.(category.id)}
+        >
+          <X className="size-5" />
+        </button>
+      )}
+
+      <Image
+        src={category.thumbnailImg || "/placeholder.jpg"}
+        alt={category.name}
+        width={160}
+        height={160}
+        className="object-cover rounded-md size-32"
+      />
+      <p className="font-medium">{category.name}</p>
+    </div>
   );
 };

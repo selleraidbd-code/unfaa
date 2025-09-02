@@ -54,6 +54,17 @@ const shopApi = api.injectEndpoints({
       }),
       invalidatesTags: [TagType.ShopTheme],
     }),
+    updateShopThemeSectionProducts: builder.mutation<
+      void,
+      { shopThemeId: string; shopSectionId: string; productIds: string[] }
+    >({
+      query: (data) => ({
+        url: `/shop-theme/shop-section/change-shop-section-products`,
+        method: METHOD.PATCH,
+        body: data,
+      }),
+      invalidatesTags: [TagType.ShopTheme],
+    }),
   }),
 });
 
@@ -63,4 +74,5 @@ export const {
   useCreateShopThemeMutation,
   useUpdateCoreThemeMutation,
   useUpdateShopThemeCategoryMutation,
+  useUpdateShopThemeSectionProductsMutation,
 } = shopApi;

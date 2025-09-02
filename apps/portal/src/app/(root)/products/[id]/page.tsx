@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import {
@@ -10,8 +10,8 @@ import {
   useUpdateProductMutation,
   useUpdateProductVariantMutation,
 } from "@/redux/api/product-api";
-import { ChevronLeft, PlusCircle, Trash2, Edit, Save, X } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { PlusCircle, Trash2, Edit, Save, X } from "lucide-react";
+import { useForm, UseFormReturn } from "react-hook-form";
 
 import { Editor } from "@/components/editor";
 import { productSchema } from "@/features/products/product-schema";
@@ -20,7 +20,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
-import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -42,15 +41,20 @@ import {
 import { toast } from "sonner";
 import { ProductFormType } from "../create/page";
 import { CustomButton } from "@/components/ui/custom-button";
+import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
+import { cn } from "@workspace/ui/lib/utils";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
 
 const EditProduct = () => {
   const router = useRouter();
   const { id } = useParams();
   const user = useGetUser();
 
-  const { data: product } = useGetProductByIdQuery({
-    id: id as string,
-  });
+  const { data: product, isLoading: isLoadingProduct } = useGetProductByIdQuery(
+    {
+      id: id as string,
+    }
+  );
 
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
 
@@ -85,30 +89,30 @@ const EditProduct = () => {
     label: category.name,
   }));
 
-  useEffect(() => {
-    if (product) {
-      form.reset({
-        name: product.data.name,
-        banglaName: product.data.banglaName,
-        price: product.data.price || 0,
-        discountPrice: product.data.discountPrice || 0,
-        photoURL: product.data.photoURL,
-        keywords: product.data.keywords,
-        stock: product.data.stock,
-        categoryIds: [product.data.categoryId],
-        description: product.data.description,
-        fullDescription: product.data.fullDescription,
-        // productVariant: product.data.productVariant.map((variant) => ({
-        //     title: variant.name,
-        //     options: variant.options?.map((option) => ({
-        //         attribute: option.attribute,
-        //         extraPrice: option.extraPrice,
-        //         imageURL: option.imageURL,
-        //     })),
-        // })),
-      });
-    }
-  }, [form, product]);
+  // useEffect(() => {
+  //   if (product) {
+  //     form.reset({
+  //       name: product.data.name,
+  //       banglaName: product.data.banglaName,
+  //       price: product.data.price || 0,
+  //       discountPrice: product.data.discountPrice || 0,
+  //       photoURL: product.data.photoURL,
+  //       keywords: product.data.keywords,
+  //       stock: product.data.stock,
+  //       categoryIds: [product.data.categoryId],
+  //       description: product.data.description,
+  //       fullDescription: product.data.fullDescription,
+  // productVariant: product.data.productVariant.map((variant) => ({
+  //     title: variant.name,
+  //     options: variant.options?.map((option) => ({
+  //         attribute: option.attribute,
+  //         extraPrice: option.extraPrice,
+  //         imageURL: option.imageURL,
+  //     })),
+  // })),
+  //     });
+  //   }
+  // }, [form, product]);
 
   const [editingVariants, setEditingVariants] = useState<Set<number>>(
     new Set()
@@ -125,19 +129,19 @@ const EditProduct = () => {
   >([]);
 
   // Initialize variants from product data
-  useEffect(() => {
-    if (product?.data?.productVariant) {
-      setVariants(
-        product.data.productVariant.map((variant) => ({
-          id: variant.id,
-          name: variant.name,
-          price: variant.price,
-          discountPrice: variant.discountPrice,
-          productId: product.data.id,
-        }))
-      );
-    }
-  }, [product]);
+  // useEffect(() => {
+  //   if (product?.data?.productVariant) {
+  //     setVariants(
+  //       product.data.productVariant.map((variant) => ({
+  //         id: variant.id,
+  //         name: variant.name,
+  //         price: variant.price,
+  //         discountPrice: variant.discountPrice,
+  //         productId: product.data.id,
+  //       }))
+  //     );
+  //   }
+  // }, [product]);
 
   const handleAddVariant = () => {
     setVariants((prev) => [
@@ -258,41 +262,24 @@ const EditProduct = () => {
     //     });
   };
 
+  if (isLoadingProduct) {
+    return <CustomLoading />;
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="grid gap-4">
-          <div className="flex items-center gap-4">
-            <CustomButton
-              href="/products"
-              variant="outline"
-              size="icon"
-              className="h-7 w-7"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="sr-only">Back</span>
-            </CustomButton>
-            <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-              Back to Products
-            </h1>
-            <Badge variant="outline" className="ml-auto sm:ml-0">
-              In stock
-            </Badge>
-            <div className="hidden items-center gap-2 md:ml-auto md:flex">
-              <CustomButton href="/products" variant="outline" size="sm">
-                Discard
-              </CustomButton>
-              <CustomButton
-                disabled={isUpdating}
-                isLoading={isUpdating}
-                type="submit"
-                size="sm"
-              >
-                Save Product
-              </CustomButton>
-            </div>
-          </div>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <div className="flex items-center gap-4">
+          <HeaderBackButton title="Back to Products" href="/products" />
 
+          <DiscardAndSaveButton
+            form={form}
+            isUpdating={isUpdating}
+            className="hidden md:ml-auto md:flex"
+          />
+        </div>
+
+        <div className="grid gap-4">
           <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
             <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
               <Card>
@@ -583,9 +570,44 @@ const EditProduct = () => {
             </CustomButton>
           </div>
         </div>
+
+        <DiscardAndSaveButton
+          form={form}
+          isUpdating={isUpdating}
+          className="flex border-t justify-end p-4"
+        />
       </form>
     </Form>
   );
 };
 
 export default EditProduct;
+
+const DiscardAndSaveButton = ({
+  form,
+  isUpdating,
+  className,
+}: {
+  form: UseFormReturn<ProductFormType>;
+  isUpdating: boolean;
+  className?: string;
+}) => {
+  return (
+    <div className={cn("items-center gap-2", className)}>
+      <CustomButton
+        href="/products"
+        variant="outline"
+        type="button"
+        disabled={form.formState.isSubmitting || isUpdating}
+      >
+        Discard
+      </CustomButton>
+      <CustomButton
+        isLoading={form.formState.isSubmitting || isUpdating}
+        type="submit"
+      >
+        Save Product
+      </CustomButton>
+    </div>
+  );
+};

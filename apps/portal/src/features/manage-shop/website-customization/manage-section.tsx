@@ -109,7 +109,7 @@ export const SectionProductCard = ({
         </button>
       )}
       <Image
-        src={product.photoURL || "/placeholder.jpg"}
+        src={"/placeholder.jpg"}
         alt={product.name}
         width={300}
         height={300}

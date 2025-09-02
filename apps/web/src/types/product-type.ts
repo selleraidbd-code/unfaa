@@ -1,9 +1,24 @@
-export interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  originalPrice: number;
-  discount: number;
-  image: string;
-}
+export type Product = {
+    id: string;
+    name: string;
+    banglaName: string;
+    slug: string;
+    description: string;
+    fullDescription: string;
+    sku: string;
+    price: number;
+    discountPrice: number;
+    unitName: string;
+    warranty: string;
+    photoURL: string;
+    images: string[];
+    videoLink: string | null;
+    activeStatus: "active" | "inactive";
+    keywords: string;
+    stock: number;
+    createdAt: string;
+    updatedAt: string;
+    shopId: string;
+    deliveryId: string;
+    brandId: string;
+};

@@ -1,24 +1,33 @@
+import { Category } from "@/types/shop-type";
+
 export type Product = {
-    id: string;
-    name: string;
-    banglaName: string;
-    slug: string;
-    description: string;
-    fullDescription: string;
-    sku: string;
-    price: number;
-    discountPrice: number;
-    unitName: string;
-    warranty: string;
-    photoURL: string;
-    images: string[];
-    videoLink: string | null;
-    activeStatus: "active" | "inactive";
-    keywords: string;
-    stock: number;
-    createdAt: string;
-    updatedAt: string;
-    shopId: string;
-    deliveryId: string;
-    brandId: string;
+  id: string;
+  name: string;
+  banglaName: string;
+  slug: string;
+  description: string;
+  fullDescription: string;
+  sku: string;
+  categories: CategoryTheme[];
+  price: number;
+  discountPrice: number;
+  unitName: string;
+  warranty: string;
+  photoURL: string;
+  images: string[];
+  videoLink: string | null;
+  activeStatus: "active" | "inactive";
+  keywords: string;
+  stock: number;
+  createdAt: string;
+  updatedAt: string;
+  shopId: string;
+  deliveryId: string;
+  brandId: string;
+};
+
+export type CategoryTheme = {
+  categoryId: string;
+  productId: string;
+  category: Category;
 };

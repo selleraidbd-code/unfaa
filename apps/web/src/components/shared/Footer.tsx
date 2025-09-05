@@ -14,7 +14,7 @@ import Link from "next/link";
 
 export const Footer = () => {
   return (
-    <footer className="relative bg-primary pt-12 pb-8 overflow-hidden">
+    <footer className="relative bg-[#7922E6] pt-12 pb-8 overflow-hidden">
       {/* Background patterns */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-10"></div>
@@ -25,15 +25,15 @@ export const Footer = () => {
       <div className="container relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
           <div className="group">
-            <div className="flex items-center mb-8">
+            <div className="flex items-center text-white mb-8">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
                 <Brain className="h-6 w-6" />
               </div>
-              <span className="ml-3 text-xl font-bold tracking-tight bg-gradient-to-r from-black via-gray-800 to-gray-600 bg-clip-text text-transparent">
+              <span className="ml-3 text-xl font-bold tracking-tight text-white">
                 Chillbion
               </span>
             </div>
-            <p className="text-gray-600 leading-relaxed mb-8">
+            <p className="leading-relaxed text-white mb-8">
               Helping startups transform ideas into reality with cutting-edge
               technology solutions.
             </p>
@@ -56,8 +56,8 @@ export const Footer = () => {
             </div>
           </div>
 
-          <div>
-            <h4 className="text-lg font-bold tracking-tight mb-6 bg-gradient-to-r from-black via-gray-800 to-gray-600 bg-clip-text text-transparent">
+          <div className="text-white">
+            <h4 className="text-lg font-bold tracking-tight mb-6 text-white bg-clip-text ">
               Services
             </h4>
             <ul className="space-y-4">
@@ -71,7 +71,7 @@ export const Footer = () => {
                 <li key={idx}>
                   <a
                     href="#"
-                    className="text-gray-600 hover:text-black transition-colors duration-300 flex items-center group"
+                    className=" hover:text-black transition-colors duration-300 flex items-center group"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     {service}
@@ -81,8 +81,8 @@ export const Footer = () => {
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-lg font-bold tracking-tight mb-6 bg-gradient-to-r from-black via-gray-800 to-gray-600 bg-clip-text text-transparent">
+          <div className="text-white">
+            <h4 className="text-lg font-bold tracking-tight mb-6 text-white bg-clip-text ">
               Company
             </h4>
             <ul className="space-y-4">
@@ -91,7 +91,7 @@ export const Footer = () => {
                   <li key={idx}>
                     <a
                       href="#"
-                      className="text-gray-600 hover:text-black transition-colors duration-300 flex items-center group"
+                      className=" hover:text-black transition-colors duration-300 flex items-center group"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                       {item}
@@ -103,29 +103,29 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-lg font-bold tracking-tight mb-6 bg-gradient-to-r from-black via-gray-800 to-gray-600 bg-clip-text text-transparent">
+            <h4 className="text-lg font-bold tracking-tight mb-6 text-white bg-clip-text">
               Contact
             </h4>
             <ul className="space-y-4">
-              <li className="text-gray-600 flex items-center">
-                <MapPin className="w-5 h-5 mr-2 text-gray-400" />
+              <li className="text-white flex items-center">
+                <MapPin className="w-5 h-5 mr-2 " />
                 Dhaka, Bangladesh
               </li>
               <li>
                 <a
                   href="mailto:contact@chillbion.com"
-                  className="text-gray-600 hover:text-black transition-colors duration-300 flex items-center group"
+                  className="text-white hover:text-black transition-colors duration-300 flex items-center group"
                 >
-                  <Mail className="w-5 h-5 mr-2 text-gray-400" />
+                  <Mail className="w-5 h-5 mr-2 " />
                   contact@chillbion.com
                 </a>
               </li>
               <li>
                 <a
                   href="tel:+18001234567"
-                  className="text-gray-600 hover:text-black transition-colors duration-300 flex items-center group"
+                  className="text-white hover:text-black transition-colors duration-300 flex items-center group"
                 >
-                  <Phone className="w-5 h-5 mr-2 text-gray-400" />
+                  <Phone className="w-5 h-5 mr-2 " />
                   +1 (800) 123-4567
                 </a>
               </li>
@@ -133,7 +133,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-24 pt-8 border-t text-gray-300  text-sm border-black/10 flex justify-between items-center">
+        <div className="mt-6 pt-4 border-t text-gray-300  text-sm border-gray-300 flex justify-between items-center">
           <p className="font-medium">
             © {new Date().getFullYear()} Chillbion. All rights reserved.
           </p>

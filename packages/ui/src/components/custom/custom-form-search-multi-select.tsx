@@ -92,14 +92,14 @@ export const CustomFormSearchMultiSelect = <T extends FieldValues>({
                                         role="combobox"
                                         aria-expanded={open}
                                         className={cn(
-                                            "w-full justify-between border shadow-none text-sm bg-transparent min-h-[40px]",
+                                            "w-full justify-between border shadow-none text-sm bg-transparent hover:bg-transparent min-h-[40px] h-auto",
                                             {
                                                 "border-destructive": error,
                                             }
                                         )}
                                         disabled={disabled}
                                     >
-                                        <div className="flex flex-wrap gap-1 flex-1 justify-start">
+                                        <div className="flex flex-wrap gap-1 flex-1 justify-start items-center">
                                             {selectedOptions.length > 0 ? (
                                                 selectedOptions.map(
                                                     (option) => (

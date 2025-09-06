@@ -55,7 +55,7 @@ const TutorialPage = ({ isPermission }: TutorialPageProps) => {
     const handleDelete = (id: string) => {
         fire({
             title: "Delete Tutorial",
-            text: "Are you sure you want to delete this tutorial?",
+            description: "Are you sure you want to delete this tutorial?",
             onConfirm: async () => {
                 await deleteTutorial({ id })
                     .unwrap()

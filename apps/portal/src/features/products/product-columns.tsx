@@ -78,18 +78,23 @@ export const createProductColumns = (
     {
         accessorKey: "category",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Category" />
+            <DataTableColumnHeader column={column} title="Categories" />
         ),
         cell: ({ row }) => {
-            const category = categories.find(
-                (cat) => cat.id === row.original.categoryId
-            );
             return (
-                <Badge variant="outline">{category?.name || "Unknown"}</Badge>
+                <div className="flex flex-wrap gap-1">
+                    {row.original.categories.map((cat) => (
+                        <Badge key={cat.category.id} variant="outline">
+                            {cat.category.name || "Unknown"}
+                        </Badge>
+                    ))}
+                </div>
             );
         },
         filterFn: (row, id, filterValue) => {
-            return String(row.original.categoryId) === String(filterValue);
+            return row.original.categories.some(
+                (cat) => String(cat.category.id) === String(filterValue)
+            );
         },
     },
     {

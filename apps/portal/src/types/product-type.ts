@@ -24,15 +24,23 @@ export interface ProductMeta {
 export interface ProductVariant {
     id: string;
     name: string;
-    price: number;
-    discountPrice: number;
+    isRequired: boolean;
+    options: ProductVariantOption[];
 }
 
 export interface ProductVariantUpdate {
     name: string;
-    price: number;
-    discountPrice: number;
-    productId: string;
+    isRequired: boolean;
+    options?: ProductVariantOptionUpdate[];
+}
+
+export interface ProductVariantOptionUpdate {
+    id?: string;
+    productVariantId: string;
+    name: string;
+    sku?: string;
+    extraPrice?: number;
+    imgUrl?: string;
 }
 
 export interface Product {
@@ -46,6 +54,7 @@ export interface Product {
     price: number | null;
     discountPrice: number | null;
     photoURL: string;
+    images: string[];
     keywords: string;
     stock: number;
     createdAt: string;
@@ -70,11 +79,11 @@ export interface ProductCeratePayload {
     price?: number;
     discountPrice?: number;
     photoURL: string;
+    images: string[];
     keywords: string;
     stock: number;
     activeStatus: "active" | "inactive";
     shopId: string;
-    images: string[];
     categoryIds: string[];
     productVariant: ProductVariantPayload[];
     unitName?: string;
@@ -83,13 +92,22 @@ export interface ProductCeratePayload {
 }
 
 export interface ProductVariantOption {
+    id?: string;
     name: string;
-    sku: string;
-    extraPrice: number;
+    sku?: string;
+    extraPrice?: number;
     imgUrl?: string;
 }
 
 export interface ProductVariantPayload {
     name: string;
+    isRequired: boolean;
     productVariantOptions: ProductVariantOption[];
+}
+
+export interface ProductVariantBulkPayload {
+    name: string;
+    isRequired: boolean;
+    productId: string;
+    options: ProductVariantOption[];
 }

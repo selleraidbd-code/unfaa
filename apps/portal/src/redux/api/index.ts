@@ -47,7 +47,7 @@ export const baseQueryWithReAuth: BaseQueryFn<
                 {
                     url: "/auth/refresh-token",
                     method: METHOD.POST,
-                    body: { refresh_token: refreshToken },
+                    body: { refreshToken },
                 },
                 api,
                 extraOptions

@@ -10,73 +10,80 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 export const ManageBanner = ({ theme }: { theme: ShopTheme }) => {
-  const bannerImg = theme.bannerImg || [];
-  const { fire } = useAlert();
+    const bannerImg = theme.bannerImg || [];
+    const { fire } = useAlert();
 
-  const [updateCoreTheme, { isLoading }] = useUpdateCoreThemeMutation();
+    const [updateCoreTheme, { isLoading }] = useUpdateCoreThemeMutation();
 
-  const handleDeleteBanner = (imgUrl: string) => {
-    fire({
-      title: "Delete Banner",
-      text: "Are you sure you want to delete this banner?",
-      onConfirm: async () => {
-        await updateCoreTheme({
-          id: theme.id,
-          payload: {
-            bannerImg: bannerImg.filter((img) => img !== imgUrl),
-          },
-        })
-          .unwrap()
-          .then(() => {
-            toast.success("Banner deleted successfully");
-          })
-          .catch((error) => {
-            toast.error(error.data.message || "Something went wrong");
-          });
-      },
-    });
-  };
+    const handleDeleteBanner = (imgUrl: string) => {
+        fire({
+            title: "Delete Banner",
+            description: "Are you sure you want to delete this banner?",
+            onConfirm: async () => {
+                await updateCoreTheme({
+                    id: theme.id,
+                    payload: {
+                        bannerImg: bannerImg.filter((img) => img !== imgUrl),
+                    },
+                })
+                    .unwrap()
+                    .then(() => {
+                        toast.success("Banner deleted successfully");
+                    })
+                    .catch((error) => {
+                        toast.error(
+                            error.data.message || "Something went wrong"
+                        );
+                    });
+            },
+        });
+    };
 
-  return (
-    <div className="w-full flex flex-col border-2 border-dashed border-slate-300 rounded-lg p-6">
-      <WebCustomizationHeader
-        title="Homepage Banners"
-        description="Select upto 5 items to get a better visual impact on your
+    return (
+        <div className="w-full flex flex-col border-2 border-dashed border-slate-300 rounded-lg p-6">
+            <WebCustomizationHeader
+                title="Homepage Banners"
+                description="Select upto 5 items to get a better visual impact on your
                 website"
-        button={<UploadBannerDialog bannerImg={bannerImg} themeId={theme.id} />}
-      />
+                button={
+                    <UploadBannerDialog
+                        bannerImg={bannerImg}
+                        themeId={theme.id}
+                    />
+                }
+            />
 
-      <br />
+            <br />
 
-      {bannerImg.length === 0 ? (
-        <WebCustomizationEmptyMessage
-          title="No banners uploaded yet"
-          description="Upload up to 5 banner images to create an engaging homepage experience for your customers."
-        />
-      ) : (
-        <div className="grid lg:grid-cols-2 gap-5">
-          {bannerImg.map((img) => (
-            <div key={img} className="w-full relative rounded-lg">
-              <Image
-                src={img}
-                alt="banner"
-                className="w-full rounded-lg"
-                width={800}
-                height={400}
-              />
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-3 right-3"
-                onClick={() => handleDeleteBanner(img)}
-                disabled={isLoading}
-              >
-                <Trash2 />
-              </Button>
-            </div>
-          ))}
+            {bannerImg.length === 0 ? (
+                <WebCustomizationEmptyMessage
+                    title="No banners uploaded yet"
+                    description="Upload up to 5 banner images to create an engaging homepage experience for your customers."
+                />
+            ) : (
+                <div className="grid lg:grid-cols-2 gap-5">
+                    {bannerImg.map((img) => (
+                        <div key={img} className="w-full relative rounded-lg">
+                            <Image
+                                src={img}
+                                alt="banner"
+                                className="w-full rounded-lg"
+                                width={800}
+                                height={400}
+                            />
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-3 right-3"
+                                onClick={() => handleDeleteBanner(img)}
+                                disabled={isLoading}
+                            >
+                                <Trash2 />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };

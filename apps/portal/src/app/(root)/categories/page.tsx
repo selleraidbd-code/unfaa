@@ -43,7 +43,7 @@ const Page = () => {
     const onDelete = async (id: string) => {
         fire({
             title: "Delete Category",
-            text: "Are you sure you want to delete this category?",
+            description: "Are you sure you want to delete this category?",
             onConfirm: async () => {
                 await deleteCategory({ id })
                     .unwrap()

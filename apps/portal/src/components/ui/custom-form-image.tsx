@@ -48,6 +48,8 @@ export const CustomFormImage = <T extends FieldValues>({
                             onFilesSelected={(files) => {
                                 if (files.length > 0) {
                                     field.onChange(files[0]?.url ?? "");
+                                } else {
+                                    field.onChange("");
                                 }
                             }}
                             initialFiles={field.value ? [field.value] : []}

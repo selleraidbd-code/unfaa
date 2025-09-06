@@ -45,7 +45,7 @@ export const OrderDetails = ({
         if (order) {
             fire({
                 title: "Delete Order",
-                text: "Are you sure you want to delete this order?",
+                description: "Are you sure you want to delete this order?",
                 onConfirm: async () => {
                     await deleteOrder({ id: order.id })
                         .unwrap()

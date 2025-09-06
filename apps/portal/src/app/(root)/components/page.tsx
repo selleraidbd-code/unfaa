@@ -51,7 +51,7 @@ const ComponentsPage = () => {
     const handleDelete = (data: Component) => {
         fire({
             title: "Are you sure?",
-            text: "You are about to delete this component",
+            description: "You are about to delete this component",
             onConfirm: async () => {
                 await deleteComponentById(data.id)
                     .unwrap()

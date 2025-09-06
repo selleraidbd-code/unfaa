@@ -10,6 +10,7 @@ import {
 import {
     Product,
     ProductCeratePayload,
+    ProductVariantBulkPayload,
     ProductVariantUpdate,
 } from "@/types/product-type";
 
@@ -18,6 +19,17 @@ const productApi = api.injectEndpoints({
         createProduct: builder.mutation<void, ProductCeratePayload>({
             query: (payload) => ({
                 url: `/product/`,
+                method: METHOD.POST,
+                body: payload,
+            }),
+            invalidatesTags: [TagType.Product],
+        }),
+        createProductVariantBulk: builder.mutation<
+            void,
+            { id: string; payload: ProductVariantBulkPayload[] }
+        >({
+            query: ({ id, payload }) => ({
+                url: `/product-variant/${id}`,
                 method: METHOD.POST,
                 body: payload,
             }),
@@ -76,6 +88,13 @@ const productApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Product],
         }),
+        deleteProductVariant: builder.mutation<void, { id: string }>({
+            query: ({ id }) => ({
+                url: `/product-variant/${id}`,
+                method: METHOD.DELETE,
+            }),
+            invalidatesTags: [TagType.Product],
+        }),
     }),
 });
 
@@ -83,7 +102,9 @@ export const {
     useGetProductsQuery,
     useGetProductByIdQuery,
     useCreateProductMutation,
+    useCreateProductVariantBulkMutation,
     useUpdateProductMutation,
     useUpdateProductVariantMutation,
     useDeleteProductMutation,
+    useDeleteProductVariantMutation,
 } = productApi;

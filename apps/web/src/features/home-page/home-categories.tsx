@@ -1,15 +1,20 @@
 import { ShopThemeCategory } from "@/types/shop-type";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export const HomeCategories = ({
   categories,
 }: {
   categories: ShopThemeCategory[];
 }) => {
+  console.log("categories :>> ", categories);
   return (
     <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="container">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
+        {/* <div className="text-center mb-8 sm:mb-12">
           <div className="flex items-center justify-center mb-3 sm:mb-4">
             <div className="w-1 h-6 sm:h-8 bg-purple-600 rounded-full mr-2 sm:mr-3"></div>
             <span className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">
@@ -22,6 +27,13 @@ export const HomeCategories = ({
           <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
             Discover our curated collection of products organized by category
           </p>
+        </div> */}
+        <div>
+          <p className="flex items-center gap-1.5">
+            <span className="w-1.5 h-6 bg-primary rounded-sm"></span>{" "}
+            <span className="text-lg">Categories</span>
+          </p>
+          <h2 className="title mt-2">Browse By Category</h2>
         </div>
 
         {/* Categories Grid */}
@@ -54,7 +66,23 @@ export const HomeCategories = ({
             </div>
           ) : (
             categories.map((category) => (
-              <div key={category.id}>{category.category.name}</div>
+              <Link
+                href={`/category/${category.categoryId}`}
+                key={category.id}
+                className="group cursor-pointer rounded-md mt-8 border-1  "
+              >
+                <Image
+                  alt="category image"
+                  src={category?.category.thumbnailImg || "/placeholder.png"}
+                  width={100}
+                  height={100}
+                  className=" flex w-[50%] h-[50%] mx-auto items-center justify-center mt-5  object-cover  group-hover:transition-all duration-300 group-hover:scale-110"
+                />
+
+                <h3 className="text-sm text-center mt-4 text-muted-foreground group-hover:text-primary transition-colors duration-300">
+                  {category.category.name}
+                </h3>
+              </Link>
             ))
           )}
         </div>

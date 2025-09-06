@@ -15,6 +15,7 @@ import { Order } from "@/types/order-type";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import { cn } from "@workspace/ui/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import { orderStatusOptions } from "@/features/orders/data";
 
 interface FilterParams {
     searchTerm?: string;
@@ -24,7 +25,8 @@ const OrdersPage = () => {
     const user = useGetUser();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const status = searchParams.get("status") || "orders";
+    const status = searchParams.get("status") || "";
+
     const [filterParams, setFilterParams] = useState<FilterParams>({});
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [activeTab, setActiveTab] = useState<string>(status);
@@ -36,6 +38,7 @@ const OrdersPage = () => {
     const { data, isLoading, isError } = useGetOrdersQuery({
         shopId: user?.shop.id,
         ...filterParams,
+        orderStatus: status === "all" ? undefined : status,
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
     });
@@ -47,57 +50,6 @@ const OrdersPage = () => {
     const handleRowClick = (row: Order) => {
         setSelectedOrder(row);
     };
-
-    const tabOptions = [
-        {
-            label: "All Orders",
-            value: "orders",
-        },
-        {
-            label: "Order Placed",
-            value: "order-placed",
-        },
-        {
-            label: "Order Confirmed",
-            value: "order-confirmed",
-        },
-        {
-            label: "Order Canceled",
-            value: "order-canceled",
-        },
-        {
-            label: "Order Send",
-            value: "order-send",
-        },
-        {
-            label: "Order Hold",
-            value: "order-hold",
-        },
-        {
-            label: "Order Waiting ",
-            value: "order-waiting",
-        },
-        {
-            label: "Order NZC",
-            value: "order-nzc",
-        },
-        {
-            label: "Order Returned",
-            value: "order-returned",
-        },
-        {
-            label: "Order Delivered",
-            value: "order-delivered",
-        },
-        {
-            label: "Delivery Pending",
-            value: "delivery-pending",
-        },
-        {
-            label: "Delivery Completed",
-            value: "delivery-completed",
-        },
-    ];
 
     const handleTabClick = (tab: string) => {
         setActiveTab(tab);
@@ -126,7 +78,7 @@ const OrdersPage = () => {
                 </div>
 
                 <div className="flex justify-center gap-2.5 flex-wrap text-sm w-full">
-                    {tabOptions.map((tab) => (
+                    {orderStatusOptions.map((tab) => (
                         <button
                             key={tab.value}
                             value={tab.value}

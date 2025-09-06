@@ -141,10 +141,16 @@ const EditProduct = () => {
             fullDescription: product.data.fullDescription || "",
             productVariant:
                 product.data.productVariant?.map((variant) => ({
-                    id: variant.id,
+                    id: variant.id || "",
                     name: variant.name,
-                    productVariantOptions: [],
                     isRequired: false,
+                    productVariantOptions: variant.options.map((option) => ({
+                        id: option.id || "",
+                        name: option.name,
+                        sku: option.sku || "",
+                        extraPrice: option.extraPrice || 0,
+                        imgUrl: option.imgUrl || "",
+                    })),
                 })) || [],
             activeStatus: product.data.activeStatus || "active",
             brandId: product.data.brandId || "",

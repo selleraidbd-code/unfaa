@@ -1,7 +1,7 @@
 import { ChevronRight, Package, ShoppingCart, X } from "lucide-react";
 
 import { OrderStepIndicator } from "@/types/order-type";
-import { OrderItem } from "@/types/order-type copy";
+import { OrderItem } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 import { Button } from "@workspace/ui/components/button";
 

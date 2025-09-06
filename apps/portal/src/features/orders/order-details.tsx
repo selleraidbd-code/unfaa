@@ -1,13 +1,18 @@
 import Image from "next/image";
 
-import { useDeleteOrderMutation } from "@/redux/api/order-api";
+import {
+    useDeleteOrderMutation,
+    useUpdateOrderMutation,
+} from "@/redux/api/order-api";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { orderStatusOptions } from "@/features/orders/data";
 import { useAlert } from "@/hooks/useAlert";
-import { Order } from "@/types/order-type";
-import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
+import { Order, OrderStatus } from "@/types/order-type";
 import { Button } from "@workspace/ui/components/button";
+import { CustomSelect } from "@workspace/ui/components/custom/custom-select";
+import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { Separator } from "@workspace/ui/components/separator";
 import {
     Sheet,
@@ -39,7 +44,24 @@ export const OrderDetails = ({
 
     const { fire } = useAlert();
 
+    const [updateOrder, { isLoading: isUpdating }] = useUpdateOrderMutation();
     const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
+
+    const handleUpdate = async (status: string) => {
+        if (order) {
+            await updateOrder({
+                id: order.id,
+                payload: { orderStatus: status as OrderStatus },
+            })
+                .unwrap()
+                .then(() => {
+                    toast.success("Order updated successfully");
+                })
+                .catch((error) => {
+                    toast.error(error.data.message);
+                });
+        }
+    };
 
     const handleDelete = async () => {
         if (order) {
@@ -51,6 +73,7 @@ export const OrderDetails = ({
                         .unwrap()
                         .then(() => {
                             toast.success("Order deleted successfully");
+                            onOpenChange(false);
                         })
                         .catch((error) => {
                             toast.error(error.data.message);
@@ -59,8 +82,6 @@ export const OrderDetails = ({
             });
         }
     };
-
-    console.log("order :>> ", order);
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
@@ -87,7 +108,7 @@ export const OrderDetails = ({
                     </div>
 
                     <Button
-                        disabled={!order || isDeleting}
+                        disabled={!order || isDeleting || isUpdating}
                         size="sm"
                         variant="destructiveOutline"
                         className="ml-auto"
@@ -209,23 +230,24 @@ export const OrderDetails = ({
                                     </div>
                                 </dl>
                             </div>
+
                             <Separator className="my-4" />
                             <div className="grid gap-3">
                                 <div className="font-semibold">
-                                    Payment Information
+                                    Order Information
                                 </div>
-                                <p>
-                                    <span className="text-muted-foreground">
-                                        Payment Status:{" "}
-                                    </span>
-                                    <span>{order.paymentStatus}</span>
-                                </p>
-                                <p>
+                                <div className="flex items-center justify-between gap-2">
                                     <span className="text-muted-foreground">
                                         Order Status:{" "}
                                     </span>
-                                    <span>{order.orderStatus}</span>
-                                </p>
+
+                                    <CustomSelect
+                                        className="max-w-xs"
+                                        options={orderStatusOptions}
+                                        value={order.orderStatus}
+                                        onChange={handleUpdate}
+                                    />
+                                </div>
                             </div>
                         </>
                     ) : (

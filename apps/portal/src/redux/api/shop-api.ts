@@ -7,7 +7,12 @@ import {
     TagType,
 } from "@/redux/type";
 
-import { CreateShop, Shop } from "@/types/shop-type";
+import {
+    CreateShop,
+    Shop,
+    ShopExtraInfo,
+    ShopPolicyType,
+} from "@/types/shop-type";
 
 const shopApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -49,6 +54,26 @@ const shopApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Shop],
         }),
+        getShopPolicies: builder.query<
+            ResponseObject<ShopExtraInfo>,
+            { shopSlug: string; policyType: ShopPolicyType }
+        >({
+            query: ({ shopSlug, policyType }) => ({
+                url: `/shop/extra-info/${shopSlug}/${policyType}`,
+                method: METHOD.GET,
+            }),
+            providesTags: [TagType.Shop],
+        }),
+        createShopPolicy: builder.mutation<
+            void,
+            { shopSlug: string; policyType: ShopPolicyType; policy: string }
+        >({
+            query: ({ shopSlug, policyType, policy }) => ({
+                url: `/shop/extra-info/${shopSlug}/${policyType}`,
+                method: METHOD.POST,
+                body: { policy },
+            }),
+        }),
     }),
 });
 
@@ -58,4 +83,6 @@ export const {
     useGetMyShopQuery,
     useUpdateShopMutation,
     useDeleteShopMutation,
+    useGetShopPoliciesQuery,
+    useCreateShopPolicyMutation,
 } = shopApi;

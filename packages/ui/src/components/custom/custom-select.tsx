@@ -54,7 +54,7 @@ export const CustomSelect = ({
                             placeholder={placeholder || "Select an option"}
                         />
                     </SelectTrigger>
-                    <SelectContent className="w-full min-w-[8rem]">
+                    <SelectContent className="w-full max-h-[320px] overflow-y-auto min-w-[8rem]">
                         {options.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                                 {option.label}

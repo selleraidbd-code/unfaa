@@ -5,7 +5,7 @@ import { OrderItemInProductStep } from "@/features/make-order/product-step/sales
 import { useGetProductsQuery } from "@/redux/api/product-api";
 
 import { OrderStepIndicator } from "@/types/order-type";
-import { OrderItem } from "@/types/order-type copy";
+import { OrderItem } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 
 interface ProductsStepProps {

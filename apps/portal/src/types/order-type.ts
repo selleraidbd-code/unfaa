@@ -71,6 +71,13 @@ export type Order = {
     }[];
 };
 
+export interface OrderItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+}
+
 export type CreateOrder = {
     shopId: string;
     customerId: string;
@@ -90,3 +97,7 @@ export interface CustomItem {
     price: number;
     quantity: number;
 }
+
+export type UpdateOrderPayload = {
+    orderStatus?: OrderStatus;
+};

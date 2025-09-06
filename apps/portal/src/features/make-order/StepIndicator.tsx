@@ -1,7 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 
 import { OrderStepIndicator } from "@/types/order-type";
-import { OrderItem } from "@/types/order-type copy";
+import { OrderItem } from "@/types/order-type";
 
 type StepIndicatorProps = {
     orderItems: OrderItem[];

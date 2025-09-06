@@ -71,7 +71,20 @@ function SidebarProvider({
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen);
+    const [_open, _setOpen] = React.useState(() => {
+        // Check if we're in the browser and have a cookie
+        if (typeof window !== "undefined") {
+            const cookieValue = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
+                ?.split("=")[1];
+
+            // Only open if cookie explicitly says 'true', otherwise default to closed
+            return cookieValue === "true";
+        }
+        // On server side, use defaultOpen
+        return defaultOpen;
+    });
     const open = openProp ?? _open;
     const setOpen = React.useCallback(
         (value: boolean | ((value: boolean) => boolean)) => {
@@ -82,8 +95,13 @@ function SidebarProvider({
                 _setOpen(openState);
             }
 
-            // This sets the cookie to keep the sidebar state.
-            document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+            // Only save the cookie when sidebar is open, remove it when closed
+            if (openState) {
+                document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+            } else {
+                // Remove the cookie when sidebar is closed
+                document.cookie = `${SIDEBAR_COOKIE_NAME}=; path=/; max-age=0`;
+            }
         },
         [setOpenProp, open]
     );

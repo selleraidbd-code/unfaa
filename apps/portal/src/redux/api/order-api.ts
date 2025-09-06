@@ -1,7 +1,7 @@
 import { api } from "@/redux/api";
 import { PaginatedResponse, QueryParams, METHOD, TagType } from "@/redux/type";
 
-import { CreateOrder, Order } from "@/types/order-type";
+import { CreateOrder, Order, UpdateOrderPayload } from "@/types/order-type";
 
 const orderApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -33,7 +33,7 @@ const orderApi = api.injectEndpoints({
         }),
         updateOrder: builder.mutation<
             void,
-            { id: string; payload: { status: string } }
+            { id: string; payload: UpdateOrderPayload }
         >({
             query: ({ id, payload }) => ({
                 url: `/order/${id}`,

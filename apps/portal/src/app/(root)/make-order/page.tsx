@@ -12,7 +12,7 @@ import {
     OrderStatus,
     OrderStepIndicator,
 } from "@/types/order-type";
-import { OrderItem } from "@/types/order-type copy";
+import { OrderItem } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 import { useState } from "react";
 

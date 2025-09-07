@@ -25,7 +25,7 @@ const OrdersPage = () => {
     const user = useGetUser();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const status = searchParams.get("status") || "";
+    const status = searchParams.get("status") || "all";
 
     const [filterParams, setFilterParams] = useState<FilterParams>({});
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);

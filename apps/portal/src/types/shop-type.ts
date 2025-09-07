@@ -17,6 +17,10 @@ export type Shop = {
     photoURL: string;
     shopOwnerId: string;
     status: string;
+    termsAndConditions?: string;
+    returnPolicy?: string;
+    refundPolicy?: string;
+    privacyPolicy?: string;
     createdAt: string;
     updatedAt: string;
 };

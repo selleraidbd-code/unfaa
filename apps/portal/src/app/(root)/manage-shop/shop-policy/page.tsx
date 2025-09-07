@@ -5,8 +5,8 @@ import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { CustomButton } from "@/components/ui/custom-button";
 import useGetUser from "@/hooks/useGetUser";
 import {
-    useCreateShopPolicyMutation,
     useGetShopPoliciesQuery,
+    useUpdateShopMutation,
 } from "@/redux/api/shop-api";
 import { ShopPolicyType } from "@/types/shop-type";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
@@ -16,29 +16,54 @@ import { toast } from "sonner";
 
 const ShopPolicy = () => {
     const user = useGetUser();
+    const shopId = user?.shop.id || "";
     const shopSlug = user?.shop.slug || "";
     const [termsAndConditions, setTermsAndConditions] = useState("");
     const [privacyPolicy, setPrivacyPolicy] = useState("");
     const [returnPolicy, setReturnPolicy] = useState("");
     const [refundPolicy, setRefundPolicy] = useState("");
 
-    const { data, isLoading } = useGetShopPoliciesQuery({
+    const {
+        data: termsAndConditionsData,
+        isLoading: isLoadingTermsAndConditions,
+    } = useGetShopPoliciesQuery({
         shopSlug,
         policyType: ShopPolicyType.TERMS_AND_CONDITIONS,
     });
+    const { data: privacyPolicyData, isLoading: isLoadingPrivacyPolicy } =
+        useGetShopPoliciesQuery({
+            shopSlug,
+            policyType: ShopPolicyType.PRIVACY_POLICY,
+        });
+    const { data: returnPolicyData, isLoading: isLoadingReturnPolicy } =
+        useGetShopPoliciesQuery({
+            shopSlug,
+            policyType: ShopPolicyType.RETURN_POLICY,
+        });
+    const { data: refundPolicyData, isLoading: isLoadingRefundPolicy } =
+        useGetShopPoliciesQuery({
+            shopSlug,
+            policyType: ShopPolicyType.REFUND_POLICY,
+        });
 
-    const [createShopPolicy, { isLoading: isCreatingPolicy }] =
-        useCreateShopPolicyMutation();
+    const [updateShop, { isLoading: isCreatingPolicy }] =
+        useUpdateShopMutation();
 
-    if (isLoading) {
+    if (
+        isLoadingTermsAndConditions ||
+        isLoadingPrivacyPolicy ||
+        isLoadingReturnPolicy ||
+        isLoadingRefundPolicy
+    ) {
         return <CustomLoading />;
     }
 
     const handleSaveTermsAndConditions = async () => {
-        await createShopPolicy({
-            shopSlug,
-            policyType: ShopPolicyType.TERMS_AND_CONDITIONS,
-            policy: termsAndConditions,
+        await updateShop({
+            id: shopId,
+            payload: {
+                termsAndConditions,
+            },
         })
             .unwrap()
             .then(() => {
@@ -52,10 +77,11 @@ const ShopPolicy = () => {
     };
 
     const handleSavePrivacyPolicy = async () => {
-        await createShopPolicy({
-            shopSlug,
-            policyType: ShopPolicyType.PRIVACY_POLICY,
-            policy: privacyPolicy,
+        await updateShop({
+            id: shopId,
+            payload: {
+                privacyPolicy,
+            },
         })
             .unwrap()
             .then(() => {
@@ -69,10 +95,11 @@ const ShopPolicy = () => {
     };
 
     const handleSaveReturnPolicy = async () => {
-        await createShopPolicy({
-            shopSlug,
-            policyType: ShopPolicyType.RETURN_POLICY,
-            policy: returnPolicy,
+        await updateShop({
+            id: shopId,
+            payload: {
+                returnPolicy,
+            },
         })
             .unwrap()
             .then(() => {
@@ -86,10 +113,11 @@ const ShopPolicy = () => {
     };
 
     const handleSaveRefundPolicy = async () => {
-        await createShopPolicy({
-            shopSlug,
-            policyType: ShopPolicyType.REFUND_POLICY,
-            policy: refundPolicy,
+        await updateShop({
+            id: shopId,
+            payload: {
+                refundPolicy,
+            },
         })
             .unwrap()
             .then(() => {
@@ -106,14 +134,15 @@ const ShopPolicy = () => {
         <div className="space-y-6">
             <HeaderBackButton title="Shop Policy" href="/manage-shop" />
 
-            {JSON.stringify(data?.data)}
-
             <CustomCollapsible
                 title="Terms and Conditions"
                 content={
                     <div className="flex flex-col gap-6">
                         <Editor
-                            content={data?.data.termsAndConditions || ""}
+                            content={
+                                termsAndConditionsData?.data
+                                    .termsAndConditions || ""
+                            }
                             onChange={setTermsAndConditions}
                         />
 
@@ -132,7 +161,9 @@ const ShopPolicy = () => {
                 content={
                     <div className="flex flex-col gap-6">
                         <Editor
-                            content={data?.data.privacyPolicy || ""}
+                            content={
+                                privacyPolicyData?.data.privacyPolicy || ""
+                            }
                             onChange={setPrivacyPolicy}
                         />
 
@@ -151,7 +182,7 @@ const ShopPolicy = () => {
                 content={
                     <div className="flex flex-col gap-6">
                         <Editor
-                            content={data?.data.returnPolicy || ""}
+                            content={returnPolicyData?.data.returnPolicy || ""}
                             onChange={setReturnPolicy}
                         />
 
@@ -171,7 +202,7 @@ const ShopPolicy = () => {
                 content={
                     <div className="flex flex-col gap-6">
                         <Editor
-                            content={data?.data.refundPolicy || ""}
+                            content={refundPolicyData?.data.refundPolicy || ""}
                             onChange={setRefundPolicy}
                         />
 

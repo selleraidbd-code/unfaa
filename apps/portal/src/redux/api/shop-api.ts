@@ -39,9 +39,12 @@ const shopApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Shop],
         }),
-        updateShop: builder.mutation<void, Partial<Shop>>({
-            query: (payload) => ({
-                url: `/shop/${payload.id}`,
+        updateShop: builder.mutation<
+            void,
+            { id: string; payload: Partial<Shop> }
+        >({
+            query: ({ id, payload }) => ({
+                url: `/shop/${id}`,
                 method: METHOD.PATCH,
                 body: payload,
             }),
@@ -64,16 +67,6 @@ const shopApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Shop],
         }),
-        createShopPolicy: builder.mutation<
-            void,
-            { shopSlug: string; policyType: ShopPolicyType; policy: string }
-        >({
-            query: ({ shopSlug, policyType, policy }) => ({
-                url: `/shop/extra-info/${shopSlug}/${policyType}`,
-                method: METHOD.POST,
-                body: { policy },
-            }),
-        }),
     }),
 });
 
@@ -84,5 +77,4 @@ export const {
     useUpdateShopMutation,
     useDeleteShopMutation,
     useGetShopPoliciesQuery,
-    useCreateShopPolicyMutation,
 } = shopApi;

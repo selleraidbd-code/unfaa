@@ -63,7 +63,7 @@ const OTPVerifyForm = () => {
                 dispatch(setToken(res.accessToken));
 
                 toast.success("Verification has been successfully completed.");
-                router.replace("/");
+                router.replace("/onboarding");
             })
             .catch((er) => {
                 if (er?.status === 406) {

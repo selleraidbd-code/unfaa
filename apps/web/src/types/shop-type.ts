@@ -134,3 +134,18 @@ export type Brand = {
     isActive: boolean;
     shopId: string;
 };
+
+export enum ShopPolicyType {
+    PRIVACY_POLICY = "privacyPolicy",
+    TERMS_AND_CONDITIONS = "termsAndConditions",
+    RETURN_POLICY = "returnPolicy",
+    REFUND_POLICY = "refundPolicy",
+}
+
+export type ShopExtraInfo = {
+    id: string;
+    privacyPolicy?: string;
+    termsAndConditions?: string;
+    returnPolicy?: string;
+    refundPolicy?: string;
+};

@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@workspace/ui/components/card";
 import OTPVerifyForm from "@/features/auth/otp-form";
 

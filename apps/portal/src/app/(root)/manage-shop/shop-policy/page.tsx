@@ -150,6 +150,7 @@ const ShopPolicy = () => {
                             className="ms-auto"
                             onClick={handleSaveTermsAndConditions}
                             isLoading={isCreatingPolicy}
+                            disabled={!termsAndConditions}
                         >
                             Save Terms and Conditions
                         </CustomButton>
@@ -171,6 +172,7 @@ const ShopPolicy = () => {
                             className="ms-auto"
                             onClick={handleSavePrivacyPolicy}
                             isLoading={isCreatingPolicy}
+                            disabled={!privacyPolicy}
                         >
                             Save Privacy Policy
                         </CustomButton>
@@ -190,6 +192,7 @@ const ShopPolicy = () => {
                             className="ms-auto"
                             onClick={handleSaveReturnPolicy}
                             isLoading={isCreatingPolicy}
+                            disabled={!returnPolicy}
                         >
                             Save Return Policy
                         </CustomButton>
@@ -210,6 +213,7 @@ const ShopPolicy = () => {
                             className="ms-auto"
                             onClick={handleSaveRefundPolicy}
                             isLoading={isCreatingPolicy}
+                            disabled={!refundPolicy}
                         >
                             Save Refund Policy
                         </CustomButton>

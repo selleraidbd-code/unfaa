@@ -1,4 +1,4 @@
-export const shopCategories = [
+export const shopTypes = [
     {
         label: "Clothing & Apparel",
         value: "clothing_apparel",
@@ -50,5 +50,9 @@ export const shopCategories = [
     {
         label: "Groceries & Household",
         value: "groceries_household",
+    },
+    {
+        label: "Other",
+        value: "other",
     },
 ];

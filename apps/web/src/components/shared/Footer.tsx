@@ -1,154 +1,163 @@
 import React from "react";
-import {
-  Brain,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Github,
-  Instagram,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
 import Link from "next/link";
 
-export const Footer = () => {
-  return (
-    <footer className="relative bg-[#7922E6] pt-12 pb-8 overflow-hidden">
-      {/* Background patterns */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/5 via-transparent to-transparent"></div>
-      </div>
+import {
+    FaFacebook,
+    FaFacebookMessenger,
+    FaInstagram,
+    FaTiktok,
+    FaWhatsapp,
+    FaYoutube,
+} from "react-icons/fa";
+import { Logo } from "@/components/shared/logo";
 
-      <div className="container relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
-          <div className="group">
-            <div className="flex items-center text-white mb-8">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
-                <Brain className="h-6 w-6" />
-              </div>
-              <span className="ml-3 text-xl font-bold tracking-tight text-white">
-                Chillbion
-              </span>
+interface Footer7Props {
+    logo?: {
+        url: string;
+        src: string;
+        alt: string;
+        title: string;
+    };
+    sections?: Array<{
+        title: string;
+        links: Array<{ name: string; href: string }>;
+    }>;
+    description?: string;
+    socialLinks?: Array<{
+        icon: React.ReactElement;
+        href: string;
+        label: string;
+    }>;
+    copyright?: string;
+    legalLinks?: Array<{
+        name: string;
+        href: string;
+    }>;
+}
+
+const defaultSections = [
+    {
+        title: "Main Sections",
+        links: [
+            { name: "Home", href: "/" },
+            { name: "Products", href: "/products" },
+        ],
+    },
+    // {
+    //     title: "Help & Support",
+    //     links: [
+    //         { name: "Contact Us", href: "/contact-us" },
+    //         { name: "About Us", href: "/about-us" },
+    //         { name: "FAQ", href: "/faq" },
+    //     ],
+    // },
+    {
+        title: "Legal Information",
+        links: [
+            { name: "Terms and Conditions", href: "/terms-conditions" },
+            { name: "Privacy Policy", href: "/privacy-policy" },
+            { name: "Return Policy", href: "/return-policy" },
+            { name: "Refund Policy", href: "/refund-policy" },
+        ],
+    },
+];
+
+const defaultSocialLinks = [
+    {
+        icon: <FaFacebook className="size-5 text-white lg:size-7" />,
+        href: "https://www.facebook.com/profile.php?id=61577049317463",
+        label: "Facebook",
+    },
+    {
+        icon: <FaWhatsapp className="size-5 text-white lg:size-7" />,
+        href: "https://wa.me/+8801776344646",
+        label: "Whatsapp",
+    },
+    {
+        icon: <FaYoutube className="size-5 text-white lg:size-7" />,
+        href: "https://youtube.com/channel/UC9JIco9sWftdrc53FhS8zng?si=i6lsB6kVldG-Ic6N",
+        label: "Youtube",
+    },
+    {
+        icon: <FaFacebookMessenger className="size-5 text-white lg:size-7" />,
+        href: "https://m.me/689072867619860?source=qr_link_share",
+        label: "Messenger",
+    },
+    {
+        icon: <FaInstagram className="size-5 text-white lg:size-7" />,
+        href: "https://www.instagram.com/sahoz_bazar?igsh=MTdhd2p5Njhvb2lpZQ==",
+        label: "Instagram",
+    },
+    {
+        icon: <FaTiktok className="size-5 text-white lg:size-7" />,
+        href: "https://www.tiktok.com/@sahoz.bazar?_t=ZS-8xHxBml80Cw&_r=1",
+        label: "Tiktok",
+    },
+];
+
+export const Footer = ({
+    sections = defaultSections,
+    description = "সহজ বাজার থেকে সকল প্রয়োজনীয় পণ্য অর্ডার করুন সহজেই",
+    socialLinks = defaultSocialLinks,
+    copyright = "Sahoz Bazar সর্বস্বত্ব সংরক্ষিত।",
+}: Footer7Props) => {
+    return (
+        <section className="bg-zinc-800 pt-12">
+            <div className="container">
+                <div className="flex w-full flex-col justify-between gap-10 lg:flex-row lg:items-start lg:text-left">
+                    <div className="flex w-full flex-col justify-between gap-6 lg:items-start">
+                        {/* Logo */}
+                        <Logo domain="sahoz.bazar" />
+
+                        <p className="max-w-[70%] text-sm text-gray-400">
+                            {description}
+                        </p>
+                        <ul className="flex items-center space-x-6 text-muted-foreground">
+                            {socialLinks.map((social, idx) => (
+                                <li
+                                    key={idx}
+                                    className="font-medium hover:text-primary"
+                                >
+                                    <Link
+                                        href={social.href}
+                                        target="_blank"
+                                        aria-label={social.label}
+                                    >
+                                        {social.icon}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="grid w-full grid-cols-2 gap-6 sm:grid-cols-3 lg:gap-20">
+                        <div></div>
+                        {sections.map((section, sectionIdx) => (
+                            <div key={sectionIdx}>
+                                <h3 className="mb-4 font-semibold text-gray-400">
+                                    {section.title}
+                                </h3>
+                                <ul className="space-y-3 text-sm text-white">
+                                    {section.links.map((link, linkIdx) => (
+                                        <li
+                                            key={linkIdx}
+                                            className="font-medium hover:text-primary"
+                                        >
+                                            <a href={link.href}>{link.name}</a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="mt-8 border-t py-4 text-xs font-medium text-muted-foreground lg:text-sm">
+                    <p className="text-center">
+                        © {new Date().getFullYear()} {copyright}
+                    </p>
+                </div>
             </div>
-            <p className="leading-relaxed text-white mb-8">
-              Helping startups transform ideas into reality with cutting-edge
-              technology solutions.
-            </p>
-            <div className="flex space-x-4">
-              {[
-                { icon: Facebook, href: "#" },
-                { icon: Twitter, href: "#" },
-                { icon: Linkedin, href: "#" },
-                { icon: Github, href: "#" },
-                { icon: Instagram, href: "#" },
-              ].map((social, idx) => (
-                <a
-                  key={idx}
-                  href={social.href}
-                  className="w-10 h-10 rounded-xl bg-white/90 border border-black/10 flex items-center justify-center text-gray-600 hover:bg-gradient-to-br hover:from-blue-500 hover:to-purple-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-sm hover:shadow-lg"
-                >
-                  <social.icon size={18} />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div className="text-white">
-            <h4 className="text-lg font-bold tracking-tight mb-6 text-white bg-clip-text ">
-              Services
-            </h4>
-            <ul className="space-y-4">
-              {[
-                "MVP Development",
-                "Full-Stack Development",
-                "AI Solutions",
-                "LLM Applications",
-                "Data Engineering",
-              ].map((service, idx) => (
-                <li key={idx}>
-                  <a
-                    href="#"
-                    className=" hover:text-black transition-colors duration-300 flex items-center group"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    {service}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="text-white">
-            <h4 className="text-lg font-bold tracking-tight mb-6 text-white bg-clip-text ">
-              Company
-            </h4>
-            <ul className="space-y-4">
-              {["About Us", "Team", "Case Studies", "Blog", "Careers"].map(
-                (item, idx) => (
-                  <li key={idx}>
-                    <a
-                      href="#"
-                      className=" hover:text-black transition-colors duration-300 flex items-center group"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                      {item}
-                    </a>
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-lg font-bold tracking-tight mb-6 text-white bg-clip-text">
-              Contact
-            </h4>
-            <ul className="space-y-4">
-              <li className="text-white flex items-center">
-                <MapPin className="w-5 h-5 mr-2 " />
-                Dhaka, Bangladesh
-              </li>
-              <li>
-                <a
-                  href="mailto:contact@chillbion.com"
-                  className="text-white hover:text-black transition-colors duration-300 flex items-center group"
-                >
-                  <Mail className="w-5 h-5 mr-2 " />
-                  contact@chillbion.com
-                </a>
-              </li>
-              <li>
-                <a
-                  href="tel:+18001234567"
-                  className="text-white hover:text-black transition-colors duration-300 flex items-center group"
-                >
-                  <Phone className="w-5 h-5 mr-2 " />
-                  +1 (800) 123-4567
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="mt-6 pt-4 border-t text-gray-300  text-sm border-gray-300 flex justify-between items-center">
-          <p className="font-medium">
-            © {new Date().getFullYear()} Chillbion. All rights reserved.
-          </p>
-          <p>
-            Design And Developed By{" "}
-            <Link
-              href={"https://www.unfaa.com/"}
-              target="_blank"
-              className="font-medium cursor-pointer hover:underline"
-            >
-              Unfaa Store
-            </Link>
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
+        </section>
+    );
 };

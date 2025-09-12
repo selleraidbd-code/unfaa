@@ -3,7 +3,7 @@
 import { EditorContent, useEditor } from "@tiptap/react";
 
 import { editorExtensions } from "@/components/editor/editor-extensions";
-import { Toolbar } from "@/components/editor/editor-toolbar";
+import { EditorToolbar } from "@/components/editor/editor-toolbar";
 
 export const Editor = ({
     content,
@@ -29,7 +29,7 @@ export const Editor = ({
 
     return (
         <div className="rounded-sm">
-            <Toolbar editor={editor} />
+            <EditorToolbar editor={editor} />
             <div
                 id="editor"
                 className={`no-scrollbar [&_.ProseMirror]:prose [&_.ProseMirror]:font-inherit min-h-40 max-h-[60dvh] overflow-auto rounded-b-sm border border-t-transparent [&_.ProseMirror]:max-w-none [&_.ProseMirror_.is-editor-empty]:text-muted-foreground [&_.ProseMirror_p[style*="text-align"]]:my-0!`}

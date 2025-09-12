@@ -5,6 +5,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { StoreProvider } from "@/providers/StoreProvider";
 import { Toaster } from "sonner";
 import { AlertProvider } from "@/providers/AlertProvider";
+import { UserInfoProvider } from "@/providers/user-info-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -16,10 +17,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 disableTransitionOnChange
                 enableColorScheme
             >
-                <AlertProvider>
-                    <Toaster position="top-center" richColors />
-                    {children}
-                </AlertProvider>
+                <UserInfoProvider>
+                    <AlertProvider>
+                        <Toaster position="top-center" richColors />
+                        {children}
+                    </AlertProvider>
+                </UserInfoProvider>
             </NextThemesProvider>
         </StoreProvider>
     );

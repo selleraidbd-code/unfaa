@@ -4,7 +4,7 @@ import type React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { shopCategories } from "@/data/shop-data";
+import { shopTypes } from "@/data/shop-data";
 import { useCreateShopMutation } from "@/redux/api/shop-api";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -202,7 +202,7 @@ export default function ShopOnboarding() {
                                 <CustomFormSelect
                                     label="Shop Type"
                                     name="shopType"
-                                    options={shopCategories}
+                                    options={shopTypes}
                                     control={form.control}
                                     required
                                 />

@@ -1,53 +1,91 @@
 "use client";
 
-import { shopCategories } from "@/data/shop-data";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { shopTypes } from "@/data/shop-data";
+import { useGetMyShopQuery, useUpdateShopMutation } from "@/redux/api/shop-api";
+import { Shop, ShopType } from "@/types/shop-type";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
-import { CustomFormSwitch } from "@workspace/ui/components/custom/custom-form-switch";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
-import { Button } from "@workspace/ui/components/button";
+import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
 import { Form } from "@workspace/ui/components/form";
+import { Label } from "@workspace/ui/components/label";
 import { cn } from "@workspace/ui/lib/utils";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 const shopInfoSchema = z.object({
     name: z.string().min(1),
-    email: z.string().email(),
     description: z.string().min(1),
-    phoneNumber: z.string().min(1),
-    address: z.string().min(1),
-    topBarMessage: z.string().min(1),
-    shopType: z.string().min(1),
-    vat: z.number().min(1),
-    orderNote: z.string().min(1),
-    maintainStockQuantity: z.boolean(),
-    showProductSoldCount: z.boolean(),
+    // email: z.string().email(),
+    // phoneNumber: z.string().min(1),
+    // address: z.string().min(1),
+    // topBarMessage: z.string().min(1),
+    shopType: z.nativeEnum(ShopType),
+    // vat: z.number().min(1),
+    // orderNote: z.string().min(1),
+    // maintainStockQuantity: z.boolean(),
+    // showProductSoldCount: z.boolean(),
+    photoURL: z.string().optional(),
 });
 
 export const ShopBasicInfo = ({ className }: { className?: string }) => {
+    const { data: shop, isLoading: isLoadingShop } = useGetMyShopQuery();
+    const shopData = shop?.data;
+    const [theme, setTheme] = useState("#2563eb");
+    console.log("shopData :>> ", shopData);
+    const [updateShop, { isLoading: isUpdatingShop }] = useUpdateShopMutation();
+
     const form = useForm<z.infer<typeof shopInfoSchema>>({
         resolver: zodResolver(shopInfoSchema),
-        defaultValues: {
-            name: "",
-            email: "",
-            phoneNumber: "",
-            description: "",
-            address: "",
-            topBarMessage: "",
-            shopType: "",
-            vat: 0,
-            orderNote: "",
-            maintainStockQuantity: true,
-            showProductSoldCount: false,
+        values: {
+            name: shopData?.name || "",
+            // email: shopData?.email || "",
+            // phoneNumber: shopData?.phoneNumber || "",
+            description: shopData?.description || "",
+            // address: shopData?.address || "",
+            // topBarMessage: shopData?.topBarMessage || "",
+            shopType: shopData?.shopType || ShopType.OTHER,
+            // vat: shopData?.vat || 0,
+            // orderNote: shopData?.orderNote || "",
+            // maintainStockQuantity: shopData?.maintainStockQuantity || true,
+            // showProductSoldCount: shopData?.showProductSoldCount || false,
+            photoURL: shopData?.photoURL || "",
         },
     });
 
-    const onSubmit = (data: z.infer<typeof shopInfoSchema>) => {
+    const onSubmit = async (data: z.infer<typeof shopInfoSchema>) => {
+        const shopId = shopData?.id || "";
+        if (!shopId) return toast.error("Shop ID not found");
+
         console.log(data);
+        const payload: Partial<Shop> = {
+            name: data.name,
+            description: data.description,
+            shopType: data.shopType,
+            photoURL: data.photoURL,
+            theme,
+        };
+        await updateShop({
+            id: shopId,
+            payload,
+        })
+            .unwrap()
+            .then(() => {
+                toast.success("Shop updated successfully");
+                form.reset();
+            })
+            .catch((err) => {
+                toast.error(err?.data?.message || "Something went wrong");
+            });
     };
+
+    if (isLoadingShop) return <CustomLoading />;
 
     return (
         <div className={cn("space-y-6", className)}>
@@ -67,11 +105,11 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                 <CustomFormSearchSelect
                                     label="Shop Type"
                                     name="shopType"
-                                    options={shopCategories}
+                                    options={shopTypes}
                                     placeholder="Select Shop Type"
                                     control={form.control}
                                 />
-                                <CustomFormInput
+                                {/* <CustomFormInput
                                     label="Shop Email"
                                     name="email"
                                     type="email"
@@ -90,7 +128,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     placeholder="Enter Shop Address"
                                     control={form.control}
                                     className="col-span-2"
-                                />
+                                /> */}
                                 <CustomFormTextarea
                                     label="Shop Details (SEO & Data Feed)"
                                     name="description"
@@ -99,7 +137,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     className="col-span-2"
                                 />
 
-                                <CustomFormTextarea
+                                {/* <CustomFormTextarea
                                     label="Topbar Announcement Message"
                                     name="topBarMessage"
                                     className="col-span-2"
@@ -144,11 +182,35 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     placeholder="Enter Order Process Message Note"
                                     control={form.control}
                                     className="col-span-2"
+                                /> */}
+
+                                <CustomFormImage
+                                    label="Shop Logo"
+                                    name="photoURL"
+                                    control={form.control}
                                 />
+
+                                <div className="space-y-">
+                                    <Label>Shop Theme Color</Label>
+
+                                    <input
+                                        type="color"
+                                        value={theme}
+                                        onChange={(e) =>
+                                            setTheme(e.target.value)
+                                        }
+                                        className="w-full h-32 2xl:h-40 rounded-md border-none outline-none ring-0 [&::-webkit-color-swatch-wrapper]:rounded-md [&::-webkit-color-swatch]:rounded-md [&::-moz-color-swatch]:rounded-md"
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex justify-end pt-4">
-                                <Button type="submit">Update Shop Info</Button>
+                                <CustomButton
+                                    isLoading={isUpdatingShop}
+                                    type="submit"
+                                >
+                                    Update Shop Info
+                                </CustomButton>
                             </div>
                         </form>
                     </Form>

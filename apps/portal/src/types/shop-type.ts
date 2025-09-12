@@ -8,13 +8,32 @@ export type CreateShop = {
     photoURL: string;
 };
 
+export enum ShopType {
+    CLOTHING_APPAREL = "clothing_apparel",
+    SHOES_FOOTWEAR = "shoes_footwear",
+    ACCESSORIES_JEWELRY = "accessories_jewelry",
+    BEAUTY_COSMETICS = "beauty_cosmetics",
+    ELECTRONICS_GADGETS = "electronics_gadgets",
+    HEALTH_WELLNESS = "health_wellness",
+    HOME_FURNITURE = "home_furniture",
+    BOOKS_MEDIA = "books_media",
+    TOYS_GAMES = "toys_games",
+    SPORTS_OUTDOORS = "sports_outdoors",
+    FOOD_BEVERAGES = "food_beverages",
+    PET_SUPPLIES_EQUIPMENT = "pet_supplies_equipment",
+    GROCERIES_HOUSEHOLD = "groceries_household",
+    OTHER = "other",
+}
+
 export type Shop = {
     id: string;
     slug: string;
     name: string;
     description: string;
+    shopType: ShopType;
     banner: string;
     photoURL: string;
+    theme?: string;
     shopOwnerId: string;
     status: string;
     termsAndConditions?: string;

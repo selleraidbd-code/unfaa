@@ -10,11 +10,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import logo from "../../assets/images/logo.png";
 
+import { CustomButton } from "@/components/ui/custom-button";
 import { useSignUpMutation } from "@/redux/api/auth-api";
 import { persistor } from "@/redux/store";
-import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
-import { CustomFormError } from "@workspace/ui/components/custom/custom-form-error";
-import { Button } from "@workspace/ui/components/button";
 import {
     Card,
     CardContent,
@@ -22,6 +20,8 @@ import {
     CardHeader,
     CardTitle,
 } from "@workspace/ui/components/card";
+import { CustomFormError } from "@workspace/ui/components/custom/custom-form-error";
+import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { Form } from "@workspace/ui/components/form";
 import { cn } from "@workspace/ui/lib/utils";
 import Image from "next/image";
@@ -65,7 +65,7 @@ const SignUpForm = ({
             .unwrap()
             .then((res) => {
                 dispatch(setAuth(res.data));
-                router.push("/onboarding");
+                router.push("/auth/verify-user");
             })
             .catch((error) => {
                 setMessage(error.message);
@@ -140,13 +140,13 @@ const SignUpForm = ({
                                         <CustomFormError message={message} />
                                     )}
 
-                                    <Button
+                                    <CustomButton
                                         type="submit"
                                         className="w-full "
-                                        disabled={isLoading}
+                                        isLoading={isLoading}
                                     >
                                         Sign Up
-                                    </Button>
+                                    </CustomButton>
                                 </div>
 
                                 <div className="text-center text-blue-500 text-sm">

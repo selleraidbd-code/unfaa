@@ -23,6 +23,7 @@ export type Product = {
     updatedAt: string;
     shopId: string;
     deliveryId: string;
+    productVariant?: ProductVariant[];
     brandId: string;
     delivery: {
         deliveryZones: DeliveryZone[];
@@ -43,4 +44,23 @@ export type DeliveryZone = {
     isFree: boolean;
     createdAt: string;
     updatedAt: string;
+};
+
+export type ProductVariant = {
+    id: string;
+    name: string;
+    isRequired: boolean;
+    createdAt: string;
+    updatedAt: string;
+    productId: string;
+    options: ProductVariantOption[];
+};
+
+export type ProductVariantOption = {
+    id: string;
+    name: string;
+    imgUrl: string | null;
+    sku: string;
+    extraPrice: number;
+    productVariantId: string;
 };

@@ -1,85 +1,38 @@
 "use client";
 
-import { getShopDetails } from "@/actions/shop-actions";
+import { ThemeProvider } from "@/contexts/theme-provider";
 import { Shop, ShopTheme } from "@/types/shop-type";
-import { useParams } from "next/navigation";
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext } from "react";
 
 interface ShopContextType {
-  shop: Shop | null;
-  shopTheme: ShopTheme | undefined;
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
+    shop: Shop;
+    shopTheme: ShopTheme;
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 interface ShopProviderProps {
-  children: ReactNode;
+    children: ReactNode;
+    shop: Shop;
 }
 
-export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
-  const { domain } = useParams();
-  const domainString = domain as string;
-  const [shop, setShop] = useState<Shop | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const ShopProvider = ({ children, shop }: ShopProviderProps) => {
+    const value: ShopContextType = {
+        shop,
+        shopTheme: shop?.shopTheme,
+    };
 
-  const fetchShop = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await getShopDetails(domainString);
-
-      if (response && response.data) {
-        setShop(response.data);
-      } else {
-        throw new Error("Failed to fetch shop data");
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch shop data"
-      );
-      console.error("Error fetching shop:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!shop && domainString) {
-      fetchShop();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domainString]);
-
-  const refetch = async () => {
-    await fetchShop();
-  };
-
-  const value: ShopContextType = {
-    shop,
-    shopTheme: shop?.shopTheme,
-    loading,
-    error,
-    refetch,
-  };
-
-  return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
+    return (
+        <ShopContext.Provider value={value}>
+            <ThemeProvider themeColor={shop.theme}>{children}</ThemeProvider>
+        </ShopContext.Provider>
+    );
 };
 
 export const useShop = (): ShopContextType => {
-  const context = useContext(ShopContext);
-  if (context === undefined) {
-    throw new Error("useShop must be used within a ShopProvider");
-  }
-  return context;
+    const context = useContext(ShopContext);
+    if (context === undefined) {
+        throw new Error("useShop must be used within a ShopProvider");
+    }
+    return context;
 };

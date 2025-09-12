@@ -133,7 +133,7 @@
 
 @layer utilities {
     .container {
-        @apply mx-auto;
+        @apply mx-auto w-full px-4 md:w-[92%] lg:w-[98%] xl:px-6 2xl:px-0 xl:w-[1280px] 2xl:w-[1400px];
     }
     .scrollbar-thin {
         scrollbar-width: thin;
@@ -232,4 +232,23 @@
     @apply list-decimal;
     display: list-item;
     margin-left: 40px;
+}
+
+@keyframes pulse-wave {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 var(--color-primary);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 8px rgba(255, 0, 0, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+    }
+}
+
+.pulse-wave {
+    animation: pulse-wave 2s infinite;
 }

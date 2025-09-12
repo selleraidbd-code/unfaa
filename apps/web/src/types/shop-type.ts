@@ -104,6 +104,18 @@ export type Shop = {
     status: ShopStatus;
     landingPageLayout: string[];
     shopTheme: ShopTheme;
+
+    facebookLink?: string;
+    twitterLink?: string;
+    instagramLink?: string;
+    youtubeLink?: string;
+    tiktokLink?: string;
+    darazLink?: string;
+    discordLink?: string;
+    amazonLink?: string;
+    walmartLink?: string;
+    linkedInLink?: string;
+    whatsappNumber?: string;
 };
 
 // Shop owner types
@@ -140,6 +152,7 @@ export enum ShopPolicyType {
     TERMS_AND_CONDITIONS = "termsAndConditions",
     RETURN_POLICY = "returnPolicy",
     REFUND_POLICY = "refundPolicy",
+    ABOUT_US = "aboutUs",
 }
 
 export type ShopExtraInfo = {
@@ -148,4 +161,5 @@ export type ShopExtraInfo = {
     termsAndConditions?: string;
     returnPolicy?: string;
     refundPolicy?: string;
+    aboutUs?: string;
 };

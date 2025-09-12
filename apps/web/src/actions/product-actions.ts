@@ -6,32 +6,41 @@ import { CustomFetch } from "@/lib/CustomFetch";
 import { Product } from "@/types/product-type";
 
 export const getProducts = async ({
-  page,
-  limit,
+    page,
+    limit,
 }: {
-  page?: string;
-  limit?: number;
-  categoryId?: string;
+    page?: string;
+    limit?: number;
+    categoryId?: string;
 }) => {
-  const url = `/product?limit=${limit || 20}${page ? `&page=${page}` : ""}`;
-  console.log("called getProducts", url);
-  const products = await CustomFetch<PaginatedResponse<Product>>(url);
+    const url = `/product?limit=${limit || 20}${page ? `&page=${page}` : ""}`;
+    console.log("called getProducts", url);
+    const products = await CustomFetch<PaginatedResponse<Product>>(url);
 
-  console.log("products", products);
+    console.log("products", products);
 
-  return products;
+    return products;
 };
 
 export const getProductById = async (id: string) => {
-  const product = await CustomFetch<ResponseObject<Product>>(`/product/${id}`);
-  return product;
+    const product = await CustomFetch<ResponseObject<Product>>(
+        `/product/${id}`
+    );
+    return product;
 };
 
 export const getProductBySlug = async (shopSlug: string, slug: string) => {
-  const url = `/product/product-details/${shopSlug}/${slug}`;
-  console.log("getProductBySlug called", url);
-  const product = await CustomFetch<ResponseObject<Product>>(url);
-  return product;
+    const url = `/product/product-details/${shopSlug}/${slug}`;
+    console.log("getProductBySlug called", url);
+    const product = await CustomFetch<ResponseObject<Product>>(url);
+    return product;
+};
+
+export const getProductsBySearch = async (query: string) => {
+    const url = `/product/search?q=${encodeURIComponent(query)}`;
+    console.log("getProductsBySearch called", url);
+    const products = await CustomFetch<PaginatedResponse<Product>>(url);
+    return products;
 };
 
 // export const getAllProducts = async (): Promise<PaginatedResponse<Product>> => {

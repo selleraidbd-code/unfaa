@@ -44,6 +44,13 @@ const ManageShop = () => {
             slug: "shop-policy",
         },
         {
+            icon: Share2,
+            title: "Social Links",
+            description:
+                "Connect your shop with social media platforms to enhance visibility and engagement.",
+            slug: "social-links",
+        },
+        {
             icon: CreditCard,
             title: "Delivery Charge",
             description:
@@ -84,13 +91,6 @@ const ManageShop = () => {
             description:
                 "Provide instant communication and assistance to customers with chat support system.",
             slug: "chat-support",
-        },
-        {
-            icon: Share2,
-            title: "Social Links",
-            description:
-                "Connect your shop with social media platforms to enhance visibility and engagement.",
-            slug: "social-links",
         },
     ];
 

@@ -18,10 +18,17 @@ const ShopPolicy = () => {
     const user = useGetUser();
     const shopId = user?.shop.id || "";
     const shopSlug = user?.shop.slug || "";
+    const [aboutUs, setAboutUs] = useState("");
     const [termsAndConditions, setTermsAndConditions] = useState("");
     const [privacyPolicy, setPrivacyPolicy] = useState("");
     const [returnPolicy, setReturnPolicy] = useState("");
     const [refundPolicy, setRefundPolicy] = useState("");
+
+    const { data: aboutUsData, isLoading: isLoadingAboutUs } =
+        useGetShopPoliciesQuery({
+            shopSlug,
+            policyType: ShopPolicyType.ABOUT_US,
+        });
 
     const {
         data: termsAndConditionsData,
@@ -53,10 +60,27 @@ const ShopPolicy = () => {
         isLoadingTermsAndConditions ||
         isLoadingPrivacyPolicy ||
         isLoadingReturnPolicy ||
-        isLoadingRefundPolicy
+        isLoadingRefundPolicy ||
+        isLoadingAboutUs
     ) {
         return <CustomLoading />;
     }
+
+    const handleSaveAboutUs = async () => {
+        await updateShop({
+            id: shopId,
+            payload: {
+                aboutUs,
+            },
+        })
+            .unwrap()
+            .then(() => {
+                toast.success("About Us saved successfully");
+            })
+            .catch((error) => {
+                toast.error(error.data.message || "Failed to save About Us");
+            });
+    };
 
     const handleSaveTermsAndConditions = async () => {
         await updateShop({
@@ -135,6 +159,27 @@ const ShopPolicy = () => {
             <HeaderBackButton title="Shop Policy" href="/manage-shop" />
 
             <CustomCollapsible
+                title="About Us"
+                content={
+                    <div className="flex flex-col gap-6">
+                        <Editor
+                            content={aboutUsData?.data.aboutUs || ""}
+                            onChange={setAboutUs}
+                        />
+
+                        <CustomButton
+                            className="ms-auto"
+                            onClick={handleSaveAboutUs}
+                            isLoading={isCreatingPolicy}
+                            disabled={!aboutUs}
+                        >
+                            Save About Us
+                        </CustomButton>
+                    </div>
+                }
+            />
+
+            <CustomCollapsible
                 title="Terms and Conditions"
                 content={
                     <div className="flex flex-col gap-6">
@@ -157,6 +202,7 @@ const ShopPolicy = () => {
                     </div>
                 }
             />
+
             <CustomCollapsible
                 title="Privacy Policy"
                 content={

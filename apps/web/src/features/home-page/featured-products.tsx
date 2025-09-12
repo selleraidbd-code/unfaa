@@ -91,69 +91,69 @@ import { Swiper, SwiperSlide } from "swiper/react";
 // ];
 
 interface FeaturedProductsProps {
-  subtitle: string;
-  title: string;
-  uniqueId: string;
-  products: ShopSectionProduct[];
+    subtitle: string;
+    title: string;
+    uniqueId: string;
+    products: ShopSectionProduct[];
 }
 
 export const FeaturedProducts = ({
-  subtitle,
-  title,
-  uniqueId,
-  products,
+    subtitle,
+    title,
+    uniqueId,
+    products,
 }: FeaturedProductsProps) => {
-  return (
-    <section className="pb-16 container relative">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <p className="flex items-center gap-1.5">
-            <span className="w-1.5 h-6 bg-primary rounded-sm"></span>{" "}
-            <span className="text-lg">{subtitle}</span>
-          </p>
-          <h2 className="title mt-2">{title}</h2>
-        </div>
+    return (
+        <section className="pb-16 container relative">
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <p className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-6 bg-primary rounded-sm"></span>{" "}
+                        <span className="text-lg">{subtitle}</span>
+                    </p>
+                    <h2 className="title mt-2">{title}</h2>
+                </div>
 
-        {/* Navigation Arrows */}
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            className={`swiper-button-custom-prev-${uniqueId} size-12 rounded-full cursor-pointer disabled:bg-gray-400  bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center transition-colors duration-100`}
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="size-6" />
-          </button>
-          <button
-            className={`swiper-button-custom-next-${uniqueId} size-12 rounded-full cursor-pointer disabled:bg-gray-400 bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center transition-colors duration-100`}
-            aria-label="Next slide"
-          >
-            <ChevronRight className="size-6" />
-          </button>
-        </div>
-      </div>
+                {/* Navigation Arrows */}
+                <div className="flex items-center gap-4">
+                    <button
+                        type="button"
+                        className={`swiper-button-custom-prev-${uniqueId} size-12 rounded-full cursor-pointer disabled:bg-muted disabled:text-muted-foreground  bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center transition-colors duration-100`}
+                        aria-label="Previous slide"
+                    >
+                        <ChevronLeft className="size-6" />
+                    </button>
+                    <button
+                        className={`swiper-button-custom-next-${uniqueId} size-12 rounded-full cursor-pointer disabled:bg-muted disabled:text-muted-foreground bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center transition-colors duration-100`}
+                        aria-label="Next slide"
+                    >
+                        <ChevronRight className="size-6" />
+                    </button>
+                </div>
+            </div>
 
-      <Swiper
-        modules={[Navigation]}
-        spaceBetween={20}
-        navigation={{
-          nextEl: `.swiper-button-custom-next-${uniqueId}`,
-          prevEl: `.swiper-button-custom-prev-${uniqueId}`,
-        }}
-        breakpoints={{
-          640: { slidesPerView: 2 },
-          768: { slidesPerView: 3 },
-          1024: { slidesPerView: 3 },
-          1280: { slidesPerView: 4 },
-          1500: { slidesPerView: 5 },
-        }}
-        className="product-slider"
-      >
-        {products.map((product) => (
-          <SwiperSlide key={product.id}>
-            <ProductCard product={product.product} />
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </section>
-  );
+            <Swiper
+                modules={[Navigation]}
+                spaceBetween={20}
+                navigation={{
+                    nextEl: `.swiper-button-custom-next-${uniqueId}`,
+                    prevEl: `.swiper-button-custom-prev-${uniqueId}`,
+                }}
+                breakpoints={{
+                    640: { slidesPerView: 2 },
+                    768: { slidesPerView: 3 },
+                    1024: { slidesPerView: 3 },
+                    1280: { slidesPerView: 4 },
+                    1500: { slidesPerView: 5 },
+                }}
+                className="product-slider"
+            >
+                {products.map((product) => (
+                    <SwiperSlide key={product.id}>
+                        <ProductCard product={product.product} />
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+        </section>
+    );
 };

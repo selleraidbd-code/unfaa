@@ -36,12 +36,26 @@ export type Shop = {
     theme?: string;
     shopOwnerId: string;
     status: string;
-    termsAndConditions?: string;
-    returnPolicy?: string;
-    refundPolicy?: string;
-    privacyPolicy?: string;
     createdAt: string;
     updatedAt: string;
+    shopEmail?: string;
+    whatsappNumber?: string;
+    facebookLink?: string;
+    twitterLink?: string;
+    instagramLink?: string;
+    youtubeLink?: string;
+    tiktokLink?: string;
+    darazLink?: string;
+    discordLink?: string;
+    amazonLink?: string;
+    walmartLink?: string;
+    linkedInLink?: string;
+
+    termsAndConditions?: string;
+    privacyPolicy?: string;
+    returnPolicy?: string;
+    refundPolicy?: string;
+    aboutUs?: string;
 };
 
 export type ShopThemeProduct = {
@@ -100,6 +114,7 @@ export enum ShopPolicyType {
     TERMS_AND_CONDITIONS = "termsAndConditions",
     RETURN_POLICY = "returnPolicy",
     REFUND_POLICY = "refundPolicy",
+    ABOUT_US = "aboutUs",
 }
 
 export type ShopExtraInfo = {
@@ -109,4 +124,5 @@ export type ShopExtraInfo = {
     termsAndConditions: string;
     returnPolicy: string;
     refundPolicy: string;
+    aboutUs: string;
 };

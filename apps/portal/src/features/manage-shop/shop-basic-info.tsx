@@ -22,8 +22,8 @@ import { z } from "zod";
 const shopInfoSchema = z.object({
     name: z.string().min(1),
     description: z.string().min(1),
-    // email: z.string().email(),
-    // phoneNumber: z.string().min(1),
+    shopEmail: z.string().email(),
+    whatsappNumber: z.string(),
     // address: z.string().min(1),
     // topBarMessage: z.string().min(1),
     shopType: z.nativeEnum(ShopType),
@@ -45,8 +45,8 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
         resolver: zodResolver(shopInfoSchema),
         values: {
             name: shopData?.name || "",
-            // email: shopData?.email || "",
-            // phoneNumber: shopData?.phoneNumber || "",
+            shopEmail: shopData?.shopEmail || "",
+            whatsappNumber: shopData?.whatsappNumber || "",
             description: shopData?.description || "",
             // address: shopData?.address || "",
             // topBarMessage: shopData?.topBarMessage || "",
@@ -69,6 +69,8 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
             description: data.description,
             shopType: data.shopType,
             photoURL: data.photoURL,
+            whatsappNumber: data.whatsappNumber,
+            shopEmail: data.shopEmail,
             theme,
         };
         await updateShop({
@@ -109,26 +111,19 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     placeholder="Select Shop Type"
                                     control={form.control}
                                 />
-                                {/* <CustomFormInput
+                                <CustomFormInput
                                     label="Shop Email"
-                                    name="email"
+                                    name="shopEmail"
                                     type="email"
                                     placeholder="Enter Shop Email"
                                     control={form.control}
                                 />
                                 <CustomFormInput
                                     label="Shop Phone Number"
-                                    name="phoneNumber"
+                                    name="whatsappNumber"
                                     placeholder="Enter Shop Phone Number"
                                     control={form.control}
                                 />
-                                <CustomFormTextarea
-                                    label="Shop Address"
-                                    name="address"
-                                    placeholder="Enter Shop Address"
-                                    control={form.control}
-                                    className="col-span-2"
-                                /> */}
                                 <CustomFormTextarea
                                     label="Shop Details (SEO & Data Feed)"
                                     name="description"

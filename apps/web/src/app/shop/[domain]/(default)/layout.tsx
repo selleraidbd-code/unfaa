@@ -1,12 +1,32 @@
 import { Footer } from "@/components/shared/Footer";
-import { Navbar } from "@/components/shared/Navbar";
+import { Navbar } from "@/components/shared/navbar/Navbar";
+import { getShopDetails } from "@/actions/shop-actions";
+import { ShopNotFound } from "@/components/shop-not-found";
+import { FloatingCall } from "@/components/shared/floating-call";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = async ({
+    children,
+    params,
+}: {
+    children: React.ReactNode;
+    params: Promise<{ domain: string }>;
+}) => {
+    const { domain } = await params;
+    const shopDetails = await getShopDetails(domain);
+
+    // If no shop is found, show the ShopNotFound component without navbar/footer
+    if (!shopDetails?.data) {
+        return <ShopNotFound />;
+    }
+
+    console.log("shopDetails", shopDetails);
+
     return (
         <>
-            <Navbar />
+            <Navbar shop={shopDetails.data} />
             {children}
-            <Footer />
+            <FloatingCall phoneNumber={shopDetails.data.whatsappNumber} />
+            <Footer shop={shopDetails.data} />
         </>
     );
 };

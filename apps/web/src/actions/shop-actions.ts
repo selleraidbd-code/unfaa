@@ -21,7 +21,6 @@ export const getShopDetails = async (
     slug: string
 ): Promise<ResponseObject<Shop> | null> => {
     const shopSlug = slug.split(".")[0];
-    console.log("shopSlug", shopSlug);
 
     try {
         const response = await fetch(

@@ -7,7 +7,6 @@ export const getShopPolicy = async (
     policyType: ShopPolicyType
 ): Promise<ResponseObject<ShopExtraInfo> | null> => {
     const shopSlug = slug.split(".")[0];
-    console.log("shopSlug", shopSlug);
 
     try {
         const response = await fetch(

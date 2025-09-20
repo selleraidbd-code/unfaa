@@ -10,11 +10,16 @@ import {
     CartItem,
     cartStorage,
     MAX_QUANTITY,
+    SelectedVariant,
 } from "@/lib/cart";
 import { cn } from "@workspace/ui/lib/utils";
 import { CustomButton } from "@/components/ui/custom-button";
 
-const CartItems = () => {
+interface CartItemsProps {
+    shopId: string;
+}
+
+const CartItems: React.FC<CartItemsProps> = ({ shopId }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
     useEffect(() => {
@@ -30,7 +35,7 @@ const CartItems = () => {
 
     const handleQuantityChange = (
         productId: string,
-        variantId: string,
+        selectedVariants: SelectedVariant[],
         newQuantity: number
     ) => {
         if (newQuantity < 1) return;
@@ -40,12 +45,20 @@ const CartItems = () => {
             return;
         }
 
-        cartStorage.updateQuantity(productId, variantId, newQuantity);
+        cartStorage.updateQuantity(
+            productId,
+            shopId,
+            selectedVariants,
+            newQuantity
+        );
         window.dispatchEvent(new Event("cart-updated"));
     };
 
-    const handleRemoveItem = (productId: string, variantId: string) => {
-        cartStorage.removeItem(productId, variantId);
+    const handleRemoveItem = (
+        productId: string,
+        selectedVariants: SelectedVariant[]
+    ) => {
+        cartStorage.removeItem(productId, shopId, selectedVariants);
         window.dispatchEvent(new Event("cart-updated"));
     };
 
@@ -73,10 +86,10 @@ const CartItems = () => {
                 </p>
             </div>
 
-            {cartItems.map((item) => (
+            {cartItems.map((item, index) => (
                 <div
                     className="flex items-center gap-4 border-b py-4 lg:py-6"
-                    key={`${item.productId}-${item.variantId}`}
+                    key={`${item.productId}-${index}`}
                 >
                     <div className="flex w-full items-center gap-3 lg:w-[60%] lg:gap-5">
                         <Image
@@ -88,10 +101,22 @@ const CartItems = () => {
                         />
                         <div className="flex flex-col gap-1 max-lg:w-full">
                             <h3 className="font-medium">{item.name}</h3>
-                            {item.variant ? (
-                                <p className="text-sm text-muted-foreground max-lg:hidden">
-                                    Variant: {item.variant.name}
-                                </p>
+                            {item.selectedVariants &&
+                            item.selectedVariants.length > 0 ? (
+                                <div className="text-sm text-muted-foreground max-lg:hidden">
+                                    {item.selectedVariants.map(
+                                        (variant, idx) => (
+                                            <span key={idx}>
+                                                {variant.variantName}:{" "}
+                                                {variant.optionName}
+                                                {idx <
+                                                    item.selectedVariants
+                                                        .length -
+                                                        1 && ", "}
+                                            </span>
+                                        )
+                                    )}
+                                </div>
                             ) : null}
                             <div className="flex items-center justify-between gap-2 lg:hidden">
                                 <ItemQuantity
@@ -99,21 +124,20 @@ const CartItems = () => {
                                     onQuantityChange={(newQuantity) =>
                                         handleQuantityChange(
                                             item.productId,
-                                            item.variantId,
+                                            item.selectedVariants,
                                             newQuantity
                                         )
                                     }
                                 />
 
                                 <p className="flex items-center gap-1 text-sm font-medium">
-                                    <X className="size-3" /> ৳{" "}
-                                    {item.variant?.discountPrice || item.price}
+                                    <X className="size-3" /> ৳ {item.price}
                                 </p>
                                 <button
                                     onClick={() =>
                                         handleRemoveItem(
                                             item.productId,
-                                            item.variantId
+                                            item.selectedVariants
                                         )
                                     }
                                     className="hover:text-destructive"
@@ -130,7 +154,7 @@ const CartItems = () => {
                         onQuantityChange={(newQuantity) =>
                             handleQuantityChange(
                                 item.productId,
-                                item.variantId,
+                                item.selectedVariants,
                                 newQuantity
                             )
                         }
@@ -142,7 +166,10 @@ const CartItems = () => {
                         </p>
                         <button
                             onClick={() =>
-                                handleRemoveItem(item.productId, item.variantId)
+                                handleRemoveItem(
+                                    item.productId,
+                                    item.selectedVariants
+                                )
                             }
                             className="hover:text-destructive"
                         >

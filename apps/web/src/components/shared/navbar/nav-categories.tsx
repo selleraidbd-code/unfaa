@@ -15,7 +15,7 @@ export const NavCategories = ({
 }) => {
     const categoryItems = categories.map((category) => ({
         label: category.category.name,
-        href: `/categories/${category.category.id}`,
+        href: `/category/${category.category.id}`,
     }));
 
     return (

@@ -7,8 +7,10 @@ import CartSummary from "@/features/cart/CartSummary";
 
 import { cartStorage } from "@/lib/cart";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
+import { useShop } from "@/contexts/shop-context";
 
 const CartWrapper = () => {
+    const { shop } = useShop();
     const [isEmpty, setIsEmpty] = useState(true);
 
     useEffect(() => {
@@ -41,7 +43,7 @@ const CartWrapper = () => {
                     শপিং কার্ট
                 </h1>
                 <div className="grid gap-16 lg:grid-cols-3">
-                    <CartItems />
+                    <CartItems shopId={shop.id} />
                     <CartSummary />
                 </div>
             </div>

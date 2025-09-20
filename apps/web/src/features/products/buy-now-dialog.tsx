@@ -109,7 +109,10 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="flex-1 bg-black hover:bg-gray-800 text-white">
+                <Button
+                    size={"lg"}
+                    className="flex-1 bg-black hover:bg-gray-800 text-white"
+                >
                     Buy Now
                 </Button>
             </DialogTrigger>

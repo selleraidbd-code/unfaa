@@ -4,20 +4,36 @@ import { PaginatedResponse, ResponseObject } from "@/types";
 
 import { CustomFetch } from "@/lib/CustomFetch";
 import { Product } from "@/types/product-type";
+import { getUrlWithQueryParams } from "@/lib";
 
 export const getProducts = async ({
     page,
     limit,
+    categoryId,
+    searchTerm,
+    shopId,
+    minPrice,
+    maxPrice,
 }: {
     page?: string;
     limit?: number;
     categoryId?: string;
+    searchTerm?: string;
+    shopId?: string;
+    minPrice?: string;
+    maxPrice?: string;
 }) => {
-    const url = `/product?limit=${limit || 20}${page ? `&page=${page}` : ""}`;
-    console.log("called getProducts", url);
-    const products = await CustomFetch<PaginatedResponse<Product>>(url);
+    const url = getUrlWithQueryParams("/product", {
+        limit: limit || 20,
+        page,
+        categoryId,
+        searchTerm,
+        shopId,
+        minPrice,
+        maxPrice,
+    });
 
-    console.log("products", products);
+    const products = await CustomFetch<PaginatedResponse<Product>>(url);
 
     return products;
 };
@@ -31,16 +47,8 @@ export const getProductById = async (id: string) => {
 
 export const getProductBySlug = async (shopSlug: string, slug: string) => {
     const url = `/product/product-details/${shopSlug}/${slug}`;
-    console.log("getProductBySlug called", url);
     const product = await CustomFetch<ResponseObject<Product>>(url);
     return product;
-};
-
-export const getProductsBySearch = async (query: string) => {
-    const url = `/product/search?q=${encodeURIComponent(query)}`;
-    console.log("getProductsBySearch called", url);
-    const products = await CustomFetch<PaginatedResponse<Product>>(url);
-    return products;
 };
 
 // export const getAllProducts = async (): Promise<PaginatedResponse<Product>> => {

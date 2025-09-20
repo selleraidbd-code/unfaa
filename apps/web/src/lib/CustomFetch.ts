@@ -5,22 +5,33 @@ import config from "@/config";
 interface FetchOptions extends RequestInit {
     headers?: Record<string, string>;
     formData?: boolean;
+    next?: {
+        revalidate?: number | false;
+        tags?: string[];
+    };
 }
 
-export const CustomFetch = async <T>(endpoint: string, options: FetchOptions = {}): Promise<T | undefined> => {
+export const CustomFetch = async <T>(
+    endpoint: string,
+    options: FetchOptions = {}
+): Promise<T | undefined> => {
     const url: string = `${config.serverUrl}${endpoint}`;
 
-    options = {
-        ...options,
+    const { next, formData, ...fetchOptions } = options;
+
+    const finalOptions: RequestInit = {
+        ...fetchOptions,
         headers: {
-            ...options.headers,
-            ...(!options.formData && (!options.headers || !("Content-Type" in options.headers))
+            ...fetchOptions.headers,
+            ...(!formData &&
+            (!fetchOptions.headers || !("Content-Type" in fetchOptions.headers))
                 ? { "Content-Type": "application/json" }
                 : {}),
         },
+        ...(next && { next }),
     };
 
-    const response = await fetch(url, options);
+    const response = await fetch(url, finalOptions);
     if (response.status === 204) return;
 
     const body = await response.json();

@@ -7,6 +7,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
+    const categories = product?.categories;
     return (
         <Link
             href={`/products/${product.slug}`}
@@ -28,20 +29,22 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             </div>
 
             <div className="p-4 border-t ">
-                <h3 className="text-sm  bg-primary text-primary-foreground px-2 py-1 rounded-sm inline-block">
-                    {product?.categories
-                        ?.map((category) => category.category.name)
-                        .join(", ")}
-                </h3>
+                {categories && (
+                    <h3 className="text-sm  bg-primary text-primary-foreground px-2 py-1 rounded-sm inline-block">
+                        {categories
+                            ?.map((category) => category.category.name)
+                            .join(", ")}
+                    </h3>
+                )}
                 <p className="text-lg mt-3  transition-all duration-300 group-hover:text-primary group-hover:underline">
                     {product?.banglaName}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                     <p className="mt-1 text-xl font-semibold  text-primary">
-                        ${product?.price}
+                        ${product?.discountPrice}
                     </p>
                     <p className="text-sm mt-2 line-through text-muted-foreground">
-                        ${product?.discountPrice}
+                        ${product?.price}
                     </p>
                 </div>
             </div>

@@ -19,13 +19,13 @@ const Layout = async ({
         return <ShopNotFound />;
     }
 
-    console.log("shopDetails", shopDetails);
+    const whatsappNumber = shopDetails.data.whatsappNumber;
 
     return (
         <>
             <Navbar shop={shopDetails.data} />
             {children}
-            <FloatingCall phoneNumber={shopDetails.data.whatsappNumber} />
+            {whatsappNumber && <FloatingCall phoneNumber={whatsappNumber} />}
             <Footer shop={shopDetails.data} />
         </>
     );

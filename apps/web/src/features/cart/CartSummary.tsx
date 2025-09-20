@@ -13,7 +13,7 @@ type CartSummaryData = {
     itemCount: number;
 };
 
-const CartSummary = () => {
+const CartSummary: React.FC = () => {
     const [summary, setSummary] = useState<CartSummaryData>({
         subtotal: 0,
         shipping: 0,

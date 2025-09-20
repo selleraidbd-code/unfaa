@@ -103,6 +103,7 @@ export const FeaturedProducts = ({
     uniqueId,
     products,
 }: FeaturedProductsProps) => {
+    console.log("products", products);
     return (
         <section className="pb-16 container relative">
             <div className="flex items-center justify-between mb-8">

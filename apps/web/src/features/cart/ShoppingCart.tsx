@@ -7,7 +7,8 @@ import { useEffect, useState } from "react";
 import { ShoppingBag, Trash2 } from "lucide-react";
 
 import { CustomButton } from "@/components/ui/custom-button";
-import { CartItem, cartStorage } from "@/lib/cart";
+import { CartItem, cartStorage, SelectedVariant } from "@/lib/cart";
+import { useShop } from "@/contexts/shop-context";
 import {
     HoverCard,
     HoverCardContent,
@@ -17,6 +18,7 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
 
 const ShoppingCart = () => {
+    const { shop } = useShop();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [summary, setSummary] = useState({
         subtotal: 0,
@@ -51,8 +53,11 @@ const ShoppingCart = () => {
         return () => window.removeEventListener("cart-updated", updateCart);
     }, []);
 
-    const handleRemoveItem = (productId: string, variantId: string) => {
-        cartStorage.removeItem(productId, variantId);
+    const handleRemoveItem = (
+        productId: string,
+        selectedVariants: SelectedVariant[]
+    ) => {
+        cartStorage.removeItem(productId, shop.id, selectedVariants);
         window.dispatchEvent(new Event("cart-updated"));
     };
 
@@ -78,9 +83,9 @@ const ShoppingCart = () => {
             >
                 <div className="flex flex-col gap-2">
                     <ScrollArea className="flex max-h-[40dvh] flex-col gap-2 px-4">
-                        {cartItems.map((item) => (
+                        {cartItems.map((item, index) => (
                             <div
-                                key={`${item.productId}-${item.variantId}`}
+                                key={`${item.productId}-${index}`}
                                 className="flex items-center gap-2 py-1"
                             >
                                 <Image
@@ -92,19 +97,30 @@ const ShoppingCart = () => {
                                 />
                                 <div className="flex-1">
                                     <p className="text-sm font-medium">
-                                        {item.name} - {item.variant?.name}
+                                        {item.name}
+                                        {item.selectedVariants &&
+                                            item.selectedVariants.length >
+                                                0 && (
+                                                <span className="text-xs text-white/70">
+                                                    {" "}
+                                                    -{" "}
+                                                    {item.selectedVariants
+                                                        .map(
+                                                            (v) => v.optionName
+                                                        )
+                                                        .join(", ")}
+                                                </span>
+                                            )}
                                     </p>
                                     <div className="flex items-center justify-between font-medium">
                                         <p className="text-sm">
-                                            {item.quantity} × ৳{" "}
-                                            {/* {item.variant?.discountPrice ||
-                                                item.price} */}
+                                            {item.quantity} × ৳ {item.price}
                                         </p>
                                         <button
                                             onClick={() =>
                                                 handleRemoveItem(
                                                     item.productId,
-                                                    item.variantId
+                                                    item.selectedVariants
                                                 )
                                             }
                                             className="hover:text-destructive"

@@ -1,5 +1,5 @@
-import { getProductsBySearch } from "@/actions/product-actions";
-import { SearchResultsPage } from "../../../../../../features/products/SearchResultsPage";
+import { getProducts } from "@/actions/product-actions";
+import { SearchResultsPage } from "@/features/products/SearchResultsPage";
 
 const page = async ({
     params,
@@ -8,7 +8,7 @@ const page = async ({
 }) => {
     const { query } = await params;
     const decodedQuery = decodeURIComponent(query);
-    const products = await getProductsBySearch(decodedQuery);
+    const products = await getProducts({ searchTerm: decodedQuery });
 
     return (
         <div>

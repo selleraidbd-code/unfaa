@@ -55,7 +55,7 @@ export const baseQueryWithReAuth: BaseQueryFn<
 
             if (refreshResult.data) {
                 api.dispatch({
-                    type: "auth/setAuth",
+                    type: "auth/setToken",
                     payload: refreshResult.data,
                 });
 

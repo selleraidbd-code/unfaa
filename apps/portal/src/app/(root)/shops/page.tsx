@@ -14,7 +14,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 import Link from "next/link";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { useState } from "react";
 
 const ShopsPage = () => {

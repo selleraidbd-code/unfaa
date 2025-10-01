@@ -1,6 +1,6 @@
 import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
 import { CustomButton } from "@/components/ui/custom-button";
-import { SectionProductCard } from "@/features/manage-shop/website-customization/manage-section";
+import { ProductSelectionCard } from "@/features/products/product-selection-card";
 import useGetUser from "@/hooks/useGetUser";
 import { useGetProductsQuery } from "@/redux/api/product-api";
 import { useUpdateShopThemeSectionProductsMutation } from "@/redux/api/shop-theme-api";
@@ -17,7 +17,7 @@ import {
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 export const SelectProductDialog = ({
     shopThemeId,
@@ -100,7 +100,7 @@ export const SelectProductDialog = ({
                 >
                     <DialogContainer className="space-y-4 flex flex-wrap gap-4">
                         {products.map((product) => (
-                            <SectionProductCard
+                            <ProductSelectionCard
                                 key={product.id}
                                 product={product}
                                 isSelected={selectedProducts.includes(

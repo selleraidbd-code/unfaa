@@ -16,7 +16,7 @@ import { OrderItem } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 import { useState } from "react";
 
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 export type OrderDetails = {
     orderNotes: string;

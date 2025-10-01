@@ -16,7 +16,7 @@ import { useState, useCallback } from "react";
 import { useUploadImageMutation } from "@/redux/api/media-api";
 import { CloudUpload, Loader, UploadIcon, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { cn } from "@workspace/ui/lib/utils";
 import { useUpdateCoreThemeMutation } from "@/redux/api/shop-theme-api";
 

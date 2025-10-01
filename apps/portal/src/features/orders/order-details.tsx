@@ -5,7 +5,7 @@ import {
     useUpdateOrderMutation,
 } from "@/redux/api/order-api";
 import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 import { orderStatusOptions } from "@/features/orders/data";
 import { useAlert } from "@/hooks/useAlert";

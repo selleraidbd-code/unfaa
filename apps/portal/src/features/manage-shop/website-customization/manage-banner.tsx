@@ -7,7 +7,7 @@ import { useUpdateCoreThemeMutation } from "@/redux/api/shop-theme-api";
 import { Button } from "@workspace/ui/components/button";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 export const ManageBanner = ({ theme }: { theme: ShopTheme }) => {
     const bannerImg = theme.bannerImg || [];

@@ -3,7 +3,7 @@
 import { useAppSelector } from "@/redux/store/hook";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 export const VerificationProvider = ({
     children,

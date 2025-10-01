@@ -4,17 +4,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "@workspace/ui/components/sonner";
 import { Trash } from "lucide-react";
-import { toast } from "sonner";
 
+import { DataTable } from "@/components/table/data-table";
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import {
     useDeletePaymentMutation,
     useGetPaymentsQuery,
 } from "@/redux/api/payments-api";
 import { Payment } from "@/types/payments-type";
-import { DataTable } from "@/components/table/data-table";
-import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 

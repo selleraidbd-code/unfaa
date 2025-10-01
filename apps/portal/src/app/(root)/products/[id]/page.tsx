@@ -34,7 +34,7 @@ import { Form } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
 import { cn } from "@workspace/ui/lib/utils";
 import { Pencil, Plus, Trash2, X, Save } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 import { useAlert } from "@/hooks/useAlert";
 import { useState } from "react";

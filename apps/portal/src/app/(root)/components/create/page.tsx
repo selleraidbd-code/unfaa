@@ -15,7 +15,7 @@ import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
 import { EComponentType } from "@workspace/ui/landing/types";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 enum ERequiredFiled {
     REQUIRED = "required",

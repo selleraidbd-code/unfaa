@@ -3,7 +3,7 @@
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { StoreProvider } from "@/providers/StoreProvider";
-import { Toaster } from "sonner";
+import { Toaster } from "@workspace/ui/components/sonner";
 import { AlertProvider } from "@/providers/AlertProvider";
 import { UserInfoProvider } from "@/providers/user-info-provider";
 

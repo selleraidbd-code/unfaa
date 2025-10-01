@@ -7,13 +7,29 @@ import {
     TagType,
 } from "@/redux/type";
 
-import { Site } from "@/types/site-type";
+import { LandingPageDemo, Site } from "@/types/site-type";
 
 const landingPageApi = api.injectEndpoints({
     endpoints: (builder) => ({
         createLandingPage: builder.mutation({
             query: (payload) => ({
                 url: `/landingPageLayout`,
+                method: METHOD.POST,
+                body: payload,
+            }),
+            invalidatesTags: [TagType.LandingPage],
+        }),
+        createLandingPageWithSection: builder.mutation({
+            query: (payload) => ({
+                url: `/landingPageLayout/build-landing-layout-with-section`,
+                method: METHOD.POST,
+                body: payload,
+            }),
+            invalidatesTags: [TagType.LandingPage],
+        }),
+        createLandingPageDemoWithSection: builder.mutation({
+            query: (payload) => ({
+                url: `/landingPageLayout/build-landing-layout-demo-with-section`,
                 method: METHOD.POST,
                 body: payload,
             }),
@@ -52,6 +68,16 @@ const landingPageApi = api.injectEndpoints({
             }),
             providesTags: [TagType.LandingPage],
         }),
+        getLandingPageWithProductId: builder.query<
+            ResponseObject<LandingPageDemo>,
+            { productId: string }
+        >({
+            query: ({ productId }) => ({
+                url: `/landingPageLayout/${productId}`,
+                method: METHOD.GET,
+            }),
+            providesTags: [TagType.LandingPage],
+        }),
         updateLandingPage: builder.mutation<void, QueryParams>({
             query: (queryParams) => ({
                 url: `/landingPageLayout/details/${queryParams.slug}`,
@@ -72,10 +98,13 @@ const landingPageApi = api.injectEndpoints({
 
 export const {
     useCreateLandingPageMutation,
+    useCreateLandingPageWithSectionMutation,
+    useCreateLandingPageDemoWithSectionMutation,
     useAddSectionToLandingPageMutation,
     useAddFooterOrNavbarSectionToLandingPageMutation,
     useGetLandingPagesQuery,
     useGetLandingPageQuery,
     useUpdateLandingPageMutation,
     useDeleteLandingPageMutation,
+    useGetLandingPageWithProductIdQuery,
 } = landingPageApi;

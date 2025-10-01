@@ -13,7 +13,7 @@ import {
 } from "@/redux/api/brand-api";
 import { Brand } from "@/types/brand-type";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 const Page = () => {
     const user = useGetUser();

@@ -12,7 +12,7 @@ import { cn } from "@workspace/ui/lib/utils";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 interface ManageCategoriesProps {
     theme: ShopTheme;

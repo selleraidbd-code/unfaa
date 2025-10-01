@@ -20,7 +20,7 @@ import { Form } from "@workspace/ui/components/form";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 const employeeFormSchema = z.object({

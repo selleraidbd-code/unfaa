@@ -7,7 +7,7 @@ import { downloadQRCodeFromContainer } from "@/lib/qr-code-utils";
 import { Button } from "@workspace/ui/components/button";
 import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { Download } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 export const ShopSettingsRightSide = () => {
     const qrCodeRef = useRef<HTMLDivElement>(null);

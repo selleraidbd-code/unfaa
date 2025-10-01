@@ -7,16 +7,16 @@ import {
     useGetComponentQuery,
 } from "@/redux/api/component-api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@workspace/ui/components/sonner";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { FileUpload } from "@/components/file-upload";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { Button } from "@workspace/ui/components/button";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
 import CustomRadioGroup from "@workspace/ui/components/custom/custom-radio-group";
-import { HeaderBackButton } from "@/components/ui/custom-back-button";
-import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
 import { EComponentType } from "@workspace/ui/landing/types";
 import { useEffect } from "react";

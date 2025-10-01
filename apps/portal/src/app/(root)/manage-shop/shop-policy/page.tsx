@@ -12,7 +12,7 @@ import { ShopPolicyType } from "@/types/shop-type";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
 import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 const ShopPolicy = () => {
     const user = useGetUser();

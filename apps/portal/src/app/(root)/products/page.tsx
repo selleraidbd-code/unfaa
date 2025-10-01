@@ -11,7 +11,7 @@ import {
 import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import { PaginationState } from "@tanstack/react-table";
 import { Trash } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 import { Product } from "@/types/product-type";
 import useGetUser from "@/hooks/useGetUser";

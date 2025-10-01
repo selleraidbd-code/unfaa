@@ -15,6 +15,7 @@ type TCustomButton = {
         | "ghost"
         | "link"
         | "destructive"
+        | "destructiveOutline"
         | "accent";
     size?: "default" | "sm" | "lg" | "icon";
     icon?: React.ReactNode;

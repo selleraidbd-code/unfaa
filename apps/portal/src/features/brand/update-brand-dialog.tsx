@@ -15,7 +15,7 @@ import {
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 const brandFormSchema = z.object({

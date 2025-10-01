@@ -18,7 +18,7 @@ import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import useGetUser from "@/hooks/useGetUser";
 
 const CustomersPage = () => {

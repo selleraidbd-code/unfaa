@@ -1,139 +1,108 @@
 "use client";
 
-import { Site } from "@/types/site-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { useAlert } from "@/hooks/useAlert";
+import { useDeleteLandingPageTemplateMutation } from "@/redux/api/landing-page-template-api";
+import { LandingPageDemo } from "@/types/site-type";
 import { Badge } from "@workspace/ui/components/badge";
-import { Button } from "@workspace/ui/components/button";
-import { Eye } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { toast } from "@workspace/ui/components/sonner";
+import { Eye, Trash2 } from "lucide-react";
 
 interface TemplateCardProps {
-    template: Site;
+    template: LandingPageDemo;
+    isEditable?: boolean;
 }
 
-export function TemplateCard({ template }: TemplateCardProps) {
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isHovering, setIsHovering] = useState(false);
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+export const TemplateCard = ({
+    template,
+    isEditable = false,
+}: TemplateCardProps) => {
+    const { fire } = useAlert();
 
-    // Auto-scroll images when hovering
-    useEffect(() => {
-        if (isHovering && template.siteImageUrl) {
-            // intervalRef.current = setInterval(() => {
-            //     setCurrentImageIndex((prevIndex) =>
-            //         prevIndex === template.templateUrl.length - 1
-            //             ? 0
-            //             : prevIndex + 1
-            //     );
-            // }, 2000);
-        } else if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-        }
+    const [deleteTemplate] = useDeleteLandingPageTemplateMutation();
 
-        return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
-        };
-    }, [isHovering, template.siteImageUrl]);
-
-    const handleMouseEnter = () => {
-        setIsHovering(true);
-    };
-
-    const handleMouseLeave = () => {
-        setIsHovering(false);
-        // Reset to first image when not hovering
-        setCurrentImageIndex(0);
+    const handleDelete = async () => {
+        fire({
+            title: "Delete Template",
+            description: "Are you sure you want to delete this template?",
+            onConfirm: async () => {
+                await deleteTemplate({ id: template.id })
+                    .unwrap()
+                    .then(() => {
+                        toast.success("Template deleted successfully");
+                    })
+                    .catch((error) => {
+                        toast.error(
+                            error.data.message || "Failed to delete template"
+                        );
+                    });
+            },
+        });
     };
 
     return (
-        <div
-            className="group rounded-lg overflow-hidden border bg-card shadow-sm transition-all hover:shadow-md"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-        >
-            <div className="aspect-video w-full overflow-hidden bg-muted relative">
-                {/* {template.images.map((image, index) => (
-                    <div
-                        key={index}
-                        className={cn(
-                            "absolute inset-0 h-full w-full transition-opacity duration-500",
-                            currentImageIndex === index
-                                ? "opacity-100"
-                                : "opacity-0"
-                        )}
-                    >
-                        <Image
-                            src={image}
-                            alt={`${template.name} preview ${index + 1}`}
-                            width={600}
-                            height={400}
-                            className="h-full w-full object-cover object-center transition-transform group-hover:scale-105"
-                            priority={index === 0}
-                        />
-                    </div>
-                ))} */}
+        <div className="border flex flex-col overflow-hidden items-center rounded-lg  h-[550px] w-full max-xl:w-[500px]">
+            <div
+                className="w-full h-full cursor-pointer bg-cover bg-no-repeat bg-top transition-all duration-[3s] ease-in-out hover:bg-center focus:bg-top"
+                style={{
+                    backgroundImage: `url(${template.imgURL})`,
+                }}
+            />
 
-                {/* Image indicators */}
-                {/* {template.templateUrl && (
-                    <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
-                        {template.templateUrl.map((_, index) => (
-                            <div
-                                key={index}
-                                className={cn(
-                                    "h-1.5 w-6 rounded-full transition-all",
-                                    currentImageIndex === index
-                                        ? "bg-primary"
-                                        : "bg-primary/30"
-                                )}
-                            />
-                        ))}
-                    </div>
-                )} */}
-            </div>
-
-            <div className="p-4">
-                <div className="flex items-start justify-between">
-                    <h3 className="text-lg font-semibold">{template.name}</h3>
-                    {/* <Badge
+            {isEditable ? (
+                <CustomButton className="my-4">View Landing Page</CustomButton>
+            ) : (
+                <div className="p-4">
+                    <div className="flex items-start justify-between">
+                        <h3 className="text-lg font-semibold">
+                            {template.name}
+                        </h3>
+                        {/* <Badge
                         variant={template.isPublished ? "default" : "secondary"}
                         className="text-xs"
                     >
                         {template.isPublished ? "Published" : "Draft"}
                     </Badge> */}
-                </div>
+                    </div>
 
-                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                    {template.description || "No description available"}
-                </p>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                        {template.keyword || "No description available"}
+                    </p>
 
-                <div className="flex gap-2 mt-3 flex-wrap">
-                    <Badge variant="secondary" className="text-xs">
-                        {template.siteCategoryId}
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                        {template.theme}
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                        {template.siteType}
-                    </Badge>
-                </div>
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                        <Badge variant="secondary" className="text-xs">
+                            {template.theme}
+                        </Badge>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-2 mt-4">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={`/site/${template.subDomainName}`}>
-                            <Eye className="h-4 w-4 mr-1" />
+                    <div className="flex items-center gap-4 mt-4">
+                        <CustomButton
+                            variant="outline"
+                            size="sm"
+                            href={`/site/${template.slug}`}
+                        >
+                            <Eye />
                             Preview
-                        </Link>
-                    </Button>
-                    <Button size="sm" asChild>
-                        <Link href={`/templates/${template.id}`}>
+                        </CustomButton>
+
+                        <CustomButton
+                            size="sm"
+                            href={`/templates/${template.id}`}
+                        >
                             Use Template
-                        </Link>
-                    </Button>
+                        </CustomButton>
+
+                        <CustomButton
+                            size="sm"
+                            variant="destructiveOutline"
+                            onClick={handleDelete}
+                        >
+                            <Trash2 />
+                            Delete
+                        </CustomButton>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
-}
+};

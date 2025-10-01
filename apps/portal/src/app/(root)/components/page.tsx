@@ -17,7 +17,7 @@ import { Checkbox } from "@workspace/ui/components/checkbox";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 import { Component } from "@workspace/ui/landing/types";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 const ComponentsPage = () => {
     const router = useRouter();

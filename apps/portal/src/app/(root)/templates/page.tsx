@@ -1,27 +1,24 @@
 "use client";
 
 import { CustomButton } from "@/components/ui/custom-button";
-import { TemplateCard } from "@/features/templates/template-card";
-import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";
-import { SiteType } from "@/types/site-type";
-import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@workspace/ui/components/tabs";
-import { Plus, SlidersHorizontal } from "lucide-react";
 import { shopTypes } from "@/data/shop-data";
+import { TemplateCard } from "@/features/templates/template-card";
+import { useGetLandingPagesTemplateQuery } from "@/redux/api/landing-page-template-api";
+import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
+import { CustomSelect } from "@workspace/ui/components/custom/custom-select";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 
 const Templates = () => {
-    const { data } = useGetLandingPagesQuery({
-        siteType: SiteType.PORTFOLIO,
+    const [category, setCategory] = useState("");
+    const { data: templatesData } = useGetLandingPagesTemplateQuery({
+        category: category,
     });
 
-    const templates = data?.data || [];
-
-    console.log(data);
+    const categoryOptions = shopTypes.map((category) => ({
+        value: category.value,
+        label: category.label,
+    }));
 
     return (
         <div>
@@ -34,8 +31,17 @@ const Templates = () => {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-end gap-4">
                     <CustomSearch placeholder="Search templates..." />
+
+                    <CustomSelect
+                        label="Template Category"
+                        placeholder="Select Template category"
+                        value={category}
+                        onChange={setCategory}
+                        options={categoryOptions}
+                        className="max-w-48"
+                    />
 
                     <CustomButton href="/templates/create">
                         <Plus />
@@ -44,61 +50,10 @@ const Templates = () => {
                 </div>
             </div>
 
-            <div className="mb-8">
-                <Tabs defaultValue="all">
-                    <div className="flex items-center justify-between">
-                        <TabsList>
-                            <TabsTrigger value="all">All</TabsTrigger>
-                            {shopTypes.map((category) => (
-                                <TabsTrigger
-                                    key={category.value}
-                                    value={category.value}
-                                >
-                                    {category.label}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-
-                        <CustomButton variant="outline" size="sm">
-                            <SlidersHorizontal className="h-4 w-4 mr-2" />
-                            Filters
-                        </CustomButton>
-                    </div>
-
-                    <TabsContent value="all" className="mt-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {templates.map((template) => (
-                                <TemplateCard
-                                    key={template.id}
-                                    template={template}
-                                />
-                            ))}
-                        </div>
-                    </TabsContent>
-
-                    {shopTypes.map((category) => (
-                        <TabsContent
-                            key={category.value}
-                            value={category.value}
-                            className="mt-6"
-                        >
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {templates
-                                    .filter(
-                                        (template) =>
-                                            template.siteCategoryId ===
-                                            category.value
-                                    )
-                                    .map((template) => (
-                                        <TemplateCard
-                                            key={template.id}
-                                            template={template}
-                                        />
-                                    ))}
-                            </div>
-                        </TabsContent>
-                    ))}
-                </Tabs>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 gap-4">
+                {templatesData?.data.map((template) => (
+                    <TemplateCard key={template.id} template={template} />
+                ))}
             </div>
         </div>
     );

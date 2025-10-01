@@ -6,6 +6,7 @@ import {
     ResponseObject,
     TagType,
 } from "@/redux/type";
+import { Category } from "@/types/category-type";
 
 import {
     CreateShop,
@@ -67,6 +68,17 @@ const shopApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Shop],
         }),
+        getShopCategories: builder.query<
+            PaginatedResponse<Category>,
+            QueryParams
+        >({
+            query: (queryParams) => ({
+                url: `/site-category`,
+                method: METHOD.GET,
+                params: queryParams,
+            }),
+            providesTags: [TagType.Category],
+        }),
     }),
 });
 
@@ -77,4 +89,5 @@ export const {
     useUpdateShopMutation,
     useDeleteShopMutation,
     useGetShopPoliciesQuery,
+    useGetShopCategoriesQuery,
 } = shopApi;

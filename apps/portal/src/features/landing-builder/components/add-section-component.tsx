@@ -11,148 +11,156 @@ import { ArrowLeft, Plus } from "lucide-react";
 
 import { Button } from "@workspace/ui/components/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContainer,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { allComponentsTypeOptions } from "@workspace/ui/landing/data";
 import type { Component } from "@workspace/ui/landing/types";
 import { EComponentType, Section } from "@workspace/ui/landing/types";
+import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
 
-const AddSectionComponent = ({ type }: { type?: "navbar" | "footer" }) => {
-  const dispatch = useAppDispatch();
+export const AddSectionComponent = ({
+    type,
+}: {
+    type?: "navbar" | "footer";
+}) => {
+    const dispatch = useAppDispatch();
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedComponentType, setSelectedComponentType] = useState<
-    EComponentType | undefined
-  >(undefined);
-  const [step, setStep] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedComponentType, setSelectedComponentType] = useState<
+        EComponentType | undefined
+    >(undefined);
+    const [step, setStep] = useState(0);
 
-  const { data, isLoading, isFetching } = useGetComponentsQuery(
-    { type: selectedComponentType },
-    { skip: !selectedComponentType }
-  );
-
-  const handleAddSection = (single: Component) => {
-    const compo = allComponents.find(
-      (singleCompo) => singleCompo.name === single.name
+    const { data, isLoading, isFetching, isError } = useGetComponentsQuery(
+        { type: selectedComponentType },
+        { skip: !selectedComponentType }
     );
-    console.log("compo :>> ", allComponents);
 
-    if (!compo) return;
+    const handleAddSection = (single: Component) => {
+        const compo = allComponents.find(
+            (singleCompo) => singleCompo.name === single.name
+        );
+        console.log("compo :>> ", allComponents);
 
-    dispatch(
-      addNewSection({
-        componentInfo: single,
-        componentData: compo?.defaultValue as Section,
-      })
-    );
-    setIsOpen(false);
-  };
+        if (!compo) return;
 
-  const Step_1 = (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {allComponentsTypeOptions?.map((section) => (
-        <div
-          key={section.id}
-          className="group relative cursor-pointer overflow-hidden rounded-lg shadow-md transition-all hover:shadow-lg"
-          style={{
-            backgroundImage: `url(http://multi-media-server.naimurrhman.com/uploads/img/1744612373405-488001795.png)`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            height: "250px",
-          }}
-          onClick={() => {
-            setSelectedComponentType(section.type as EComponentType);
-            setStep(1);
-          }}
-        >
-          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/50 to-black/30 transition-all group-hover:from-black/90" />
+        dispatch(
+            addNewSection({
+                componentInfo: single,
+                componentData: compo?.defaultValue as Section,
+            })
+        );
+        setIsOpen(false);
+    };
 
-          <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
-            <div className="text-left">
-              <h3 className="mb-2 text-xl font-bold tracking-tight text-white transition-all group-hover:text-2xl">
-                {section.title}
-              </h3>
-              <p className="text-sm text-white/80 transition-opacity group-hover:opacity-100">
-                {section.description}
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+    const Step_1 = (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {allComponentsTypeOptions?.map((section) => (
+                <div
+                    key={section.id}
+                    className="group relative cursor-pointer overflow-hidden rounded-lg shadow-md transition-all hover:shadow-lg"
+                    style={{
+                        backgroundImage: `url(http://multi-media-server.naimurrhman.com/uploads/img/1744612373405-488001795.png)`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        height: "250px",
+                    }}
+                    onClick={() => {
+                        setSelectedComponentType(
+                            section.type as EComponentType
+                        );
+                        setStep(1);
+                    }}
+                >
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/50 to-black/30 transition-all group-hover:from-black/90" />
 
-  const Step_2 = (
-    <div>
-      {isLoading || isFetching ? (
-        <div>Loading ....</div>
-      ) : (
-        <div>
-          {data?.data.length ? (
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-              {data?.data.map((single) => (
-                <div key={single.id}>
-                  <button
-                    onClick={() => handleAddSection(single)}
-                    className="h-full w-full"
-                  >
-                    <Image
-                      src={single.imgURL}
-                      height={200}
-                      width={300}
-                      className="w-full rounded-lg object-cover"
-                      alt="section as image"
-                    ></Image>
-                    <span>{single.name}</span>
-                  </button>
+                    <div className="absolute inset-0 flex flex-col justify-end p-6 text-white">
+                        <div className="text-left">
+                            <h3 className="mb-2 text-xl font-bold tracking-tight text-white transition-all group-hover:text-2xl">
+                                {section.title}
+                            </h3>
+                            <p className="text-sm text-white/80 transition-opacity group-hover:opacity-100">
+                                {section.description}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-              ))}
+            ))}
+        </div>
+    );
+
+    const Step_2 = (
+        <EmptyErrorLoadingHandler
+            isLoading={isLoading || isFetching}
+            isError={isError}
+            isEmpty={data?.data.length === 0}
+        >
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                {data?.data.map((single) => (
+                    <div key={single.id}>
+                        <button
+                            onClick={() => handleAddSection(single)}
+                            className="h-full w-full"
+                        >
+                            <Image
+                                src={single.imgURL}
+                                height={200}
+                                width={300}
+                                className="w-full rounded-lg object-cover"
+                                alt="section as image"
+                            ></Image>
+                            <span>{single.name}</span>
+                        </button>
+                    </div>
+                ))}
             </div>
-          ) : (
-            <div>No component found</div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+        </EmptyErrorLoadingHandler>
+    );
 
-  const allStep = [Step_1, Step_2];
-  const titles = ["Select Section", "Select Design"];
+    const allStep = [Step_1, Step_2];
+    const titles = ["Select Section", "Select Design"];
 
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="accent" className="w-fit mx-auto capitalize" size="lg">
-          <Plus />
-          {`Add ${type || "Section"}`}
-        </Button>
-      </DialogTrigger>
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    variant="accent"
+                    className="w-fit mx-auto capitalize"
+                    size="lg"
+                >
+                    <Plus />
+                    {`Add ${type || "Section"}`}
+                </Button>
+            </DialogTrigger>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{titles[step]}</DialogTitle>
-          <DialogDescription className="sr-only">
-            {`Add ${type || "Section"}`}
-          </DialogDescription>
-        </DialogHeader>
+            <DialogContent className="lg:max-w-7xl">
+                <DialogHeader>
+                    <DialogTitle>{titles[step]}</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        {`Add ${type || "Section"}`}
+                    </DialogDescription>
+                </DialogHeader>
 
-        <div className="h-[73dvh] w-full overflow-y-auto">{allStep[step]}</div>
+                <DialogContainer>{allStep[step]}</DialogContainer>
 
-        <div className="flex justify-end">
-          {step >= 1 ? (
-            <Button variant="accent" onClick={() => setStep((pre) => pre - 1)}>
-              <ArrowLeft /> Back
-            </Button>
-          ) : null}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+                <DialogFooter className="flex justify-end">
+                    {step >= 1 ? (
+                        <Button
+                            variant="accent"
+                            onClick={() => setStep((pre) => pre - 1)}
+                        >
+                            <ArrowLeft /> Back
+                        </Button>
+                    ) : null}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 };
-
-export default AddSectionComponent;

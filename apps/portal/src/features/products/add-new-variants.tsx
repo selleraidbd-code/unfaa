@@ -17,7 +17,7 @@ import {
 import { Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 type ProductVariantFormType = z.infer<typeof productVariantSchema>;

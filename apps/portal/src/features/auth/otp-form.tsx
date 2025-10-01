@@ -12,7 +12,7 @@ import { ErrorResponse } from "@/redux/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { REGEXP_ONLY_DIGITS } from "@workspace/ui/components/input-otp";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 import { CustomButton } from "@/components/ui/custom-button";

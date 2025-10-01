@@ -89,9 +89,6 @@ importers:
       redux-persist:
         specifier: ^6.0.0
         version: 6.0.0(react@19.1.1)(redux@5.0.1)
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -117,6 +114,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^5.2.1
+        version: 5.2.1(react-hook-form@7.62.0(react@19.1.1))
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -135,12 +135,18 @@ importers:
       react-dom:
         specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
+      react-hook-form:
+        specifier: ^7.62.0
+        version: 7.62.0(react@19.1.1)
       react-icons:
         specifier: ^5.5.0
         version: 5.5.0(react@19.1.1)
       swiper:
         specifier: ^11.2.10
         version: 11.2.10
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: ^20.19.9

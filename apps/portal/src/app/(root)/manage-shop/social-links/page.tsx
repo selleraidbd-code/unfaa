@@ -10,7 +10,7 @@ import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-inp
 import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
 import { Form } from "@workspace/ui/components/form";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 const socialLinksSchema = z.object({

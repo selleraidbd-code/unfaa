@@ -9,7 +9,7 @@ import {
 } from "@/redux/api/tutorial-api";
 import { X } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 interface Tutorial {
     id: string;

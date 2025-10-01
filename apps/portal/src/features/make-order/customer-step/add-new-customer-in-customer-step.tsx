@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CheckCircle2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 import { CreateCustomer, Customer } from "@/types/customer-type";

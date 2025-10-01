@@ -21,7 +21,7 @@ import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-
 import { Form } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
 import { useForm, UseFormReturn } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 import { cn } from "@workspace/ui/lib/utils";
 import { ProductCeratePayload } from "@/types/product-type";

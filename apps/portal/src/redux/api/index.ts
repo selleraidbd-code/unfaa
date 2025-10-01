@@ -8,7 +8,7 @@ import {
     FetchBaseQueryError,
     retry,
 } from "@reduxjs/toolkit/query/react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 export const API_TIMEOUT = 60_000;
 export const API_BASE_URL = config.serverUrl;
@@ -54,9 +54,10 @@ export const baseQueryWithReAuth: BaseQueryFn<
             );
 
             if (refreshResult.data) {
+                const authData = refreshResult.data as { accessToken: string };
                 api.dispatch({
                     type: "auth/setToken",
-                    payload: refreshResult.data,
+                    payload: authData.accessToken,
                 });
 
                 result = await baseQuery(args, api, extraOptions);

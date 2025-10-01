@@ -37,15 +37,13 @@ const CartWrapper = () => {
     }
 
     return (
-        <div className="min-h-[85.1dvh] bg-background">
-            <div className="width py-8 lg:py-16">
-                <h1 className="mb-6 text-2xl font-bold lg:mb-12 lg:text-3xl">
-                    শপিং কার্ট
-                </h1>
-                <div className="grid gap-16 lg:grid-cols-3">
-                    <CartItems shopId={shop.id} />
-                    <CartSummary />
-                </div>
+        <div className="container space-y-5 py-8 lg:py-16 min-h-[70dvh]">
+            <h1 className="mb-6 text-2xl font-semibold lg:mb-12 lg:text-3xl">
+                Shopping Cart
+            </h1>
+            <div className="grid gap-16 lg:grid-cols-3">
+                <CartItems shopId={shop.id} />
+                <CartSummary />
             </div>
         </div>
     );

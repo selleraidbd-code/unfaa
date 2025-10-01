@@ -14,7 +14,7 @@ import {
 } from "@/redux/api/category-api";
 import { Category } from "@/types/category-type";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 const Page = () => {
     const user = useGetUser();

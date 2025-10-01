@@ -77,10 +77,7 @@ const ShoppingCart = () => {
                     {summary.itemCount}
                 </span>
             </HoverCardTrigger>
-            <HoverCardContent
-                className="w-80 border-foreground/90 bg-foreground/90 px-0 text-white"
-                align="end"
-            >
+            <HoverCardContent className="w-80 px-0" align="end">
                 <div className="flex flex-col gap-2">
                     <ScrollArea className="flex max-h-[40dvh] flex-col gap-2 px-4">
                         {cartItems.map((item, index) => (

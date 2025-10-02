@@ -57,6 +57,11 @@ const CheckoutForm = ({ children }: { children: React.ReactNode }) => {
         deliveryZoneId: "",
     });
 
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues,
+    });
+
     useEffect(() => {
         const savedForm = localStorage.getItem("checkout_form");
         if (savedForm) {
@@ -66,11 +71,6 @@ const CheckoutForm = ({ children }: { children: React.ReactNode }) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues,
-    });
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const cartItems = cartStorage.getCart();

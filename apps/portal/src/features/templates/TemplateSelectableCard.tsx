@@ -1,6 +1,6 @@
 "use client";
 
-import { LandingPageDemo } from "@/types/site-type";
+import { LandingPageDemo } from "@/types/landing-page-type";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Eye } from "lucide-react";

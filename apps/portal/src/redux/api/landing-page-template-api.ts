@@ -7,7 +7,7 @@ import {
     TagType,
 } from "@/redux/type";
 
-import { LandingPageDemo } from "@/types/site-type";
+import { LandingPageDemo } from "@/types/landing-page-type";
 
 const landingPageTemplateApi = api.injectEndpoints({
     endpoints: (builder) => ({

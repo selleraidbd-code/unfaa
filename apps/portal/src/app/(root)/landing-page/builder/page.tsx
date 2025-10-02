@@ -1,11 +1,14 @@
 "use client";
 
 import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { LandingPageCreator } from "@/features/landing-builder/components/LandingPageCreator";
 import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
 import { ShowSelectedTemplate } from "@/features/landing-builder/components/ShowSelectedTemplate";
 import { TemplateSelectableCard } from "@/features/templates/TemplateSelectableCard";
+import { useGetLandingPageWithProductIdQuery } from "@/redux/api/landing-page-api";
 import { useGetLandingPagesTemplateQuery } from "@/redux/api/landing-page-template-api";
-import { LandingPageDemo } from "@/types/site-type";
+import { LandingPageDemo } from "@/types/landing-page-type";
+import { Component } from "@workspace/ui/landing/types";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -22,15 +25,53 @@ const Page = () => {
         isError: templatesError,
     } = useGetLandingPagesTemplateQuery({});
 
+    const {
+        data: landingPage,
+        isLoading: landingPageLoading,
+        isError: landingPageError,
+    } = useGetLandingPageWithProductIdQuery(
+        { productId: productId as string },
+        { skip: !productId }
+    );
+
+    if (landingPageLoading || templatesLoading) return <div>Loading...</div>;
+    if (landingPageError) return <div>Error</div>;
+
+    if (landingPage?.data) {
+        const section = landingPage.data.section.map((section) => {
+            const { refaranceComponent, ...rest } = section;
+            return {
+                componentData: rest,
+                componentInfo: refaranceComponent as Component,
+            };
+        });
+        return (
+            <LandingPageCreator
+                basicInfo={{
+                    name: landingPage.data.name,
+                    keyword: landingPage.data.keyword,
+                }}
+                info={section}
+                productId={productId as string}
+            />
+        );
+    }
+
+    if (selectedTemplate) {
+        return (
+            <ShowSelectedTemplate
+                templateId={selectedTemplate.id as string}
+                productId={productId as string}
+            />
+        );
+    }
+
+    if (!productId) {
+        return <ProductSelectDialogForLandingPage open={true} />;
+    }
+
     return (
         <>
-            {selectedTemplate && (
-                <ShowSelectedTemplate
-                    templateId={selectedTemplate.id as string}
-                    productId={productId as string}
-                />
-            )}
-
             {!selectedTemplate && (
                 <EmptyErrorLoadingHandler
                     isLoading={templatesLoading}
@@ -58,8 +99,6 @@ const Page = () => {
                     </div>
                 </EmptyErrorLoadingHandler>
             )}
-
-            {!productId && <ProductSelectDialogForLandingPage open={true} />}
         </>
     );
 };

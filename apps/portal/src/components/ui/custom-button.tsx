@@ -20,6 +20,7 @@ type TCustomButton = {
     size?: "default" | "sm" | "lg" | "icon";
     icon?: React.ReactNode;
     type?: "button" | "submit" | "reset";
+    target?: "_blank" | "_self" | "_parent" | "_top";
 };
 
 export const CustomButton = ({
@@ -33,10 +34,11 @@ export const CustomButton = ({
     size = "default",
     icon,
     type = "button",
+    target = "_self",
 }: TCustomButton) => {
     if (href) {
         return (
-            <Link href={href}>
+            <Link href={href} target={target}>
                 <Button
                     className={className}
                     disabled={isLoading || disabled}

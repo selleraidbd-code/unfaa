@@ -1,6 +1,7 @@
 const config = {
-  serverUrl: process.env.NEXT_PUBLIC_SERVER_URL,
-  rootDomain: process.env.NEXT_PUBLIC_ROOT_DOMAIN || "unfaa.com",
+    serverUrl: process.env.NEXT_PUBLIC_SERVER_URL,
+    rootDomain: process.env.NEXT_PUBLIC_ROOT_DOMAIN || "unfaa.com",
+    nodeEnv: process.env.NEXT_PUBLIC_NODE_ENV || "development",
 };
 
 export default config;

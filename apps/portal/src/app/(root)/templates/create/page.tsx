@@ -16,7 +16,7 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { shopTypes } from "@/data/shop-data";
 import { ShowSelectedSection } from "@/features/landing-builder/components/show-selected-section";
 import { useCreateLandingPageDemoWithSectionMutation } from "@/redux/api/landing-page-api";
-import { SiteType } from "@/types/site-type";
+import { SiteType } from "@/types/landing-page-type";
 import { Button } from "@workspace/ui/components/button";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import { CustomSelect } from "@workspace/ui/components/custom/custom-select";

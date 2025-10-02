@@ -7,7 +7,7 @@ import {
     TagType,
 } from "@/redux/type";
 
-import { LandingPageDemo, Site } from "@/types/site-type";
+import { LandingPage, LandingPageDemo } from "@/types/landing-page-type";
 
 const landingPageApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -50,7 +50,10 @@ const landingPageApi = api.injectEndpoints({
                 body: payload.sections,
             }),
         }),
-        getLandingPages: builder.query<PaginatedResponse<Site>, QueryParams>({
+        getLandingPages: builder.query<
+            PaginatedResponse<LandingPage>,
+            QueryParams
+        >({
             query: (queryParams) => ({
                 url: `/landingPageLayout`,
                 method: METHOD.GET,
@@ -59,11 +62,11 @@ const landingPageApi = api.injectEndpoints({
             providesTags: [TagType.LandingPage],
         }),
         getLandingPage: builder.query<
-            ResponseObject<Site>,
-            { sub_domain: string }
+            ResponseObject<LandingPage>,
+            { slug: string }
         >({
-            query: ({ sub_domain }) => ({
-                url: `/landingPageLayout/${sub_domain}`,
+            query: ({ slug }) => ({
+                url: `/landingPageLayout/${slug}`,
                 method: METHOD.GET,
             }),
             providesTags: [TagType.LandingPage],

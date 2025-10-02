@@ -82,6 +82,7 @@ export const cartStorage = {
         }
 
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+        window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
     removeItem: (
@@ -100,6 +101,7 @@ export const cartStorage = {
                 )
         );
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updatedCart));
+        window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
     updateQuantity: (
@@ -123,10 +125,12 @@ export const cartStorage = {
                 : item
         );
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updatedCart));
+        window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
     clearCart: () => {
         localStorage.removeItem(CART_STORAGE_KEY);
+        window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
     getTotalItems: (): number => {

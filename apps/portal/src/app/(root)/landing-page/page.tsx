@@ -1,29 +1,36 @@
 "use client";
 
+import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
 import { CustomButton } from "@/components/ui/custom-button";
+import config from "@/config";
 import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
+import useGetUser from "@/hooks/useGetUser";
+import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";
+import { Button } from "@workspace/ui/components/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@workspace/ui/components/card";
+import { formatDateWithTime } from "@workspace/ui/lib/formateDate";
+import { Calendar, Edit, ExternalLink, Globe } from "lucide-react";
 import { useState } from "react";
 
-const landingPages = [
-    {
-        id: 1,
-        name: "Landing Page 1",
-        url: "https://evotechbd.info/wp-content/uploads/2025/06/screencapture-dev-evo-tech-pantheonsite-io-step-three-peace-2025-01-15-19_43_29-scaled-1.webp",
-    },
-    {
-        id: 2,
-        name: "Landing Page 2",
-        url: "https://evotechbd.info/wp-content/uploads/2025/06/screencapture-dev-evo-tech-pantheonsite-io-step-mustard-oil-2025-01-15-19_44_31-scaled-1.webp",
-    },
-    {
-        id: 3,
-        name: "Landing Page 3",
-        url: "https://evotechbd.info/wp-content/uploads/2025/06/screencapture-dev-evo-tech-pantheonsite-io-step-mustard-oil-2025-01-15-19_44_31-scaled-1.webp",
-    },
-];
-
 const Page = () => {
+    const user = useGetUser();
+    console.log("user", user);
     const [productSelectModalOpen, setProductSelectModalOpen] = useState(false);
+
+    const { data, isLoading, isError } = useGetLandingPagesQuery({
+        shopId: user?.shop.id,
+    });
+
+    const getLandingPageUrl = (pageSlug: string) => {
+        return `${config.nodeEnv === "development" ? "http" : "https"}://${user?.shop?.slug}.${config.rootDomain}/${pageSlug}`;
+    };
 
     return (
         <>
@@ -45,23 +52,65 @@ const Page = () => {
                     </CustomButton>
                 </div>
 
-                <div className="max-xl:flex xl:grid xl:grid-cols-3 flex-wrap gap-6 max-xl:justify-center">
-                    {landingPages.map((landingPage) => (
-                        <div
+                <EmptyErrorLoadingHandler
+                    isLoading={isLoading}
+                    isError={isError}
+                    isEmpty={data?.data.length === 0}
+                    emptyTitle="No landing pages found"
+                    emptyDescription="Create your first landing page to get started with building your online presence."
+                    emptyButton={
+                        <Button onClick={() => setProductSelectModalOpen(true)}>
+                            Create Landing Page
+                        </Button>
+                    }
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                    {data?.data.map((landingPage) => (
+                        <Card
                             key={landingPage.id}
-                            className="border flex flex-col items-center gap-4 rounded-lg p-4 h-[700px] w-full max-xl:w-[500px]"
+                            className="hover:shadow-lg transition-shadow duration-200"
                         >
-                            <div
-                                className="w-full h-full cursor-pointer bg-cover bg-no-repeat bg-top transition-all duration-[3s] ease-in-out hover:bg-center focus:bg-top"
-                                style={{
-                                    backgroundImage: `url(${landingPage.url})`,
-                                }}
-                            />
+                            <CardHeader>
+                                <CardTitle className="sub-title line-clamp-2">
+                                    {landingPage.name}
+                                </CardTitle>
 
-                            <CustomButton>View Landing Page</CustomButton>
-                        </div>
+                                <CardDescription className="flex items-center gap-1 text-sm">
+                                    <Globe className="size-3" />/
+                                    {landingPage.slug}
+                                </CardDescription>
+                            </CardHeader>
+
+                            <CardContent className="pt-0">
+                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                    <Calendar className="size-3" />
+                                    Created :{" "}
+                                    {formatDateWithTime(landingPage.createdAt)}
+                                </div>
+                            </CardContent>
+
+                            <CardFooter className="grid grid-cols-2 gap-4">
+                                <CustomButton
+                                    variant="outline"
+                                    href={`/landing-page/builder?productId=${landingPage.productId}`}
+                                    className="w-full"
+                                >
+                                    <Edit className="size-4" />
+                                    Edit Page
+                                </CustomButton>
+
+                                <CustomButton
+                                    target="_blank"
+                                    href={getLandingPageUrl(landingPage.slug)}
+                                    className="w-full"
+                                >
+                                    <ExternalLink className="size-4" />
+                                    View Page
+                                </CustomButton>
+                            </CardFooter>
+                        </Card>
                     ))}
-                </div>
+                </EmptyErrorLoadingHandler>
             </div>
 
             {productSelectModalOpen && (

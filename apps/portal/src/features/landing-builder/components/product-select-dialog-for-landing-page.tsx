@@ -37,7 +37,7 @@ export const ProductSelectDialogForLandingPage = ({
             toast.error("Please select a product");
             return;
         }
-        router.push(`/landing-page/create?productId=${selectedProductId}`);
+        router.push(`/landing-page/builder?productId=${selectedProductId}`);
         onClose?.();
     };
 

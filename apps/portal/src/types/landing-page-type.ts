@@ -57,54 +57,16 @@ export enum SiteType {
     TEMPLATE = "template",
 }
 
-export type Site = {
+export type LandingPage = {
     id: string;
-    userId: string;
+    shopId: string;
+    productId: string;
+    metaData: null;
     name: string;
-    theme: string | null;
-    expiryDate: string;
-    subDomainName: string;
-    siteCategoryId: string;
-    description: string;
-    siteType: SiteType;
-    siteImageUrl: string;
+    slug: string;
     keyword: string;
-    publishStatus: string;
-    navbarId: string | null;
-    sidebarId: string | null;
-    footerId: string | null;
-    metaData: null;
-    siteCategory: {
-        id: string;
-        name: string;
-        imgURL: string;
-        description: string;
-        createdAt: string;
-        updatedAt: string;
-    };
-    footer: Section | null;
-    navbar: Section | null;
-    sidebar: Section | null;
-    sitePage: [
-        {
-            id: string;
-            name: string;
-            pageTitle: string;
-        },
-    ];
     createdAt: string;
     updatedAt: string;
-};
-
-export type SitePage = {
-    id: string;
-    name: string;
-    pageTitle: string;
-    siteId: string;
-    createdAt: string;
-    updatedAt: string;
-    metaData: null;
-    section: Section[];
 };
 
 export type LandingPageDemo = {

@@ -64,7 +64,7 @@ const Page = () => {
                             <div className="overflow-y-auto md:max-h-[50dvh]">
                                 {cartItems.map((item) => (
                                     <div
-                                        key={`${item.productId}-${item.selectedVariants[0].variantId}`}
+                                        key={`${item.productId}-${item.selectedVariants[0]?.variantId || "no-variant"}`}
                                         className="flex items-center py-2.5"
                                     >
                                         <div className="flex w-[70%] items-center gap-2">
@@ -77,10 +77,16 @@ const Page = () => {
                                             />
                                             <div>
                                                 <p>{item.name}</p>
-                                                {item.variant?.name && (
+                                                {item.selectedVariants.length >
+                                                    0 && (
                                                     <p className="text-sm text-muted-foreground">
                                                         Variant:{" "}
-                                                        {item.variant?.name}
+                                                        {item.selectedVariants
+                                                            .map(
+                                                                (v) =>
+                                                                    v.optionName
+                                                            )
+                                                            .join(", ")}
                                                     </p>
                                                 )}
                                             </div>
@@ -89,8 +95,7 @@ const Page = () => {
                                         <div className="w-[30%]">
                                             <span>
                                                 {item.quantity} × ৳{" "}
-                                                {item.variant?.discountPrice ||
-                                                    item.price}
+                                                {item.price || 0}
                                             </span>
                                         </div>
                                     </div>

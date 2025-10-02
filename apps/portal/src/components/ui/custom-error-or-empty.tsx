@@ -13,6 +13,7 @@ interface CustomErrorOrEmptyProps {
     className?: string;
     href?: string;
     buttonText?: string;
+    button?: React.ReactNode;
 }
 
 export const CustomErrorOrEmpty = ({
@@ -24,6 +25,7 @@ export const CustomErrorOrEmpty = ({
     className,
     href,
     buttonText = "Go to",
+    button,
 }: CustomErrorOrEmptyProps) => {
     return (
         <div className={cn("center h-[60vh] flex-col", className)}>
@@ -63,6 +65,7 @@ export const CustomErrorOrEmpty = ({
                     {buttonText}
                 </CustomButton>
             )}
+            {button}
         </div>
     );
 };

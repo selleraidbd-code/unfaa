@@ -14,6 +14,7 @@ type TEmptyErrorLoadingHandler = {
     errorDescription?: string;
     isLoading?: boolean;
     loadingComponent?: React.ReactNode;
+    emptyButton?: React.ReactNode;
 };
 
 export const EmptyErrorLoadingHandler = ({
@@ -28,6 +29,7 @@ export const EmptyErrorLoadingHandler = ({
     errorTitle = "Something went wrong",
     errorDescription,
     loadingComponent,
+    emptyButton,
 }: TEmptyErrorLoadingHandler) => {
     if (isLoading) {
         if (loadingComponent) {
@@ -60,6 +62,7 @@ export const EmptyErrorLoadingHandler = ({
             <CustomErrorOrEmpty
                 title={emptyTitle}
                 description={emptyDescription}
+                button={emptyButton}
             />
         );
     }

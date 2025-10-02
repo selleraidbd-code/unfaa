@@ -1,3 +1,5 @@
+import { getDeliveryZones } from "@/actions/delivery-actions";
+import { useShop } from "@/contexts/shop-context";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSelect } from "@workspace/ui/components/custom/custom-form-select";
 import { useFormContext } from "react-hook-form";
@@ -23,6 +25,8 @@ const MOCK_DELIVERY_ZONES = [
 ];
 
 const BillingDetails = () => {
+    const { shop } = useShop();
+    console.log("shop", shop);
     const { control } = useFormContext();
 
     return (

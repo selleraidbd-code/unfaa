@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import {
     setEditing,
     setLandingPageData,
@@ -11,7 +9,7 @@ import { toast } from "@workspace/ui/components/sonner";
 
 import { useCreateLandingPageWithSectionMutation } from "@/redux/api/landing-page-api";
 import { useGetShopCategoriesQuery } from "@/redux/api/shop-api";
-import { SiteType } from "@/types/site-type";
+import { SiteType } from "@/types/landing-page-type";
 import { Button } from "@workspace/ui/components/button";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea";
@@ -30,14 +28,11 @@ export const LandingPageCreator = ({
     basicInfo,
     info,
     productId,
-    landingPageId,
 }: {
     basicInfo: { name: string; keyword: string };
     info: { componentData: Section; componentInfo: Component }[];
     productId: string;
-    landingPageId?: string;
 }) => {
-    const router = useRouter();
     const dispatch = useAppDispatch();
     const { theme } = useTheme();
 
@@ -68,6 +63,7 @@ export const LandingPageCreator = ({
 
     const [createLandingPageWithSection, { isLoading }] =
         useCreateLandingPageWithSectionMutation();
+
     const { data: categoryData } = useGetShopCategoriesQuery({
         limit: 200,
     });

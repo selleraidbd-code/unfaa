@@ -3,7 +3,7 @@
 import { CustomButton } from "@/components/ui/custom-button";
 import { useAlert } from "@/hooks/useAlert";
 import { useDeleteLandingPageTemplateMutation } from "@/redux/api/landing-page-template-api";
-import { LandingPageDemo } from "@/types/site-type";
+import { LandingPageDemo } from "@/types/landing-page-type";
 import { Badge } from "@workspace/ui/components/badge";
 import { toast } from "@workspace/ui/components/sonner";
 import { Eye, Trash2 } from "lucide-react";

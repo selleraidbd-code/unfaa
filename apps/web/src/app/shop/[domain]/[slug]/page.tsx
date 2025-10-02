@@ -13,7 +13,10 @@ type Props = {
 export async function generateStaticParams() {
     try {
         const response = await getLandingPages();
-        return response?.data.map((layout: LandingPage) => ({
+        if (!response?.data) {
+            return [];
+        }
+        return response.data.map((layout: LandingPage) => ({
             slug: layout.slug,
         }));
     } catch (error) {

@@ -4,7 +4,7 @@ import type React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { shopTypes } from "@/data/shop-data";
+import { ShopTypeEnum, shopTypes } from "@/data/shop-data";
 import { useCreateShopMutation } from "@/redux/api/shop-api";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -102,6 +102,39 @@ export default function ShopOnboarding() {
         }
     };
 
+    const getShopIdToClone = async (shopType: ShopTypeEnum) => {
+        switch (shopType) {
+            case ShopTypeEnum.CLOTHING_APPAREL:
+                return "be52c3b4-a534-4b88-a9ac-a02a9b25886a";
+            case ShopTypeEnum.SHOES_FOOTWEAR:
+                return "2";
+            case ShopTypeEnum.ACCESSORIES_JEWELRY:
+                return "3";
+            case ShopTypeEnum.BEAUTY_COSMETICS:
+                return "4";
+            case ShopTypeEnum.ELECTRONICS_GADGETS:
+                return "5";
+            case ShopTypeEnum.HEALTH_WELLNESS:
+                return "6";
+            case ShopTypeEnum.HOME_FURNITURE:
+                return "7";
+            case ShopTypeEnum.BOOKS_MEDIA:
+                return "8";
+            case ShopTypeEnum.TOYS_GAMES:
+                return "9";
+            case ShopTypeEnum.SPORTS_OUTDOORS:
+                return "10";
+            case ShopTypeEnum.FOOD_BEVERAGES:
+                return "11";
+            case ShopTypeEnum.PET_SUPPLIES_EQUIPMENT:
+                return "12";
+            case ShopTypeEnum.GROCERIES_HOUSEHOLD:
+                return "13";
+            case ShopTypeEnum.OTHER:
+                return "14";
+        }
+    };
+
     const onSubmit = async (data: z.infer<typeof onboardingFormSchema>) => {
         console.log(data);
         const shopData = {
@@ -110,6 +143,9 @@ export default function ShopOnboarding() {
             shopType: data.shopType || "",
             photoURL: data.photoUrl || "",
             banner: data.banner || "",
+            shopIdToClone: await getShopIdToClone(
+                data.shopType as ShopTypeEnum
+            ),
         };
 
         await createShop(shopData)
@@ -196,7 +232,7 @@ export default function ShopOnboarding() {
                                     placeholder="Describe your shop, products, and what makes you unique..."
                                     control={form.control}
                                     description="This will help customers understand what your shop is about"
-                                    // required
+                                    required
                                 />
 
                                 <CustomFormSelect

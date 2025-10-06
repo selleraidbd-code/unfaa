@@ -19,7 +19,6 @@ const landingPageTemplateApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.LandingPage],
         }),
-
         getLandingPagesTemplate: builder.query<
             PaginatedResponse<LandingPageDemo>,
             QueryParams

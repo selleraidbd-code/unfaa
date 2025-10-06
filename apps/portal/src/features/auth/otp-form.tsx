@@ -53,27 +53,29 @@ const OTPVerifyForm = () => {
             return;
         }
 
-        verifySignupOTP({
-            token: parseInt(otp),
-        })
-            .unwrap()
-            .then((res) => {
-                console.log(res);
-                dispatch(setUser(res.user));
-                dispatch(setToken(res.accessToken));
+        router.push("/onboarding");
 
-                toast.success("Verification has been successfully completed.");
-                router.replace("/onboarding");
-            })
-            .catch((er) => {
-                if (er?.status === 406) {
-                    handleResendOpt();
-                    form.reset();
-                    toast.error("The verification code has been resent.");
-                } else {
-                    toast.error(er?.data?.message || "Something went wrong.");
-                }
-            });
+        // verifySignupOTP({
+        //     token: parseInt(otp),
+        // })
+        //     .unwrap()
+        //     .then((res) => {
+        //         console.log(res);
+        //         dispatch(setUser(res.user));
+        //         dispatch(setToken(res.accessToken));
+
+        //         toast.success("Verification has been successfully completed.");
+        //         router.replace("/onboarding");
+        //     })
+        //     .catch((er) => {
+        //         if (er?.status === 406) {
+        //             handleResendOpt();
+        //             form.reset();
+        //             toast.error("The verification code has been resent.");
+        //         } else {
+        //             toast.error(er?.data?.message || "Something went wrong.");
+        //         }
+        //     });
     };
 
     const handleResendOpt = async () => {

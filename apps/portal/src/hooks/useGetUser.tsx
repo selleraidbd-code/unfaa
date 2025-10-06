@@ -7,10 +7,10 @@ const useGetUser = () => {
     const user = useAppSelector((state) => state.auth.user);
 
     const { data: userData } = useGetUserQuery(undefined, {
-        skip: !!user?.id,
+        skip: !!user?.shop?.id,
     });
 
-    if (user?.id) {
+    if (user?.shop?.id) {
         return user;
     }
 

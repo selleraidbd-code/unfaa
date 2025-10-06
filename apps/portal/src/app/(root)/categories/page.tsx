@@ -25,7 +25,7 @@ const Page = () => {
     );
 
     const { data, isLoading, isError } = useGetCategoriesQuery({
-        shopId: user?.shop.id,
+        shopId: user?.shop?.id,
         page: 1,
         limit: 50,
     });
@@ -82,11 +82,11 @@ const Page = () => {
                 >
                     {data?.data?.map((category: Category) => (
                         <CategoryCard
-                            key={category.id}
+                            key={category?.id}
                             category={category}
                             onEdit={() => onUpdate(category)}
                             onView={() => onView(category)}
-                            onDelete={() => onDelete(category.id)}
+                            onDelete={() => onDelete(category?.id)}
                         />
                     ))}
                 </EmptyErrorLoadingHandler>

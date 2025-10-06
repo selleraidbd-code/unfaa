@@ -74,7 +74,9 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
             customerAddress: customerInfo.address,
             deliveryZoneId: product?.delivery?.deliveryZones?.[0]?.id || "",
             orderStatus: OrderStatus.PLACED,
-            orderItems: [{ productId: product.id, quantity }],
+            orderItems: [
+                { productId: product.id, quantity, orderItemVariant: [] },
+            ],
         };
 
         const response = await fetch(url, {

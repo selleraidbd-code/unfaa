@@ -37,7 +37,7 @@ const CreateTemplate = () => {
     const portfolioImage = useAppSelector(
         (state) => state.landingPage.landingPageData.imgUrl
     );
-    const portfolioCategory = useAppSelector(
+    const shopCategory = useAppSelector(
         (state) => state.landingPage.landingPageData.category
     );
 
@@ -73,9 +73,9 @@ const CreateTemplate = () => {
             name: portfolioName,
             keyword: portfolioKeyword,
             imgURL: portfolioImage,
+            landingPageLayoutType: shopCategory,
         };
 
-        console.log("save", data);
         await createLandingPageDemoWithSection(data)
             .unwrap()
             .then((res) => {
@@ -139,7 +139,7 @@ const CreateTemplate = () => {
                 <CustomSelect
                     label="Template Category"
                     placeholder="Template Category"
-                    value={portfolioCategory}
+                    value={shopCategory}
                     options={categoryOptions}
                     onChange={(value) =>
                         dispatch(

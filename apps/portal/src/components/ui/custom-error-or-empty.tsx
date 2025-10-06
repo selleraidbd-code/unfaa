@@ -49,23 +49,25 @@ export const CustomErrorOrEmpty = ({
             <p className="text-icon max-w-lg text-center text-lg leading-relaxed">
                 {description}
             </p>
-            {isTryAgain && (
-                <Button
-                    className="mt-6 w-[160px]"
-                    onClick={() => {
-                        if (onRetry) onRetry();
-                        else window.location.reload();
-                    }}
-                >
-                    Try Again
-                </Button>
-            )}
-            {href && (
-                <CustomButton className="mt-6 w-[160px]" href={href}>
-                    {buttonText}
-                </CustomButton>
-            )}
-            {button}
+            <div className="flex flex-col gap-4 mt-4">
+                {isTryAgain && (
+                    <Button
+                        className="mt-6 w-[160px]"
+                        onClick={() => {
+                            if (onRetry) onRetry();
+                            else window.location.reload();
+                        }}
+                    >
+                        Try Again
+                    </Button>
+                )}
+                {href && (
+                    <CustomButton className="mt-6 w-[160px]" href={href}>
+                        {buttonText}
+                    </CustomButton>
+                )}
+                {button}
+            </div>
         </div>
     );
 };

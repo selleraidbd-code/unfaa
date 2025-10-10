@@ -2,6 +2,7 @@
 
 import { Logo } from "@/components/shared/logo";
 import ShoppingCart from "@/features/cart/ShoppingCart";
+import { getLink } from "@/lib/get-link";
 import { Shop } from "@/types/shop-type";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
@@ -19,14 +20,23 @@ export const TopNavbar = ({ shop }: { shop: Shop }) => {
 
         if (trimmedQuery) {
             const encodedQuery = encodeURIComponent(trimmedQuery);
-            router.push(`/search/${encodedQuery}`);
+            router.push(
+                getLink({
+                    shopSlug: shop.slug,
+                    path: `/search/${encodedQuery}`,
+                })
+            );
             setSearchQuery("");
         }
     };
 
     return (
         <div className="flex items-center justify-between py-2 container">
-            <Logo image={shop?.photoURL} className="flex-shrink-0" />
+            <Logo
+                shopSlug={shop.slug}
+                image={shop?.photoURL}
+                className="flex-shrink-0"
+            />
 
             <form
                 onSubmit={handleSearch}

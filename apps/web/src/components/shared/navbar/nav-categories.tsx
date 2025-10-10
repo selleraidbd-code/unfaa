@@ -1,3 +1,4 @@
+import { getLink } from "@/lib/get-link";
 import { ShopThemeCategory } from "@/types/shop-type";
 import {
     NavigationMenu,
@@ -10,12 +11,17 @@ import {
 
 export const NavCategories = ({
     categories,
+    shopSlug,
 }: {
     categories: ShopThemeCategory[];
+    shopSlug: string;
 }) => {
     const categoryItems = categories.map((category) => ({
         label: category.category.name,
-        href: `/category/${category.category.id}`,
+        href: getLink({
+            shopSlug,
+            path: `/category/${category.category.id}`,
+        }),
     }));
 
     return (

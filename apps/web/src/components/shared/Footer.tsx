@@ -10,6 +10,7 @@ import {
     FaWhatsapp,
     FaYoutube,
 } from "react-icons/fa";
+import { getLink } from "@/lib/get-link";
 
 interface FooterProps {
     shop: Shop;
@@ -81,7 +82,7 @@ export const Footer = ({ shop }: FooterProps) => {
                 <div className="flex w-full flex-col justify-between gap-10 lg:flex-row lg:items-start lg:text-left">
                     <div className="flex w-full flex-col justify-between gap-6 lg:items-start">
                         {/* Logo */}
-                        <Logo image={shop?.photoURL} />
+                        <Logo shopSlug={shop.slug} image={shop?.photoURL} />
 
                         <p className="max-w-[70%] text-sm text-muted line-clamp-3">
                             {shop?.description}
@@ -120,7 +121,14 @@ export const Footer = ({ shop }: FooterProps) => {
                                             key={linkIdx}
                                             className="font-medium hover:text-primary"
                                         >
-                                            <a href={link.href}>{link.name}</a>
+                                            <Link
+                                                href={getLink({
+                                                    shopSlug: shop.slug,
+                                                    path: link.href,
+                                                })}
+                                            >
+                                                {link.name}
+                                            </Link>
                                         </li>
                                     ))}
                                 </ul>

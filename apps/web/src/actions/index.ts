@@ -1,6 +1,6 @@
 "use server";
 
-import config from "@/config";
+import { config } from "@/config";
 
 type ApiRequestInit = RequestInit & {
     next?: NextFetchRequestConfig;

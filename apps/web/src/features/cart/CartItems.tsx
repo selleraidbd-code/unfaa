@@ -14,12 +14,14 @@ import {
 } from "@/lib/cart";
 import { cn } from "@workspace/ui/lib/utils";
 import { CustomButton } from "@/components/ui/custom-button";
+import { getLink } from "@/lib/get-link";
 
 interface CartItemsProps {
     shopId: string;
+    shopSlug: string;
 }
 
-const CartItems: React.FC<CartItemsProps> = ({ shopId }) => {
+const CartItems: React.FC<CartItemsProps> = ({ shopId, shopSlug }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
     useEffect(() => {
@@ -66,7 +68,13 @@ const CartItems: React.FC<CartItemsProps> = ({ shopId }) => {
         return (
             <div className="lg:col-span-2">
                 <div className="flex justify-end pt-6">
-                    <CustomButton href="/products" className="max-lg:w-full">
+                    <CustomButton
+                        href={getLink({
+                            shopSlug: shopSlug,
+                            path: "/products",
+                        })}
+                        className="max-lg:w-full"
+                    >
                         Continue Shopping
                     </CustomButton>
                 </div>
@@ -180,7 +188,13 @@ const CartItems: React.FC<CartItemsProps> = ({ shopId }) => {
             ))}
 
             <div className="flex justify-end pt-6">
-                <CustomButton href="/products" className="max-lg:w-full">
+                <CustomButton
+                    href={getLink({
+                        shopSlug: shopSlug,
+                        path: "/products",
+                    })}
+                    className="max-lg:w-full"
+                >
                     Continue Shopping
                 </CustomButton>
             </div>

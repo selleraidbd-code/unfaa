@@ -31,6 +31,7 @@ import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getLink } from "@/lib/get-link";
 
 type ProductsPageWrapperProps = {
     totalProducts: number;
@@ -39,6 +40,7 @@ type ProductsPageWrapperProps = {
     minPrice: number;
     maxPrice: number;
     children: React.ReactNode;
+    shopSlug: string;
 };
 export const ProductsPageWrapper = ({
     totalProducts,
@@ -47,6 +49,7 @@ export const ProductsPageWrapper = ({
     minPrice,
     maxPrice,
     children,
+    shopSlug,
 }: ProductsPageWrapperProps) => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -70,7 +73,9 @@ export const ProductsPageWrapper = ({
     };
 
     const clearFilters = () => {
-        router.push(`/products`, { scroll: false });
+        router.push(getLink({ shopSlug: shopSlug, path: "/products" }), {
+            scroll: false,
+        });
     };
 
     // Check if any filters are active
@@ -98,7 +103,7 @@ export const ProductsPageWrapper = ({
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink
-                            href="/"
+                            href={getLink({ shopSlug: shopSlug, path: "/" })}
                             className="flex items-center gap-2"
                         >
                             <HomeIcon className="w-4 h-4" />

@@ -16,6 +16,7 @@ import {
 } from "@workspace/ui/components/hover-card";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
+import { getLink } from "@/lib/get-link";
 
 const ShoppingCart = () => {
     const { shop } = useShop();
@@ -63,7 +64,7 @@ const ShoppingCart = () => {
 
     if (summary.itemCount === 0) {
         return (
-            <Link href="/cart">
+            <Link href={getLink({ shopSlug: shop.slug, path: "/cart" })}>
                 <ShoppingBag className="size-5 cursor-pointer hover:text-primary" />
             </Link>
         );
@@ -141,14 +142,20 @@ const ShoppingCart = () => {
                     <Separator className="my-2 bg-white/20" />
                     <div className="grid w-full grid-cols-2 gap-4 px-4">
                         <CustomButton
-                            href="/cart"
+                            href={getLink({
+                                shopSlug: shop.slug,
+                                path: "/cart",
+                            })}
                             className="w-full"
                             disabled={summary.itemCount === 0}
                         >
                             View Cart
                         </CustomButton>
                         <CustomButton
-                            href="/checkout"
+                            href={getLink({
+                                shopSlug: shop.slug,
+                                path: "/checkout",
+                            })}
                             className="w-full"
                             disabled={summary.itemCount === 0}
                         >

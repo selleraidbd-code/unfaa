@@ -10,20 +10,20 @@ import "swiper/css/pagination";
 import { Providers } from "@/providers";
 
 const fontSans = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
+    subsets: ["latin"],
+    variable: "--font-sans",
 });
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${fontSans.variable} font-sans antialiased `}>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <body className={`${fontSans.variable} font-sans antialiased `}>
+                <Providers>{children}</Providers>
+            </body>
+        </html>
+    );
 }

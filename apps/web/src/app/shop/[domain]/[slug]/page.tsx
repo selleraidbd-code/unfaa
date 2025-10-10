@@ -1,5 +1,5 @@
 import { getLandingPages } from "@/actions/landing-page-actions";
-import config from "@/config";
+import { config } from "@/config";
 import { LandingPage } from "@/types/landing-type";
 import { allComponents } from "@workspace/ui/landing/index";
 

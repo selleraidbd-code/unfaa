@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 
 import CartItems from "@/features/cart/CartItems";
-import CartSummary from "@/features/cart/CartSummary";
+import { CartSummary } from "@/features/cart/CartSummary";
 
 import { cartStorage } from "@/lib/cart";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 import { useShop } from "@/contexts/shop-context";
+import { getLink } from "@/lib/get-link";
 
 const CartWrapper = () => {
     const { shop } = useShop();
@@ -31,7 +32,7 @@ const CartWrapper = () => {
                 title="আপনি কোন প্রোডাক্ট যোগ করেননি"
                 description="আপনার কার্টে কোন প্রোডাক্ট নেই। প্রোডাক্ট যোগ করতে নিচের বাটনে ক্লিক করুন।"
                 buttonText="প্রোডাক্টগুলো দেখুন"
-                href="/products"
+                href={getLink({ shopSlug: shop.slug, path: "/products" })}
             />
         );
     }
@@ -42,8 +43,8 @@ const CartWrapper = () => {
                 Shopping Cart
             </h1>
             <div className="grid gap-16 lg:grid-cols-3">
-                <CartItems shopId={shop.id} />
-                <CartSummary />
+                <CartItems shopId={shop.id} shopSlug={shop.slug} />
+                <CartSummary shopSlug={shop.slug} />
             </div>
         </div>
     );

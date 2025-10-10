@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PRIMARY_DOMAIN = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || "unfaa.com";
+const PRIMARY_DOMAIN = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || "unfaa";
 
 export async function middleware(req: NextRequest) {
-    const { pathname, search } = req.nextUrl;
+    const { pathname } = req.nextUrl;
     const host = req.headers.get("host");
 
     // Skip middleware for static files
@@ -22,33 +22,22 @@ export async function middleware(req: NextRequest) {
 
     if (!domain || domain.trim() === "") return NextResponse.next();
 
-    const isPrimary =
-        domain === PRIMARY_DOMAIN ||
-        domain === "localhost" ||
-        domain.includes(".vercel.app") ||
-        /^\d+\.\d+\.\d+\.\d+$/.test(domain);
-
-    // console.log("domain", domain);
-    // console.log("isPrimary", isPrimary);
+    const isPrimary = domain.includes(PRIMARY_DOMAIN);
 
     // Primary domain (oneielts.com)
     if (isPrimary) {
         return NextResponse.next();
     }
 
-    console.log("domain", domain);
+    // Tenant domain - rewrite /shop/domain to /domain
+    // if (pathname.startsWith(`/shop/${domain}`)) {
+    //     const newPath = pathname.replace(`/shop/${domain}`, `/${domain}`);
+    //     const rewriteUrl = new URL(newPath, req.url);
+    //     rewriteUrl.search = search;
+    //     return NextResponse.rewrite(rewriteUrl);
+    // }
 
-    // Tenant domain
-    const orgPath = `/shop/${domain}`;
-    let rewriteUrl: URL | null = null;
-
-    // Setup rewrite if needed
-    if (!pathname.startsWith(orgPath)) {
-        rewriteUrl = new URL(`${orgPath}${pathname}`, req.url);
-        rewriteUrl.search = search;
-    }
-
-    return rewriteUrl ? NextResponse.rewrite(rewriteUrl) : NextResponse.next();
+    return NextResponse.next();
 }
 
 // Matcher configuration - exclude static files and API routes

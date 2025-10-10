@@ -1,16 +1,21 @@
+import { getLink } from "@/lib/get-link";
 import { Product } from "@/types/product-type";
 import Image from "next/image";
 import Link from "next/link";
 
 interface ProductCardProps {
     product: Product;
+    shopSlug: string;
 }
 
-export const ProductCard = ({ product }: ProductCardProps) => {
+export const ProductCard = ({ product, shopSlug }: ProductCardProps) => {
     const categories = product?.categories;
     return (
         <Link
-            href={`/products/${product.slug}`}
+            href={getLink({
+                shopSlug,
+                path: `/products/${product.slug}`,
+            })}
             className="rounded-md  block border border-gray-200 overflow-hidden transition-all duration-300 hover:border-primary group"
         >
             <div className="relative ">

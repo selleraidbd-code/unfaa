@@ -1,6 +1,6 @@
 "use client";
 
-import config from "@/config";
+import { config } from "@/config";
 import { QuantitySelector } from "@/features/products/quantity-selector";
 import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
 import { Product } from "@/types/product-type";

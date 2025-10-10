@@ -2,7 +2,7 @@
 
 import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
 import { CustomButton } from "@/components/ui/custom-button";
-import config from "@/config";
+import { config } from "@/config";
 import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
 import useGetUser from "@/hooks/useGetUser";
 import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";

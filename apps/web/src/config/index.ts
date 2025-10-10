@@ -1,6 +1,5 @@
-const config = {
+export const config = {
     serverUrl: process.env.NEXT_PUBLIC_SERVER_URL,
-    storeUrl: process.env.NEXT_PUBLIC_STORE_URL,
+    portalUrl: process.env.NEXT_PUBLIC_PORTAL_URL,
+    webUrl: process.env.NEXT_PUBLIC_WEB_URL,
 };
-
-export default config;

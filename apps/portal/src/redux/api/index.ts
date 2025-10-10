@@ -1,4 +1,4 @@
-import config from "@/config";
+import { config } from "@/config";
 import { METHOD, RootState, tagTypes } from "@/redux/type";
 import {
     BaseQueryFn,
@@ -19,6 +19,8 @@ export const baseQuery = fetchBaseQuery({
 
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).auth.accessToken;
+
+        console.log("token", token);
 
         if (token) {
             headers.set("Authorization", `${token}`);

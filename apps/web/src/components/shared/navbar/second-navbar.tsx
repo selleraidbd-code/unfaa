@@ -1,4 +1,5 @@
 import { NavCategories } from "@/components/shared/navbar/nav-categories";
+import { getLink } from "@/lib/get-link";
 import { Shop } from "@/types/shop-type";
 import { Phone } from "lucide-react";
 import Link from "next/link";
@@ -22,13 +23,19 @@ export const SecondNavbar = ({ shop }: { shop: Shop }) => {
     return (
         <div className="hidden lg:block border-t border-primary">
             <div className="flex items-center justify-between py-1 container mx-auto w-full">
-                <NavCategories categories={shop.shopTheme.categories} />
+                <NavCategories
+                    categories={shop.shopTheme.categories}
+                    shopSlug={shop.slug}
+                />
 
                 <nav className="flex items-center gap-8">
                     {navItems.map((item) => (
                         <Link
                             key={item.label}
-                            href={item.href}
+                            href={getLink({
+                                shopSlug: shop.slug,
+                                path: item.href,
+                            })}
                             className="text-foreground hover:text-primary font-medium"
                         >
                             {item.label}

@@ -37,11 +37,16 @@ const page = async ({
             brands={brands?.data || []}
             minPrice={minPrice ? parseInt(minPrice) : 0}
             maxPrice={maxPrice ? parseInt(maxPrice) : 1000}
+            shopSlug={domain}
         >
             {products?.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                     {products.map((product, index) => (
-                        <ProductCard key={index} product={product} />
+                        <ProductCard
+                            key={index}
+                            product={product}
+                            shopSlug={shopDetails?.data?.slug || ""}
+                        />
                     ))}
                 </div>
             ) : (

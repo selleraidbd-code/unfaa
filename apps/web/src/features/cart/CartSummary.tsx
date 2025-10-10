@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { cartStorage } from "@/lib/cart";
 import { CustomButton } from "@/components/ui/custom-button";
 import { Separator } from "@workspace/ui/components/separator";
+import { getLink } from "@/lib/get-link";
 
 type CartSummaryData = {
     subtotal: number;
@@ -13,7 +14,7 @@ type CartSummaryData = {
     itemCount: number;
 };
 
-const CartSummary: React.FC = () => {
+export const CartSummary = ({ shopSlug }: { shopSlug: string }) => {
     const [summary, setSummary] = useState<CartSummaryData>({
         subtotal: 0,
         shipping: 0,
@@ -68,11 +69,12 @@ const CartSummary: React.FC = () => {
                 </div>
             </div>
 
-            <CustomButton href="/checkout" className="w-full">
+            <CustomButton
+                href={getLink({ shopSlug: shopSlug, path: "/checkout" })}
+                className="w-full"
+            >
                 Proceed to Checkout
             </CustomButton>
         </div>
     );
 };
-
-export default CartSummary;

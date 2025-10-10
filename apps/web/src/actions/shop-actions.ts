@@ -1,4 +1,4 @@
-import config from "@/config";
+import { config } from "@/config";
 import { ResponseObject } from "@/types";
 import { Shop } from "@/types/shop-type";
 

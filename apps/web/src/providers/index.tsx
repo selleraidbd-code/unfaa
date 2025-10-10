@@ -9,9 +9,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <NextThemesProvider
             attribute="class"
             defaultTheme="light"
-            enableSystem
+            forcedTheme="light"
+            enableSystem={false}
             disableTransitionOnChange
-            enableColorScheme
+            enableColorScheme={false}
         >
             <Toaster position="top-center" richColors />
             {children}

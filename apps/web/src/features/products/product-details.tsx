@@ -1,3 +1,4 @@
+import { getLink } from "@/lib/get-link";
 import { ProductDetailsActionButtons } from "@/features/products/product-details-action-buttons";
 import { ProductDetailsImages } from "@/features/products/product-details-images";
 import { ProductDetailsSidebar } from "@/features/products/product-details-sidebar";
@@ -13,14 +14,23 @@ import {
 import { Separator } from "@workspace/ui/components/separator";
 import { HomeIcon } from "lucide-react";
 
-export const ProductDetails = ({ product }: { product: Product }) => {
+export const ProductDetails = ({
+    product,
+    shopSlug,
+}: {
+    product: Product;
+    shopSlug: string;
+}) => {
     return (
         <section className="container pb-12">
             <Breadcrumb className="my-6">
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink
-                            href="/"
+                            href={getLink({
+                                shopSlug,
+                                path: "/",
+                            })}
                             className="flex items-center gap-1"
                         >
                             <HomeIcon className="h-4 w-4" />

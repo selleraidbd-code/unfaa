@@ -26,30 +26,34 @@ export const revalidate = 1800; // 30 minutes in seconds
 // }
 
 const page = async ({ params }: { params: Promise<{ domain: string }> }) => {
-  const { domain } = await params;
+    const { domain } = await params;
 
-  const shopDetails = await getShopDetails(domain);
-  const categories = shopDetails?.data?.shopTheme?.categories || [];
-  const shopSections = shopDetails?.data?.shopTheme?.shopSection || [];
+    const shopDetails = await getShopDetails(domain);
+    const categories = shopDetails?.data?.shopTheme?.categories || [];
+    const shopSections = shopDetails?.data?.shopTheme?.shopSection || [];
 
-  return (
-    <div>
-      <HeroSection />
-      <HomeCategories categories={categories} />
+    return (
+        <div>
+            <HeroSection />
+            <HomeCategories
+                categories={categories}
+                shopSlug={shopDetails?.data?.slug as string}
+            />
 
-      {/* Top Selling Products  */}
+            {/* Top Selling Products  */}
 
-      {shopSections.map((section) => (
-        <FeaturedProducts
-          key={section.id}
-          subtitle={section.description}
-          title={section.title}
-          uniqueId={section.id}
-          products={section.products}
-        />
-      ))}
+            {shopSections.map((section) => (
+                <FeaturedProducts
+                    key={section.id}
+                    subtitle={section.description}
+                    title={section.title}
+                    uniqueId={section.id}
+                    products={section.products}
+                    shopSlug={shopDetails?.data?.slug as string}
+                />
+            ))}
 
-      {/* <FeaturedProducts
+            {/* <FeaturedProducts
         key="top-selling-products"
         subtitle="All The Time"
         title="Top Selling Products"
@@ -73,8 +77,8 @@ const page = async ({ params }: { params: Promise<{ domain: string }> }) => {
         title="Today Sell"
         uniqueId="featured-products"
       /> */}
-    </div>
-  );
+        </div>
+    );
 };
 
 export default page;

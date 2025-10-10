@@ -1,4 +1,4 @@
-import config from "@/config";
+import { config } from "@/config";
 import { ResponseObject } from "@/types";
 import { ShopExtraInfo, ShopPolicyType } from "@/types/shop-type";
 

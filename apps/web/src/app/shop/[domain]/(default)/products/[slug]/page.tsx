@@ -21,7 +21,7 @@ const page = async ({
         );
     }
 
-    return <ProductDetails product={product?.data} />;
+    return <ProductDetails product={product?.data} shopSlug={shopSlug} />;
 };
 
 export default page;

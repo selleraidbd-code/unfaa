@@ -1,4 +1,4 @@
-import config from "@/config";
+import { config } from "@/config";
 import {
     Card,
     CardContent,
@@ -73,7 +73,7 @@ export const ShopNotFound = () => {
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link
-                                href={`${config.storeUrl}/auth/sign-up`}
+                                href={`${config.portalUrl}/auth/sign-up`}
                                 target="_blank"
                                 className="bg-gradient-to-r flex items-center gap-2 from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105"
                             >

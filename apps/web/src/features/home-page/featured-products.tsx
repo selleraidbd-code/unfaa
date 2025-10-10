@@ -95,6 +95,7 @@ interface FeaturedProductsProps {
     title: string;
     uniqueId: string;
     products: ShopSectionProduct[];
+    shopSlug: string;
 }
 
 export const FeaturedProducts = ({
@@ -102,6 +103,7 @@ export const FeaturedProducts = ({
     title,
     uniqueId,
     products,
+    shopSlug,
 }: FeaturedProductsProps) => {
     console.log("products", products);
     return (
@@ -151,7 +153,10 @@ export const FeaturedProducts = ({
             >
                 {products.map((product) => (
                     <SwiperSlide key={product.id}>
-                        <ProductCard product={product.product} />
+                        <ProductCard
+                            product={product.product}
+                            shopSlug={shopSlug}
+                        />
                     </SwiperSlide>
                 ))}
             </Swiper>

@@ -1,11 +1,14 @@
+import { getLink } from "@/lib/get-link";
 import { ShopThemeCategory } from "@/types/shop-type";
 import Image from "next/image";
 import Link from "next/link";
 
 export const HomeCategories = ({
     categories,
+    shopSlug,
 }: {
     categories: ShopThemeCategory[];
+    shopSlug: string;
 }) => {
     return (
         <section className="container pb-8 sm:pb-12">
@@ -50,7 +53,10 @@ export const HomeCategories = ({
                 ) : (
                     categories.map((category) => (
                         <Link
-                            href={`/category/${category.categoryId}`}
+                            href={getLink({
+                                shopSlug,
+                                path: `/category/${category.categoryId}`,
+                            })}
                             key={category.id}
                             className="group cursor-pointer rounded-md mt-8 border-1  "
                         >

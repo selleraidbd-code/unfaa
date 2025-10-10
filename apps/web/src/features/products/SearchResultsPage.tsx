@@ -1,9 +1,11 @@
 "use client";
 
 import { ProductCard } from "@/features/home-page/product-card";
+import { getLink } from "@/lib/get-link";
 import { Product } from "@/types/product-type";
 import { Search } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 type SearchResultsPageProps = {
     products: Product[];
@@ -14,6 +16,7 @@ export const SearchResultsPage = ({
     products,
     searchQuery,
 }: SearchResultsPageProps) => {
+    const { domain } = useParams();
     return (
         <div className="container py-6 space-y-5 pb-12">
             <h1 className="text-xl font-semibold text-muted-foreground">
@@ -26,7 +29,11 @@ export const SearchResultsPage = ({
             {products.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {products.map((product, index) => (
-                        <ProductCard key={index} product={product} />
+                        <ProductCard
+                            key={index}
+                            product={product}
+                            shopSlug={domain as string}
+                        />
                     ))}
                 </div>
             ) : (
@@ -40,7 +47,10 @@ export const SearchResultsPage = ({
                         spelling.
                     </p>
                     <Link
-                        href="/products"
+                        href={getLink({
+                            shopSlug: domain as string,
+                            path: "/products",
+                        })}
                         className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                     >
                         Browse All Products

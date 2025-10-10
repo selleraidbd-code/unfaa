@@ -1,6 +1,6 @@
 "use server";
 
-import config from "@/config";
+import { config } from "@/config";
 
 interface FetchOptions extends RequestInit {
     headers?: Record<string, string>;

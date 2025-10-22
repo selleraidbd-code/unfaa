@@ -1,6 +1,6 @@
 "use client";
 
-import { BuyNowDialog } from "@/features/products/buy-now-dialog";
+import { BuyNowDialog } from "@/features/shop/products/buy-now-dialog";
 import {
     cartStorage,
     createSelectedVariants,

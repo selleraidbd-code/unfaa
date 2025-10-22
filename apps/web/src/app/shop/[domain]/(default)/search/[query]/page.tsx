@@ -1,5 +1,5 @@
 import { getProducts } from "@/actions/product-actions";
-import { SearchResultsPage } from "@/features/products/SearchResultsPage";
+import { SearchResultsPage } from "@/features/shop/products/SearchResultsPage";
 
 const page = async ({
     params,

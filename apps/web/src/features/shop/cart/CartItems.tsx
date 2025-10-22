@@ -21,7 +21,7 @@ interface CartItemsProps {
     shopSlug: string;
 }
 
-const CartItems: React.FC<CartItemsProps> = ({ shopId, shopSlug }) => {
+export const CartItems = ({ shopId, shopSlug }: CartItemsProps) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
     useEffect(() => {
@@ -236,5 +236,3 @@ const ItemQuantity = ({
         </div>
     );
 };
-
-export default CartItems;

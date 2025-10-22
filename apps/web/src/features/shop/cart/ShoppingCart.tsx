@@ -18,7 +18,7 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
 import { getLink } from "@/lib/get-link";
 
-const ShoppingCart = () => {
+export const ShoppingCart = () => {
     const { shop } = useShop();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [summary, setSummary] = useState({
@@ -167,5 +167,3 @@ const ShoppingCart = () => {
         </HoverCard>
     );
 };
-
-export default ShoppingCart;

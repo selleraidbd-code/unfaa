@@ -1,7 +1,7 @@
 "use client";
 
-import { Logo } from "@/components/shared/logo";
-import ShoppingCart from "@/features/cart/ShoppingCart";
+import { Logo } from "@/components/shop/logo";
+import { ShoppingCart } from "@/features/shop/cart/ShoppingCart";
 import { getLink } from "@/lib/get-link";
 import { Shop } from "@/types/shop-type";
 import { Button } from "@workspace/ui/components/button";

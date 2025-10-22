@@ -3,8 +3,8 @@ import { getCategories } from "@/actions/category-actions";
 import { getProducts } from "@/actions/product-actions";
 import { getShopDetails } from "@/actions/shop-actions";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-import { ProductCard } from "@/features/home-page/product-card";
-import { ProductsPageWrapper } from "@/features/products/products-page-wrapper";
+import { ProductCard } from "@/features/shop/home-page/product-card";
+import { ProductsPageWrapper } from "@/features/shop/products/products-page-wrapper";
 
 const page = async ({
     params,

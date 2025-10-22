@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import BillingDetails from "@/features/checkout/BillingDetails";
+import BillingDetails from "@/features/shop/checkout/BillingDetails";
 import { CircleDot } from "lucide-react";
 
 import { makeOrder } from "@/actions/order-actions";

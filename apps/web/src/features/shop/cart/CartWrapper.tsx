@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import CartItems from "@/features/cart/CartItems";
-import { CartSummary } from "@/features/cart/CartSummary";
+import { CartItems } from "@/features/shop/cart/CartItems";
+import { CartSummary } from "@/features/shop/cart/CartSummary";
 
 import { cartStorage } from "@/lib/cart";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";

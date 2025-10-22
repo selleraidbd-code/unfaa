@@ -1,7 +1,7 @@
 "use client";
 
 import { config } from "@/config";
-import { QuantitySelector } from "@/features/products/quantity-selector";
+import { QuantitySelector } from "@/features/shop/products/quantity-selector";
 import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 import { Button } from "@workspace/ui/components/button";

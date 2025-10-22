@@ -1,7 +1,7 @@
 import { getShopDetails } from "@/actions/shop-actions";
-import { FeaturedProducts } from "@/features/home-page/featured-products";
-import { HeroSection } from "@/features/home-page/hero-section";
-import { HomeCategories } from "@/features/home-page/home-categories";
+import { FeaturedProducts } from "@/features/shop/home-page/featured-products";
+import { HeroSection } from "@/features/shop/home-page/hero-section";
+import { HomeCategories } from "@/features/shop/home-page/home-categories";
 
 // Configure ISR with revalidation every 30 minutes
 export const revalidate = 1800; // 30 minutes in seconds

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import CartWrapper from "@/features/cart/CartWrapper";
+import CartWrapper from "@/features/shop/cart/CartWrapper";
 
 export const metadata: Metadata = {
     title: "Shopping Cart",

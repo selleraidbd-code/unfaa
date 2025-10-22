@@ -1,6 +1,6 @@
 import { getProductBySlug } from "@/actions/product-actions";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-import { ProductDetails } from "@/features/products/product-details";
+import { ProductDetails } from "@/features/shop/products/product-details";
 
 const page = async ({
     params,

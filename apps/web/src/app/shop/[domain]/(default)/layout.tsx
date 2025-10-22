@@ -1,8 +1,8 @@
-import { Footer } from "@/components/shared/Footer";
-import { Navbar } from "@/components/shared/navbar/Navbar";
+import { Footer } from "@/components/shop/Footer";
+import { Navbar } from "@/components/shop/navbar/Navbar";
 import { getShopDetails } from "@/actions/shop-actions";
 import { ShopNotFound } from "@/components/shop-not-found";
-import { FloatingCall } from "@/components/shared/floating-call";
+import { FloatingCall } from "@/components/shop/floating-call";
 
 const Layout = async ({
     children,

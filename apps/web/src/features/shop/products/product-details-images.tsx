@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductDetailsImageModal } from "@/features/products/product-details-image-modal";
+import { ProductDetailsImageModal } from "@/features/shop/products/product-details-image-modal";
 import Image from "next/image";
 import { useState } from "react";
 

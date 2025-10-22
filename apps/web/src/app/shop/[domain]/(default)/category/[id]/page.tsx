@@ -1,6 +1,6 @@
 import { getProducts } from "@/actions/product-actions";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-import { ProductCard } from "@/features/home-page/product-card";
+import { ProductCard } from "@/features/shop/home-page/product-card";
 import { getLink } from "@/lib/get-link";
 import {
     Breadcrumb,

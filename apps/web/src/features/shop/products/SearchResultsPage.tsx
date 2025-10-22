@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductCard } from "@/features/home-page/product-card";
+import { ProductCard } from "@/features/shop/home-page/product-card";
 import { getLink } from "@/lib/get-link";
 import { Product } from "@/types/product-type";
 import { Search } from "lucide-react";

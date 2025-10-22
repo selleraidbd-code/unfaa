@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Logo } from "@/components/shared/logo";
+import { Logo } from "@/components/shop/logo";
 import { Shop } from "@/types/shop-type";
 import {
     FaFacebook,

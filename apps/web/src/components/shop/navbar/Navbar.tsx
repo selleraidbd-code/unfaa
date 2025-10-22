@@ -1,7 +1,7 @@
 "use client";
 
-import { SecondNavbar } from "@/components/shared/navbar/second-navbar";
-import { TopNavbar } from "@/components/shared/navbar/top-navbar";
+import { SecondNavbar } from "@/components/shop/navbar/second-navbar";
+import { TopNavbar } from "@/components/shop/navbar/top-navbar";
 import { Shop } from "@/types/shop-type";
 
 export const Navbar = ({ shop }: { shop: Shop }) => {

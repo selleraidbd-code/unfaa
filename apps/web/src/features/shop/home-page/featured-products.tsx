@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductCard } from "@/features/home-page/product-card";
+import { ProductCard } from "@/features/shop/home-page/product-card";
 import { ShopSectionProduct } from "@/types/shop-type";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Navigation } from "swiper/modules";

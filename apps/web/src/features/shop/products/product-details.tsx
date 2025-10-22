@@ -1,7 +1,7 @@
 import { getLink } from "@/lib/get-link";
-import { ProductDetailsActionButtons } from "@/features/products/product-details-action-buttons";
-import { ProductDetailsImages } from "@/features/products/product-details-images";
-import { ProductDetailsSidebar } from "@/features/products/product-details-sidebar";
+import { ProductDetailsActionButtons } from "@/features/shop/products/product-details-action-buttons";
+import { ProductDetailsImages } from "@/features/shop/products/product-details-images";
+import { ProductDetailsSidebar } from "@/features/shop/products/product-details-sidebar";
 import { Product } from "@/types/product-type";
 import {
     Breadcrumb,

@@ -1,4 +1,4 @@
-import { NavCategories } from "@/components/shared/navbar/nav-categories";
+import { NavCategories } from "@/components/shop/navbar/nav-categories";
 import { getLink } from "@/lib/get-link";
 import { Shop } from "@/types/shop-type";
 import { Phone } from "lucide-react";

@@ -20,7 +20,7 @@ export const CategoryCard = ({
             alt={category.name}
             width={100}
             height={100}
-            className="size-48 object-cover rounded-md"
+            className="size-44 object-cover rounded-md"
         />
         <p className="font-semibold text-center">{category.name}</p>
         {(onEdit || onView || onDelete) && (

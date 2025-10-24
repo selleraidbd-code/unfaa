@@ -6,7 +6,6 @@ import {
     useReSendVerificationSignupOTPMutation,
     useVerifySignupOTPMutation,
 } from "@/redux/api/auth-api";
-import { setToken, setUser } from "@/redux/slices/auth-slice";
 import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
 import { ErrorResponse } from "@/redux/type";
 import { zodResolver } from "@hookform/resolvers/zod";

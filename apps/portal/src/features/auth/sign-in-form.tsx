@@ -1,17 +1,15 @@
 "use client";
 
 import { signInFormSchema } from "@/features/auth/auth-schemas";
-import { clearAuth, setAuth } from "@/redux/slices/auth-slice";
-import { useAppDispatch } from "@/redux/store/hook";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { loginAction } from "@/actions/auth-actions";
 import { CustomButton } from "@/components/ui/custom-button";
-import { useSignInMutation } from "@/redux/api/auth-api";
+import { useAuthSuccess } from "@/features/auth/hooks/use-auth-utils";
 import {
     Card,
     CardContent,
@@ -26,7 +24,6 @@ import Image from "next/image";
 import logo from "../../assets/images/logo.png";
 
 const SignInForm = () => {
-    const dispatch = useAppDispatch();
     const form = useForm<z.infer<typeof signInFormSchema>>({
         resolver: zodResolver(signInFormSchema),
         defaultValues: {
@@ -35,26 +32,25 @@ const SignInForm = () => {
         },
     });
 
-    const router = useRouter();
-    const [message, setMessage] = useState<string | undefined>("");
-    const [signIn, { isLoading }] = useSignInMutation();
+    const [error, setError] = useState<string | null>(null);
+    const [isPending, startTransition] = useTransition();
 
-    const onSubmit = async (data: z.infer<typeof signInFormSchema>) => {
-        setMessage("");
-        dispatch(clearAuth());
-        const { email, password } = data;
-        console.log(email, password);
-        await signIn({ email, password })
-            .unwrap()
-            .then((data) => {
-                if (data?.data?.user) {
-                    dispatch(setAuth(data.data));
-                    router.push("/");
-                }
-            })
-            .catch(() => {
-                setMessage("Invalid email or password");
-            });
+    const onSuccess = useAuthSuccess();
+
+    const onSubmit = (data: z.infer<typeof signInFormSchema>) => {
+        startTransition(async () => {
+            const response = await loginAction(data.email, data.password);
+
+            if (response.status === "success") {
+                onSuccess({
+                    accessToken: response.data.accessToken,
+                    refreshToken: response.data.refreshToken,
+                    user: response.data.user,
+                });
+            } else {
+                setError(response.error || "Something went wrong");
+            }
+        });
     };
 
     return (
@@ -107,12 +103,12 @@ const SignInForm = () => {
                                     </Link>
                                 </div>
 
-                                <CustomFormError message={message} />
+                                <CustomFormError message={error || undefined} />
 
                                 <CustomButton
                                     type="submit"
                                     className="w-full  "
-                                    isLoading={isLoading}
+                                    isLoading={isPending}
                                 >
                                     Sign In
                                 </CustomButton>

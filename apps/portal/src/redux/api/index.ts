@@ -1,5 +1,10 @@
 import { config } from "@/config";
-import { METHOD, RootState, tagTypes } from "@/redux/type";
+import {
+    logoutThunk,
+    setTokens,
+    setTokensThunk,
+} from "@/redux/slices/auth-slice";
+import { METHOD, ResponseObject, RootState, tagTypes } from "@/redux/type";
 import {
     BaseQueryFn,
     createApi,
@@ -19,8 +24,6 @@ export const baseQuery = fetchBaseQuery({
 
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).auth.accessToken;
-
-        console.log("token", token);
 
         if (token) {
             headers.set("Authorization", `${token}`);
@@ -45,7 +48,6 @@ export const baseQueryWithReAuth: BaseQueryFn<
         const refreshToken = (api.getState() as RootState).auth.refreshToken;
 
         if (refreshToken) {
-            console.log("refreshToken is available");
             const refreshResult = await baseQueryWithoutAuth(
                 {
                     url: "/auth/refresh-token",
@@ -56,19 +58,37 @@ export const baseQueryWithReAuth: BaseQueryFn<
                 extraOptions
             );
 
-            if (refreshResult.data) {
-                console.log("setting new token");
-                const authData = refreshResult.data as { accessToken: string };
-                api.dispatch({
-                    type: "auth/setToken",
-                    payload: authData.accessToken,
-                });
+            if (!refreshResult.error && refreshResult.data) {
+                const response = refreshResult.data as ResponseObject<{
+                    accessToken: string;
+                }>;
+                const tokens = {
+                    accessToken: response.data.accessToken,
+                    refreshToken: refreshToken,
+                };
+
+                api.dispatch(setTokens(tokens));
+                await api.dispatch(setTokensThunk(tokens));
 
                 result = await baseQuery(args, api, extraOptions);
             } else {
-                api.dispatch({ type: "auth/logout" });
+                await api.dispatch(logoutThunk());
                 toast.error("Session expired");
             }
+
+            // if (refreshResult.data) {
+            //     console.log("setting new token");
+            //     const authData = refreshResult.data as { accessToken: string };
+            //     api.dispatch({
+            //         type: "auth/setToken",
+            //         payload: authData.accessToken,
+            //     });
+
+            //     result = await baseQuery(args, api, extraOptions);
+            // } else {
+            //     api.dispatch({ type: "auth/logout" });
+            //     toast.error("Session expired");
+            // }
         } else {
             api.dispatch({ type: "auth/logout" });
         }

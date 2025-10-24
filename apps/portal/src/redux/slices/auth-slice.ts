@@ -1,16 +1,36 @@
-import { createSlice } from "@reduxjs/toolkit";
-
+import { logoutAction, revalidateTokensAction } from "@/actions/auth-actions";
 import { User } from "@/features/auth/auth-type";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface AuthState {
-    accessToken: string | null;
+type AuthState = {
     user: User | null;
+
+    state: "loading" | "success"; // TODO: Rethink about this
+
+    accessToken: string | null;
     refreshToken: string | null;
-}
+};
+
+// Async thunk for logout
+export const logoutThunk = createAsyncThunk("auth/logout", async () => {
+    await logoutAction();
+    window.location.reload();
+});
+
+// Set token to server side storage
+export const setTokensThunk = createAsyncThunk(
+    "auth/setTokens",
+    async (tokens: { accessToken: string; refreshToken: string }) => {
+        await revalidateTokensAction(tokens.accessToken, tokens.refreshToken);
+    }
+);
 
 const initialState: AuthState = {
-    accessToken: null,
     user: null,
+
+    state: "loading",
+
+    accessToken: null,
     refreshToken: null,
 };
 
@@ -18,29 +38,35 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setToken: (state, action) => {
-            state.accessToken = action.payload;
-        },
-        setUser: (state, action) => {
+        setUser: (state, action: PayloadAction<User>) => {
+            state.state = "success";
             state.user = action.payload;
         },
-        setAuth: (state, action) => {
+        clearAuth: (state) => {
+            state.user = null;
+            state.accessToken = null;
+            state.refreshToken = null;
+        },
+        setTokens: (
+            state,
+            action: PayloadAction<{ accessToken: string; refreshToken: string }>
+        ) => {
             state.accessToken = action.payload.accessToken;
-            state.user = action.payload.user;
             state.refreshToken = action.payload.refreshToken;
         },
-        clearAuth: (state) => {
-            state.accessToken = null;
-            state.user = null;
-            state.refreshToken = null;
+        setState: (state, action: PayloadAction<"loading" | "success">) => {
+            state.state = action.payload;
         },
-        logout: (state) => {
+    },
+    extraReducers: (builder) => {
+        builder.addCase(logoutThunk.fulfilled, (state) => {
+            state.user = null;
             state.accessToken = null;
             state.refreshToken = null;
-            state.user = null;
-        },
+        });
     },
 });
 
-export const { clearAuth, setToken, setUser, setAuth } = authSlice.actions;
+export const { setUser, clearAuth, setTokens, setState } = authSlice.actions;
+
 export default authSlice.reducer;

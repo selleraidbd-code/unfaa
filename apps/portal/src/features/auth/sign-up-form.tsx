@@ -1,18 +1,15 @@
 "use client";
 
 import { signUpFormSchema } from "@/features/auth/auth-schemas";
-import { clearAuth, setAuth } from "@/redux/slices/auth-slice";
-import { useAppDispatch } from "@/redux/store/hook";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import logo from "../../assets/images/logo.png";
 
+import { registerAction } from "@/actions/auth-actions";
 import { CustomButton } from "@/components/ui/custom-button";
-import { useSignUpMutation } from "@/redux/api/auth-api";
-import { persistor } from "@/redux/store";
+import { useAuthSuccess } from "@/features/auth/hooks/use-auth-utils";
 import {
     Card,
     CardContent,
@@ -25,15 +22,12 @@ import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-inp
 import { Form } from "@workspace/ui/components/form";
 import { cn } from "@workspace/ui/lib/utils";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import logo from "../../assets/images/logo.png";
 
 const SignUpForm = ({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"div">) => {
-    const router = useRouter();
-    const dispatch = useAppDispatch();
-
     const form = useForm<z.infer<typeof signUpFormSchema>>({
         resolver: zodResolver(signUpFormSchema),
         defaultValues: {
@@ -44,32 +38,35 @@ const SignUpForm = ({
         },
     });
 
-    const [signUp, { isLoading }] = useSignUpMutation();
+    const [error, setError] = useState<string | null>(null);
+    const [isPending, startTransition] = useTransition();
 
-    const [message, setMessage] = useState("");
+    const onSuccess = useAuthSuccess();
 
-    const onSubmit = async (data: z.infer<typeof signUpFormSchema>) => {
-        setMessage("");
-        dispatch(clearAuth());
-        persistor.purge();
+    const onSubmit = (data: z.infer<typeof signUpFormSchema>) => {
+        startTransition(async () => {
+            if (data.password !== data.confirmPassword) {
+                setError("Password and Confirm Password do not match");
+                return;
+            }
 
-        if (data.password !== data.confirmPassword) {
-            setMessage("Password and Confirm Password do not match");
-            return;
-        }
-        await signUp({
-            name: data.name,
-            email: data.email,
-            password: data.password,
-        })
-            .unwrap()
-            .then((res) => {
-                dispatch(setAuth(res.data));
-                router.push("/auth/verify-user");
-            })
-            .catch((error) => {
-                setMessage(error.message);
-            });
+            const response = await registerAction(
+                data.name,
+                data.email,
+                data.password
+            );
+
+            if (response.status === "success") {
+                onSuccess({
+                    accessToken: response.data.accessToken,
+                    refreshToken: response.data.refreshToken,
+                    user: response.data.user,
+                    path: "/auth/verify-user",
+                });
+            } else {
+                setError(response.error || "Something went wrong");
+            }
+        });
     };
 
     return (
@@ -136,14 +133,14 @@ const SignUpForm = ({
                                         required
                                     />
 
-                                    {message && (
-                                        <CustomFormError message={message} />
-                                    )}
+                                    <CustomFormError
+                                        message={error || undefined}
+                                    />
 
                                     <CustomButton
                                         type="submit"
                                         className="w-full "
-                                        isLoading={isLoading}
+                                        isLoading={isPending}
                                     >
                                         Sign Up
                                     </CustomButton>

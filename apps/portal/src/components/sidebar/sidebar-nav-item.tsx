@@ -36,9 +36,15 @@ export interface NavItemProps {
 
 export const SidebarNavItem = ({ item }: { item: NavItemProps }) => {
     const pathname = usePathname();
-    const { setOpen } = useSidebar();
+    const { setOpen, setOpenMobile, isMobile } = useSidebar();
 
     const isActive = pathname.split("/")[1] === item.url.split("/")[1];
+
+    const handleNavClick = () => {
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    };
 
     if (!item.items || item.items.length === 0) {
         return (
@@ -48,7 +54,7 @@ export const SidebarNavItem = ({ item }: { item: NavItemProps }) => {
                     asChild
                     isActive={isActive}
                 >
-                    <Link href={item.url}>
+                    <Link href={item.url} onClick={handleNavClick}>
                         {item.icon && <item.icon className="size-5 " />}
                         <span>{item.title}</span>
                     </Link>
@@ -90,7 +96,10 @@ export const SidebarNavItem = ({ item }: { item: NavItemProps }) => {
                                         asChild
                                         isActive={isSubItemActive}
                                     >
-                                        <Link href={subItem.url}>
+                                        <Link
+                                            href={subItem.url}
+                                            onClick={handleNavClick}
+                                        >
                                             <span className="xl:text-base">
                                                 {subItem.title}
                                             </span>

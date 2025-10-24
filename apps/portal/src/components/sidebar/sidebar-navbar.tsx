@@ -1,3 +1,5 @@
+"use client";
+
 import { ThemeSwitcher } from "@/components/shared/theme-switcher";
 import { NavUser } from "@/components/sidebar/nav-user";
 import { CustomButton } from "@/components/ui/custom-button";

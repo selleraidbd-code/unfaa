@@ -1,15 +1,15 @@
 import {
+    Bell,
     ChevronDown,
     CreditCard,
     LogOut,
-    Bell,
     UserCircle,
 } from "lucide-react";
 
-import { clearAuth } from "@/redux/slices/auth-slice";
+import { User } from "@/features/auth/auth-type";
+import { logoutThunk } from "@/redux/slices/auth-slice";
 import {} from "@/redux/store";
 import { useAppDispatch } from "@/redux/store/hook";
-import { User } from "@/features/auth/auth-type";
 import {
     Avatar,
     AvatarFallback,
@@ -29,15 +29,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
-import { useRouter } from "next/navigation";
 
 export function NavUser({ user }: { user: User | null }) {
-    const router = useRouter();
     const dispatch = useAppDispatch();
 
-    const handleSignOut = () => {
-        dispatch(clearAuth());
-        router.push("/auth/sign-in");
+    const handleSignOut = async () => {
+        dispatch(logoutThunk());
     };
 
     return (

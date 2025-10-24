@@ -15,12 +15,12 @@ import { CustomSelect } from "@workspace/ui/components/custom/custom-select";
 import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { Separator } from "@workspace/ui/components/separator";
 import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-} from "@workspace/ui/components/sheet";
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@workspace/ui/components/dialog";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 
 export const OrderDetails = ({
@@ -84,163 +84,168 @@ export const OrderDetails = ({
     };
 
     return (
-        <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetHeader className="sr-only">
-                <SheetTitle>Order Details</SheetTitle>
-                <SheetDescription>Order Details</SheetDescription>
-            </SheetHeader>
-            <SheetContent className="sm:max-w-2xl px-6 py-8">
-                <div className="flex justify-between">
-                    <div className="space-y-0.5">
-                        <CustomTextCopy
-                            prefixText="Order"
-                            text={order?.orderNumber.toString() || ""}
-                            copy={true}
-                            className="sub-title w-fit"
-                            textClassName="lg:text-xl"
-                        />
-                        <p className="text-muted-foreground text-sm">
-                            Date:{" "}
-                            {order
-                                ? formatDate(order.createdAt)
-                                : "Select an order"}
-                        </p>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Order Details</DialogTitle>
+                    <DialogDescription>
+                        View and manage order information
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6">
+                    {/* Order Header */}
+                    <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                            <CustomTextCopy
+                                prefixText="Order"
+                                text={order?.orderNumber.toString() || ""}
+                                copy={true}
+                                className="sub-title w-fit"
+                                textClassName="text-xl font-semibold"
+                            />
+                            <p className="text-muted-foreground text-sm">
+                                Date:{" "}
+                                {order
+                                    ? formatDate(order.createdAt)
+                                    : "Select an order"}
+                            </p>
+                        </div>
+
+                        <Button
+                            disabled={!order || isDeleting || isUpdating}
+                            size="sm"
+                            variant="destructiveOutline"
+                            onClick={handleDelete}
+                        >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete Order
+                        </Button>
                     </div>
 
-                    <Button
-                        disabled={!order || isDeleting || isUpdating}
-                        size="sm"
-                        variant="destructiveOutline"
-                        className="ml-auto"
-                        onClick={handleDelete}
-                    >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        Delete Order
-                    </Button>
-                </div>
-
-                <div className="border-t">
+                    {/* Order Items */}
                     {order ? (
                         <>
-                            <div className="grid gap-3 py-6">
-                                <div className="overflow-y-auto md:max-h-[50dvh]">
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold">
+                                    Order Items
+                                </h3>
+                                <div className="space-y-3 max-h-60 overflow-y-auto">
                                     {order?.orderItems.map((item) => (
                                         <div
                                             key={`${item.productId}-${item.productVariantId}`}
-                                            className="flex items-center py-2.5"
+                                            className="flex items-center gap-3 p-3 border rounded-lg"
                                         >
-                                            <div className="flex w-[70%] items-center gap-2">
-                                                <Image
-                                                    unoptimized
-                                                    src={
-                                                        item.product
-                                                            ?.photoURL ||
-                                                        "/placeholder.jpg"
-                                                    }
-                                                    alt={
-                                                        item.product?.name || ""
-                                                    }
-                                                    width={100}
-                                                    height={100}
-                                                    className="h-16 w-16 rounded-sm"
-                                                />
-                                                <div>
-                                                    <p>{item.product?.name}</p>
-                                                    {item.productVariant
-                                                        ?.name && (
-                                                        <p className="text-sm text-muted-foreground">
-                                                            Variant:{" "}
-                                                            {
-                                                                item
-                                                                    .productVariant
-                                                                    ?.name
-                                                            }
-                                                        </p>
-                                                    )}
-                                                </div>
+                                            <Image
+                                                unoptimized
+                                                src={
+                                                    item.product?.photoURL ||
+                                                    "/placeholder.jpg"
+                                                }
+                                                alt={item.product?.name || ""}
+                                                width={60}
+                                                height={60}
+                                                className="h-15 w-15 rounded-md object-cover"
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium truncate">
+                                                    {item.product?.name}
+                                                </p>
+                                                {item.productVariant?.name && (
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Variant:{" "}
+                                                        {
+                                                            item.productVariant
+                                                                ?.name
+                                                        }
+                                                    </p>
+                                                )}
+                                                <p className="text-sm text-muted-foreground">
+                                                    Qty: {item.quantity}
+                                                </p>
                                             </div>
-
-                                            <div className="w-[30%]">
-                                                <span>
-                                                    {item.quantity} × ৳{" "}
+                                            <div className="text-right">
+                                                <p className="font-medium">
+                                                    ৳{" "}
                                                     {item.productVariant
                                                         ?.discountPrice ||
                                                         item.product
                                                             ?.discountPrice}
-                                                </span>
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    × {item.quantity}
+                                                </p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="space-y-4 border-y border-dashed border-foreground/20 py-3 max-lg:text-sm">
-                                    <div className="flex items-center justify-between">
-                                        <p className="w-[70%]">সাবটোটাল</p>
-                                        <p className="w-[30%]">৳ {total}</p>
+                                {/* Order Summary */}
+                                <div className="space-y-3 border-t pt-4">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Subtotal
+                                        </span>
+                                        <span>৳ {total}</span>
                                     </div>
-
-                                    <div className="flex items-center justify-between">
-                                        <p className="w-[70%]">শিপিং প্রসেস</p>
-                                        <p className="w-[30%]">Free Shipping</p>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Shipping
+                                        </span>
+                                        <span>Free</span>
                                     </div>
-                                </div>
-                                <div className="flex items-center justify-between pt-3 font-medium">
-                                    <p className="w-[70%]">টোটাল</p>
-                                    <p className="w-[30%]">৳ {total}</p>
+                                    <Separator />
+                                    <div className="flex justify-between font-semibold text-lg">
+                                        <span>Total</span>
+                                        <span>৳ {total}</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <Separator className="my-4" />
-                            <div className="grid gap-3">
-                                <div className="font-semibold">
+                            {/* Customer Information */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold">
                                     Customer Information
-                                </div>
-                                <dl className="grid gap-3">
-                                    <div className="flex items-center justify-between">
-                                        <dt className="text-muted-foreground">
-                                            Customer Name
-                                        </dt>
-                                        <dd>{order.customerName}</dd>
+                                </h3>
+                                <div className="grid gap-3 p-4 bg-muted/30 rounded-lg">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
+                                            Name
+                                        </span>
+                                        <span className="font-medium">
+                                            {order.customerName}
+                                        </span>
                                     </div>
-
-                                    <div className="flex items-center justify-between">
-                                        <dt className="text-muted-foreground">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
                                             Phone
-                                        </dt>
-                                        <dd>
-                                            <a
-                                                href={`tel:${order.customerPhoneNumber}`}
-                                            >
-                                                {order.customerPhoneNumber}
-                                            </a>
-                                        </dd>
+                                        </span>
+                                        <a
+                                            href={`tel:${order.customerPhoneNumber}`}
+                                            className="font-medium text-blue-600 hover:underline"
+                                        >
+                                            {order.customerPhoneNumber}
+                                        </a>
                                     </div>
-
-                                    <div className="flex items-center justify-between">
-                                        <dt className="text-muted-foreground">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">
                                             Address
-                                        </dt>
-                                        <dd>
-                                            <a
-                                                href={`mailto:${order.customerAddress}`}
-                                            >
-                                                {order.customerAddress}
-                                            </a>
-                                        </dd>
+                                        </span>
+                                        <span className="font-medium text-right max-w-xs truncate">
+                                            {order.customerAddress}
+                                        </span>
                                     </div>
-                                </dl>
+                                </div>
                             </div>
 
-                            <Separator className="my-4" />
-                            <div className="grid gap-3">
-                                <div className="font-semibold">
-                                    Order Information
-                                </div>
-                                <div className="flex items-center justify-between gap-2">
+                            {/* Order Management */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold">
+                                    Order Management
+                                </h3>
+                                <div className="flex items-center justify-between gap-4">
                                     <span className="text-muted-foreground">
-                                        Order Status:{" "}
+                                        Status
                                     </span>
-
                                     <CustomSelect
                                         className="max-w-xs"
                                         options={orderStatusOptions}
@@ -251,19 +256,22 @@ export const OrderDetails = ({
                             </div>
                         </>
                     ) : (
-                        <div className="text-center text-muted-foreground">
+                        <div className="text-center text-muted-foreground py-8">
                             Select an order to view details
                         </div>
                     )}
-                </div>
 
-                <div className="text-xs text-muted-foreground">
-                    Updated{" "}
-                    <time dateTime={order?.createdAt || ""}>
-                        {formatDate(order?.updatedAt || "") || "N/A"}
-                    </time>
+                    {/* Footer */}
+                    {order && (
+                        <div className="text-xs text-muted-foreground border-t pt-4">
+                            Last updated:{" "}
+                            <time dateTime={order?.updatedAt || ""}>
+                                {formatDate(order?.updatedAt || "") || "N/A"}
+                            </time>
+                        </div>
+                    )}
                 </div>
-            </SheetContent>
-        </Sheet>
+            </DialogContent>
+        </Dialog>
     );
 };

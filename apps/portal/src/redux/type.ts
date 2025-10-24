@@ -19,6 +19,7 @@ export enum TagType {
     Payment = "Payment",
     Tutorial = "Tutorial",
     Delivery = "Delivery",
+    Courier = "Courier",
 }
 
 export const tagTypes = Object.values(TagType);

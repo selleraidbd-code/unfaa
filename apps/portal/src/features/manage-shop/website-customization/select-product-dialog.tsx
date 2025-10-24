@@ -1,4 +1,4 @@
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { ProductSelectionCard } from "@/features/products/product-selection-card";
 import useGetUser from "@/hooks/useGetUser";
@@ -93,26 +93,29 @@ export const SelectProductDialog = ({
                     className="md:w-full"
                 />
 
-                <EmptyErrorLoadingHandler
+                <DataStateHandler
+                    data={products}
                     isLoading={isLoading}
                     isError={isError}
                     isEmpty={products.length === 0}
                 >
-                    <DialogContainer className="space-y-4 flex flex-wrap gap-4">
-                        {products.map((product) => (
-                            <ProductSelectionCard
-                                key={product.id}
-                                product={product}
-                                isSelected={selectedProducts.includes(
-                                    product.id
-                                )}
-                                onSelect={() =>
-                                    handleSelectAndDeselect(product.id)
-                                }
-                            />
-                        ))}
-                    </DialogContainer>
-                </EmptyErrorLoadingHandler>
+                    {(productsData) => (
+                        <DialogContainer className="space-y-4 flex flex-wrap gap-4">
+                            {productsData.map((product) => (
+                                <ProductSelectionCard
+                                    key={product.id}
+                                    product={product}
+                                    isSelected={selectedProducts.includes(
+                                        product.id
+                                    )}
+                                    onSelect={() =>
+                                        handleSelectAndDeselect(product.id)
+                                    }
+                                />
+                            ))}
+                        </DialogContainer>
+                    )}
+                </DataStateHandler>
 
                 <DialogFooter className="grid grid-cols-2 gap-4">
                     <DialogClose asChild>

@@ -1,4 +1,4 @@
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { ProductSelectionCard } from "@/features/products/product-selection-card";
 import useGetUser from "@/hooks/useGetUser";
@@ -51,22 +51,29 @@ export const ProductSelectDialogForLandingPage = ({
                     Select a product to add to the landing page
                 </DialogDescription>
 
-                <EmptyErrorLoadingHandler
+                <DataStateHandler
+                    data={data?.data}
                     isLoading={isLoading}
                     isError={isError}
                     isEmpty={data?.data.length === 0}
                 >
-                    <DialogContainer className="space-y-4 flex flex-wrap gap-4">
-                        {data?.data.map((product) => (
-                            <ProductSelectionCard
-                                key={product.id}
-                                product={product}
-                                isSelected={selectedProductId === product.id}
-                                onSelect={(pId) => setSelectedProductId(pId)}
-                            />
-                        ))}
-                    </DialogContainer>
-                </EmptyErrorLoadingHandler>
+                    {(products) => (
+                        <DialogContainer className="space-y-4 flex flex-wrap gap-4">
+                            {products.map((product) => (
+                                <ProductSelectionCard
+                                    key={product.id}
+                                    product={product}
+                                    isSelected={
+                                        selectedProductId === product.id
+                                    }
+                                    onSelect={(pId) =>
+                                        setSelectedProductId(pId)
+                                    }
+                                />
+                            ))}
+                        </DialogContainer>
+                    )}
+                </DataStateHandler>
                 <DialogFooter>
                     <DialogClose asChild>
                         <CustomButton variant="outline">Cancel</CustomButton>

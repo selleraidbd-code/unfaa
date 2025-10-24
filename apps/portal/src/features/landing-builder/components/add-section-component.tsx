@@ -23,7 +23,7 @@ import {
 import { allComponentsTypeOptions } from "@workspace/ui/landing/data";
 import type { Component } from "@workspace/ui/landing/types";
 import { EComponentType, Section } from "@workspace/ui/landing/types";
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 
 export const AddSectionComponent = ({
     type,
@@ -97,31 +97,34 @@ export const AddSectionComponent = ({
     );
 
     const Step_2 = (
-        <EmptyErrorLoadingHandler
+        <DataStateHandler
+            data={data?.data}
             isLoading={isLoading || isFetching}
             isError={isError}
             isEmpty={data?.data.length === 0}
         >
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                {data?.data.map((single) => (
-                    <div key={single.id}>
-                        <button
-                            onClick={() => handleAddSection(single)}
-                            className="h-full w-full"
-                        >
-                            <Image
-                                src={single.imgURL}
-                                height={200}
-                                width={300}
-                                className="w-full rounded-lg object-cover"
-                                alt="section as image"
-                            ></Image>
-                            <span>{single.name}</span>
-                        </button>
-                    </div>
-                ))}
-            </div>
-        </EmptyErrorLoadingHandler>
+            {(componentsData) => (
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                    {componentsData.map((single) => (
+                        <div key={single.id}>
+                            <button
+                                onClick={() => handleAddSection(single)}
+                                className="h-full w-full"
+                            >
+                                <Image
+                                    src={single.imgURL}
+                                    height={200}
+                                    width={300}
+                                    className="w-full rounded-lg object-cover"
+                                    alt="section as image"
+                                ></Image>
+                                <span>{single.name}</span>
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </DataStateHandler>
     );
 
     const allStep = [Step_1, Step_2];

@@ -1,4 +1,4 @@
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { CategoryCard } from "@/features/manage-shop/website-customization/manage-categories";
 import useGetUser from "@/hooks/useGetUser";
@@ -82,29 +82,32 @@ export const AddCategoryDialog = ({
                         visual impact.
                     </DialogDescription>
                 </DialogHeader>
-                <EmptyErrorLoadingHandler
+                <DataStateHandler
+                    data={categories}
                     isLoading={isLoading}
                     isError={isError}
                     isEmpty={categories.length === 0}
                 >
-                    <DialogContainer className="flex flex-wrap gap-4">
-                        {categories.map((category: Category) => {
-                            const isSelected = selectedCategories.includes(
-                                category.id
-                            );
-                            return (
-                                <CategoryCard
-                                    key={category.id}
-                                    category={category}
-                                    isSelected={isSelected}
-                                    onSelect={() =>
-                                        handleSelectAndDeselect(category.id)
-                                    }
-                                />
-                            );
-                        })}
-                    </DialogContainer>
-                </EmptyErrorLoadingHandler>
+                    {(categoriesData) => (
+                        <DialogContainer className="flex flex-wrap gap-4">
+                            {categoriesData.map((category: Category) => {
+                                const isSelected = selectedCategories.includes(
+                                    category.id
+                                );
+                                return (
+                                    <CategoryCard
+                                        key={category.id}
+                                        category={category}
+                                        isSelected={isSelected}
+                                        onSelect={() =>
+                                            handleSelectAndDeselect(category.id)
+                                        }
+                                    />
+                                );
+                            })}
+                        </DialogContainer>
+                    )}
+                </DataStateHandler>
                 <DialogFooter className="grid grid-cols-2 gap-5">
                     <DialogClose asChild>
                         <CustomButton variant="outline">Cancel</CustomButton>

@@ -12,15 +12,15 @@ export const BrandCard = ({
     onEdit?: (brand: Brand) => void;
     onDelete?: (id: string) => void;
 }) => (
-    <div className="border rounded-md flex flex-col items-center justify-between gap-2 w-52 p-4 cursor-pointer">
+    <div className="border rounded-md flex flex-col items-center justify-between gap-2 w-[155px] md:w-44 lg:w-48 p-2 md:p-4 cursor-pointer">
         <Image
             src={brand.imgURL || "/placeholder.jpg"}
             alt={brand.name}
             width={100}
             height={100}
-            className="size-40 object-cover rounded-md"
+            className="size-24 sm:size-32 lg:size-40 object-cover rounded-md"
         />
-        <p className="font-semibold text-center">{brand.name}</p>
+        <p className="font-semibold text-center max-md:text-sm">{brand.name}</p>
         {(onEdit || onDelete) && (
             <div className="flex justify-end gap-2 items-center">
                 <Button

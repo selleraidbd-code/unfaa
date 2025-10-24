@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { LandingPageCreator } from "@/features/landing-builder/components/LandingPageCreator";
 import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
 import { ShowSelectedTemplate } from "@/features/landing-builder/components/ShowSelectedTemplate";
@@ -73,31 +73,34 @@ const Page = () => {
     return (
         <>
             {!selectedTemplate && (
-                <EmptyErrorLoadingHandler
+                <DataStateHandler
+                    data={templates?.data}
                     isLoading={templatesLoading}
                     isError={templatesError}
                     isEmpty={templates?.data.length === 0}
                 >
-                    <div className="border p-4 text-center rounded-md">
-                        <h2 className="title pb-1 text-primary">
-                            Select a template
-                        </h2>
-                        <p className="text-muted-foreground pb-6">
-                            Select a template to create a landing page
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {templates?.data.map((template) => (
-                                <TemplateSelectableCard
-                                    key={template.id}
-                                    template={template}
-                                    onSelect={(template) =>
-                                        setSelectedTemplate(template)
-                                    }
-                                />
-                            ))}
+                    {(templatesData) => (
+                        <div className="border p-4 text-center rounded-md">
+                            <h2 className="title pb-1 text-primary">
+                                Select a template
+                            </h2>
+                            <p className="text-muted-foreground pb-6">
+                                Select a template to create a landing page
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {templatesData.map((template) => (
+                                    <TemplateSelectableCard
+                                        key={template.id}
+                                        template={template}
+                                        onSelect={(template) =>
+                                            setSelectedTemplate(template)
+                                        }
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </EmptyErrorLoadingHandler>
+                    )}
+                </DataStateHandler>
             )}
         </>
     );

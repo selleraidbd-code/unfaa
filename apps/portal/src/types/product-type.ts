@@ -43,6 +43,11 @@ export interface ProductVariantOptionUpdate {
     imgUrl?: string;
 }
 
+export enum ProductActiveStatus {
+    ACTIVE = "active",
+    INACTIVE = "inactive",
+}
+
 export interface Product {
     id: string;
     name: string;
@@ -58,7 +63,7 @@ export interface Product {
     keywords: string;
     stock: number;
     createdAt: string;
-    activeStatus: "active" | "inactive";
+    activeStatus: ProductActiveStatus;
     updatedAt: string;
     shopId: string;
     unitName?: string;

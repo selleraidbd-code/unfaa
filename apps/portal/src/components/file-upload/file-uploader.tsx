@@ -216,7 +216,7 @@ export const FileUploader = ({
                     or click to browse
                 </p>
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center gap-2 md:gap-4">
                 <Button
                     variant="outline"
                     type="button"

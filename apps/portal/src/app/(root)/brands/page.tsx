@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { BrandCard } from "@/features/brand/brand-card";
 import { BrandLoadingSkeleton } from "@/features/brand/brand-loading-skeleton";
 import { CreateBrandDialog } from "@/features/brand/create-brand-dialog";
@@ -14,6 +14,7 @@ import {
 import { Brand } from "@/types/brand-type";
 import { useState } from "react";
 import { toast } from "@workspace/ui/components/sonner";
+import { AlertType } from "@workspace/ui/components/custom/custom-alert-dialogue";
 
 const Page = () => {
     const user = useGetUser();
@@ -36,6 +37,7 @@ const Page = () => {
     const onDelete = async (id: string) => {
         fire({
             title: "Delete Brand",
+            type: AlertType.WARNING,
             description: "Are you sure you want to delete this brand?",
             onConfirm: async () => {
                 await deleteBrand({ id })
@@ -64,8 +66,9 @@ const Page = () => {
             <div className="space-y-8">
                 <HeaderSection />
 
-                <EmptyErrorLoadingHandler
-                    className="flex flex-wrap gap-6"
+                <DataStateHandler
+                    data={data?.data}
+                    className="flex flex-wrap gap-4 max-md:justify-center md:gap-6"
                     isError={isError}
                     isLoading={isLoading}
                     loadingComponent={<BrandLoadingSkeleton />}
@@ -73,15 +76,17 @@ const Page = () => {
                     emptyTitle="No brands found"
                     emptyDescription="Create your first brand to start organizing your products."
                 >
-                    {data?.data?.map((brand: Brand) => (
-                        <BrandCard
-                            key={brand.id}
-                            brand={brand}
-                            onEdit={onUpdate}
-                            onDelete={onDelete}
-                        />
-                    ))}
-                </EmptyErrorLoadingHandler>
+                    {(brands) =>
+                        brands.map((brand) => (
+                            <BrandCard
+                                key={brand.id}
+                                brand={brand}
+                                onEdit={onUpdate}
+                                onDelete={onDelete}
+                            />
+                        ))
+                    }
+                </DataStateHandler>
             </div>
 
             {brand && (

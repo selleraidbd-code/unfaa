@@ -45,6 +45,7 @@ export const baseQueryWithReAuth: BaseQueryFn<
         const refreshToken = (api.getState() as RootState).auth.refreshToken;
 
         if (refreshToken) {
+            console.log("refreshToken is available");
             const refreshResult = await baseQueryWithoutAuth(
                 {
                     url: "/auth/refresh-token",
@@ -56,6 +57,7 @@ export const baseQueryWithReAuth: BaseQueryFn<
             );
 
             if (refreshResult.data) {
+                console.log("setting new token");
                 const authData = refreshResult.data as { accessToken: string };
                 api.dispatch({
                     type: "auth/setToken",

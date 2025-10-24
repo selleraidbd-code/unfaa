@@ -14,15 +14,17 @@ export const CategoryCard = ({
     onView?: (category: Category) => void;
     onDelete?: (id: string) => void;
 }) => (
-    <div className="border rounded-md flex flex-col items-center justify-between gap-2 w-52 p-4 cursor-pointer">
+    <div className="border rounded-md flex flex-col items-center justify-between gap-2 w-[155px] md:w-44 lg:w-48 p-2 md:p-4 cursor-pointer">
         <Image
             src={category.thumbnailImg || "/placeholder.jpg"}
             alt={category.name}
             width={100}
             height={100}
-            className="size-44 object-cover rounded-md"
+            className="size-24 sm:size-32 lg:size-40 object-cover rounded-md"
         />
-        <p className="font-semibold text-center">{category.name}</p>
+        <p className="font-semibold text-center max-md:text-sm">
+            {category.name}
+        </p>
         {(onEdit || onView || onDelete) && (
             <div className="flex justify-end gap-2 items-center">
                 <Button

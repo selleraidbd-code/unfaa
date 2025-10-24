@@ -20,12 +20,16 @@ export const SidebarNavbar = () => {
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
 
-                <CustomButton target="_blank" href={getShopUrl()}>
+                <CustomButton
+                    className="max-md:hidden"
+                    target="_blank"
+                    href={getShopUrl()}
+                >
                     <Globe className="size-4" /> Go to Website
                 </CustomButton>
             </div>
 
-            <div className="ml-auto pr-8 flex items-center gap-4">
+            <div className="ml-auto md:pr-8 flex items-center gap-4">
                 <ThemeSwitcher />
                 <NavUser user={user} />
             </div>

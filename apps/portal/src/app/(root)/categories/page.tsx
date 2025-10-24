@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CategorySkeleton } from "@/features/categories/category-skeleton";
 import { CategoryCard } from "@/features/category/category-card";
 import { CategoryDetailsDialog } from "@/features/category/category-details-dialog";
@@ -72,24 +72,27 @@ const Page = () => {
                     <CreateCategoryDialog />
                 </div>
 
-                <EmptyErrorLoadingHandler
-                    className="flex flex-wrap gap-6"
+                <DataStateHandler
+                    data={data?.data}
+                    className="flex flex-wrap gap-4 max-md:justify-center md:gap-6"
                     isError={isError}
                     errorTitle="Failed to load categories. Please try again later."
                     isEmpty={data?.data?.length === 0}
                     isLoading={isLoading}
                     loadingComponent={<CategorySkeleton />}
                 >
-                    {data?.data?.map((category: Category) => (
-                        <CategoryCard
-                            key={category?.id}
-                            category={category}
-                            onEdit={() => onUpdate(category)}
-                            onView={() => onView(category)}
-                            onDelete={() => onDelete(category?.id)}
-                        />
-                    ))}
-                </EmptyErrorLoadingHandler>
+                    {(categories) =>
+                        categories.map((category) => (
+                            <CategoryCard
+                                key={category?.id}
+                                category={category}
+                                onEdit={() => onUpdate(category)}
+                                onView={() => onView(category)}
+                                onDelete={() => onDelete(category?.id)}
+                            />
+                        ))
+                    }
+                </DataStateHandler>
             </div>
 
             {/* Update Category Dialog */}

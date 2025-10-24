@@ -3,20 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { createProductColumns } from "@/features/products/product-columns";
 import {
     useDeleteProductMutation,
     useGetProductsQuery,
 } from "@/redux/api/product-api";
 import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import { PaginationState } from "@tanstack/react-table";
-import { Trash } from "lucide-react";
 import { toast } from "@workspace/ui/components/sonner";
 
 import { Product } from "@/types/product-type";
 import useGetUser from "@/hooks/useGetUser";
-import { DataTable } from "@/components/table/data-table";
-import { DataTableRowActions } from "@/components/table/data-table-row-actions";
+import { useAlert } from "@/hooks/useAlert";
+import { ProductTableView } from "@/features/products/product-table-view";
+import { ProductCardList } from "@/features/products/product-card-list";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@workspace/ui/components/select";
+import { Plus, Search } from "lucide-react";
+import Link from "next/link";
 
 interface FilterParams {
     searchTerm?: string;
@@ -26,6 +36,7 @@ interface FilterParams {
 
 export default function ProductsPage() {
     const user = useGetUser();
+    const { fire } = useAlert();
     const router = useRouter();
     const [filterParams, setFilterParams] = useState<FilterParams>({});
     const [pagination, setPagination] = useState<PaginationState>({
@@ -47,14 +58,21 @@ export default function ProductsPage() {
     const [deleteProduct] = useDeleteProductMutation();
 
     const handleDelete = async (id: string) => {
-        await deleteProduct({ id })
-            .unwrap()
-            .then(() => {
-                toast.success("Product deleted successfully");
-            })
-            .catch(() => {
-                toast.error("Failed to delete product");
-            });
+        fire({
+            title: "Delete Product",
+            description:
+                "Are you sure you want to delete this product? This action cannot be undone.",
+            onConfirm: async () => {
+                await deleteProduct({ id })
+                    .unwrap()
+                    .then(() => {
+                        toast.success("Product deleted successfully");
+                    })
+                    .catch(() => {
+                        toast.error("Failed to delete product");
+                    });
+            },
+        });
     };
 
     const handleSearch = (searchTerm: string | undefined) => {
@@ -101,69 +119,106 @@ export default function ProductsPage() {
         value: category.id.toString(),
     }));
 
-    const columns = createProductColumns(categories?.data || []);
-
-    columns.push({
-        id: "actions",
-        cell: ({ row }) => (
-            <DataTableRowActions
-                row={row}
-                actions={[
-                    {
-                        label: "Edit",
-                        onClick: () =>
-                            router.push(`/products/${row.original.id}`),
-                    },
-                    {
-                        label: "Delete",
-                        onClick: () => handleDelete(row.original.id),
-                    },
-                ]}
-            />
-        ),
-    });
-
     return (
-        <DataTable
-            title="Products"
-            data={data?.data || []}
-            columns={columns}
-            showViewOptions={true}
-            filterableColumns={[
-                {
-                    id: "category",
-                    title: "Category",
-                    options: categoryOptions || [],
-                    isMulti: true,
-                },
-                {
-                    id: "activeStatus",
-                    title: "Status",
-                    options: [
-                        { label: "Active", value: "active" },
-                        { label: "Inactive", value: "inactive" },
-                    ],
-                },
-            ]}
-            onSearch={handleSearch}
-            onFilterChange={handleFilterChange}
-            paginationMeta={data?.meta}
-            onPaginationChange={setPagination}
-            createButtonInfo={{
-                label: "Add Product",
-                href: "/products/create",
-            }}
-            bulkActions={[
-                {
-                    label: "Delete Selected",
-                    onClick: handleBulkDelete,
-                    variant: "destructive",
-                    icon: Trash,
-                },
-            ]}
-            isLoading={isLoading}
-            isError={isError}
-            skeletonRows={10}
-        />
+        <div className="space-y-6">
+            {/* Mobile Header & Filters */}
+            <div className="lg:hidden space-y-4">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold">Products</h1>
+                    <Button asChild>
+                        <Link href="/products/create">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add
+                        </Link>
+                    </Button>
+                </div>
+
+                <div className="space-y-2">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search products..."
+                            className="pl-9"
+                            onChange={(e) =>
+                                handleSearch(e.target.value || undefined)
+                            }
+                        />
+                    </div>
+
+                    <div className="flex gap-2">
+                        <Select
+                            onValueChange={(value) =>
+                                handleFilterChange(
+                                    "category",
+                                    value === "all" ? [] : [value]
+                                )
+                            }
+                        >
+                            <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    All Categories
+                                </SelectItem>
+                                {categoryOptions?.map((option) => (
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        <Select
+                            onValueChange={(value) =>
+                                handleFilterChange(
+                                    "activeStatus",
+                                    value === "all" ? [] : [value]
+                                )
+                            }
+                        >
+                            <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Status</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive">
+                                    Inactive
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden lg:block">
+                <ProductTableView
+                    products={data?.data || []}
+                    isLoading={isLoading}
+                    isError={isError}
+                    onPaginationChange={setPagination}
+                    paginationMeta={data?.meta}
+                    onDelete={handleDelete}
+                    onBulkDelete={handleBulkDelete}
+                    onSearch={handleSearch}
+                    onFilterChange={handleFilterChange}
+                    categoryOptions={categoryOptions || []}
+                />
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden">
+                <ProductCardList
+                    products={data?.data || []}
+                    isLoading={isLoading}
+                    onDelete={handleDelete}
+                />
+            </div>
+        </div>
     );
 }

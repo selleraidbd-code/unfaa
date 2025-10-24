@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { config } from "@/config";
 import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
@@ -52,7 +52,8 @@ const Page = () => {
                     </CustomButton>
                 </div>
 
-                <EmptyErrorLoadingHandler
+                <DataStateHandler
+                    data={data?.data}
                     isLoading={isLoading}
                     isError={isError}
                     isEmpty={data?.data.length === 0}
@@ -65,52 +66,58 @@ const Page = () => {
                     }
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
-                    {data?.data.map((landingPage) => (
-                        <Card
-                            key={landingPage.id}
-                            className="hover:shadow-lg transition-shadow duration-200"
-                        >
-                            <CardHeader>
-                                <CardTitle className="sub-title line-clamp-2">
-                                    {landingPage.name}
-                                </CardTitle>
+                    {(landingPages) =>
+                        landingPages.map((landingPage) => (
+                            <Card
+                                key={landingPage.id}
+                                className="hover:shadow-lg transition-shadow duration-200"
+                            >
+                                <CardHeader>
+                                    <CardTitle className="sub-title line-clamp-2">
+                                        {landingPage.name}
+                                    </CardTitle>
 
-                                <CardDescription className="flex items-center gap-1 text-sm">
-                                    <Globe className="size-3" />/
-                                    {landingPage.slug}
-                                </CardDescription>
-                            </CardHeader>
+                                    <CardDescription className="flex items-center gap-1 text-sm">
+                                        <Globe className="size-3" />/
+                                        {landingPage.slug}
+                                    </CardDescription>
+                                </CardHeader>
 
-                            <CardContent className="pt-0">
-                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                    <Calendar className="size-3" />
-                                    Created :{" "}
-                                    {formatDateWithTime(landingPage.createdAt)}
-                                </div>
-                            </CardContent>
+                                <CardContent className="pt-0">
+                                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                        <Calendar className="size-3" />
+                                        Created :{" "}
+                                        {formatDateWithTime(
+                                            landingPage.createdAt
+                                        )}
+                                    </div>
+                                </CardContent>
 
-                            <CardFooter className="grid grid-cols-2 gap-4">
-                                <CustomButton
-                                    variant="outline"
-                                    href={`/landing-page/builder?productId=${landingPage.productId}`}
-                                    className="w-full"
-                                >
-                                    <Edit className="size-4" />
-                                    Edit Page
-                                </CustomButton>
+                                <CardFooter className="grid grid-cols-2 gap-4">
+                                    <CustomButton
+                                        variant="outline"
+                                        href={`/landing-page/builder?productId=${landingPage.productId}`}
+                                        className="w-full"
+                                    >
+                                        <Edit className="size-4" />
+                                        Edit Page
+                                    </CustomButton>
 
-                                <CustomButton
-                                    target="_blank"
-                                    href={getLandingPageUrl(landingPage.slug)}
-                                    className="w-full"
-                                >
-                                    <ExternalLink className="size-4" />
-                                    View Page
-                                </CustomButton>
-                            </CardFooter>
-                        </Card>
-                    ))}
-                </EmptyErrorLoadingHandler>
+                                    <CustomButton
+                                        target="_blank"
+                                        href={getLandingPageUrl(
+                                            landingPage.slug
+                                        )}
+                                        className="w-full"
+                                    >
+                                        <ExternalLink className="size-4" />
+                                        View Page
+                                    </CustomButton>
+                                </CardFooter>
+                            </Card>
+                        ))
+                    }
+                </DataStateHandler>
             </div>
 
             {productSelectModalOpen && (

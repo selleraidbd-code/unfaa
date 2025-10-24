@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyErrorLoadingHandler } from "@/components/shared/empty-error-loading-handler";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { ManageBanner } from "@/features/manage-shop/website-customization/manage-banner";
 import { ManageCategories } from "@/features/manage-shop/website-customization/manage-categories";
@@ -22,25 +22,26 @@ const WebsiteCustomization = () => {
                 title="Website Customization"
                 href="/manage-shop"
             />
-            <EmptyErrorLoadingHandler
+            <DataStateHandler
+                data={theme}
                 isLoading={isLoading}
                 loadingClassName="py-40"
                 isError={isError}
                 isEmpty={!theme}
                 className="space-y-6"
             >
-                {theme && (
+                {(themeData) => (
                     <>
-                        <ManageBanner theme={theme} />
+                        <ManageBanner theme={themeData} />
 
-                        <ManageCategories theme={theme} />
+                        <ManageCategories theme={themeData} />
 
-                        {theme.shopSection.map((section) => (
+                        {themeData.shopSection.map((section) => (
                             <ManageSection key={section.id} section={section} />
                         ))}
                     </>
                 )}
-            </EmptyErrorLoadingHandler>
+            </DataStateHandler>
         </div>
     );
 };

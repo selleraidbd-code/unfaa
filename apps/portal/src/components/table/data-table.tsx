@@ -44,7 +44,7 @@ interface PaginationState {
     pageSize: number;
 }
 
-interface Meta {
+export interface Meta {
     limit: number;
     page: number;
     total: number;
@@ -76,7 +76,7 @@ interface DataTableProps<TData, TValue> {
     filterableColumns?: FilterableColumn[];
     onSearch?: (searchTerm: string) => void;
     pagination?: boolean;
-    paginationMeta?: Meta;
+    paginationMeta: Meta;
     onPaginationChange?: (state: PaginationState) => void;
     showViewOptions?: boolean;
     createButtonInfo?: TableCreateButtonInfoProps;
@@ -118,8 +118,8 @@ export function DataTable<TData, TValue>({
         React.useState<ColumnFiltersState>([]);
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
-        pageIndex: 0,
-        pageSize: 10,
+        pageIndex: paginationMeta.page - 1, // Convert from 1-based to 0-based
+        pageSize: paginationMeta.limit,
     });
 
     const table = useReactTable({
@@ -218,7 +218,7 @@ export function DataTable<TData, TValue>({
                 onFilterChange={onFilterChange}
             />
 
-            <div className="rounded-md border">
+            <div className="rounded-md min-h-[60vh] overflow-x-auto border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -295,6 +295,7 @@ export function DataTable<TData, TValue>({
                 <DataTablePagination
                     table={table}
                     totalRows={paginationMeta.total}
+                    paginationMeta={paginationMeta}
                 />
             )}
         </div>

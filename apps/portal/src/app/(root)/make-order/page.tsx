@@ -80,10 +80,28 @@ const Page = () => {
         );
     };
 
+    // Update order item variants
+    const updateOrderItemVariants = (
+        itemId: string,
+        selectedVariants: OrderItem["selectedVariants"]
+    ) => {
+        setOrderItems(
+            orderItems.map((item) =>
+                item.id === itemId ? { ...item, selectedVariants } : item
+            )
+        );
+    };
+
     // Calculate order subtotal
     const calculateTotal = () => {
         return orderItems.reduce((total, item) => {
-            const itemTotal = item.price * item.quantity;
+            const extraPrice =
+                item.selectedVariants?.reduce(
+                    (sum, variant) => sum + variant.extraPrice,
+                    0
+                ) || 0;
+            const finalPrice = item.price + extraPrice;
+            const itemTotal = finalPrice * item.quantity;
             return total + itemTotal;
         }, 0);
     };
@@ -115,7 +133,11 @@ const Page = () => {
                 productId: item.id,
                 quantity: item.quantity,
                 productPrice: item.price,
-                orderItemVariant: [],
+                orderItemVariant:
+                    item.selectedVariants?.map((variant) => ({
+                        productVariantId: variant.variantId,
+                        productVariantOptionId: variant.optionId,
+                    })) || [],
             })),
             customerAddress: orderDetails.deliveryAddress,
             orderStatus: OrderStatus.PLACED,
@@ -171,6 +193,7 @@ const Page = () => {
                         addProductToOrder={addProductToOrder}
                         updateQuantity={updateQuantity}
                         removeOrderItem={removeOrderItem}
+                        updateOrderItemVariants={updateOrderItemVariants}
                         setActiveStep={setActiveStep}
                         calculateTotal={calculateTotal}
                         shopId={user?.shop.id || ""}

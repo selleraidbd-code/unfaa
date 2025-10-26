@@ -1,6 +1,5 @@
 "use client";
 
-import { PaginationState } from "@tanstack/react-table";
 import { useState } from "react";
 import { toast } from "@workspace/ui/components/sonner";
 import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
@@ -14,42 +13,43 @@ import { EmployeeCardList } from "@/features/employee/employee-card-list";
 import { Employee } from "@/types/employee-type";
 import useGetUser from "@/hooks/useGetUser";
 import { useAlert } from "@/hooks/useAlert";
+import { AlertType } from "@workspace/ui/components/custom/custom-alert-dialogue";
+import { useSearchParams } from "next/navigation";
 
 const EmployeesPage = () => {
+    const searchParams = useSearchParams();
     const user = useGetUser();
     const { fire } = useAlert();
     const isMobile = useBreakpoint({ size: "lg" });
     const [employee, setEmployee] = useState<Employee | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const page = searchParams.get("page") || 1;
+    const limit = searchParams.get("limit") || 10;
 
     const { data, isLoading, isError } = useGetEmployeesQuery({
-        page: 1,
-        limit: 10,
+        page: Number(page),
+        limit,
         shopId: user?.shop?.id,
+        searchTerm: searchTerm || undefined,
     });
 
     const [deleteEmployee] = useDeleteEmployeeMutation();
 
     const handleSearch = (value: string) => {
-        console.log(value);
-    };
-
-    const handlePaginationChange = (state: PaginationState) => {
-        console.log(state);
-    };
-
-    const handleBulkDelete = () => {
-        console.log("Bulk delete");
+        setSearchTerm(value);
     };
 
     const handleDelete = async (id: string) => {
         fire({
-            title: "Fire Employee",
-            description: "Are you sure you want to remove this employee?",
+            title: "Remove Employee",
+            type: AlertType.WARNING,
+            description:
+                "Are you sure you want to remove this employee from the shop? This action cannot be undone.",
             onConfirm: async () => {
                 await deleteEmployee(id)
                     .unwrap()
                     .then(() => {
-                        toast.success("🎉 Employee deleted successfully");
+                        toast.success("🎉 Employee removed successfully");
                     })
                     .catch((error) => {
                         toast.error(
@@ -64,6 +64,12 @@ const EmployeesPage = () => {
         setEmployee(employee);
     };
 
+    const paginationMeta = {
+        page: Number(page),
+        limit: Number(limit),
+        total: data?.meta?.total || 0,
+    };
+
     return (
         <>
             {!isMobile ? (
@@ -71,12 +77,10 @@ const EmployeesPage = () => {
                     data={data?.data || []}
                     isLoading={isLoading}
                     isError={isError}
-                    paginationMeta={data?.meta}
+                    paginationMeta={paginationMeta}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onSearch={handleSearch}
-                    onPaginationChange={handlePaginationChange}
-                    onBulkDelete={handleBulkDelete}
                 />
             ) : (
                 <EmployeeCardList

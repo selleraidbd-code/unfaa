@@ -17,19 +17,22 @@ import { useForm } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
-const employeeFormSchema = z.object({
-    name: z.string().min(2, {
-        message: "Employee name must be at least 2 characters.",
+const customerFormSchema = z.object({
+    name: z.string().min(3, {
+        message: "Customer name must be at least 3 characters.",
     }),
-    email: z.string().email({
-        message: "Invalid email address.",
-    }),
-    address: z.string().min(1, {
+    email: z
+        .string()
+        .email({
+            message: "Invalid email address.",
+        })
+        .or(z.literal("")),
+    address: z.string().min(3, {
         message: "Address is required.",
     }),
 });
 
-type BrandFormValues = z.infer<typeof employeeFormSchema>;
+type CustomerFormValues = z.infer<typeof customerFormSchema>;
 
 export const UpdateCustomerDialog = ({
     open,
@@ -40,9 +43,9 @@ export const UpdateCustomerDialog = ({
     setOpen: (open: boolean) => void;
     customer: Customer;
 }) => {
-    const form = useForm<BrandFormValues>({
-        resolver: zodResolver(employeeFormSchema),
-        defaultValues: {
+    const form = useForm<CustomerFormValues>({
+        resolver: zodResolver(customerFormSchema),
+        values: {
             name: customer.name || "",
             email: customer.email || "",
             address: customer.address || "",
@@ -51,13 +54,13 @@ export const UpdateCustomerDialog = ({
 
     const [updateCustomer, { isLoading }] = useUpdateCustomerMutation();
 
-    const onSubmit = async (data: BrandFormValues) => {
+    const onSubmit = async (data: CustomerFormValues) => {
         const payload: UpdateCustomer = {
             id: customer.id,
             payload: {
                 name: data.name,
-                email: data.email,
-                address: data.address,
+                email: data.email || undefined,
+                address: data.address || undefined,
             },
         };
 
@@ -93,16 +96,16 @@ export const UpdateCustomerDialog = ({
                         <CustomFormInput
                             label="Name"
                             name="name"
-                            placeholder="Enter brand name"
+                            placeholder="Enter customer name"
                             type="text"
-                            required={true}
                             control={form.control}
+                            required
                         />
 
                         <CustomFormInput
                             label="Email"
                             name="email"
-                            placeholder="Enter email"
+                            placeholder="Enter email address"
                             type="email"
                             control={form.control}
                         />
@@ -112,6 +115,7 @@ export const UpdateCustomerDialog = ({
                             name="address"
                             placeholder="Enter address"
                             control={form.control}
+                            required
                         />
 
                         <div className="flex justify-end gap-4">

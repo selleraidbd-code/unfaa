@@ -11,6 +11,8 @@ import { Form } from "@workspace/ui/components/form";
 import useGetUser from "@/hooks/useGetUser";
 import { OrderStepIndicator } from "@/types/order-type";
 import { CustomButton } from "@/components/ui/custom-button";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import { CustomFormPhoneInput } from "@/components/ui/custom-form-phone-input";
 
 interface AddNewCustomerInCustomerStepProps {
     setShowNewCustomerForm: (show: boolean) => void;
@@ -19,10 +21,15 @@ interface AddNewCustomerInCustomerStepProps {
 }
 
 const customerSchema = z.object({
-    name: z.string().min(1, { message: "Name is required" }),
-    email: z.string().email().optional(),
-    phoneNumber: z.string().min(1, { message: "Phone number is required" }),
-    address: z.string().optional(),
+    name: z.string().min(3, { message: "Name is required" }),
+    email: z
+        .string()
+        .email({ message: "Invalid email address." })
+        .or(z.literal("")),
+    phoneNumber: z
+        .string()
+        .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+    address: z.string().min(3, { message: "Address is required" }),
 });
 
 export type createCustomerFormValues = z.infer<typeof customerSchema>;
@@ -97,10 +104,10 @@ export const AddNewCustomerInCustomerStep = ({
                             label="Name"
                             placeholder="Customer name"
                             control={form.control}
-                            // required
+                            required
                         />
 
-                        <CustomFormInput
+                        <CustomFormPhoneInput
                             name="phoneNumber"
                             label="Phone"
                             placeholder="Phone number"
@@ -121,6 +128,7 @@ export const AddNewCustomerInCustomerStep = ({
                             label="Address"
                             placeholder="Address"
                             control={form.control}
+                            required
                         />
                     </div>
 

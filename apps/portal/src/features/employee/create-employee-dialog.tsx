@@ -37,12 +37,12 @@ const employeeFormSchema = z.object({
     roles: z.array(z.string()),
 });
 
-type BrandFormValues = z.infer<typeof employeeFormSchema>;
+type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 
 export const CreateEmployeeDialog = () => {
     const user = useGetUser();
     const [open, setOpen] = useState(false);
-    const form = useForm<BrandFormValues>({
+    const form = useForm<EmployeeFormValues>({
         resolver: zodResolver(employeeFormSchema),
         defaultValues: {
             name: "",
@@ -54,7 +54,7 @@ export const CreateEmployeeDialog = () => {
 
     const [createEmployee, { isLoading }] = useCreateEmployeeMutation();
 
-    const onSubmit = async (data: BrandFormValues) => {
+    const onSubmit = async (data: EmployeeFormValues) => {
         if (!user) {
             toast.error("User not found");
             return;
@@ -73,7 +73,7 @@ export const CreateEmployeeDialog = () => {
             .unwrap()
             .then(() => {
                 form.reset();
-                toast.success("Brand created successfully");
+                toast.success("Employee created successfully");
                 setOpen(false);
             })
             .catch((error) => {
@@ -115,26 +115,26 @@ export const CreateEmployeeDialog = () => {
                         <CustomFormInput
                             label="Name"
                             name="name"
-                            placeholder="Enter brand name"
+                            placeholder="Enter employee name"
                             type="text"
-                            required={true}
                             control={form.control}
+                            required
                         />
                         <CustomFormInput
                             label="Email"
                             name="email"
                             placeholder="Enter email address"
                             type="email"
-                            required={true}
                             control={form.control}
+                            required
                         />
                         <CustomFormInput
                             label="Password"
                             name="password"
                             placeholder="Enter password"
                             type="password"
-                            required={true}
                             control={form.control}
+                            required
                         />
                         <div className="flex justify-end gap-4">
                             <DialogClose asChild>

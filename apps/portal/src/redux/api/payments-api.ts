@@ -2,6 +2,7 @@ import { api } from "@/redux/api";
 import {
     METHOD,
     PaginatedResponse,
+    QueryParams,
     ResponseObject,
     TagType,
 } from "@/redux/type";
@@ -9,10 +10,11 @@ import { Payment } from "@/types/payments-type";
 
 const paymentsApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getPayments: builder.query<PaginatedResponse<Payment>, void>({
-            query: () => ({
+        getPayments: builder.query<PaginatedResponse<Payment>, QueryParams>({
+            query: (queryParams) => ({
                 url: `/subscription`,
                 method: METHOD.GET,
+                params: queryParams,
             }),
             providesTags: [TagType.Payment],
         }),

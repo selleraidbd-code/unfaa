@@ -22,29 +22,34 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import { CustomFormPhoneInput } from "@/components/ui/custom-form-phone-input";
 
-const employeeFormSchema = z.object({
-    name: z.string().min(2, {
-        message: "Employee name must be at least 2 characters.",
+const customerFormSchema = z.object({
+    name: z.string().min(3, {
+        message: "Customer name must be at least 2 characters.",
     }),
-    email: z.string().email({
-        message: "Invalid email address.",
-    }),
-    phoneNumber: z.string().min(10, {
-        message: "Phone number must be at least 10 characters.",
-    }),
-    address: z.string().min(1, {
+    email: z
+        .string()
+        .email({
+            message: "Invalid email address.",
+        })
+        .or(z.literal("")),
+    phoneNumber: z
+        .string()
+        .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+    address: z.string().min(3, {
         message: "Address is required.",
     }),
 });
 
-type BrandFormValues = z.infer<typeof employeeFormSchema>;
+type BrandFormValues = z.infer<typeof customerFormSchema>;
 
 export const CreateCustomerDialog = () => {
     const user = useGetUser();
     const [open, setOpen] = useState(false);
     const form = useForm<BrandFormValues>({
-        resolver: zodResolver(employeeFormSchema),
+        resolver: zodResolver(customerFormSchema),
         defaultValues: {
             name: "",
             email: "",
@@ -63,9 +68,9 @@ export const CreateCustomerDialog = () => {
 
         const payload: CreateCustomer = {
             name: data.name,
-            email: data.email,
+            email: data.email || undefined,
             phoneNumber: data.phoneNumber,
-            address: data.address,
+            address: data.address || undefined,
             shopId: user.shop.id,
         };
 
@@ -106,11 +111,12 @@ export const CreateCustomerDialog = () => {
                         <CustomFormInput
                             label="Name"
                             name="name"
-                            placeholder="Enter brand name"
+                            placeholder="Enter customer name"
                             type="text"
-                            required={true}
                             control={form.control}
+                            required
                         />
+
                         <CustomFormInput
                             label="Email"
                             name="email"
@@ -118,19 +124,21 @@ export const CreateCustomerDialog = () => {
                             type="email"
                             control={form.control}
                         />
-                        <CustomFormInput
+
+                        <CustomFormPhoneInput
                             label="Phone Number"
                             name="phoneNumber"
                             placeholder="Enter phone number"
-                            type="text"
-                            required={true}
                             control={form.control}
+                            required
                         />
+
                         <CustomFormTextarea
                             label="Address"
                             name="address"
                             placeholder="Enter address"
                             control={form.control}
+                            required
                         />
                         <div className="flex justify-end gap-4">
                             <DialogClose asChild>

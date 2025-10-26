@@ -1,9 +1,9 @@
 "use client";
 
 import { Product } from "@/types/product-type";
-import { DataTable } from "@/components/table/data-table";
+import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
-import { ColumnDef, PaginationState } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import { Trash } from "lucide-react";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import {
@@ -20,8 +20,7 @@ interface ProductTableViewProps {
     products: Product[];
     isLoading?: boolean;
     isError?: boolean;
-    onPaginationChange: (pagination: PaginationState) => void;
-    paginationMeta?: any;
+    paginationMeta: Meta;
     onDelete: (id: string) => void;
     onBulkDelete: (products: Product[]) => void;
     onSearch: (searchTerm: string | undefined) => void;
@@ -33,7 +32,6 @@ export function ProductTableView({
     products,
     isLoading,
     isError,
-    onPaginationChange,
     paginationMeta,
     onDelete,
     onBulkDelete,
@@ -215,7 +213,6 @@ export function ProductTableView({
             onSearch={onSearch}
             onFilterChange={onFilterChange}
             paginationMeta={paginationMeta}
-            onPaginationChange={onPaginationChange}
             createButtonInfo={{
                 label: "Add Product",
                 href: "/products/create",

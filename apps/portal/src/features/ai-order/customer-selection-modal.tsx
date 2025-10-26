@@ -1,0 +1,156 @@
+"use client";
+
+import { DataStateHandler } from "@/components/shared/data-state-handler";
+import {
+    CustomPagination,
+    PaginationMeta,
+} from "@/components/ui/custom-pagination";
+import {
+    CustomerCardSkeleton,
+    CustomerSelectionCard,
+    SelectedCustomerCard,
+} from "@/features/ai-order/customer-card";
+import useGetUser from "@/hooks/useGetUser";
+import { useGetCustomersQuery } from "@/redux/api/customer-api";
+import { Customer } from "@/types/customer-type";
+import { Button } from "@workspace/ui/components/button";
+import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
+import {
+    Dialog,
+    DialogContainer,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@workspace/ui/components/dialog";
+import { formatDate } from "@workspace/ui/lib/formateDate";
+import { User } from "lucide-react";
+import { useState } from "react";
+
+interface CustomerSelectionModalProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onSelectCustomer: (customer: Customer) => void;
+    currentCustomerPhone?: string;
+}
+
+export const CustomerSelectionModal = ({
+    open,
+    onOpenChange,
+    onSelectCustomer,
+    currentCustomerPhone,
+}: CustomerSelectionModalProps) => {
+    const user = useGetUser();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const { data, isLoading, isError } = useGetCustomersQuery({
+        page: currentPage,
+        limit: 20,
+        shopId: user?.shop?.id,
+        searchTerm: searchTerm || undefined,
+    });
+
+    const handleSearch = (value: string) => {
+        setSearchTerm(value);
+        setCurrentPage(1);
+    };
+
+    const handleSelectCustomer = (customer: Customer) => {
+        onSelectCustomer(customer);
+        onOpenChange(false);
+    };
+
+    const customers = data?.data || [];
+    const paginationMeta: PaginationMeta = {
+        page: currentPage,
+        limit: 20,
+        total: data?.meta?.total || 0,
+    };
+
+    const selectedCustomer = customers.find(
+        (customer) => customer.phoneNumber === currentCustomerPhone
+    );
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="md:max-w-4xl flex flex-col">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <User className="h-5 w-5" />
+                        Select Customer
+                    </DialogTitle>
+                    <DialogDescription>
+                        Choose a customer from your existing customers or search
+                        for a specific one.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <DialogContainer className="space-y-4">
+                    {/* Search */}
+                    <CustomSearch
+                        onSearch={handleSearch}
+                        placeholder="Search customers by name, phone, or email..."
+                        className="md:w-full"
+                    />
+
+                    <DataStateHandler
+                        data={customers}
+                        isLoading={isLoading}
+                        loadingComponent={
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {Array.from({ length: 6 }).map((_, index) => (
+                                    <CustomerCardSkeleton key={index} />
+                                ))}
+                            </div>
+                        }
+                        isError={isError}
+                        isEmpty={customers.length === 0}
+                        emptyDescription={
+                            searchTerm
+                                ? "No customers found matching your search"
+                                : "No customers found"
+                        }
+                    >
+                        {(customers) => (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {selectedCustomer && (
+                                    <SelectedCustomerCard
+                                        customer={selectedCustomer}
+                                        className="col-span-2"
+                                    />
+                                )}
+
+                                {customers.map((customer) => (
+                                    <CustomerSelectionCard
+                                        key={customer.id}
+                                        customer={customer}
+                                        onSelectCustomer={handleSelectCustomer}
+                                        currentCustomerPhone={
+                                            currentCustomerPhone
+                                        }
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </DataStateHandler>
+                </DialogContainer>
+
+                <DialogFooter>
+                    {/* Pagination */}
+                    {customers.length > 0 && (
+                        <CustomPagination
+                            paginationMeta={paginationMeta}
+                            showRowSelection={false}
+                            showRowsPerPage={false}
+                            showPageCount={false}
+                            onPageChange={setCurrentPage}
+                            className="w-full justify-center"
+                        />
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};

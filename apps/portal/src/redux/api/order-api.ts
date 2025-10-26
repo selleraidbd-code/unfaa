@@ -1,7 +1,18 @@
 import { api } from "@/redux/api";
-import { PaginatedResponse, QueryParams, METHOD, TagType } from "@/redux/type";
+import {
+    PaginatedResponse,
+    QueryParams,
+    METHOD,
+    TagType,
+    ResponseObject,
+} from "@/redux/type";
 
-import { CreateOrder, Order, UpdateOrderPayload } from "@/types/order-type";
+import {
+    CreateOrder,
+    Order,
+    UpdateOrderPayload,
+    AIOrderGenerationResult,
+} from "@/types/order-type";
 
 const orderApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -49,6 +60,16 @@ const orderApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Order],
         }),
+        aiOrderGeneration: builder.mutation<
+            ResponseObject<AIOrderGenerationResult>,
+            { shopId: string; info: string }
+        >({
+            query: ({ shopId, info }) => ({
+                url: `/ai-generation/order-generation/${shopId}`,
+                method: METHOD.POST,
+                body: { info },
+            }),
+        }),
     }),
 });
 
@@ -57,4 +78,5 @@ export const {
     useCreateOrderbyAdminMutation,
     useUpdateOrderMutation,
     useDeleteOrderMutation,
+    useAiOrderGenerationMutation,
 } = orderApi;

@@ -6,18 +6,23 @@ import { Trash } from "lucide-react";
 
 import { UserRole } from "@/types";
 import { User } from "@/features/auth/auth-type";
-import { DataTable } from "@/components/table/data-table";
+import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableFieldCopy } from "@/components/table/data-table-field-copy";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 import { toast } from "@workspace/ui/components/sonner";
+import { useSearchParams } from "next/navigation";
 
 const UsersPage = () => {
+    const searchParams = useSearchParams();
+    const page = searchParams.get("page") || 1;
+    const limit = searchParams.get("limit") || 10;
+
     const { data, isLoading, isError } = useGetUsersQuery({
-        page: 1,
-        limit: 10,
+        page: Number(page),
+        limit: Number(limit),
     });
 
     const [deleteUser] = useDeleteUserMutation();
@@ -165,6 +170,12 @@ const UsersPage = () => {
         },
     ];
 
+    const meta: Meta = {
+        total: data?.meta?.total || 0,
+        page: Number(page),
+        limit: Number(limit),
+    };
+
     return (
         <DataTable
             title="Users"
@@ -180,7 +191,7 @@ const UsersPage = () => {
             ]}
             onSearch={handleSearch}
             pagination={true}
-            paginationMeta={data?.meta}
+            paginationMeta={meta}
             onPaginationChange={handlePaginationChange}
             createButtonInfo={{
                 label: "Create User",

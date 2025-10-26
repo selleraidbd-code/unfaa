@@ -1,26 +1,23 @@
 "use client";
 
-import { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { Trash } from "lucide-react";
-import { DataTable } from "@/components/table/data-table";
+import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { DataTableFieldCopy } from "@/components/table/data-table-field-copy";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
-import { Checkbox } from "@workspace/ui/components/checkbox";
-import { formatDate } from "@workspace/ui/lib/formateDate";
 import { Employee } from "@/types/employee-type";
+import { ColumnDef } from "@tanstack/react-table";
+import { formatDate } from "@workspace/ui/lib/formateDate";
 import { CreateEmployeeDialog } from "./create-employee-dialog";
-import { getEmployeeRoleOptions } from "./employee-role-options";
+import { getEmployeeRoleLabel } from "./employee-role-options";
 
 interface EmployeeTableViewProps {
     data: Employee[];
     isLoading: boolean;
     isError: boolean;
-    paginationMeta?: any;
+    paginationMeta: Meta;
     onEdit: (employee: Employee) => void;
     onDelete: (id: string) => void;
     onSearch: (value: string) => void;
-    onPaginationChange: (state: PaginationState) => void;
-    onBulkDelete: () => void;
 }
 
 export const EmployeeTableView = ({
@@ -31,42 +28,16 @@ export const EmployeeTableView = ({
     onEdit,
     onDelete,
     onSearch,
-    onPaginationChange,
-    onBulkDelete,
 }: EmployeeTableViewProps) => {
     const employeesColumns: ColumnDef<Employee>[] = [
-        {
-            id: "select",
-            header: ({ table }) => (
-                <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
-                    }
-                    aria-label="Select all"
-                    className="translate-y-[2px]"
-                />
-            ),
-            cell: ({ row }) => (
-                <Checkbox
-                    checked={row.getIsSelected()}
-                    onCheckedChange={(value) => row.toggleSelected(!!value)}
-                    aria-label="Select row"
-                    className="translate-y-[2px]"
-                />
-            ),
-            enableSorting: false,
-            enableHiding: false,
-        },
         {
             accessorKey: "id",
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title="ID" />
             ),
-            cell: ({ row }) => <p>{row.getValue("id")}</p>,
+            cell: ({ row }) => (
+                <DataTableFieldCopy row={row} field="id" slice={8} />
+            ),
             enableSorting: false,
             enableHiding: false,
         },
@@ -93,6 +64,26 @@ export const EmployeeTableView = ({
                     <span className="truncate font-medium">
                         {row.original.user.email}
                     </span>
+                );
+            },
+        },
+        {
+            accessorKey: "role",
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Role" />
+            ),
+            cell: ({ row }) => {
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {row.original.roles.map((role) => (
+                            <span
+                                key={role}
+                                className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-medium"
+                            >
+                                {getEmployeeRoleLabel(role)}
+                            </span>
+                        ))}
+                    </div>
                 );
             },
         },
@@ -129,41 +120,16 @@ export const EmployeeTableView = ({
         },
     ];
 
-    const employeeRoleOptions = getEmployeeRoleOptions();
-    const roles = [
-        {
-            value: "",
-            label: "All",
-        },
-        ...employeeRoleOptions,
-    ];
-
     return (
         <DataTable
             title="Employees"
             data={data}
             columns={employeesColumns}
             showViewOptions={true}
-            filterableColumns={[
-                {
-                    id: "role",
-                    title: "Role",
-                    options: roles,
-                },
-            ]}
             onSearch={onSearch}
             pagination={true}
             paginationMeta={paginationMeta}
-            onPaginationChange={onPaginationChange}
             createButton={<CreateEmployeeDialog />}
-            bulkActions={[
-                {
-                    label: "Delete Selected",
-                    onClick: onBulkDelete,
-                    variant: "destructive",
-                    icon: Trash,
-                },
-            ]}
             isLoading={isLoading}
             isError={isError}
         />

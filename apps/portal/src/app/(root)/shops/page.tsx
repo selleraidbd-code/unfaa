@@ -6,7 +6,7 @@ import { Trash } from "lucide-react";
 
 import { Shop } from "@/types/shop-type";
 import { statuses } from "@/components/table/data";
-import { DataTable } from "@/components/table/data-table";
+import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableFieldCopy } from "@/components/table/data-table-field-copy";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
@@ -16,8 +16,12 @@ import { formatDate } from "@workspace/ui/lib/formateDate";
 import Link from "next/link";
 import { toast } from "@workspace/ui/components/sonner";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 const ShopsPage = () => {
+    const searchParams = useSearchParams();
+    const page = searchParams.get("page") || 1;
+    const limit = searchParams.get("limit") || 10;
     const [search, setSearch] = useState("");
 
     const { data, isLoading, isError } = useGetShopsQuery({
@@ -162,6 +166,12 @@ const ShopsPage = () => {
         },
     ];
 
+    const meta: Meta = {
+        total: data?.meta?.total || 0,
+        page: Number(page),
+        limit: Number(limit),
+    };
+
     return (
         <DataTable
             title="Shops"
@@ -177,7 +187,7 @@ const ShopsPage = () => {
             ]}
             onSearch={handleSearch}
             pagination={true}
-            paginationMeta={data?.meta}
+            paginationMeta={meta}
             onPaginationChange={handlePaginationChange}
             createButtonInfo={{
                 label: "Create Shop",

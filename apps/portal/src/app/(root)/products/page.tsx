@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import {
     useDeleteProductMutation,
@@ -35,20 +35,18 @@ interface FilterParams {
 }
 
 export default function ProductsPage() {
+    const searchParams = useSearchParams();
+    const page = searchParams.get("page") || 1;
+    const limit = searchParams.get("limit") || 10;
     const user = useGetUser();
     const { fire } = useAlert();
-    const router = useRouter();
     const [filterParams, setFilterParams] = useState<FilterParams>({});
-    const [pagination, setPagination] = useState<PaginationState>({
-        pageIndex: 0,
-        pageSize: 10,
-    });
 
     const { data, isLoading, isError } = useGetProductsQuery({
         shopName: user?.shop.name,
         ...filterParams,
-        page: pagination.pageIndex + 1,
-        limit: pagination.pageSize,
+        page: Number(page),
+        limit: Number(limit),
     });
 
     const { data: categories } = useGetCategoriesQuery({
@@ -118,6 +116,12 @@ export default function ProductsPage() {
         label: category.name,
         value: category.id.toString(),
     }));
+
+    const paginationMeta = {
+        page: Number(page),
+        limit: Number(limit),
+        total: data?.meta?.total || 0,
+    };
 
     return (
         <div className="space-y-6">
@@ -201,8 +205,7 @@ export default function ProductsPage() {
                     products={data?.data || []}
                     isLoading={isLoading}
                     isError={isError}
-                    onPaginationChange={setPagination}
-                    paginationMeta={data?.meta}
+                    paginationMeta={paginationMeta}
                     onDelete={handleDelete}
                     onBulkDelete={handleBulkDelete}
                     onSearch={handleSearch}

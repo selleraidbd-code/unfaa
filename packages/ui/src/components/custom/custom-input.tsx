@@ -43,13 +43,14 @@ export const CustomInput = ({
     return (
         <div className={`w-full space-y-1 ${className}`}>
             {label && (
-                <Label className="gap-1">
+                <Label htmlFor={label} className="gap-1">
                     {label}{" "}
                     {required && <span className="text-red-500">*</span>}
                 </Label>
             )}
             <div className="relative">
                 <Input
+                    id={label}
                     placeholder={placeholder}
                     type={
                         type === "password"

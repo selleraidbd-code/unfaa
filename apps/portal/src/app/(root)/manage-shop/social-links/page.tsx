@@ -88,7 +88,7 @@ const SocialMediaLinks = () => {
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                        className="lg:grid grid-cols-2 gap-6 max-lg:space-y-5"
                     >
                         <CustomFormInput
                             label="Facebook"

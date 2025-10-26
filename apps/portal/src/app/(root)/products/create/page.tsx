@@ -27,12 +27,14 @@ import { cn } from "@workspace/ui/lib/utils";
 import { ProductCeratePayload } from "@/types/product-type";
 import { CustomFormImages } from "@/components/ui/custom-form-images";
 import { createProductSchema } from "@/features/products/product-schema";
+import { useRouter } from "next/navigation";
 
 export type ProductFormType = z.infer<typeof createProductSchema>;
 
 const AddProduct = () => {
     const user = useGetUser();
     const shopId = user?.shop.id || "";
+    const router = useRouter();
 
     const form = useForm<ProductFormType>({
         resolver: zodResolver(createProductSchema),
@@ -110,8 +112,8 @@ const AddProduct = () => {
             .unwrap()
             .then(() => {
                 toast.success("Product created successfully");
-                // form.reset();
-                // router.push("/products");
+                form.reset();
+                router.push("/products");
             })
             .catch(() => {
                 toast.error("Failed to create Product");
@@ -147,7 +149,7 @@ const AddProduct = () => {
                                     placeholder="Enter Your name"
                                 />
                                 <CustomFormInput
-                                    label="Product Name (Bangla)"
+                                    label="Product Name (Native Name | Display Name)"
                                     name="banglaName"
                                     control={form.control}
                                     required
@@ -319,6 +321,15 @@ const AddProduct = () => {
                                             );
                                         }}
                                     />
+
+                                    {form.formState.errors.fullDescription && (
+                                        <p className="text-red-500">
+                                            {
+                                                form.formState.errors
+                                                    .fullDescription.message
+                                            }
+                                        </p>
+                                    )}
                                 </div>
                                 <CustomFormTextarea
                                     label="Keywords ( For SEO )"

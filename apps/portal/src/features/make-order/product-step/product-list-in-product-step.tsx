@@ -1,19 +1,22 @@
 import { Plus } from "lucide-react";
 
-import { Product } from "@/types/product-type";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
+import { Product } from "@/types/product-type";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
+import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
 type ProductListInProductStepProps = {
     products: Product[];
+    isLoading: boolean;
     onSearch: (value: string) => void;
     addProductToOrder: (product: Product) => void;
 };
 
 export const ProductListInProductStep = ({
     products,
+    isLoading,
     onSearch,
     addProductToOrder,
 }: ProductListInProductStepProps) => {
@@ -29,7 +32,16 @@ export const ProductListInProductStep = ({
                 />
 
                 {/* Product list */}
-                {products.length > 0 ? (
+                {isLoading ? (
+                    <div className="grid gap-3">
+                        {[...Array(10)].map((_, i) => (
+                            <Skeleton
+                                key={i}
+                                className="h-10 w-full rounded-md"
+                            />
+                        ))}
+                    </div>
+                ) : products.length > 0 ? (
                     <div className="max-h-[calc(100vh-324px)] overflow-y-auto rounded-md border">
                         <table className="w-full">
                             <thead className="sticky top-0 bg-gray-50">
@@ -49,11 +61,14 @@ export const ProductListInProductStep = ({
 
                             <tbody>
                                 {products.map((product) => (
-                                    <tr key={product.id} className="border-b">
-                                        <td className="line-clamp-2 px-4 py-3 text-sm">
+                                    <tr
+                                        key={product.id}
+                                        className="border-b h-14"
+                                    >
+                                        <td className="line-clamp-2 py-1 text-sm px-4">
                                             {product.name}
                                         </td>
-                                        <td className="px-4 py-3 text-right text-sm">
+                                        <td className="text-right text-sm px-4">
                                             <Badge
                                                 variant={
                                                     product.stock > 10
@@ -66,7 +81,7 @@ export const ProductListInProductStep = ({
                                                 {product.stock}
                                             </Badge>
                                         </td>
-                                        <td className="px-4 py-3 text-right text-sm">
+                                        <td className="text-right text-sm px-4">
                                             <Button
                                                 size="sm"
                                                 onClick={() =>

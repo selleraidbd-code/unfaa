@@ -1,13 +1,13 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "@workspace/ui/components/sonner";
 import { Trash } from "lucide-react";
 
-import { DataTable } from "@/components/table/data-table";
+import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 import {
@@ -19,12 +19,16 @@ import { Checkbox } from "@workspace/ui/components/checkbox";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 
 const Payments = () => {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || "1";
+    const limit = searchParams.get("limit") || 10;
     const [searchTerm, setSearchTerm] = useState("");
 
-    const { data, isLoading, isError } = useGetPaymentsQuery();
+    const { data, isLoading, isError } = useGetPaymentsQuery({
+        page: Number(page),
+        limit: Number(limit),
+        search: searchTerm || undefined,
+    });
 
     const [deletePayment] = useDeletePaymentMutation();
 
@@ -128,6 +132,12 @@ const Payments = () => {
 
     console.log(data);
 
+    const meta: Meta = {
+        total: data?.meta?.total || 0,
+        page: Number(page),
+        limit: Number(limit),
+    };
+
     return (
         <DataTable
             title="Payments"
@@ -136,7 +146,7 @@ const Payments = () => {
             showViewOptions={true}
             onSearch={handleSearch}
             pagination={true}
-            paginationMeta={data?.meta}
+            paginationMeta={meta}
             bulkActions={[
                 {
                     label: "Delete Selected",

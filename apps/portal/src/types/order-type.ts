@@ -76,6 +76,13 @@ export interface OrderItem {
     name: string;
     price: number;
     quantity: number;
+    selectedVariants?: {
+        variantId: string;
+        variantName: string;
+        optionId: string;
+        optionName: string;
+        extraPrice: number;
+    }[];
 }
 
 export type CreateOrder = {
@@ -85,6 +92,10 @@ export type CreateOrder = {
         productId: string;
         quantity: number;
         productPrice: number;
+        orderItemVariant: {
+            productVariantId: string;
+            productVariantOptionId: string;
+        }[];
     }[];
     customerAddress: string;
     orderStatus: OrderStatus;
@@ -101,3 +112,25 @@ export interface CustomItem {
 export type UpdateOrderPayload = {
     orderStatus?: OrderStatus;
 };
+
+// AI Order Generation Types
+export interface AIOrderGenerationProductInfo {
+    productId: string | null;
+    productName: string;
+    productQuantity: number;
+}
+
+export interface AIOrderGenerationData {
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    customerId: string | null;
+    productInfo: AIOrderGenerationProductInfo[];
+}
+
+export interface AIOrderGenerationResult {
+    result: {
+        missingFields: string[];
+        data: AIOrderGenerationData;
+    };
+}

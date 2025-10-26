@@ -4,12 +4,17 @@ import { OrderStepIndicator } from "@/types/order-type";
 import { OrderItem } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 import { Button } from "@workspace/ui/components/button";
+import { VariantSelector } from "@/features/make-order/product-step/variant-selector";
 
 type OrderItemInProductStepProps = {
     products: Product[];
     orderItems: OrderItem[];
     updateQuantity: (id: string, quantity: number) => void;
     removeOrderItem: (id: string) => void;
+    updateOrderItemVariants: (
+        id: string,
+        selectedVariants: OrderItem["selectedVariants"]
+    ) => void;
     calculateTotal: () => number;
     setActiveStep: (step: OrderStepIndicator) => void;
 };
@@ -19,9 +24,11 @@ export const OrderItemInProductStep = ({
     orderItems,
     updateQuantity,
     removeOrderItem,
+    updateOrderItemVariants,
     calculateTotal,
     setActiveStep,
 }: OrderItemInProductStepProps) => {
+    console.log(orderItems);
     return (
         <div className="col-span-7 space-y-4 py-4">
             <h2 className="sub-title">Order Items</h2>
@@ -33,6 +40,9 @@ export const OrderItemInProductStep = ({
                             <tr className="border-b">
                                 <th className="px-4 py-3 text-left text-sm font-medium">
                                     Product
+                                </th>
+                                <th className="px-4 py-3 text-center text-sm font-medium">
+                                    Variants
                                 </th>
                                 <th className="px-4 py-3 text-right text-sm font-medium">
                                     Price
@@ -50,15 +60,60 @@ export const OrderItemInProductStep = ({
                         </thead>
                         <tbody>
                             {orderItems.map((item) => {
-                                const itemSubtotal = item.price * item.quantity;
+                                const product = products.find(
+                                    (p) => p.id === item.id
+                                );
+                                const extraPrice =
+                                    item.selectedVariants?.reduce(
+                                        (sum, variant) =>
+                                            sum + variant.extraPrice,
+                                        0
+                                    ) || 0;
+                                const finalPrice = item.price + extraPrice;
+                                const itemSubtotal = finalPrice * item.quantity;
 
                                 return (
                                     <tr key={item.id} className="border-b">
                                         <td className="px-4 py-3 text-sm">
                                             {item.name}
                                         </td>
+                                        <td className="px-4 py-3 text-center">
+                                            {product &&
+                                            product.productVariant.length >
+                                                0 ? (
+                                                <VariantSelector
+                                                    product={product}
+                                                    orderItem={item}
+                                                    onVariantChange={
+                                                        updateOrderItemVariants
+                                                    }
+                                                />
+                                            ) : (
+                                                <span className="text-xs text-gray-400">
+                                                    No variants
+                                                </span>
+                                            )}
+                                        </td>
                                         <td className="px-4 py-3 text-right text-sm">
-                                            ${item.price.toFixed(2)}
+                                            <div className="space-y-1">
+                                                <div>
+                                                    ৳{" "}
+                                                    {item.price.toLocaleString()}
+                                                </div>
+                                                {extraPrice > 0 && (
+                                                    <div className="text-xs text-green-600">
+                                                        +৳{" "}
+                                                        {extraPrice.toLocaleString()}
+                                                    </div>
+                                                )}
+
+                                                {extraPrice > 0 && (
+                                                    <div className="font-medium">
+                                                        ৳{" "}
+                                                        {finalPrice.toLocaleString()}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3 text-right">
                                             <div className="flex items-center justify-end">
@@ -102,7 +157,7 @@ export const OrderItemInProductStep = ({
                                         </td>
 
                                         <td className="px-4 py-3 text-right text-sm font-medium">
-                                            ${itemSubtotal.toFixed(2)}
+                                            ৳ {itemSubtotal.toLocaleString()}
                                         </td>
                                         <td className="px-4 py-3 text-right">
                                             <Button
@@ -140,7 +195,7 @@ export const OrderItemInProductStep = ({
                     {orderItems.reduce((sum, item) => sum + item.quantity, 0)} )
                 </p>
                 <p className="text-lg font-semibold">
-                    $ {calculateTotal().toFixed(2)}
+                    ৳ {calculateTotal().toLocaleString()}
                 </p>
             </div>
 

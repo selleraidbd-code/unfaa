@@ -24,3 +24,17 @@ export interface UpdateCustomer {
         address?: string;
     };
 }
+
+export interface FraudCheckerData {
+    mobile_number: string;
+    total_parcels: number;
+    total_delivered: number;
+    total_cancel: number;
+    apis: {
+        [courierName: string]: {
+            total_parcels: number;
+            total_delivered_parcels: number;
+            total_cancelled_parcels: number;
+        };
+    };
+}

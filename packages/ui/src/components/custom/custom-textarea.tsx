@@ -31,8 +31,9 @@ export const CustomTextarea = ({
 }: CustomTextareaProps) => {
     return (
         <div className={cn("w-full space-y-1", className)}>
-            {label && <Label>{label}</Label>}
+            {label && <Label htmlFor={label}>{label}</Label>}
             <Textarea
+                id={label}
                 placeholder={placeholder}
                 value={value}
                 disabled={disabled}

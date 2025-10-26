@@ -1,28 +1,24 @@
 "use client";
 
-import { Editor } from "@/components/editor";
 import { HeaderBackButton } from "@/components/ui/custom-back-button";
-import { CustomButton } from "@/components/ui/custom-button";
 import useGetUser from "@/hooks/useGetUser";
 import {
     useGetShopPoliciesQuery,
     useUpdateShopMutation,
 } from "@/redux/api/shop-api";
 import { ShopPolicyType } from "@/types/shop-type";
-import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
-import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
-import { useState } from "react";
-import { toast } from "@workspace/ui/components/sonner";
+import { AboutUsPolicy } from "@/features/manage-shop/shop-policy/about-us-policy";
+
+import { TermsConditionsPolicy } from "@/features/manage-shop/shop-policy/terms-conditions-policy";
+import { PrivacyPolicy } from "@/features/manage-shop/shop-policy/privacy-policy";
+import { ReturnPolicy } from "@/features/manage-shop/shop-policy/return-policy";
+import { RefundPolicy } from "@/features/manage-shop/shop-policy/refund-policy";
+import { ShopPolicySkeleton } from "@/features/manage-shop/shop-policy/shop-policy-skeleton";
 
 const ShopPolicy = () => {
     const user = useGetUser();
     const shopId = user?.shop.id || "";
     const shopSlug = user?.shop.slug || "";
-    const [aboutUs, setAboutUs] = useState("");
-    const [termsAndConditions, setTermsAndConditions] = useState("");
-    const [privacyPolicy, setPrivacyPolicy] = useState("");
-    const [returnPolicy, setReturnPolicy] = useState("");
-    const [refundPolicy, setRefundPolicy] = useState("");
 
     const { data: aboutUsData, isLoading: isLoadingAboutUs } =
         useGetShopPoliciesQuery({
@@ -63,208 +59,52 @@ const ShopPolicy = () => {
         isLoadingRefundPolicy ||
         isLoadingAboutUs
     ) {
-        return <CustomLoading />;
+        return <ShopPolicySkeleton />;
     }
 
-    const handleSaveAboutUs = async () => {
+    const createSaveHandler = (field: string) => async (content: string) => {
         await updateShop({
             id: shopId,
             payload: {
-                aboutUs,
+                [field]: content,
             },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("About Us saved successfully");
-            })
-            .catch((error) => {
-                toast.error(error.data.message || "Failed to save About Us");
-            });
-    };
-
-    const handleSaveTermsAndConditions = async () => {
-        await updateShop({
-            id: shopId,
-            payload: {
-                termsAndConditions,
-            },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("Terms and Conditions saved successfully");
-            })
-            .catch((error) => {
-                toast.error(
-                    error.data.message || "Failed to save Terms and Conditions"
-                );
-            });
-    };
-
-    const handleSavePrivacyPolicy = async () => {
-        await updateShop({
-            id: shopId,
-            payload: {
-                privacyPolicy,
-            },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("Privacy Policy saved successfully");
-            })
-            .catch((error) => {
-                toast.error(
-                    error.data.message || "Failed to save Privacy Policy"
-                );
-            });
-    };
-
-    const handleSaveReturnPolicy = async () => {
-        await updateShop({
-            id: shopId,
-            payload: {
-                returnPolicy,
-            },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("Return Policy saved successfully");
-            })
-            .catch((error) => {
-                toast.error(
-                    error.data.message || "Failed to save Return Policy"
-                );
-            });
-    };
-
-    const handleSaveRefundPolicy = async () => {
-        await updateShop({
-            id: shopId,
-            payload: {
-                refundPolicy,
-            },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("Refund Policy saved successfully");
-            })
-            .catch((error) => {
-                toast.error(
-                    error.data.message || "Failed to save Refund Policy"
-                );
-            });
+        }).unwrap();
     };
 
     return (
         <div className="space-y-6">
             <HeaderBackButton title="Shop Policy" href="/manage-shop" />
 
-            <CustomCollapsible
-                title="About Us"
-                content={
-                    <div className="flex flex-col gap-6">
-                        <Editor
-                            content={aboutUsData?.data.aboutUs || ""}
-                            onChange={setAboutUs}
-                        />
-
-                        <CustomButton
-                            className="ms-auto"
-                            onClick={handleSaveAboutUs}
-                            isLoading={isCreatingPolicy}
-                            disabled={!aboutUs}
-                        >
-                            Save About Us
-                        </CustomButton>
-                    </div>
-                }
+            <AboutUsPolicy
+                initialContent={aboutUsData?.data.aboutUs || ""}
+                onSave={createSaveHandler("aboutUs")}
+                isSaving={isCreatingPolicy}
             />
 
-            <CustomCollapsible
-                title="Terms and Conditions"
-                content={
-                    <div className="flex flex-col gap-6">
-                        <Editor
-                            content={
-                                termsAndConditionsData?.data
-                                    .termsAndConditions || ""
-                            }
-                            onChange={setTermsAndConditions}
-                        />
-
-                        <CustomButton
-                            className="ms-auto"
-                            onClick={handleSaveTermsAndConditions}
-                            isLoading={isCreatingPolicy}
-                            disabled={!termsAndConditions}
-                        >
-                            Save Terms and Conditions
-                        </CustomButton>
-                    </div>
+            <TermsConditionsPolicy
+                initialContent={
+                    termsAndConditionsData?.data.termsAndConditions || ""
                 }
+                onSave={createSaveHandler("termsAndConditions")}
+                isSaving={isCreatingPolicy}
             />
 
-            <CustomCollapsible
-                title="Privacy Policy"
-                content={
-                    <div className="flex flex-col gap-6">
-                        <Editor
-                            content={
-                                privacyPolicyData?.data.privacyPolicy || ""
-                            }
-                            onChange={setPrivacyPolicy}
-                        />
-
-                        <CustomButton
-                            className="ms-auto"
-                            onClick={handleSavePrivacyPolicy}
-                            isLoading={isCreatingPolicy}
-                            disabled={!privacyPolicy}
-                        >
-                            Save Privacy Policy
-                        </CustomButton>
-                    </div>
-                }
-            />
-            <CustomCollapsible
-                title="Return Policy"
-                content={
-                    <div className="flex flex-col gap-6">
-                        <Editor
-                            content={returnPolicyData?.data.returnPolicy || ""}
-                            onChange={setReturnPolicy}
-                        />
-
-                        <CustomButton
-                            className="ms-auto"
-                            onClick={handleSaveReturnPolicy}
-                            isLoading={isCreatingPolicy}
-                            disabled={!returnPolicy}
-                        >
-                            Save Return Policy
-                        </CustomButton>
-                    </div>
-                }
+            <PrivacyPolicy
+                initialContent={privacyPolicyData?.data.privacyPolicy || ""}
+                onSave={createSaveHandler("privacyPolicy")}
+                isSaving={isCreatingPolicy}
             />
 
-            <CustomCollapsible
-                title="Refund Policy"
-                content={
-                    <div className="flex flex-col gap-6">
-                        <Editor
-                            content={refundPolicyData?.data.refundPolicy || ""}
-                            onChange={setRefundPolicy}
-                        />
+            <ReturnPolicy
+                initialContent={returnPolicyData?.data.returnPolicy || ""}
+                onSave={createSaveHandler("returnPolicy")}
+                isSaving={isCreatingPolicy}
+            />
 
-                        <CustomButton
-                            className="ms-auto"
-                            onClick={handleSaveRefundPolicy}
-                            isLoading={isCreatingPolicy}
-                            disabled={!refundPolicy}
-                        >
-                            Save Refund Policy
-                        </CustomButton>
-                    </div>
-                }
+            <RefundPolicy
+                initialContent={refundPolicyData?.data.refundPolicy || ""}
+                onSave={createSaveHandler("refundPolicy")}
+                isSaving={isCreatingPolicy}
             />
         </div>
     );

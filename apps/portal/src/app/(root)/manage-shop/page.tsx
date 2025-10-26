@@ -91,6 +91,7 @@ const ManageShop = () => {
             description:
                 "Provide instant communication and assistance to customers with chat support system.",
             slug: "chat-support",
+            isComingSoon: true,
         },
     ];
 

@@ -14,31 +14,34 @@ import {
 import { Customer } from "@/types/customer-type";
 import useGetUser from "@/hooks/useGetUser";
 import { useAlert } from "@/hooks/useAlert";
+import { useSearchParams } from "next/navigation";
 
 const CustomersPage = () => {
+    const searchParams = useSearchParams();
+    const page = searchParams.get("page") || 1;
+    const limit = searchParams.get("limit") || 10;
     const user = useGetUser();
     const { fire } = useAlert();
     const isMobile = useBreakpoint({ size: "lg" });
+
+    const [searchTerm, setSearchTerm] = useState<string>("");
     const [customer, setCustomer] = useState<Customer | null>(null);
 
     const { data, isLoading, isError } = useGetCustomersQuery({
-        page: 1,
-        limit: 10,
+        page: Number(page),
+        limit: Number(limit),
         shopId: user?.shop?.id,
+        searchTerm: searchTerm || undefined,
     });
 
     const [deleteCustomer] = useDeleteCustomerMutation();
 
     const handleSearch = (value: string) => {
-        console.log(value);
+        setSearchTerm(value);
     };
 
     const handlePaginationChange = (state: PaginationState) => {
         console.log(state);
-    };
-
-    const handleBulkDelete = () => {
-        console.log("Bulk delete");
     };
 
     const handleDelete = async (id: string) => {
@@ -65,6 +68,12 @@ const CustomersPage = () => {
         setCustomer(customer);
     };
 
+    const paginationMeta = {
+        page: Number(page),
+        limit: Number(limit),
+        total: data?.meta?.total || 0,
+    };
+
     return (
         <>
             {!isMobile ? (
@@ -72,12 +81,11 @@ const CustomersPage = () => {
                     data={data?.data || []}
                     isLoading={isLoading}
                     isError={isError}
-                    paginationMeta={data?.meta}
+                    paginationMeta={paginationMeta}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onSearch={handleSearch}
                     onPaginationChange={handlePaginationChange}
-                    onBulkDelete={handleBulkDelete}
                 />
             ) : (
                 <CustomerCardList

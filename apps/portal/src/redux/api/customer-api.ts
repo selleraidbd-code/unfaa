@@ -10,6 +10,7 @@ import {
 import {
     CreateCustomer,
     Customer,
+    FraudCheckerData,
     UpdateCustomer,
 } from "@/types/customer-type";
 
@@ -56,6 +57,16 @@ const customerApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Customer],
         }),
+        getFraudCheckerData: builder.mutation<
+            ResponseObject<FraudCheckerData>,
+            { phoneNumber: string }
+        >({
+            query: ({ phoneNumber }) => ({
+                url: `/customer/get-customer-fraudchecker-by-phone-number`,
+                method: METHOD.POST,
+                body: { phoneNumber },
+            }),
+        }),
     }),
 });
 
@@ -65,4 +76,5 @@ export const {
     useCreateCustomerMutation,
     useUpdateCustomerMutation,
     useDeleteCustomerMutation,
+    useGetFraudCheckerDataMutation,
 } = customerApi;

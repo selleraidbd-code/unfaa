@@ -59,3 +59,11 @@ export interface UpdateCourierSetup {
     credentials: CourierCredentials;
     isActive?: boolean;
 }
+
+export interface RiderNote {
+    id: string;
+    shopId: string;
+    riderNote: string;
+    createdAt: string;
+    updatedAt: string;
+}

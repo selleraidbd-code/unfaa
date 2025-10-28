@@ -420,7 +420,7 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
             data-slot="sidebar-group"
             data-sidebar="group"
             className={cn(
-                "relative flex w-full min-w-0 flex-col p-4 group-data-[collapsible=icon]:p-2",
+                "relative flex w-full min-w-0 flex-col px-4 py-2 group-data-[collapsible=icon]:p-2",
                 className
             )}
             {...props}

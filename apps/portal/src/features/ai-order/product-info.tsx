@@ -91,11 +91,21 @@ export const ProductInfo = ({ productState, onProductStateChange }: Props) => {
     return (
         <>
             <Card>
-                <CardHeader>
+                <CardHeader className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                         <ShoppingCart className="h-5 w-5" />
                         Product Information
                     </CardTitle>
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenModal(0)}
+                        className="flex items-center gap-2"
+                    >
+                        <Package className="h-4 w-4" />
+                        Change Product
+                    </Button>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -115,15 +125,6 @@ export const ProductInfo = ({ productState, onProductStateChange }: Props) => {
                                             ? "item"
                                             : "items"}
                                     </Badge>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleOpenModal(index)}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <Package className="h-4 w-4" />
-                                        Change Product
-                                    </Button>
                                 </div>
                             </div>
 

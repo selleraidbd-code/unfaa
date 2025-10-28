@@ -22,7 +22,7 @@ export function NavMain({
     return (
         <SidebarGroup className={className}>
             {label && (
-                <SidebarGroupLabel className="pb-2">{label}</SidebarGroupLabel>
+                <SidebarGroupLabel className="pb-1">{label}</SidebarGroupLabel>
             )}
 
             <SidebarMenu>

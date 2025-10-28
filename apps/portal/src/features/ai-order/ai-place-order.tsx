@@ -44,10 +44,7 @@ export const AiPlaceOrder = ({
             <Button variant="outline" onClick={onReset}>
                 Cancel
             </Button>
-            <Button
-                onClick={handlePlaceOrder}
-                className="flex items-center gap-2"
-            >
+            <Button onClick={handlePlaceOrder} className="min-w-40">
                 <CheckCircle className="h-4 w-4" />
                 Place Order
             </Button>

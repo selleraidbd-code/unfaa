@@ -1,6 +1,16 @@
 import { api } from "@/redux/api";
-import { METHOD, ResponseObject, TagType } from "@/redux/type";
-import { CourierSetup, CreateCourierSetup } from "@/types/courier-type";
+import {
+    METHOD,
+    PaginatedResponse,
+    QueryParams,
+    ResponseObject,
+    TagType,
+} from "@/redux/type";
+import {
+    CourierSetup,
+    CreateCourierSetup,
+    RiderNote,
+} from "@/types/courier-type";
 
 const courierApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -22,8 +32,21 @@ const courierApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Courier],
         }),
+        getSteadfastRiderNote: builder.query<
+            PaginatedResponse<RiderNote>,
+            QueryParams
+        >({
+            query: (params) => ({
+                url: `/stead-fast-courier-webhook-response`,
+                method: METHOD.GET,
+                params,
+            }),
+        }),
     }),
 });
 
-export const { useCreateCourierSetupMutation, useGetCourierSetupQuery } =
-    courierApi;
+export const {
+    useCreateCourierSetupMutation,
+    useGetCourierSetupQuery,
+    useGetSteadfastRiderNoteQuery,
+} = courierApi;

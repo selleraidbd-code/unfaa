@@ -1,22 +1,25 @@
 import { UserRole } from "@/types";
 import {
+    ArrowDown,
+    Bot,
     CirclePlay,
+    ClipboardPlus,
     Component,
     Crown,
+    FileText,
+    Folder,
     LayoutDashboard,
     MonitorUp,
+    Notebook,
     Package,
     PanelTop,
     Pocket,
-    ScanBarcode,
     ShieldPlus,
     ShoppingBag,
     ShoppingCart,
     Store,
+    Truck,
     Users,
-    ArrowDown,
-    Folder,
-    Bot,
 } from "lucide-react";
 
 export const getNavData = (role: UserRole) => {
@@ -86,16 +89,41 @@ const SellerNavData = [
                 url: "/",
                 icon: LayoutDashboard,
             },
+        ],
+    },
+    {
+        label: "Manage Order",
+        items: [
+            {
+                title: "AI Order",
+                url: "/ai-order",
+                icon: Bot,
+            },
+            {
+                title: "Manual Order",
+                url: "/make-order",
+                icon: ClipboardPlus,
+            },
             {
                 title: "Orders",
                 url: "/orders",
                 icon: ShoppingCart,
             },
             {
-                title: "AI Order",
-                url: "/ai-order",
-                icon: Bot,
+                title: "In Delivery",
+                url: "/delivery-orders",
+                icon: Truck,
             },
+            {
+                title: "Customers",
+                url: "/customers",
+                icon: Users,
+            },
+        ],
+    },
+    {
+        label: "Manage Products",
+        items: [
             {
                 title: "Products",
                 url: "/products",
@@ -105,27 +133,11 @@ const SellerNavData = [
                 title: "Categories",
                 url: "/categories",
                 icon: Package,
-                subItems: [
-                    {
-                        title: "Create",
-                        url: "/categories/create",
-                    },
-                ],
             },
             {
                 title: "Brands",
                 url: "/brands",
                 icon: Pocket,
-            },
-            {
-                title: "Employees",
-                url: "/employees",
-                icon: ShieldPlus,
-            },
-            {
-                title: "Customers",
-                url: "/customers",
-                icon: Users,
             },
         ],
     },
@@ -141,6 +153,11 @@ const SellerNavData = [
                 title: "Landing Page",
                 url: "/landing-page",
                 icon: PanelTop,
+            },
+            {
+                title: "Employees",
+                url: "/employees",
+                icon: ShieldPlus,
             },
             {
                 title: "Subscriptions",

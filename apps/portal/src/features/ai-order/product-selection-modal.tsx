@@ -31,14 +31,12 @@ interface ProductSelectionModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onSelectProduct: (product: Product) => void;
-    currentProductId?: string;
 }
 
 export const ProductSelectionModal = ({
     open,
     onOpenChange,
     onSelectProduct,
-    currentProductId,
 }: ProductSelectionModalProps) => {
     const user = useGetUser();
     const [searchTerm, setSearchTerm] = useState("");
@@ -67,10 +65,6 @@ export const ProductSelectionModal = ({
         limit: 20,
         total: data?.meta?.total || 0,
     };
-
-    const selectedProduct = products.find(
-        (product) => product.id === currentProductId
-    );
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,19 +108,12 @@ export const ProductSelectionModal = ({
                     >
                         {(products) => (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {selectedProduct && (
-                                    <SelectedProductCard
-                                        product={selectedProduct}
-                                        className="col-span-2"
-                                    />
-                                )}
-
                                 {products.map((product) => (
                                     <ProductSelectionCard
                                         key={product.id}
                                         product={product}
                                         onSelectProduct={handleSelectProduct}
-                                        currentProductId={currentProductId}
+                                        currentProductId={undefined}
                                     />
                                 ))}
                             </div>

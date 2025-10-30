@@ -1,26 +1,34 @@
-import { CustomerState, ProductState } from "@/features/ai-order/types";
+import { CustomerState } from "@/features/ai-order/types";
+import { useCreateOrderbyAdminMutation } from "@/redux/api/order-api";
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
 import { CheckCircle } from "lucide-react";
+import useGetUser from "@/hooks/useGetUser";
+import { CreateOrder, OrderItem, OrderStatus } from "@/types/order-type";
+import { isValidId } from "@/features/ai-order/lib";
 
 interface Props {
     onReset: () => void;
-    customerState: CustomerState;
-    productState: ProductState;
+    customerInfo: CustomerState;
+    orderItems: OrderItem[];
 }
 
-export const AiPlaceOrder = ({
-    onReset,
-    customerState,
-    productState,
-}: Props) => {
-    const handlePlaceOrder = () => {
-        if (!customerState || !productState) return;
+export const AiPlaceOrder = ({ onReset, customerInfo, orderItems }: Props) => {
+    const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
+    const user = useGetUser();
+
+    const handlePlaceOrder = async (status: OrderStatus) => {
+        if (!customerInfo || !Array.isArray(orderItems)) return;
+
+        if (!user) {
+            toast.error("You are not authorized to create an order");
+            return;
+        }
 
         // Validate required fields
         const missingFields = [];
-        if (!customerState.customerId) missingFields.push("Customer ID");
-        if (productState.productInfo.some((p) => !p.selectedProductId))
+        if (orderItems.length === 0) missingFields.push("At least one product");
+        if (orderItems.some((p) => !p.id))
             missingFields.push("Product selection");
 
         if (missingFields.length > 0) {
@@ -28,15 +36,53 @@ export const AiPlaceOrder = ({
             return;
         }
 
-        // Combine states for order creation
-        const orderData = {
-            ...customerState,
-            productInfo: productState.productInfo,
-        };
+        const customerId = isValidId(customerInfo.customerId)
+            ? customerInfo.customerId
+            : "";
 
-        // Here you would typically call the create order API
-        toast.success("Order placed successfully!");
-        console.log("Order data:", orderData);
+        // Build payload akin to make-order page
+        const payload: CreateOrder = {
+            shopId: user.shop.id,
+            customerId,
+            customerName: customerInfo.customerName,
+            customerPhoneNumber: customerInfo.customerPhone,
+            orderItems: orderItems.map((item) => {
+                const extras = (item.selectedVariants ?? []).reduce(
+                    (sum, sv) => sum + (Number(sv.extraPrice ?? 0) || 0),
+                    0
+                );
+                const unitPrice = Number(item.price ?? 0) + extras;
+                const orderItemVariant = (item.selectedVariants ?? []).map(
+                    (sv) => ({
+                        productVariantId: String(sv.variantId),
+                        productVariantOptionId: String(sv.optionId),
+                    })
+                );
+
+                return {
+                    productId: String(item.id),
+                    quantity: Number(item.quantity) || 1,
+                    productPrice: unitPrice,
+                    orderItemVariant,
+                };
+            }),
+            customerAddress: customerInfo.customerAddress,
+            orderStatus: status,
+            notes: "",
+            // Temporary delivery zone as requested
+            deliveryZoneId: "ae5255f5-49d9-492b-94d0-80d937c1260d",
+        } as const;
+
+        try {
+            await createOrder({ assignedTo: user.id, payload }).unwrap();
+            toast.success("Order created successfully!");
+            onReset();
+        } catch (err: any) {
+            const message = err?.data?.message || "Failed to create order";
+            toast.error(message);
+            // eslint-disable-next-line no-console
+            console.log("Create order error :>> ", err);
+        }
     };
 
     return (
@@ -44,9 +90,22 @@ export const AiPlaceOrder = ({
             <Button variant="outline" onClick={onReset}>
                 Cancel
             </Button>
-            <Button onClick={handlePlaceOrder} className="min-w-40">
+            <Button
+                onClick={() => handlePlaceOrder(OrderStatus.CONFIRMED)}
+                variant="secondary"
+                className="min-w-40"
+                disabled={isLoading}
+            >
                 <CheckCircle className="h-4 w-4" />
-                Place Order
+                {isLoading ? "Confirming..." : "Confirm Order"}
+            </Button>
+            <Button
+                onClick={() => handlePlaceOrder(OrderStatus.PLACED)}
+                className="min-w-40"
+                disabled={isLoading}
+            >
+                <CheckCircle className="h-4 w-4" />
+                {isLoading ? "Placing..." : "Place Order"}
             </Button>
         </div>
     );

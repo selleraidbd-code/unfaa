@@ -88,6 +88,8 @@ export interface OrderItem {
 export type CreateOrder = {
     shopId: string;
     customerId: string;
+    customerName?: string;
+    customerPhoneNumber?: string;
     orderItems: {
         productId: string;
         quantity: number;

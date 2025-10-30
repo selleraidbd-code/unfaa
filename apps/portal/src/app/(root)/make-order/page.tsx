@@ -128,7 +128,6 @@ const Page = () => {
 
         const payload: CreateOrder = {
             shopId: user.shop.id,
-            customerId: selectedCustomer.id,
             orderItems: orderItems.map((item) => ({
                 productId: item.id,
                 quantity: item.quantity,
@@ -139,6 +138,7 @@ const Page = () => {
                         productVariantOptionId: variant.optionId,
                     })) || [],
             })),
+            customerId: selectedCustomer.id,
             customerAddress: orderDetails.deliveryAddress,
             orderStatus: OrderStatus.PLACED,
             notes: orderDetails.orderNotes,

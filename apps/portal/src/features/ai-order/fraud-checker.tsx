@@ -16,22 +16,19 @@ import { cn } from "@workspace/ui/lib/utils";
 import {
     AlertCircle,
     CheckCircle,
-    CheckSquare,
     Loader2,
-    LucideIcon,
     Package,
-    Percent,
     RotateCcw,
     ShieldUser,
-    Truck,
     XCircle,
 } from "lucide-react";
 import { useState } from "react";
-import { FaCartShopping, FaTruckFast } from "react-icons/fa6";
 import { FaPercentage } from "react-icons/fa";
+import { FaCartShopping, FaTruckFast } from "react-icons/fa6";
 
 interface Props {
     fraudState: FraudCheckerData | null;
+    error?: string | null;
     onCheckFraud: (phone: string) => void;
     customerPhone: string;
     isChecking?: boolean;
@@ -39,6 +36,7 @@ interface Props {
 
 export const FraudChecker = ({
     fraudState,
+    error,
     onCheckFraud,
     customerPhone,
     isChecking = false,
@@ -46,7 +44,7 @@ export const FraudChecker = ({
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [phoneInput, setPhoneInput] = useState(customerPhone);
 
-    if (!fraudState && !isChecking) {
+    if (!fraudState && !error && !isChecking) {
         return null;
     }
 
@@ -72,12 +70,22 @@ export const FraudChecker = ({
         : 0;
 
     const getCustomerStatus = (rate: number) => {
+        if (fraudState && fraudState.total_parcels === 0) {
+            return {
+                icon: Package,
+                iconColor: "text-blue-600",
+                bgColor: "bg-blue-50 dark:bg-blue-950",
+                borderColor: "border-blue-200 dark:border-blue-800",
+                title: "New Customer (নতুন গ্রাহক)",
+                subtitle: "No delivery history found yet",
+            };
+        }
         if (rate >= 70) {
             return {
                 icon: CheckCircle,
                 iconColor: "text-green-600",
-                bgColor: "bg-green-50",
-                borderColor: "border-green-200",
+                bgColor: "bg-green-50 dark:bg-green-950",
+                borderColor: "border-green-200 dark:border-green-800",
                 title: "Reliable Customer (এটি একটি নিরাপদ ডেলিভারি। )",
                 subtitle: "Excellent delivery record",
             };
@@ -85,8 +93,8 @@ export const FraudChecker = ({
             return {
                 icon: AlertCircle,
                 iconColor: "text-yellow-600",
-                bgColor: "bg-yellow-50",
-                borderColor: "border-yellow-200",
+                bgColor: "bg-yellow-50 dark:bg-yellow-950",
+                borderColor: "border-yellow-200 dark:border-yellow-800",
                 title: "Moderate Risk (এটি একটি মধ্যম রিস্ক ডেলিভারি। )",
                 subtitle: "Average delivery rate",
             };
@@ -94,8 +102,8 @@ export const FraudChecker = ({
             return {
                 icon: XCircle,
                 iconColor: "text-red-600",
-                bgColor: "bg-red-50",
-                borderColor: "border-red-200",
+                bgColor: "bg-red-50 dark:bg-red-950",
+                borderColor: "border-red-200 dark:border-red-800",
                 title: "High Risk Customer (এটি একটি উচ্চ রিস্ক ডেলিভারি। )",
                 subtitle: "Low delivery success rate",
             };
@@ -136,8 +144,10 @@ export const FraudChecker = ({
               },
               {
                   icon: FaPercentage,
-                  color: getDeliveryRateColor(deliveryRate),
-                  value: `${deliveryRate}%`,
+                  color: fraudState.total_parcels
+                      ? getDeliveryRateColor(deliveryRate)
+                      : "text-gray-600",
+                  value: fraudState.total_parcels ? `${deliveryRate}%` : "N/A",
                   labelBn: "ডেলিভারি রেট",
                   labelEn: `Success Rate`,
               },
@@ -145,7 +155,7 @@ export const FraudChecker = ({
         : [];
 
     return (
-        <div className="space-y-6 bg-white p-4 rounded-xl lg:p-6 max-w-7xl border">
+        <div className="space-y-6 bg-card p-4 rounded-xl lg:p-6 max-w-7xl border">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -178,8 +188,26 @@ export const FraudChecker = ({
                 </div>
             )}
 
+            {/* Error State */}
+            {error && !isChecking && (
+                <div className="flex gap-4 p-4 rounded-lg border bg-red-50 border-red-200">
+                    <XCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                        <p className="text-lg font-medium text-red-600 mb-1">
+                            Verification Failed
+                        </p>
+                        <p className="text-red-700">{error}</p>
+                        {customerPhone && (
+                            <p className="text-sm text-red-600 mt-2">
+                                Phone: {customerPhone}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Customer Info */}
-            {fraudState && (
+            {fraudState && !error && (
                 <div className="space-y-6">
                     {/* Customer Status */}
                     <div
@@ -210,39 +238,42 @@ export const FraudChecker = ({
                     <SummaryStats stats={summaryStats} />
 
                     {/* Courier History Table */}
-                    {Object.keys(fraudState.apis).length > 0 && (
-                        <div className="overflow-x-auto border rounded-lg p-4">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b">
-                                        <th className="text-left py-3 px-2 font-medium text-gray-700">
-                                            কুরিয়ার
-                                        </th>
-                                        <th className="text-center py-3 px-2 font-medium text-primary">
-                                            অর্ডার
-                                        </th>
-                                        <th className="text-center py-3 px-2 font-medium text-green-700">
-                                            ডেলিভারি
-                                        </th>
-                                        <th className="text-center py-3 px-2 font-medium text-red-600">
-                                            বাতিল
-                                        </th>
-                                        <th
-                                            className={cn(
-                                                "text-center py-3 px-2 font-medium",
-                                                getDeliveryRateColor(
-                                                    deliveryRate
-                                                )
-                                            )}
-                                        >
-                                            ডেলিভারি %
-                                        </th>
-                                    </tr>
-                                </thead>
+                    {fraudState &&
+                        fraudState.total_parcels > 0 &&
+                        Object?.keys(fraudState?.apis || {}).length > 0 && (
+                            <div className="overflow-x-auto border rounded-lg p-4">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b">
+                                            <th className="text-left py-3 px-2 font-medium text-gray-700">
+                                                কুরিয়ার
+                                            </th>
+                                            <th className="text-center py-3 px-2 font-medium text-primary">
+                                                অর্ডার
+                                            </th>
+                                            <th className="text-center py-3 px-2 font-medium text-green-700">
+                                                ডেলিভারি
+                                            </th>
+                                            <th className="text-center py-3 px-2 font-medium text-red-600">
+                                                বাতিল
+                                            </th>
+                                            <th
+                                                className={cn(
+                                                    "text-center py-3 px-2 font-medium",
+                                                    getDeliveryRateColor(
+                                                        deliveryRate
+                                                    )
+                                                )}
+                                            >
+                                                ডেলিভারি %
+                                            </th>
+                                        </tr>
+                                    </thead>
 
-                                <tbody>
-                                    {Object.entries(fraudState.apis).map(
-                                        ([courier, data]) => {
+                                    <tbody>
+                                        {Object.entries(
+                                            fraudState?.apis || {}
+                                        ).map(([courier, data]) => {
                                             const courierDeliveryRate =
                                                 data.total_parcels
                                                     ? Math.round(
@@ -287,12 +318,11 @@ export const FraudChecker = ({
                                                     </td>
                                                 </tr>
                                             );
-                                        }
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                 </div>
             )}
 

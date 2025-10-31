@@ -24,6 +24,13 @@ import {
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
+import {
+    CustomTabs,
+    CustomTabsList,
+    CustomTabsTrigger,
+    CustomTabsContent,
+} from "@workspace/ui/components/custom/custom-tabs";
+
 const Page = () => {
     const user = useGetUser();
     const [activeTab, setActiveTab] = useState("pending-parcel");
@@ -52,7 +59,7 @@ const Page = () => {
     const { data: notSentData, isLoading: isNotSentLoading } =
         useGetOrdersQuery({
             shopId: user?.shop.id,
-            orderStatus: OrderStatus.CONFIRMED,
+            orderStatus: OrderStatus.SEND,
             page: notSentPage,
             limit: pageSize,
         });
@@ -141,11 +148,41 @@ const Page = () => {
     );
 
     return (
-        <div className="grid gap-4 md:gap-8">
-            <h1 className="title">Delivery Orders</h1>
+        <div className="grid gap-4 md:gap-6">
+            <h1 className="title">In Delivery Orders</h1>
+
+            <CustomTabs value={activeTab} onValueChange={setActiveTab}>
+                <CustomTabsList>
+                    <CustomTabsTrigger
+                        value="ready-for-dispatch"
+                        icon={<Truck className="size-4 lg:size-5" />}
+                    >
+                        Ready for Dispatch
+                    </CustomTabsTrigger>
+                    <CustomTabsTrigger
+                        value="pending-parcel"
+                        icon={<Package className="size-4 lg:size-5" />}
+                    >
+                        Pending Parcel
+                    </CustomTabsTrigger>
+                    <CustomTabsTrigger
+                        value="rider-note"
+                        icon={<FileText className="size-4 lg:size-5" />}
+                    >
+                        Rider Note
+                    </CustomTabsTrigger>
+                </CustomTabsList>
+            </CustomTabs>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger
+                        value="ready-for-dispatch"
+                        className="flex items-center gap-2"
+                    >
+                        <Truck className="w-4 h-4" />
+                        Ready for Dispatch
+                    </TabsTrigger>
                     <TabsTrigger
                         value="pending-parcel"
                         className="flex items-center gap-2"
@@ -153,13 +190,7 @@ const Page = () => {
                         <Package className="w-4 h-4" />
                         Pending Parcel
                     </TabsTrigger>
-                    <TabsTrigger
-                        value="not-sent"
-                        className="flex items-center gap-2"
-                    >
-                        <Truck className="w-4 h-4" />
-                        Not Sent to Courier
-                    </TabsTrigger>
+
                     <TabsTrigger
                         value="rider-note"
                         className="flex items-center gap-2"
@@ -255,7 +286,7 @@ const Page = () => {
                 </TabsContent>
 
                 {/* Not Sent to Courier Tab */}
-                <TabsContent value="not-sent" className="mt-6">
+                <TabsContent value="ready-for-dispatch" className="mt-6">
                     {isNotSentLoading ? (
                         renderLoadingSkeleton()
                     ) : notSentData?.data?.length === 0 ? (

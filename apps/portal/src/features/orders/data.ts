@@ -10,18 +10,6 @@ export const orderStatusOptions = [
         value: OrderStatus.PLACED,
     },
     {
-        label: "Order Confirmed",
-        value: OrderStatus.CONFIRMED,
-    },
-    {
-        label: "Order Canceled",
-        value: OrderStatus.CANCELLED,
-    },
-    {
-        label: "Order Send",
-        value: OrderStatus.SEND,
-    },
-    {
         label: "Order Hold",
         value: OrderStatus.HOLD,
     },
@@ -30,23 +18,35 @@ export const orderStatusOptions = [
         value: OrderStatus.WAITING,
     },
     {
-        label: "Order NZC",
-        value: OrderStatus.NZC,
+        label: "Order Confirmed",
+        value: OrderStatus.CONFIRMED,
     },
     {
-        label: "Order Returned",
-        value: OrderStatus.RETURN,
+        label: "Order Canceled",
+        value: OrderStatus.CANCELLED,
     },
-    {
-        label: "Order Delivered",
-        value: OrderStatus.RECEIVED,
-    },
-    {
-        label: "Delivery Pending",
-        value: OrderStatus.PROCESSING,
-    },
-    {
-        label: "Delivery Completed",
-        value: OrderStatus.INCOMPLETE,
-    },
+    // {
+    //     label: "Parcel Send",
+    //     value: OrderStatus.SEND,
+    // },
+    // {
+    //     label: "Order NZC",
+    //     value: OrderStatus.NZC,
+    // },
+    // {
+    //     label: "Order Returned",
+    //     value: OrderStatus.RETURN,
+    // },
+    // {
+    //     label: "Order Delivered",
+    //     value: OrderStatus.RECEIVED,
+    // },
+    // {
+    //     label: "Delivery Pending",
+    //     value: OrderStatus.PROCESSING,
+    // },
+    // {
+    //     label: "Delivery Completed",
+    //     value: OrderStatus.INCOMPLETE,
+    // },
 ];

@@ -10,11 +10,12 @@ import { useState } from "react";
 import { CustomerInfo } from "@/features/ai-order/customer-info";
 import { FraudChecker } from "@/features/ai-order/fraud-checker";
 import { GenerateSkeleton } from "@/features/ai-order/generate-skeleton";
-import { isValidBdPhoneNumber } from "@/features/ai-order/lib";
+import { isValidBdPhoneNumber, isValidId } from "@/features/ai-order/lib";
 import { ProductInfoOrder } from "@/features/ai-order/product-info-order";
 import { CustomerState } from "@/features/ai-order/types";
 import { useGetFraudCheckerDataMutation } from "@/redux/api/customer-api";
 import { FraudCheckerData } from "@/types/customer-type";
+import { OrderInfo } from "@/features/ai-order/order-info";
 
 const Page = () => {
     const user = useGetUser();
@@ -171,6 +172,10 @@ const Page = () => {
                         customerState={customerState}
                         onCustomerStateChange={setCustomerState}
                     />
+
+                    {isValidId(customerState.customerId) && (
+                        <OrderInfo customerId={customerState.customerId} />
+                    )}
 
                     {/* Product Information */}
                     <ProductInfoOrder

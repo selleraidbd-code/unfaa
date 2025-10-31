@@ -29,47 +29,54 @@ export type Order = {
     customerName: string;
     customerPhoneNumber: string;
     customerAddress: string;
+    notes: string;
+    courierNote: string | null;
+    courierStatus: string | null;
+    consignmentId: string | null;
     shopId: string;
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
     orderNumber: number;
+    totalAmount: number;
     createdAt: string;
     updatedAt: string;
-    orderItems: {
+    orderItems: OrderDetailsItem[];
+};
+
+export interface OrderDetailsItem {
+    id: string;
+    orderId: string;
+    quantity: number;
+    productId: string;
+    productVariantId: string;
+    createdAt: string;
+    updatedAt: string;
+    product: {
         id: string;
-        orderId: string;
-        quantity: number;
-        productId: string;
-        productVariantId: string;
+        name: string;
+        banglaName: string;
+        description: string;
+        price: number | null;
+        discountPrice: number | null;
+        photoURL: string;
+        activeStatus: string;
+        keywords: string;
+        stock: number;
         createdAt: string;
         updatedAt: string;
-        product: {
-            id: string;
-            name: string;
-            banglaName: string;
-            description: string;
-            price: number | null;
-            discountPrice: number | null;
-            photoURL: string;
-            activeStatus: string;
-            keywords: string;
-            stock: number;
-            createdAt: string;
-            updatedAt: string;
-            shopId: string;
-            categoryId: string;
-        };
-        productVariant: {
-            id: string;
-            name: string;
-            price: number;
-            discountPrice: number;
-            createdAt: string;
-            updatedAt: string;
-            productId: string;
-        };
+        shopId: string;
+        categoryId: string;
+    };
+    productVariant: {
+        id: string;
+        name: string;
+        price: number;
+        discountPrice: number;
+        createdAt: string;
+        updatedAt: string;
+        productId: string;
     }[];
-};
+}
 
 export interface OrderItem {
     id: string;
@@ -113,6 +120,10 @@ export interface CustomItem {
 
 export type UpdateOrderPayload = {
     orderStatus?: OrderStatus;
+    customerName?: string;
+    customerPhoneNumber?: string;
+    customerAddress?: string;
+    quantity?: number;
 };
 
 // AI Order Generation Types

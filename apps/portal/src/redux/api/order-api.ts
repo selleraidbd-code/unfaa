@@ -35,7 +35,7 @@ const orderApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Order],
         }),
-        getOrder: builder.query<Order, { id: string }>({
+        getOrder: builder.query<ResponseObject<Order>, { id: string }>({
             query: ({ id }) => ({
                 url: `/order/${id}`,
                 method: METHOD.GET,
@@ -75,6 +75,9 @@ const orderApi = api.injectEndpoints({
 
 export const {
     useGetOrdersQuery,
+    useLazyGetOrdersQuery,
+    useGetOrderQuery,
+    useLazyGetOrderQuery,
     useCreateOrderbyAdminMutation,
     useUpdateOrderMutation,
     useDeleteOrderMutation,

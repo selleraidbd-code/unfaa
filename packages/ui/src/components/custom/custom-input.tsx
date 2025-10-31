@@ -17,6 +17,7 @@ type CustomInputProps = {
     min?: number;
     className?: string;
     error?: string;
+    invalid?: boolean;
 };
 
 export const CustomInput = ({
@@ -31,6 +32,7 @@ export const CustomInput = ({
     min,
     className = "",
     error,
+    invalid,
 }: CustomInputProps) => {
     const [show, setShow] = useState(false);
 
@@ -66,6 +68,7 @@ export const CustomInput = ({
                     disabled={disabled}
                     min={min}
                     required={required}
+                    aria-invalid={invalid}
                 />
                 {type === "password" &&
                     (show ? (

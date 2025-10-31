@@ -3,10 +3,11 @@
 import { useState } from "react";
 
 import { useGetOrdersQuery } from "@/redux/api/order-api";
-import { Bot, DownloadCloud, Plus } from "lucide-react";
+import { useCourierEntryMutation } from "@/redux/api/couriar-api";
+import { Bot, DownloadCloud, Plus, Truck } from "lucide-react";
 
 import { CustomButton } from "@/components/ui/custom-button";
-import { OrderDetails } from "@/features/orders/order-details";
+import { OrderDetailsModal } from "@/features/orders/order-details-modal";
 import useGetUser from "@/hooks/useGetUser";
 import { Order, OrderStatus, PaymentStatus } from "@/types/order-type";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
@@ -48,6 +49,9 @@ const OrdersPage = () => {
         page: currentPage,
         limit: pageSize,
     });
+
+    const [courierEntry, { isLoading: isCourierEntryLoading }] =
+        useCourierEntryMutation();
 
     const handleSearch = (value: string) => {
         setFilterParams({ ...filterParams, searchTerm: value });
@@ -110,6 +114,22 @@ const OrdersPage = () => {
         setCurrentPage(page);
     };
 
+    const handleCourierEntry = async () => {
+        if (!user?.shop.id) return;
+        const confirmedIds = (data?.data || [])
+            .filter((o) => o.orderStatus === OrderStatus.CONFIRMED)
+            .map((o) => o.id);
+        if (confirmedIds.length === 0) return;
+        try {
+            await courierEntry({
+                ids: confirmedIds,
+                shopId: user.shop.id,
+            }).unwrap();
+        } catch (error) {
+            console.error("Courier entry failed", error);
+        }
+    };
+
     return (
         <>
             <div className="grid gap-4 md:gap-8">
@@ -117,6 +137,7 @@ const OrdersPage = () => {
                     <h1 className="title">
                         Orders ( {data?.meta?.total || 0} )
                     </h1>
+
                     <div className="flex items-center gap-4">
                         <CustomSearch onSearch={handleSearch} />
                         <CustomButton variant="accent">
@@ -190,6 +211,18 @@ const OrdersPage = () => {
                     </div>
                 ) : (
                     <>
+                        {activeTab === OrderStatus.CONFIRMED && (
+                            <div className="flex justify-end">
+                                <CustomButton
+                                    onClick={handleCourierEntry}
+                                    disabled={isCourierEntryLoading}
+                                >
+                                    <Truck className="h-4 w-4" />
+                                    Courier Entry
+                                </CustomButton>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {data?.data?.map((order) => (
                                 <div
@@ -324,7 +357,7 @@ const OrdersPage = () => {
             </div>
 
             {selectedOrder && (
-                <OrderDetails
+                <OrderDetailsModal
                     open={!!selectedOrder}
                     onOpenChange={() => setSelectedOrder(null)}
                     order={selectedOrder}

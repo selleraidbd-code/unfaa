@@ -90,7 +90,7 @@ export const AiPlaceOrder = ({ onReset, customerInfo, orderItems }: Props) => {
             <Button variant="outline" onClick={onReset}>
                 Cancel
             </Button>
-            <Button
+            {/* <Button
                 onClick={() => handlePlaceOrder(OrderStatus.CONFIRMED)}
                 variant="secondary"
                 className="min-w-40"
@@ -98,7 +98,7 @@ export const AiPlaceOrder = ({ onReset, customerInfo, orderItems }: Props) => {
             >
                 <CheckCircle className="h-4 w-4" />
                 {isLoading ? "Confirming..." : "Confirm Order"}
-            </Button>
+            </Button> */}
             <Button
                 onClick={() => handlePlaceOrder(OrderStatus.PLACED)}
                 className="min-w-40"

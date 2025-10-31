@@ -14,6 +14,8 @@ import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea"
 import { User, Users } from "lucide-react";
 import { useState } from "react";
 import { CustomerSelectionModal } from "./customer-selection-modal";
+import { isValidBdPhoneNumber } from "./lib";
+import { cn } from "@workspace/ui/lib/utils";
 
 type Props = {
     customerState: CustomerState;
@@ -46,8 +48,12 @@ export const CustomerInfo = ({
         onCustomerStateChange(newState);
     };
 
+    const isInvalidPhoneNumber = !isValidBdPhoneNumber(
+        customerState.customerPhone
+    );
+
     return (
-        <Card>
+        <Card className={cn(isInvalidPhoneNumber && "border-destructive")}>
             <CardHeader className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                     <User className="h-5 w-5" />
@@ -81,6 +87,7 @@ export const CustomerInfo = ({
                         onChange={(value) =>
                             handleFieldChange("customerPhone", value.toString())
                         }
+                        invalid={isInvalidPhoneNumber}
                     />
                     <CustomTextarea
                         label="Address"

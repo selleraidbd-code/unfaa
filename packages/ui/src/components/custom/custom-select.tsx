@@ -16,6 +16,7 @@ type CustomSelectProps = {
     onChange: (value: string) => void;
     required?: boolean;
     className?: string;
+    triggerClassName?: string;
     error?: string;
     options: {
         value: string;
@@ -34,9 +35,10 @@ export const CustomSelect = ({
     className = "",
     error,
     options,
+    triggerClassName,
 }: CustomSelectProps) => {
     return (
-        <div className={`w-full space-y-1 ${className}`}>
+        <div className={`w-full space-y-0.5 ${className}`}>
             {label && <div className="text-sm font-medium">{label}</div>}
             <div className="relative">
                 <Select
@@ -46,9 +48,13 @@ export const CustomSelect = ({
                     required={required}
                 >
                     <SelectTrigger
-                        className={cn("w-full", {
-                            "border-destructive": error,
-                        })}
+                        className={cn(
+                            "w-full",
+                            {
+                                "border-destructive": error,
+                            },
+                            triggerClassName
+                        )}
                     >
                         <SelectValue
                             placeholder={placeholder || "Select an option"}

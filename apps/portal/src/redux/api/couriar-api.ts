@@ -22,6 +22,15 @@ const courierApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Courier],
         }),
+        courierEntry: builder.mutation<void, { ids: string[]; shopId: string }>(
+            {
+                query: (payload) => ({
+                    url: `/order/courior-entry/${payload.shopId}`,
+                    method: METHOD.POST,
+                    body: { ids: payload.ids },
+                }),
+            }
+        ),
         getCourierSetup: builder.query<
             ResponseObject<CourierSetup>,
             { shopId: string }
@@ -47,6 +56,7 @@ const courierApi = api.injectEndpoints({
 
 export const {
     useCreateCourierSetupMutation,
+    useCourierEntryMutation,
     useGetCourierSetupQuery,
     useGetSteadfastRiderNoteQuery,
 } = courierApi;

@@ -22,6 +22,7 @@ import CustomOTPFormInput from "@workspace/ui/components/custom/custom-OTP-form-
 import { Form } from "@workspace/ui/components/form";
 import Image from "next/image";
 import logo from "../../assets/images/logo.png";
+import { setTokens, setUser } from "@/redux/slices/auth-slice";
 const FormSchema = z.object({
     otp: z.string().min(4, {
         message: "ওটিপি কোড দিতে হবে।",
@@ -52,29 +53,27 @@ const OTPVerifyForm = () => {
             return;
         }
 
-        router.push("/onboarding");
+        verifySignupOTP({
+            token: parseInt(otp),
+        })
+            .unwrap()
+            .then((res) => {
+                console.log(res);
+                // dispatch(setUser(res.user));
+                // dispatch(setTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken }));
 
-        // verifySignupOTP({
-        //     token: parseInt(otp),
-        // })
-        //     .unwrap()
-        //     .then((res) => {
-        //         console.log(res);
-        //         dispatch(setUser(res.user));
-        //         dispatch(setToken(res.accessToken));
-
-        //         toast.success("Verification has been successfully completed.");
-        //         router.replace("/onboarding");
-        //     })
-        //     .catch((er) => {
-        //         if (er?.status === 406) {
-        //             handleResendOpt();
-        //             form.reset();
-        //             toast.error("The verification code has been resent.");
-        //         } else {
-        //             toast.error(er?.data?.message || "Something went wrong.");
-        //         }
-        //     });
+                toast.success("Verification has been successfully completed.");
+                router.replace("/onboarding");
+            })
+            .catch((er) => {
+                if (er?.status === 406) {
+                    handleResendOpt();
+                    form.reset();
+                    toast.error("The verification code has been resent.");
+                } else {
+                    toast.error(er?.data?.message || "Something went wrong.");
+                }
+            });
     };
 
     const handleResendOpt = async () => {

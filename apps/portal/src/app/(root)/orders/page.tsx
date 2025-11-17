@@ -37,7 +37,7 @@ const OrdersPage = () => {
     const [pageSize] = useState(10);
 
     const { data, isLoading, isError } = useGetOrdersQuery({
-        shopId: user?.shop.id,
+        shopId: user?.shop?.id,
         ...filterParams,
         orderStatus: status === "all" ? undefined : status,
         page: currentPage,
@@ -67,7 +67,7 @@ const OrdersPage = () => {
     };
 
     const handleCourierEntry = async (selectedRows: Order[]) => {
-        if (!user?.shop.id) return;
+        if (!user?.shop?.id) return;
         const confirmedIds = selectedRows
             .filter((o) => o.orderStatus === OrderStatus.CONFIRMED)
             .map((o) => o.id);
@@ -75,7 +75,7 @@ const OrdersPage = () => {
         try {
             await courierEntry({
                 ids: confirmedIds,
-                shopId: user.shop.id,
+                shopId: user.shop?.id,
             }).unwrap();
         } catch (error) {
             console.error("Courier entry failed", error);

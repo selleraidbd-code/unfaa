@@ -1,4 +1,10 @@
+"use client";
+
+import { useAppSelector } from "@/redux/store/hook";
+
 export const ComingSoon = () => {
+    const user = useAppSelector((state) => state.auth.user);
+    console.log("user", user);
     return (
         <div className="flex min-h-[60vh] items-center justify-center p-6">
             <div className="mx-auto max-w-md text-center">

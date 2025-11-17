@@ -4,8 +4,9 @@ import { Product } from "@/types/product-type";
 export type CreateShop = {
     name: string;
     description: string;
-    banner: string;
-    photoURL: string;
+    banner?: string;
+    photoURL?: string;
+    shopType: ShopType;
 };
 
 export enum ShopType {

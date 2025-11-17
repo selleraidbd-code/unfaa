@@ -1,53 +1,54 @@
+import { User } from "@/features/auth/auth-type";
+import {
+    isRouteExactMatched,
+    isRouteMatched,
+    ROUTES,
+} from "@/middleware/route";
+import { UserRole } from "@/types";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-
-const isRouteMatched = (pathname: string, routes: readonly string[]) =>
-    routes.some((route) => pathname.startsWith(route));
-
-export const ROUTES = {
-    protected: [
-        "/brands",
-        "/categories",
-        "/components",
-        "/customers",
-        "/employees",
-        "/landing-page",
-        "/make-order",
-        "/manage-shop",
-        "/orders",
-        "/payments",
-        "/products",
-        "/shops",
-        "/subscriptions",
-        "/templates",
-        "/tutorial",
-        "/upload-tutorial",
-        "/users",
-    ] as const,
-    public: ["/onboarding"] as const,
-    auth: ["/auth/sign-in", "/auth/sign-up"] as const,
-};
 
 export async function middleware(req: NextRequest) {
     const { pathname, searchParams, search } = req.nextUrl;
 
     const isAuthenticated = await checkAuth();
-    const isProtectedRoute = isRouteMatched(pathname, ROUTES.protected);
-    const isAuthRoute = isRouteMatched(pathname, ROUTES.auth);
+    const isSellerRoute = isRouteMatched(pathname, ROUTES.sellerRoutes);
+    const isSuperAdminRoute = isRouteMatched(pathname, ROUTES.superAdminRoutes);
+    const isAuthRoute = isRouteExactMatched(pathname, ROUTES.auth);
+    const isAuthNotVerifiedRoute = isRouteExactMatched(
+        pathname,
+        ROUTES.authNotVerified
+    );
     const isPublicRoute = isRouteMatched(pathname, ROUTES.public);
     const isRootRoute = pathname === "/";
 
     if (isPublicRoute) return NextResponse.next();
 
     if (isAuthenticated) {
+        const { isVerified, isAdmin, isSeller } = await checkUserVerified();
+        if (
+            !isVerified &&
+            (isSellerRoute || isRootRoute || isAuthRoute || isSuperAdminRoute)
+        ) {
+            return redirectTo("/auth/verify-email", req);
+        }
+        if (isVerified && !isSeller) {
+            return redirectTo("/onboarding", req);
+        }
+        if (isVerified && isAuthNotVerifiedRoute) {
+            return redirectTo("/", req);
+        }
         if (isAuthRoute) {
             const callback = searchParams.get("callbackUrl") || "/";
             return redirectTo(callback, req);
         }
+        if (isSuperAdminRoute && !isAdmin) {
+            return redirectTo("/", req);
+        }
         return NextResponse.next();
     }
 
-    if (isProtectedRoute || isRootRoute) {
+    if (isSellerRoute || isRootRoute || isSuperAdminRoute) {
         const callback = encodeURIComponent(pathname + search);
         return redirectTo(`/auth/sign-in?callbackUrl=${callback}`, req);
     }
@@ -73,6 +74,22 @@ const checkAuth = async () => {
     }
 
     return false;
+};
+
+const checkUserVerified = async () => {
+    const cookieStore = await cookies();
+    const user = JSON.parse(cookieStore.get("user")?.value || "{}") as User;
+
+    const isVerified = user?.isVerified;
+    const isAdmin =
+        user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
+    const isSeller = user?.role === UserRole.SELLER && user?.shop;
+
+    return {
+        isVerified,
+        isAdmin,
+        isSeller,
+    };
 };
 
 // Matcher configuration - exclude static files and API routes

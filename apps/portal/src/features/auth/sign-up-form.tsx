@@ -61,7 +61,7 @@ const SignUpForm = ({
                     accessToken: response.data.accessToken,
                     refreshToken: response.data.refreshToken,
                     user: response.data.user,
-                    path: "/auth/verify-user",
+                    path: "/auth/verify-email",
                 });
             } else {
                 setError(response.error || "Something went wrong");

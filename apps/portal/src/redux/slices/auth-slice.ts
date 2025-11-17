@@ -17,6 +17,13 @@ export const logoutThunk = createAsyncThunk("auth/logout", async () => {
     window.location.reload();
 });
 
+export const logoutThunkWithoutReload = createAsyncThunk(
+    "auth/logout",
+    async () => {
+        await logoutAction();
+    }
+);
+
 // Set token to server side storage
 export const setTokensThunk = createAsyncThunk(
     "auth/setTokens",

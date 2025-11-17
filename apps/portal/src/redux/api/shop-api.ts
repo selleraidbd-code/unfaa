@@ -17,7 +17,7 @@ import {
 
 const shopApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        createShop: builder.mutation<void, CreateShop>({
+        createShop: builder.mutation<ResponseObject<Shop>, CreateShop>({
             query: (payload) => ({
                 url: `/shop/`,
                 method: METHOD.POST,

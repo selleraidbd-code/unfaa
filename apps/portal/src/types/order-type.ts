@@ -147,3 +147,7 @@ export interface AIOrderGenerationResult {
         data: AIOrderGenerationData;
     };
 }
+
+export interface OrderDetailsType {
+    deliveryZoneId: string;
+}

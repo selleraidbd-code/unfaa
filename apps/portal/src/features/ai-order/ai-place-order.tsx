@@ -4,16 +4,27 @@ import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
 import { CheckCircle } from "lucide-react";
 import useGetUser from "@/hooks/useGetUser";
-import { CreateOrder, OrderItem, OrderStatus } from "@/types/order-type";
+import {
+    CreateOrder,
+    OrderDetailsType,
+    OrderItem,
+    OrderStatus,
+} from "@/types/order-type";
 import { isValidId } from "@/features/ai-order/lib";
 
 interface Props {
     onReset: () => void;
     customerInfo: CustomerState;
     orderItems: OrderItem[];
+    orderDetails: OrderDetailsType;
 }
 
-export const AiPlaceOrder = ({ onReset, customerInfo, orderItems }: Props) => {
+export const AiPlaceOrder = ({
+    onReset,
+    customerInfo,
+    orderItems,
+    orderDetails,
+}: Props) => {
     const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
     const user = useGetUser();
 
@@ -70,7 +81,7 @@ export const AiPlaceOrder = ({ onReset, customerInfo, orderItems }: Props) => {
             orderStatus: status,
             notes: "",
             // Temporary delivery zone as requested
-            deliveryZoneId: "ae5255f5-49d9-492b-94d0-80d937c1260d",
+            deliveryZoneId: orderDetails.deliveryZoneId,
         } as const;
 
         try {

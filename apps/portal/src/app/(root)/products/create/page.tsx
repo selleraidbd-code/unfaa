@@ -4,12 +4,17 @@ import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import { Plus, Trash2, X } from "lucide-react";
 
 import { Editor } from "@/components/editor";
+import { PhotoGridUpload } from "@/components/file-upload/photo-grid-upload";
 import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { CustomButton } from "@/components/ui/custom-button";
 import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { createProductSchema } from "@/features/products/product-schema";
 import useGetUser from "@/hooks/useGetUser";
 import { useGetBrandsQuery } from "@/redux/api/brand-api";
+import { useGetDeliveriesQuery } from "@/redux/api/delivery-api";
 import { useCreateProductMutation } from "@/redux/api/product-api";
+import { DeliveryScope } from "@/types/delivery-type";
+import { ProductCeratePayload } from "@/types/product-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
@@ -20,14 +25,11 @@ import { CustomFormSwitch } from "@workspace/ui/components/custom/custom-form-sw
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
 import { Form } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
-import { useForm, UseFormReturn } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
-import { z } from "zod";
 import { cn } from "@workspace/ui/lib/utils";
-import { ProductCeratePayload } from "@/types/product-type";
-import { CustomFormImages } from "@/components/ui/custom-form-images";
-import { createProductSchema } from "@/features/products/product-schema";
 import { useRouter } from "next/navigation";
+import { useForm, UseFormReturn } from "react-hook-form";
+import { z } from "zod";
 
 export type ProductFormType = z.infer<typeof createProductSchema>;
 
@@ -52,6 +54,7 @@ const AddProduct = () => {
             fullDescription: "",
             productVariant: [],
             activeStatus: "active",
+            deliveryId: undefined,
         },
     });
 
@@ -60,6 +63,10 @@ const AddProduct = () => {
     });
 
     const { data: brands } = useGetBrandsQuery({
+        shopId,
+    });
+
+    const { data: deliveries } = useGetDeliveriesQuery({
         shopId,
     });
 
@@ -72,6 +79,12 @@ const AddProduct = () => {
         value: brand.id,
         label: brand.name,
     }));
+
+    const deliveryOptions =
+        deliveries?.data?.map((delivery) => ({
+            value: delivery.id,
+            label: delivery.name,
+        })) || [];
 
     const productVariants = form.watch("productVariant");
 
@@ -132,7 +145,7 @@ const AddProduct = () => {
                     <DiscardAndSaveButton
                         form={form}
                         isCreating={isCreating}
-                        className="hidden md:ml-auto md:flex"
+                        className="hidden sm:ml-auto sm:flex"
                     />
                 </div>
 
@@ -140,7 +153,7 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="General Information"
                         content={
-                            <div className="grid pt-2 grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid pt-2 md:grid-cols-2 gap-x-6 gap-y-4">
                                 <CustomFormInput
                                     label="Product Name (English)"
                                     name="name"
@@ -149,7 +162,7 @@ const AddProduct = () => {
                                     placeholder="Enter Your name"
                                 />
                                 <CustomFormInput
-                                    label="Product Name (Native Name | Display Name)"
+                                    label="Product Name (Display Name)"
                                     name="banglaName"
                                     control={form.control}
                                     required
@@ -185,22 +198,18 @@ const AddProduct = () => {
                     />
 
                     <CustomCollapsible
-                        title="Media"
+                        title="Product Images"
                         content={
-                            <div className="grid pt-2 gap-4">
-                                <CustomFormImage
-                                    name="photoURL"
-                                    control={form.control}
-                                    required
-                                    label="Main Image"
-                                    limit={1}
-                                />
-                                <CustomFormImages
-                                    name="images"
-                                    control={form.control}
-                                    required
-                                    label="Product Images"
-                                    limit={5}
+                            <div className="sm:pt-2 max-w-6xl">
+                                <PhotoGridUpload
+                                    photoURL={form.watch("photoURL")}
+                                    images={form.watch("images")}
+                                    onPhotoURLChange={(url) =>
+                                        form.setValue("photoURL", url)
+                                    }
+                                    onImagesChange={(images) =>
+                                        form.setValue("images", images)
+                                    }
                                 />
                             </div>
                         }
@@ -209,7 +218,7 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Price & Inventory"
                         content={
-                            <div className="grid pt-2 grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid pt-2 md:grid-cols-2 gap-x-6 gap-y-4">
                                 <CustomFormInput
                                     label="Sell / Current Price"
                                     name="discountPrice"
@@ -263,7 +272,7 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Product Variants"
                         content={
-                            <div className="grid pt-1 gap-6">
+                            <div className="grid pt-1 md:gap-6 gap-4">
                                 <p className="text-muted-foreground">
                                     You can add multiple variant for a single
                                     product here. Like Size, Color, and Weight
@@ -298,7 +307,15 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Product Details"
                         content={
-                            <div className="grid pt-2 grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid pt-2 md:grid-cols-2 gap-x-6 gap-y-4">
+                                <CustomFormSearchSelect
+                                    label="Delivery Charge"
+                                    name="deliveryId"
+                                    control={form.control}
+                                    options={deliveryOptions}
+                                    placeholder="Select delivery charge"
+                                />
+
                                 <CustomFormTextarea
                                     label="Short Description (SEO & Data Feed)"
                                     name="description"

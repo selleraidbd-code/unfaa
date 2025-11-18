@@ -24,7 +24,6 @@ export const OrderInput = ({
 
             <Textarea
                 id="order-text"
-                placeholder="Example: naimur phone 01308979345 address: dhaka, bangladesh, product: 2-piece Sprint Men's Sports Shoe quantity: 2"
                 value={orderText}
                 onChange={(e) => setOrderText(e.target.value)}
                 disabled={isProcessing || hasData}

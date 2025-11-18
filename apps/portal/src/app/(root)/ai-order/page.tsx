@@ -1,9 +1,11 @@
 "use client";
 
 import { OrderInput } from "@/features/ai-order/order-input";
-import useGetUser from "@/hooks/useGetUser";
 import { useAiOrderGenerationMutation } from "@/redux/api/order-api";
-import { AIOrderGenerationProductInfo } from "@/types/order-type";
+import {
+    AIOrderGenerationProductInfo,
+    OrderDetailsType,
+} from "@/types/order-type";
 import { toast } from "@workspace/ui/components/sonner";
 import { useState } from "react";
 
@@ -11,14 +13,17 @@ import { CustomerInfo } from "@/features/ai-order/customer-info";
 import { FraudChecker } from "@/features/ai-order/fraud-checker";
 import { GenerateSkeleton } from "@/features/ai-order/generate-skeleton";
 import { isValidBdPhoneNumber, isValidId } from "@/features/ai-order/lib";
+import { OrderDetails } from "@/features/ai-order/order-details";
+import { OrderInfo } from "@/features/ai-order/order-info";
 import { ProductInfoOrder } from "@/features/ai-order/product-info-order";
 import { CustomerState } from "@/features/ai-order/types";
 import { useGetFraudCheckerDataMutation } from "@/redux/api/customer-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { FraudCheckerData } from "@/types/customer-type";
-import { OrderInfo } from "@/features/ai-order/order-info";
 
 const Page = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
+    const shopId = user?.shop.id || "";
 
     const [aiOrderGeneration] = useAiOrderGenerationMutation();
     const [getFraudCheckerData] = useGetFraudCheckerDataMutation();
@@ -30,6 +35,9 @@ const Page = () => {
     const [productInfo, setProductInfo] = useState<
         AIOrderGenerationProductInfo[] | null
     >(null);
+    const [orderDetails, setOrderDetails] = useState<OrderDetailsType>({
+        deliveryZoneId: "",
+    });
     const [fraudState, setFraudState] = useState<FraudCheckerData | null>(null);
     const [fraudError, setFraudError] = useState<string | null>(null);
     const [isCheckingFraud, setIsCheckingFraud] = useState(false);
@@ -92,7 +100,7 @@ const Page = () => {
         setIsProcessing(true);
 
         await aiOrderGeneration({
-            shopId: user?.shop?.id || "",
+            shopId,
             info: orderText,
         })
             .unwrap()
@@ -177,11 +185,17 @@ const Page = () => {
                         <OrderInfo customerId={customerState.customerId} />
                     )}
 
+                    <OrderDetails
+                        orderDetails={orderDetails}
+                        setOrderDetails={setOrderDetails}
+                    />
+
                     {/* Product Information */}
                     <ProductInfoOrder
                         customerInfo={customerState}
                         productInfo={productInfo}
                         onReset={resetForm}
+                        orderDetails={orderDetails}
                     />
                 </div>
             )}

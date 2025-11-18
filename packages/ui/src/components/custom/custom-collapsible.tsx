@@ -23,7 +23,7 @@ export const CustomCollapsible = ({
         <Accordion
             type="single"
             collapsible={collapsible}
-            className={cn("w-full rounded-lg px-6 border", className)}
+            className={cn("w-full rounded-lg px-4 sm:px-6 border", className)}
             defaultValue={title}
         >
             <AccordionItem value={title}>

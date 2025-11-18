@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <AppSidebar />
             <SidebarInset>
                 <SidebarNavbar />
-                <div className="p-4 lg:p-6 2xl:p-8 pb-20 sm:pb-4">
+                <div className="p-4 lg:p-6 2xl:p-8 pb-20 md:pb-4">
                     {children}
                 </div>
                 <MobileBottomNav />

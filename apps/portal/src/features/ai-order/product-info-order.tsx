@@ -2,7 +2,11 @@
 
 import { useLazyGetProductByIdQuery } from "@/redux/api/product-api";
 import { ResponseObject } from "@/redux/type";
-import { AIOrderGenerationProductInfo, OrderItem } from "@/types/order-type";
+import {
+    AIOrderGenerationProductInfo,
+    OrderDetailsType,
+    OrderItem,
+} from "@/types/order-type";
 import { Product } from "@/types/product-type";
 import { Button } from "@workspace/ui/components/button";
 import { Label } from "@workspace/ui/components/label";
@@ -29,12 +33,14 @@ interface Props {
     customerInfo: CustomerState;
     productInfo: AIOrderGenerationProductInfo[];
     onReset: () => void;
+    orderDetails: OrderDetailsType;
 }
 
 export const ProductInfoOrder = ({
     customerInfo,
     productInfo,
     onReset,
+    orderDetails,
 }: Props) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -257,6 +263,7 @@ export const ProductInfoOrder = ({
                 onReset={onReset}
                 customerInfo={customerInfo}
                 orderItems={orderItems}
+                orderDetails={orderDetails}
             />
 
             {isModalOpen && (

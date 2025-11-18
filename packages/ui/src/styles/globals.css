@@ -252,3 +252,9 @@
 .pulse-wave {
     animation: pulse-wave 2s infinite;
 }
+
+@media (max-width: 768px) {
+    html {
+        scrollbar-width: thin;
+    }
+}

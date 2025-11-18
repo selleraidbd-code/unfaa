@@ -49,6 +49,7 @@ const productBaseSchema = z.object({
     warranty: z.string().optional(),
     categoryIds: z.array(z.string()).min(1),
     brandId: z.string().optional(),
+    deliveryId: z.string().optional(),
     description: z.string().min(1, { message: "Description is required" }),
     fullDescription: z
         .string()

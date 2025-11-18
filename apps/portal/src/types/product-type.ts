@@ -68,6 +68,7 @@ export interface Product {
     shopId: string;
     unitName?: string;
     warranty?: string;
+    deliveryId?: string;
     categories: {
         categoryId: string;
         productId: string;
@@ -94,6 +95,7 @@ export interface ProductCeratePayload {
     unitName?: string;
     warranty?: string;
     sku?: string;
+    deliveryId?: string;
 }
 
 export interface ProductVariantOption {

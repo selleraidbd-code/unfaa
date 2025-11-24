@@ -92,8 +92,8 @@ export default function ShopOnboarding() {
             name: data.name,
             description: data.description || "",
             shopType: data.shopType as ShopType,
-            photoURL: data.photoUrl || "",
-            banner: data.banner || "",
+            // photoURL: data.photoUrl || "",
+            // banner: data.banner || "",
             // shopIdToClone: await getShopIdToClone(
             //     data.shopType as ShopTypeEnum
             // ),

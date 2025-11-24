@@ -192,13 +192,6 @@ export const OrderDetailsModal = ({
                                 required
                             />
 
-                            <CustomFormSelect
-                                label="Order Status"
-                                name="orderStatus"
-                                options={orderStatusOptions}
-                                control={form.control}
-                            />
-
                             <CustomFormInput
                                 label="COD / Payable Amount"
                                 name="totalAmount"
@@ -206,6 +199,13 @@ export const OrderDetailsModal = ({
                                 placeholder="Enter COD / Payable amount"
                                 type="number"
                                 defaultValue={order?.totalAmount || 0}
+                            />
+
+                            <CustomFormSelect
+                                label="Order Status"
+                                name="orderStatus"
+                                options={orderStatusOptions}
+                                control={form.control}
                             />
                         </div>
 

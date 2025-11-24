@@ -6,11 +6,9 @@ import {
     ClipboardPlus,
     Component,
     Crown,
-    FileText,
     Folder,
     LayoutDashboard,
     MonitorUp,
-    Notebook,
     Package,
     PanelTop,
     Pocket,
@@ -99,11 +97,11 @@ const SellerNavData = [
                 url: "/ai-order",
                 icon: Bot,
             },
-            {
-                title: "Manual Order",
-                url: "/make-order",
-                icon: ClipboardPlus,
-            },
+            // {
+            //     title: "Manual Order",
+            //     url: "/make-order",
+            //     icon: ClipboardPlus,
+            // },
             {
                 title: "Orders",
                 url: "/orders",

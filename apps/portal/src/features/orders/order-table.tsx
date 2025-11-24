@@ -255,9 +255,9 @@ interface OrderTableProps {
     isLoading: boolean;
     isError: boolean;
     meta: Meta;
-    onSearch: (value: string) => void;
     onPaginationChange: (state: PaginationState) => void;
     onRowClick: (row: Order) => void;
+    onSelectionChange?: (selectedRows: Order[]) => void;
 }
 
 export const OrderTable = ({
@@ -265,21 +265,22 @@ export const OrderTable = ({
     isLoading,
     isError,
     meta,
-    onSearch,
     onPaginationChange,
     onRowClick,
+    onSelectionChange,
 }: OrderTableProps) => {
     return (
         <DataTable
             data={data}
             columns={ordersColumns}
-            onSearch={onSearch}
             pagination={true}
             paginationMeta={meta}
             onPaginationChange={onPaginationChange}
             isLoading={isLoading}
             isError={isError}
+            showViewOptions={false}
             onRowClick={onRowClick}
+            onSelectionChange={onSelectionChange}
             createButton={<div className="flex items-center gap-4"></div>}
         />
     );

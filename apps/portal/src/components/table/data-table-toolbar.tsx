@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
-
 import type { Table } from "@tanstack/react-table";
 import { ChevronDown, Plus, X } from "lucide-react";
 
@@ -12,13 +10,13 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
 import { DataTableViewOptions } from "./data-table-view-options";
 
 import { FilterableColumn, TableCreateButtonInfoProps } from "./data-table";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { CustomButton } from "@/components/ui/custom-button";
+import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 
 interface BulkAction<TData> {
     label: string;
@@ -52,26 +50,9 @@ export function DataTableToolbar<TData>({
     onBulkAction,
     onFilterChange,
 }: DataTableToolbarProps<TData>) {
-    const [searchTerm, setSearchTerm] = useState("");
-
-    const handleSearch = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter") {
-            onSearch?.(searchTerm);
-        }
-    };
-
-    const handleSearchTerm = (value: string) => {
-        setSearchTerm(value);
-
-        if (value === "") {
-            onSearch?.(value);
-        }
-    };
-
     const handleReset = () => {
         table.resetColumnFilters();
         table.resetRowSelection();
-        setSearchTerm("");
         if (onSearch) {
             onSearch("");
         }
@@ -89,15 +70,20 @@ export function DataTableToolbar<TData>({
         <div className="flex items-center justify-between">
             <div className="flex flex-1 items-center space-x-2">
                 {onSearch && (
-                    <Input
-                        type="search"
+                    // <Input
+                    //     type="search"
+                    //     placeholder="Search..."
+                    //     value={searchTerm}
+                    //     onChange={(event) =>
+                    //         handleSearchTerm(event.target.value)
+                    //     }
+                    //     onKeyDown={handleSearch}
+                    //     className="w-[150px] lg:w-[250px]"
+                    // />
+                    <CustomSearch
+                        onSearch={onSearch}
                         placeholder="Search..."
-                        value={searchTerm}
-                        onChange={(event) =>
-                            handleSearchTerm(event.target.value)
-                        }
-                        onKeyDown={handleSearch}
-                        className="h-8 w-[150px] lg:w-[250px]"
+                        className="w-[150px] lg:w-[250px]"
                     />
                 )}
                 {filterableColumns.length > 0 &&
@@ -161,7 +147,7 @@ export function DataTableToolbar<TData>({
                     </DropdownMenu>
                 )}
 
-                {(isFiltered || hasSelection || searchTerm) && (
+                {(isFiltered || hasSelection) && (
                     <Button variant="ghost" onClick={handleReset}>
                         Reset
                         <X className="ml-2 h-4 w-4" />

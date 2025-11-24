@@ -11,6 +11,7 @@ import {
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    Updater,
     useReactTable,
     type ColumnDef,
     type ColumnFiltersState,
@@ -87,6 +88,7 @@ interface DataTableProps<TData, TValue> {
     skeletonRows?: number;
     onFilterChange?: (filterId: string, filterValue: string[]) => void;
     onRowClick?: (row: TData) => void;
+    onSelectionChange?: (selectedRows: TData[]) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -110,6 +112,7 @@ export function DataTable<TData, TValue>({
     skeletonRows = 5,
     onFilterChange,
     onRowClick,
+    onSelectionChange,
 }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const [columnVisibility, setColumnVisibility] =
@@ -121,6 +124,16 @@ export function DataTable<TData, TValue>({
         pageIndex: paginationMeta.page - 1, // Convert from 1-based to 0-based
         pageSize: paginationMeta.limit,
     });
+
+    const handleRowSelectionChange = (updater: Updater<RowSelectionState>) => {
+        setRowSelection(updater);
+        setTimeout(() => {
+            const selectedRows = table
+                .getSelectedRowModel()
+                .rows.map((row) => row.original);
+            onSelectionChange?.(selectedRows);
+        }, 0);
+    };
 
     const table = useReactTable({
         data,
@@ -139,7 +152,7 @@ export function DataTable<TData, TValue>({
             },
         },
         enableRowSelection: true,
-        onRowSelectionChange: setRowSelection,
+        onRowSelectionChange: handleRowSelectionChange,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,

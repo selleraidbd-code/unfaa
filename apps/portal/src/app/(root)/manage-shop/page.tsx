@@ -1,3 +1,5 @@
+"use client";
+
 import {
     Building2,
     CreditCard,
@@ -12,6 +14,8 @@ import {
     Truck,
 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "@workspace/ui/components/sonner";
+import { Badge } from "@workspace/ui/components/badge";
 
 const ManageShop = () => {
     const shopFeatures = [
@@ -35,6 +39,7 @@ const ManageShop = () => {
             description:
                 "Manage your shop's core configurations, including domain setup and general settings.",
             slug: "shop-domain",
+            isComingSoon: true,
         },
         {
             icon: FileText,
@@ -70,6 +75,7 @@ const ManageShop = () => {
             description:
                 "Integrate and manage payment options to provide customers with secure and flexible transaction methods.",
             slug: "payment-gateway",
+            isComingSoon: true,
         },
         {
             icon: Target,
@@ -77,6 +83,7 @@ const ManageShop = () => {
             description:
                 "Enhance your shop's visibility by connecting SEO tools and marketing integrations for better engagement.",
             slug: "seo-marketing",
+            isComingSoon: true,
         },
         {
             icon: MessageSquare,
@@ -84,6 +91,7 @@ const ManageShop = () => {
             description:
                 "Enable SMS notifications and support to keep your customers informed with real-time updates.",
             slug: "sms-support",
+            isComingSoon: true,
         },
         {
             icon: MessageCircle,
@@ -108,14 +116,31 @@ const ManageShop = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {shopFeatures.map((feature) => {
                     const IconComponent = feature.icon;
-                    return (
-                        <Link
-                            href={`/manage-shop/${feature.slug}`}
-                            key={feature.slug}
-                            className="card space-y-4 hover:shadow-md"
-                        >
-                            <div className="size-10 bg-primary/10 rounded-lg center">
-                                <IconComponent className="size-5 text-primary" />
+                    const isComingSoon = feature.isComingSoon ?? false;
+
+                    const handleClick = (e: React.MouseEvent) => {
+                        if (isComingSoon) {
+                            e.preventDefault();
+                            toast.info("This feature is coming soon!", {
+                                duration: 3000,
+                            });
+                        }
+                    };
+
+                    const cardContent = (
+                        <>
+                            <div className="flex items-start justify-between">
+                                <div className="size-10 bg-primary/10 rounded-lg center">
+                                    <IconComponent className="size-5 text-primary" />
+                                </div>
+                                {isComingSoon && (
+                                    <Badge
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        Coming Soon
+                                    </Badge>
+                                )}
                             </div>
 
                             <div className="space-y-1">
@@ -127,6 +152,28 @@ const ManageShop = () => {
                                     {feature.description}
                                 </p>
                             </div>
+                        </>
+                    );
+
+                    if (isComingSoon) {
+                        return (
+                            <div
+                                key={feature.slug}
+                                onClick={handleClick}
+                                className="card space-y-4 hover:shadow-md cursor-not-allowed opacity-75"
+                            >
+                                {cardContent}
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <Link
+                            href={`/manage-shop/${feature.slug}`}
+                            key={feature.slug}
+                            className="card space-y-4 hover:shadow-md"
+                        >
+                            {cardContent}
                         </Link>
                     );
                 })}

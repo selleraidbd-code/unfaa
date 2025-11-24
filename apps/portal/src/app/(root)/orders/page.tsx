@@ -9,16 +9,18 @@ import { Meta } from "@/components/table/data-table";
 import { CustomButton } from "@/components/ui/custom-button";
 import { orderStatusOptions } from "@/features/orders/data";
 import { OrderDetailsModal } from "@/features/orders/order-details-modal";
+import { OrderTable } from "@/features/orders/order-table";
 import useGetUser from "@/hooks/useGetUser";
 import { useCourierEntryMutation } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { Order, OrderStatus } from "@/types/order-type";
+import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
     CustomTabs,
     CustomTabsList,
     CustomTabsTrigger,
 } from "@workspace/ui/components/custom/custom-tabs";
-import { OrderTable } from "@/features/orders/order-table";
+import { toast } from "@workspace/ui/components/sonner";
 
 interface FilterParams {
     searchTerm?: string;
@@ -32,6 +34,7 @@ const OrdersPage = () => {
 
     const [filterParams, setFilterParams] = useState<FilterParams>({});
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [selectedRows, setSelectedRows] = useState<Order[]>([]);
     const [activeTab, setActiveTab] = useState<string>(status);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(10);
@@ -60,26 +63,38 @@ const OrdersPage = () => {
         setActiveTab(tab);
         router.replace(`/orders?status=${tab}`);
         setCurrentPage(1);
+        setSelectedRows([]);
     };
 
     const handlePaginationChange = (state: PaginationState) => {
         setCurrentPage(state.pageIndex + 1);
     };
 
-    const handleCourierEntry = async (selectedRows: Order[]) => {
-        if (!user?.shop?.id) return;
+    const handleCourierEntry = async () => {
+        if (!user?.shop?.id || selectedRows.length === 0) return;
+
         const confirmedIds = selectedRows
             .filter((o) => o.orderStatus === OrderStatus.CONFIRMED)
             .map((o) => o.id);
-        if (confirmedIds.length === 0) return;
-        try {
-            await courierEntry({
-                ids: confirmedIds,
-                shopId: user.shop?.id,
-            }).unwrap();
-        } catch (error) {
-            console.error("Courier entry failed", error);
-        }
+
+        if (confirmedIds.length === 0)
+            return toast.error("No confirmed orders to send to courier");
+
+        await courierEntry({
+            ids: confirmedIds,
+            shopId: user.shop?.id,
+        })
+            .unwrap()
+            .then(() => {
+                toast.success("Orders sent to courier successfully");
+                setSelectedRows([]);
+            })
+            .catch((error) => {
+                toast.error(
+                    error.data?.message || "Failed to send orders to courier"
+                );
+                setSelectedRows([]);
+            });
     };
 
     const meta: Meta = {
@@ -88,20 +103,9 @@ const OrdersPage = () => {
         limit: pageSize,
     };
 
-    const bulkActions =
-        activeTab === OrderStatus.CONFIRMED
-            ? [
-                  {
-                      label: "Courier Entry",
-                      onClick: handleCourierEntry,
-                      icon: Truck,
-                  },
-              ]
-            : [];
-
     return (
         <>
-            <div className="grid gap-4 md:gap-8">
+            <div className="grid gap-2 md:gap-4">
                 <div className="flex justify-between items-center">
                     <h1 className="title">
                         Orders ( {data?.meta?.total || 0} )
@@ -146,14 +150,34 @@ const OrdersPage = () => {
                     </CustomTabsList>
                 </CustomTabs>
 
+                <div className="flex justify-between items-center">
+                    <CustomSearch
+                        onSearch={handleSearch}
+                        placeholder="Search orders"
+                    />
+
+                    {activeTab === OrderStatus.CONFIRMED && (
+                        <CustomButton
+                            onClick={handleCourierEntry}
+                            disabled={
+                                selectedRows.length === 0 ||
+                                isCourierEntryLoading
+                            }
+                        >
+                            <Truck />
+                            Send to Courier
+                        </CustomButton>
+                    )}
+                </div>
+
                 <OrderTable
                     data={data?.data || []}
                     isLoading={isLoading}
                     isError={isError}
                     meta={meta}
-                    onSearch={handleSearch}
                     onPaginationChange={handlePaginationChange}
                     onRowClick={handleRowClick}
+                    onSelectionChange={setSelectedRows}
                 />
             </div>
 

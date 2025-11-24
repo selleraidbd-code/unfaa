@@ -15,6 +15,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@workspace/ui/components/card";
+import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { toast } from "@workspace/ui/components/sonner";
@@ -39,6 +40,7 @@ import {
     Truck,
     User,
     Zap,
+    Link2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -179,6 +181,7 @@ const DeliverySupport = () => {
     const [isLoading, setIsLoading] = useState(false);
     const user = useGetUser();
     const shopId = user?.shop?.id;
+    const shopSlug = user?.shop?.slug;
 
     const {
         data: courierData,
@@ -513,9 +516,44 @@ const DeliverySupport = () => {
         );
     }
 
+    const webhookUrl = shopSlug
+        ? `https://server.unfaa.com/api/v1/order/stead-fast-webhook/${shopSlug}`
+        : "";
+
     return (
         <div className="max-w-5xl space-y-6">
             <HeaderBackButton title="Delivery Support" href="/manage-shop" />
+
+            {/* Webhook URL Section */}
+            {shopSlug && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Link2 className="w-5 h-5 text-blue-600" />
+                            <span>Webhook URL</span>
+                        </CardTitle>
+                        <p className="text-sm text-gray-600">
+                            Copy this webhook URL and paste it in your merchant
+                            dashboard to receive order updates
+                        </p>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium">
+                                Webhook URL
+                            </Label>
+                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                <CustomTextCopy
+                                    text={webhookUrl}
+                                    copy={true}
+                                    className="w-full"
+                                    textClassName="text-sm font-mono break-all"
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Current Setup Status */}
             {currentCourierType && (

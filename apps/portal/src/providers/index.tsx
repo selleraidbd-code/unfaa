@@ -6,6 +6,7 @@ import { AlertProvider } from "@/providers/AlertProvider";
 import { UserInfoProvider } from "@/providers/user-info-provider";
 import { AuthInitiatorFromCookies } from "@/features/auth/components/auth-initiator-from-cookies";
 import { TokenInitiatorInStore } from "@/features/auth/components/token-initiator-in-store";
+import { InstallPrompt } from "@/components/shared/install-prompt";
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -21,6 +22,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     <TokenInitiatorInStore>
                         <UserInfoProvider>
                             <AlertProvider>
+                                <InstallPrompt />
                                 <Toaster position="top-center" richColors />
                                 {children}
                             </AlertProvider>

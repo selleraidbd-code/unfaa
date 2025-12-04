@@ -21,7 +21,7 @@ export const loginAction = async (email: string, password: string) => {
         if (!response.ok) {
             return {
                 status: "error",
-                error: data.detail || "Invalid credentials",
+                error: data.message || "Invalid credentials",
             };
         }
 
@@ -70,7 +70,7 @@ export const registerAction = async (
         if (!response.ok) {
             return {
                 status: "error",
-                error: data.detail || "Invalid credentials",
+                error: data.message || "Invalid credentials",
             };
         }
 
@@ -119,7 +119,7 @@ export const verifyEmailAction = async (email: string, token: number) => {
         if (!response.ok) {
             return {
                 status: "error",
-                error: data.detail || "Invalid OTP",
+                error: data.message || "Invalid OTP",
             };
         }
 
@@ -161,7 +161,7 @@ export const createShopAction = async (shop: CreateShop) => {
         if (!response.ok) {
             return {
                 status: "error",
-                error: data.detail || "Something went wrong",
+                error: data.message || "Something went wrong",
             };
         }
 
@@ -190,37 +190,49 @@ export const createShopAction = async (shop: CreateShop) => {
     }
 };
 
-// export const loginWithGoogleAction = async (body: { credential?: string; code?: string; access_token?: string }) => {
-//     try {
-//         const response = await fetch(`${config.apiUrl}/identity/v1/google/login/`, {
-//             method: "POST",
-//             body: JSON.stringify(body),
-//             headers: getCommonHeaders(),
-//         });
+export const loginWithGoogleAction = async (body: {
+    credential?: string;
+    code?: string;
+    access_token?: string;
+}) => {
+    try {
+        const response = await fetch(`${config.serverUrl}/auth/google-login`, {
+            method: "POST",
+            body: JSON.stringify(body),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
-//         const data = await response.json();
+        const data = await response.json();
 
-//         if (!response.ok) {
-//             return {
-//                 status: "error",
-//                 error: data.detail || "Invalid credentials",
-//             };
-//         }
+        if (!response.ok) {
+            return {
+                status: "error",
+                error: data.message || "Invalid credentials",
+            };
+        }
 
-//         setTokensToCookies(data.access_token, data.refresh_token);
+        const { accessToken, refreshToken, user } = data.data;
 
-//         return {
-//             status: "success",
-//             data,
-//         };
-//     } catch (error) {
-//         console.error(error);
-//         return {
-//             status: "error",
-//             error: error instanceof Error ? error.message : "Something went wrong",
-//         };
-//     }
-// };
+        await setTokensToCookies(accessToken, refreshToken);
+
+        if (user) {
+            await setUserToCookies(user);
+        }
+        return {
+            status: "success",
+            data,
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            status: "error",
+            error:
+                error instanceof Error ? error.message : "Something went wrong",
+        };
+    }
+};
 
 export const logoutAction = async () => {
     const cookieStore = await cookies();

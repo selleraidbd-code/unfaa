@@ -32,7 +32,7 @@ export async function middleware(req: NextRequest) {
         ) {
             return redirectTo("/auth/verify-email", req);
         }
-        if (isVerified && !isSeller) {
+        if (isVerified && !isAdmin && !isSeller) {
             return redirectTo("/onboarding", req);
         }
         if (isVerified && isAuthNotVerifiedRoute) {

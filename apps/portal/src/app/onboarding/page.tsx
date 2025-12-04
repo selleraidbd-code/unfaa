@@ -34,7 +34,7 @@ const onboardingFormSchema = z.object({
     banner: z.string().optional(),
 });
 
-export default function ShopOnboarding() {
+const Page = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
@@ -192,4 +192,6 @@ export default function ShopOnboarding() {
             </div>
         </div>
     );
-}
+};
+
+export default Page;

@@ -1,7 +1,6 @@
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { MobileBottomNav } from "@/components/sidebar/mobile-bottom-nav";
 import { SidebarNavbar } from "@/components/sidebar/sidebar-navbar";
-import { VerificationProvider } from "@/providers/verification-provider";
 import {
     SidebarInset,
     SidebarProvider,
@@ -9,7 +8,6 @@ import {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     return (
-        // <VerificationProvider>
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
@@ -20,6 +18,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <MobileBottomNav />
             </SidebarInset>
         </SidebarProvider>
-        // </VerificationProvider>
     );
 }

@@ -12,12 +12,12 @@ import { UpdateDeliveryDialog } from "@/features/delivery/update-delivery-dialog
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Truck } from "lucide-react";
 import { toast } from "@workspace/ui/components/sonner";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import { useAlert } from "@/hooks/useAlert";
 
 const DeliveryCharge = () => {
     const { fire } = useAlert();
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
     const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(
         null

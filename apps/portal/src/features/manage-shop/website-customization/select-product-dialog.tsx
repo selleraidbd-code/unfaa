@@ -1,9 +1,9 @@
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { ProductSelectionCard } from "@/features/products/product-selection-card";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetProductsQuery } from "@/redux/api/product-api";
 import { useUpdateShopThemeSectionProductsMutation } from "@/redux/api/shop-theme-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
     Dialog,
@@ -16,8 +16,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { useState } from "react";
 import { toast } from "@workspace/ui/components/sonner";
+import { useState } from "react";
 
 export const SelectProductDialog = ({
     shopThemeId,
@@ -32,7 +32,7 @@ export const SelectProductDialog = ({
     open: boolean;
     setOpen: (open: boolean) => void;
 }) => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id;
     const [selectedProducts, setSelectedProducts] =
         useState<string[]>(productIds);

@@ -4,15 +4,15 @@ import { CustomerStep } from "@/features/make-order/customer-step/customer-step"
 import { OrderDetailsStep } from "@/features/make-order/details-step/order-details-step";
 import { ProductsStep } from "@/features/make-order/product-step/products-step";
 import { StepIndicator } from "@/features/make-order/StepIndicator";
-import useGetUser from "@/hooks/useGetUser";
 import { useCreateOrderbyAdminMutation } from "@/redux/api/order-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Customer } from "@/types/customer-type";
 import {
     CreateOrder,
+    OrderItem,
     OrderStatus,
     OrderStepIndicator,
 } from "@/types/order-type";
-import { OrderItem } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 import { useState } from "react";
 
@@ -27,7 +27,7 @@ export type OrderDetails = {
 };
 
 const Page = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [activeStep, setActiveStep] = useState(OrderStepIndicator.CUSTOMER);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(

@@ -6,18 +6,18 @@ import { BrandLoadingSkeleton } from "@/features/brand/brand-loading-skeleton";
 import { CreateBrandDialog } from "@/features/brand/create-brand-dialog";
 import { UpdateBrandDialog } from "@/features/brand/update-brand-dialog";
 import { useAlert } from "@/hooks/useAlert";
-import useGetUser from "@/hooks/useGetUser";
 import {
     useDeleteBrandMutation,
     useGetBrandsQuery,
 } from "@/redux/api/brand-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Brand } from "@/types/brand-type";
-import { useState } from "react";
-import { toast } from "@workspace/ui/components/sonner";
 import { AlertType } from "@workspace/ui/components/custom/custom-alert-dialogue";
+import { toast } from "@workspace/ui/components/sonner";
+import { useState } from "react";
 
 const Page = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const { fire } = useAlert();
 
     const [brand, setBrand] = useState<Brand | null>(null);

@@ -1,18 +1,18 @@
 import { useCreateCustomerMutation } from "@/redux/api/customer-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
+import { toast } from "@workspace/ui/components/sonner";
 import { CheckCircle2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
-import { CreateCustomer, Customer } from "@/types/customer-type";
-import { Form } from "@workspace/ui/components/form";
-import useGetUser from "@/hooks/useGetUser";
-import { OrderStepIndicator } from "@/types/order-type";
 import { CustomButton } from "@/components/ui/custom-button";
-import { isValidPhoneNumber } from "react-phone-number-input";
 import { CustomFormPhoneInput } from "@/components/ui/custom-form-phone-input";
+import { useAppSelector } from "@/redux/store/hook";
+import { CreateCustomer, Customer } from "@/types/customer-type";
+import { OrderStepIndicator } from "@/types/order-type";
+import { Form } from "@workspace/ui/components/form";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 interface AddNewCustomerInCustomerStepProps {
     setShowNewCustomerForm: (show: boolean) => void;
@@ -39,7 +39,7 @@ export const AddNewCustomerInCustomerStep = ({
     setSelectedCustomer,
     setActiveStep,
 }: AddNewCustomerInCustomerStepProps) => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const form = useForm<createCustomerFormValues>({
         resolver: zodResolver(customerSchema),
         defaultValues: {

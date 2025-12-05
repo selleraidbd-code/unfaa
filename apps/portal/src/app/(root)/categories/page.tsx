@@ -7,17 +7,17 @@ import { CategoryDetailsDialog } from "@/features/category/category-details-dial
 import { CreateCategoryDialog } from "@/features/category/create-category-dialog";
 import { UpdateCategoryDialog } from "@/features/category/update-category-dialog";
 import { useAlert } from "@/hooks/useAlert";
-import useGetUser from "@/hooks/useGetUser";
 import {
     useDeleteCategoryMutation,
     useGetCategoriesQuery,
 } from "@/redux/api/category-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Category } from "@/types/category-type";
-import { useState } from "react";
 import { toast } from "@workspace/ui/components/sonner";
+import { useState } from "react";
 
 const Page = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const { fire } = useAlert();
     const [category, setCategory] = useState<Category | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(

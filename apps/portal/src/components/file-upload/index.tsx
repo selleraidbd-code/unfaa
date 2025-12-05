@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 import { useGetImagesQuery } from "@/redux/api/media-api";
 
+import { useAppSelector } from "@/redux/store/hook";
 import { Media } from "@/types/media-type";
-import { cn } from "@workspace/ui/lib/utils";
-import useGetUser from "@/hooks/useGetUser";
 import { Label } from "@workspace/ui/components/label";
+import { cn } from "@workspace/ui/lib/utils";
 
 import { FileModal } from "./file-modal";
 import { FileUploader } from "./file-uploader";
@@ -30,7 +30,7 @@ export const FileUpload = ({
     label,
     isMinimal = false,
 }: FileUploadProps) => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const isInitialFileLoaded = useRef(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);

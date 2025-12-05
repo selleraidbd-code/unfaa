@@ -1,22 +1,22 @@
 "use client";
 
 import { HeaderBackButton } from "@/components/ui/custom-back-button";
-import useGetUser from "@/hooks/useGetUser";
+import { AboutUsPolicy } from "@/features/manage-shop/shop-policy/about-us-policy";
 import {
     useGetShopPoliciesQuery,
     useUpdateShopMutation,
 } from "@/redux/api/shop-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { ShopPolicyType } from "@/types/shop-type";
-import { AboutUsPolicy } from "@/features/manage-shop/shop-policy/about-us-policy";
 
-import { TermsConditionsPolicy } from "@/features/manage-shop/shop-policy/terms-conditions-policy";
 import { PrivacyPolicy } from "@/features/manage-shop/shop-policy/privacy-policy";
-import { ReturnPolicy } from "@/features/manage-shop/shop-policy/return-policy";
 import { RefundPolicy } from "@/features/manage-shop/shop-policy/refund-policy";
+import { ReturnPolicy } from "@/features/manage-shop/shop-policy/return-policy";
 import { ShopPolicySkeleton } from "@/features/manage-shop/shop-policy/shop-policy-skeleton";
+import { TermsConditionsPolicy } from "@/features/manage-shop/shop-policy/terms-conditions-policy";
 
 const ShopPolicy = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
     const shopSlug = user?.shop.slug || "";
 

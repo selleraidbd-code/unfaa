@@ -1,24 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "@workspace/ui/components/sonner";
-import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
+import { EmployeeCardList } from "@/features/employee/employee-card-list";
+import { EmployeeTableView } from "@/features/employee/employee-table-view";
+import { UpdateEmployeeDialog } from "@/features/employee/update-employee-dialog";
+import { useAlert } from "@/hooks/useAlert";
 import {
     useDeleteEmployeeMutation,
     useGetEmployeesQuery,
 } from "@/redux/api/employee-api";
-import { UpdateEmployeeDialog } from "@/features/employee/update-employee-dialog";
-import { EmployeeTableView } from "@/features/employee/employee-table-view";
-import { EmployeeCardList } from "@/features/employee/employee-card-list";
+import { useAppSelector } from "@/redux/store/hook";
 import { Employee } from "@/types/employee-type";
-import useGetUser from "@/hooks/useGetUser";
-import { useAlert } from "@/hooks/useAlert";
 import { AlertType } from "@workspace/ui/components/custom/custom-alert-dialogue";
+import { toast } from "@workspace/ui/components/sonner";
+import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 const EmployeesPage = () => {
     const searchParams = useSearchParams();
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const { fire } = useAlert();
     const isMobile = useBreakpoint({ size: "lg" });
     const [employee, setEmployee] = useState<Employee | null>(null);

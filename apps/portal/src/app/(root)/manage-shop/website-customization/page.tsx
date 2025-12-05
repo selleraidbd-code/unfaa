@@ -5,11 +5,11 @@ import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { ManageBanner } from "@/features/manage-shop/website-customization/manage-banner";
 import { ManageCategories } from "@/features/manage-shop/website-customization/manage-categories";
 import { ManageSection } from "@/features/manage-shop/website-customization/manage-section";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetShopThemeQuery } from "@/redux/api/shop-theme-api";
+import { useAppSelector } from "@/redux/store/hook";
 
 const WebsiteCustomization = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop?.id as string;
     const { data, isLoading, isError } = useGetShopThemeQuery({
         shopId,

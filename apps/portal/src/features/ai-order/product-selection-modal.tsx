@@ -8,12 +8,10 @@ import {
 import {
     ProductCardSkeleton,
     ProductSelectionCard,
-    SelectedProductCard,
 } from "@/features/ai-order/product-card";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetProductsQuery } from "@/redux/api/product-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Product } from "@/types/product-type";
-import { Button } from "@workspace/ui/components/button";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
     Dialog,
@@ -38,7 +36,7 @@ export const ProductSelectionModal = ({
     onOpenChange,
     onSelectProduct,
 }: ProductSelectionModalProps) => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 

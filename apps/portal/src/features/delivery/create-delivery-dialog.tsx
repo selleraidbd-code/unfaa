@@ -23,11 +23,11 @@ import { toast } from "@workspace/ui/components/sonner";
 import { useCreateDeliveryMutation } from "@/redux/api/delivery-api";
 import { CreateDelivery, DeliveryScope } from "@/types/delivery-type";
 import { deliveryFormSchema, DeliveryFormValues } from "./delivery-schema";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
 
 export const CreateDeliveryDialog = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [open, setOpen] = useState(false);
     const form = useForm<DeliveryFormValues>({
         resolver: zodResolver(deliveryFormSchema),

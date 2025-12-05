@@ -1,10 +1,11 @@
 "use client";
 
-import useGetUser from "@/hooks/useGetUser";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormPhoneInput } from "@/components/ui/custom-form-phone-input";
 import { useCreateCustomerMutation } from "@/redux/api/customer-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { CreateCustomer } from "@/types/customer-type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CustomButton } from "@/components/ui/custom-button";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
 import {
@@ -17,13 +18,12 @@ import {
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
+import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "@workspace/ui/components/sonner";
-import { z } from "zod";
 import { isValidPhoneNumber } from "react-phone-number-input";
-import { CustomFormPhoneInput } from "@/components/ui/custom-form-phone-input";
+import { z } from "zod";
 
 const customerFormSchema = z.object({
     name: z.string().min(3, {
@@ -46,7 +46,7 @@ const customerFormSchema = z.object({
 type BrandFormValues = z.infer<typeof customerFormSchema>;
 
 export const CreateCustomerDialog = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [open, setOpen] = useState(false);
     const form = useForm<BrandFormValues>({
         resolver: zodResolver(customerFormSchema),

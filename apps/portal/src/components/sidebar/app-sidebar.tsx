@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { getNavData } from "@/data/nav-data";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import { UserRole } from "@/types";
 import {
     Sidebar,
@@ -16,7 +16,7 @@ import Link from "next/link";
 import { NavMain } from "./nav-main";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const { open } = useSidebar();
 
     const data = getNavData(user?.role || UserRole.USER);

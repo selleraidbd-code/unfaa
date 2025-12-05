@@ -9,11 +9,10 @@ import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { CustomButton } from "@/components/ui/custom-button";
 import { CustomFormImage } from "@/components/ui/custom-form-image";
 import { createProductSchema } from "@/features/products/product-schema";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetBrandsQuery } from "@/redux/api/brand-api";
 import { useGetDeliveriesQuery } from "@/redux/api/delivery-api";
 import { useCreateProductMutation } from "@/redux/api/product-api";
-import { DeliveryScope } from "@/types/delivery-type";
+import { useAppSelector } from "@/redux/store/hook";
 import { ProductCeratePayload } from "@/types/product-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
@@ -34,7 +33,7 @@ import { z } from "zod";
 export type ProductFormType = z.infer<typeof createProductSchema>;
 
 const AddProduct = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
     const router = useRouter();
 

@@ -3,7 +3,7 @@ import { useCreateOrderbyAdminMutation } from "@/redux/api/order-api";
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
 import { CheckCircle } from "lucide-react";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import {
     CreateOrder,
     OrderDetailsType,
@@ -26,7 +26,7 @@ export const AiPlaceOrder = ({
     orderDetails,
 }: Props) => {
     const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
 
     const handlePlaceOrder = async (status: OrderStatus) => {
         if (!customerInfo || !Array.isArray(orderItems)) return;

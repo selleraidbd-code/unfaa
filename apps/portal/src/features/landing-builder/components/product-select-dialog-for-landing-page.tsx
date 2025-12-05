@@ -1,8 +1,8 @@
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { ProductSelectionCard } from "@/features/products/product-selection-card";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetProductsQuery } from "@/redux/api/product-api";
+import { useAppSelector } from "@/redux/store/hook";
 import {
     Dialog,
     DialogClose,
@@ -25,7 +25,7 @@ export const ProductSelectDialogForLandingPage = ({
     onClose?: () => void;
 }) => {
     const router = useRouter();
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [selectedProductId, setSelectedProductId] = useState<string>();
 
     const { data, isLoading, isError } = useGetProductsQuery({

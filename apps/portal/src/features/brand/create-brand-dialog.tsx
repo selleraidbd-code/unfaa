@@ -2,8 +2,8 @@
 
 import { CustomButton } from "@/components/ui/custom-button";
 import { CustomFormImage } from "@/components/ui/custom-form-image";
-import useGetUser from "@/hooks/useGetUser";
 import { useCreateBrandMutation } from "@/redux/api/brand-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { CreateBrand } from "@/types/brand-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
@@ -18,10 +18,10 @@ import {
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
+import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 const brandFormSchema = z.object({
@@ -34,7 +34,7 @@ const brandFormSchema = z.object({
 type BrandFormValues = z.infer<typeof brandFormSchema>;
 
 export const CreateBrandDialog = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [open, setOpen] = useState(false);
     const form = useForm<BrandFormValues>({
         resolver: zodResolver(brandFormSchema),

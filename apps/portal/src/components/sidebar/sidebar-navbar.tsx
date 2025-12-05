@@ -4,7 +4,7 @@ import { ThemeSwitcher } from "@/components/shared/theme-switcher";
 import { NavUser } from "@/components/sidebar/nav-user";
 import { CustomButton } from "@/components/ui/custom-button";
 import { config } from "@/config";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
@@ -12,7 +12,7 @@ import { Globe } from "lucide-react";
 
 export const SidebarNavbar = () => {
     const isMobile = useBreakpoint();
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
 
     const getShopUrl = () => {
         return `${config.rootDomain}/shop/${user?.shop?.slug}`;

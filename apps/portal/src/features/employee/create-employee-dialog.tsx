@@ -2,8 +2,8 @@
 
 import { CustomButton } from "@/components/ui/custom-button";
 import { getEmployeeRoleOptions } from "@/features/employee/employee-role-options";
-import useGetUser from "@/hooks/useGetUser";
 import { useCreateEmployeeMutation } from "@/redux/api/employee-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { CreateEmployee } from "@/types/employee-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
@@ -18,10 +18,10 @@ import {
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
+import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 const employeeFormSchema = z.object({
@@ -40,7 +40,7 @@ const employeeFormSchema = z.object({
 type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 
 export const CreateEmployeeDialog = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [open, setOpen] = useState(false);
     const form = useForm<EmployeeFormValues>({
         resolver: zodResolver(employeeFormSchema),

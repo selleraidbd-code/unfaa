@@ -18,9 +18,11 @@ import { CustomFormImage } from "@/components/ui/custom-form-image";
 import { CustomFormImages } from "@/components/ui/custom-form-images";
 import { AddNewVariants } from "@/features/products/add-new-variants";
 import { updateProductSchema } from "@/features/products/product-schema";
-import useGetUser from "@/hooks/useGetUser";
+import { useAlert } from "@/hooks/useAlert";
 import { getChangedFields } from "@/lib/get-changes-fields";
 import { useGetBrandsQuery } from "@/redux/api/brand-api";
+import { useAppSelector } from "@/redux/store/hook";
+import { ProductVariantUpdate } from "@/types/product-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
@@ -32,13 +34,11 @@ import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-
 import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
 import { Form } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
-import { cn } from "@workspace/ui/lib/utils";
-import { Pencil, Plus, Trash2, X, Save } from "lucide-react";
 import { toast } from "@workspace/ui/components/sonner";
-import { z } from "zod";
-import { useAlert } from "@/hooks/useAlert";
+import { cn } from "@workspace/ui/lib/utils";
+import { Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import { useState } from "react";
-import { ProductVariantUpdate } from "@/types/product-type";
+import { z } from "zod";
 
 type UpdateProductFormType = z.infer<typeof updateProductSchema>;
 
@@ -47,7 +47,7 @@ const EditProduct = () => {
     const { id } = useParams();
     const { fire } = useAlert();
     const productId = id as string;
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
 
     const { data: product, isLoading: isLoadingProduct } =

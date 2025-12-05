@@ -1,9 +1,9 @@
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { CategoryCard } from "@/features/manage-shop/website-customization/manage-categories";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import { useUpdateShopThemeCategoryMutation } from "@/redux/api/shop-theme-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Category } from "@/types/category-type";
 import {
     Dialog,
@@ -15,8 +15,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { useState } from "react";
 import { toast } from "@workspace/ui/components/sonner";
+import { useState } from "react";
 
 export const AddCategoryDialog = ({
     categoryIds,
@@ -31,7 +31,7 @@ export const AddCategoryDialog = ({
 }) => {
     const [selectedCategories, setSelectedCategories] =
         useState<string[]>(categoryIds);
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const {
         data: categoriesData,
         isLoading,

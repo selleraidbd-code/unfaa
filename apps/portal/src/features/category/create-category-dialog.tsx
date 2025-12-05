@@ -1,7 +1,7 @@
 import { CustomButton } from "@/components/ui/custom-button";
 import { CustomFormImage } from "@/components/ui/custom-form-image";
-import useGetUser from "@/hooks/useGetUser";
 import { useCreateCategoryMutation } from "@/redux/api/category-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { CreateCategory } from "@/types/category-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
@@ -9,18 +9,18 @@ import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-
 import {
     Dialog,
     DialogClose,
+    DialogContainer,
     DialogContent,
     DialogDescription,
-    DialogContainer,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
+import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "@workspace/ui/components/sonner";
 import { z } from "zod";
 
 const categoryFormSchema = z.object({
@@ -36,7 +36,7 @@ const categoryFormSchema = z.object({
 export type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 export const CreateCategoryDialog = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [open, setOpen] = useState(false);
     const form = useForm<CategoryFormValues>({
         resolver: zodResolver(categoryFormSchema),

@@ -4,8 +4,8 @@ import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { CustomButton } from "@/components/ui/custom-button";
 import { config } from "@/config";
 import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
 import {
     Card,
@@ -20,7 +20,7 @@ import { Calendar, Edit, ExternalLink, Globe } from "lucide-react";
 import { useState } from "react";
 
 const Page = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     console.log("user", user);
     const [productSelectModalOpen, setProductSelectModalOpen] = useState(false);
 

@@ -1,21 +1,20 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
+import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import {
     useDeleteProductMutation,
     useGetProductsQuery,
 } from "@/redux/api/product-api";
-import { useGetCategoriesQuery } from "@/redux/api/category-api";
-import { PaginationState } from "@tanstack/react-table";
 import { toast } from "@workspace/ui/components/sonner";
 
-import { Product } from "@/types/product-type";
-import useGetUser from "@/hooks/useGetUser";
-import { useAlert } from "@/hooks/useAlert";
-import { ProductTableView } from "@/features/products/product-table-view";
 import { ProductCardList } from "@/features/products/product-card-list";
+import { ProductTableView } from "@/features/products/product-table-view";
+import { useAlert } from "@/hooks/useAlert";
+import { useAppSelector } from "@/redux/store/hook";
+import { Product } from "@/types/product-type";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import {
@@ -38,7 +37,7 @@ export default function ProductsPage() {
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || 1;
     const limit = searchParams.get("limit") || 10;
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const { fire } = useAlert();
     const [filterParams, setFilterParams] = useState<FilterParams>({});
 

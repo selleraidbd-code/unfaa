@@ -10,7 +10,7 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { orderStatusOptions } from "@/features/orders/data";
 import { OrderDetailsModal } from "@/features/orders/order-details-modal";
 import { OrderTable } from "@/features/orders/order-table";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import { useCourierEntryMutation } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { Order, OrderStatus } from "@/types/order-type";
@@ -27,7 +27,7 @@ interface FilterParams {
 }
 
 const OrdersPage = () => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const router = useRouter();
     const searchParams = useSearchParams();
     const status = searchParams.get("status") || "all";

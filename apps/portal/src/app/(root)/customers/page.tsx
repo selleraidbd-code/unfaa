@@ -1,26 +1,26 @@
 "use client";
 
-import { PaginationState } from "@tanstack/react-table";
-import { useState } from "react";
-import { toast } from "@workspace/ui/components/sonner";
-import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
-import { UpdateCustomerDialog } from "@/features/customers/update-customer-dialog";
-import { CustomerTableView } from "@/features/customers/customer-table-view";
 import { CustomerCardList } from "@/features/customers/customer-card-list";
+import { CustomerTableView } from "@/features/customers/customer-table-view";
+import { UpdateCustomerDialog } from "@/features/customers/update-customer-dialog";
+import { useAlert } from "@/hooks/useAlert";
 import {
     useDeleteCustomerMutation,
     useGetCustomersQuery,
 } from "@/redux/api/customer-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Customer } from "@/types/customer-type";
-import useGetUser from "@/hooks/useGetUser";
-import { useAlert } from "@/hooks/useAlert";
+import { PaginationState } from "@tanstack/react-table";
+import { toast } from "@workspace/ui/components/sonner";
+import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 const CustomersPage = () => {
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || 1;
     const limit = searchParams.get("limit") || 10;
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const { fire } = useAlert();
     const isMobile = useBreakpoint({ size: "lg" });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { HeaderBackButton } from "@/components/ui/custom-back-button";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import {
     useCreateCourierSetupMutation,
     useGetCourierSetupQuery,
@@ -179,7 +179,7 @@ const DeliverySupport = () => {
         {}
     );
     const [isLoading, setIsLoading] = useState(false);
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop?.id;
     const shopSlug = user?.shop?.slug;
 

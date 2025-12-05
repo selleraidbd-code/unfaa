@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetOrdersQuery } from "@/redux/api/order-api";
-import useGetUser from "@/hooks/useGetUser";
+import { useAppSelector } from "@/redux/store/hook";
 import {
     Card,
     CardContent,
@@ -29,7 +29,7 @@ type Props = {
 };
 
 export const OrderInfo = ({ customerId }: Props) => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const { data, isLoading, isError } = useGetOrdersQuery(
         {
             customerId,

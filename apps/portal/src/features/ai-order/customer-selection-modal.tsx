@@ -10,10 +10,9 @@ import {
     CustomerSelectionCard,
     SelectedCustomerCard,
 } from "@/features/ai-order/customer-card";
-import useGetUser from "@/hooks/useGetUser";
 import { useGetCustomersQuery } from "@/redux/api/customer-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Customer } from "@/types/customer-type";
-import { Button } from "@workspace/ui/components/button";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
     Dialog,
@@ -24,7 +23,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { formatDate } from "@workspace/ui/lib/formateDate";
 import { User } from "lucide-react";
 import { useState } from "react";
 
@@ -41,7 +39,7 @@ export const CustomerSelectionModal = ({
     onSelectCustomer,
     currentCustomerPhone,
 }: CustomerSelectionModalProps) => {
-    const user = useGetUser();
+    const user = useAppSelector((state) => state.auth.user);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 

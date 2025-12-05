@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { CustomButton } from "@/components/ui/custom-button";
+import noData from "@/assets/images/no-data.png";
 
 interface CustomErrorOrEmptyProps {
     title?: string;
@@ -30,9 +31,7 @@ export const CustomErrorOrEmpty = ({
     return (
         <div className={cn("center h-[60vh] flex-col", className)}>
             <Image
-                src={
-                    "http://multi-media-server.naimurrhman.com/uploads/img/1745681986517-50678915.jpg"
-                }
+                src={noData}
                 alt="empty state"
                 width={400}
                 height={400}

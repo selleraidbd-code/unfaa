@@ -517,7 +517,7 @@ const DeliverySupport = () => {
     }
 
     const webhookUrl = shopSlug
-        ? `https://server.unfaa.com/api/v1/order/stead-fast-webhook/${shopSlug}`
+        ? `https://server.unfaa.com/api/v1/webhook/stead-fast-webhook/${shopSlug}`
         : "";
 
     return (

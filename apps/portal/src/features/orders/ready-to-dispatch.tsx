@@ -8,7 +8,7 @@ import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { OrderStatus } from "@/types/order-type";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { cn } from "@workspace/ui/lib/utils";
-import { Calendar, MapPin, Phone, Truck, User } from "lucide-react";
+import { Calendar, MapPin, Package, Phone, Truck, User } from "lucide-react";
 
 export const ReadyToDispatch = () => {
     const user = useGetUser();
@@ -73,6 +73,19 @@ export const ReadyToDispatch = () => {
                                         {order.orderStatus}
                                     </span>
                                 </div>
+                                {order.consignmentId && (
+                                    <div className="mb-3 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-md px-3 py-2">
+                                        <Package className="h-4 w-4 text-blue-600" />
+                                        <div className="flex-1">
+                                            <span className="text-xs text-blue-600 font-medium">
+                                                Consignment ID
+                                            </span>
+                                            <div className="text-sm font-semibold text-blue-900">
+                                                {order.consignmentId}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="space-y-2 mb-4">
                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <User className="h-4 w-4" />
@@ -106,14 +119,16 @@ export const ReadyToDispatch = () => {
                         ))}
                     </div>
 
-                    <CustomPagination
-                        paginationMeta={paginationMeta}
-                        showRowsPerPage={false}
-                        showRowSelection={false}
-                        showPageCount={false}
-                        onPageChange={() => {}}
-                        onLimitChange={() => {}}
-                    />
+                    <div className="mt-4 center">
+                        <CustomPagination
+                            paginationMeta={paginationMeta}
+                            showRowsPerPage={false}
+                            showRowSelection={false}
+                            showPageCount={false}
+                            onPageChange={() => {}}
+                            onLimitChange={() => {}}
+                        />
+                    </div>
                 </>
             )}
         </DataStateHandler>

@@ -37,15 +37,31 @@ export const InstallPrompt = () => {
     const [isIOS, setIsIOS] = useState(false);
 
     useEffect(() => {
-        // Check if already installed (standalone mode)
-        const isInStandaloneMode =
-            window.matchMedia("(display-mode: standalone)").matches ||
-            window.navigator.standalone ||
-            document.referrer.includes("android-app://");
+        // Check if already installed (standalone mode) - improved detection
+        const checkStandalone = () => {
+            return (
+                window.matchMedia("(display-mode: standalone)").matches ||
+                (window.navigator as Navigator).standalone === true ||
+                document.referrer.includes("android-app://") ||
+                window.location.search.includes("utm_source=pwa") ||
+                (window.navigator as any).getInstalledRelatedApps?.() !==
+                    undefined
+            );
+        };
 
+        const isInStandaloneMode = checkStandalone();
         setIsStandalone(isInStandaloneMode);
 
+        // If already installed, don't show prompt
         if (isInStandaloneMode) {
+            return;
+        }
+
+        // Check if already dismissed in this session
+        const sessionDismissed = sessionStorage.getItem(
+            "pwa-install-dismissed"
+        );
+        if (sessionDismissed === "true") {
             return;
         }
 
@@ -54,28 +70,26 @@ export const InstallPrompt = () => {
             /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         setIsIOS(iOS);
 
-        // Check if user has already dismissed (1 day cooldown)
-        const hasAlreadyDismissed = localStorage.getItem(
-            "pwa-install-dismissed"
-        );
-        const dismissedTime = hasAlreadyDismissed
-            ? parseInt(hasAlreadyDismissed)
-            : 0;
-        const oneDayInMs = 24 * 60 * 60 * 1000;
-
-        if (hasAlreadyDismissed && Date.now() - dismissedTime < oneDayInMs) {
-            return;
-        }
+        let timeoutId: NodeJS.Timeout | null = null;
 
         // Listen for beforeinstallprompt event (Android/Chrome)
         const handleBeforeInstallPrompt = (e: Event) => {
             e.preventDefault();
-            setDeferredPrompt(e as BeforeInstallPromptEvent);
-            setTimeout(() => {
-                if (!isInStandaloneMode) {
-                    setShowPrompt(true);
-                }
-            }, 3000);
+            const promptEvent = e as BeforeInstallPromptEvent;
+            setDeferredPrompt(promptEvent);
+
+            // Only show prompt if not dismissed in this session and not standalone
+            if (!sessionDismissed && !isInStandaloneMode) {
+                timeoutId = setTimeout(() => {
+                    // Double-check standalone and session dismissal before showing
+                    if (
+                        !checkStandalone() &&
+                        !sessionStorage.getItem("pwa-install-dismissed")
+                    ) {
+                        setShowPrompt(true);
+                    }
+                }, 3000);
+            }
         };
 
         window.addEventListener(
@@ -83,10 +97,16 @@ export const InstallPrompt = () => {
             handleBeforeInstallPrompt
         );
 
-        // Show iOS prompt if applicable
-        if (iOS && !hasAlreadyDismissed) {
-            setTimeout(() => {
-                setShowPrompt(true);
+        // Show iOS prompt if applicable (only if not dismissed in session)
+        if (iOS && !sessionDismissed) {
+            timeoutId = setTimeout(() => {
+                // Double-check standalone and session dismissal before showing
+                if (
+                    !checkStandalone() &&
+                    !sessionStorage.getItem("pwa-install-dismissed")
+                ) {
+                    setShowPrompt(true);
+                }
             }, 3000);
         }
 
@@ -95,6 +115,9 @@ export const InstallPrompt = () => {
                 "beforeinstallprompt",
                 handleBeforeInstallPrompt
             );
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
         };
     }, []);
 
@@ -103,20 +126,28 @@ export const InstallPrompt = () => {
             return;
         }
 
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
+        try {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
 
-        if (outcome === "accepted") {
-            setShowPrompt(false);
-            setDeferredPrompt(null);
-        } else {
+            if (outcome === "accepted") {
+                setShowPrompt(false);
+                setDeferredPrompt(null);
+                // Mark as dismissed in session since installation was accepted
+                sessionStorage.setItem("pwa-install-dismissed", "true");
+            } else {
+                handleDismiss();
+            }
+        } catch (error) {
+            // If prompt fails, just dismiss
             handleDismiss();
         }
     };
 
     const handleDismiss = () => {
         setShowPrompt(false);
-        localStorage.setItem("pwa-install-dismissed", Date.now().toString());
+        // Store dismissal in sessionStorage (session-based, not persistent)
+        sessionStorage.setItem("pwa-install-dismissed", "true");
     };
 
     if (isStandalone || !showPrompt) {

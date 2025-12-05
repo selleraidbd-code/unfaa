@@ -12,6 +12,7 @@ export const ROUTES = {
         "/products",
         "/subscriptions",
         "/tutorial",
+        "/delivery-orders",
     ] as const,
     superAdminRoutes: [
         "/shops",

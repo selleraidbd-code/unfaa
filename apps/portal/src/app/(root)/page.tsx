@@ -10,33 +10,28 @@
 
 import { ComingSoon } from "@/components/shared/coming-soon";
 
-// const OverviewPage = () => {
-//     return (
-//         <div className="flex flex-col gap-6">
-//             <TopStats />
-
-//             <div className="grid gap-6 md:grid-cols-12">
-//                 <RecentTransactions />
-//                 <RecentSales />
-//             </div>
-//             <OrderPaidStats />
-//             <div className="grid gap-6 md:grid-cols-2">
-//                 <TopPaidedCustomer />
-//                 <TopDebtCustomer />
-//             </div>
-//             <InventoryStockLevel />
-//             <div className="grid gap-6 md:grid-cols-2">
-//                 <TopSellingProducts />
-//                 <LowStockProducts />
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default OverviewPage;
-
 const Page = () => {
-    return <ComingSoon />;
+    return (
+        <ComingSoon />
+        //         <div className="flex flex-col gap-6">
+        //             <TopStats />
+
+        //             <div className="grid gap-6 md:grid-cols-12">
+        //                 <RecentTransactions />
+        //                 <RecentSales />
+        //             </div>
+        //             <OrderPaidStats />
+        //             <div className="grid gap-6 md:grid-cols-2">
+        //                 <TopPaidedCustomer />
+        //                 <TopDebtCustomer />
+        //             </div>
+        //             <InventoryStockLevel />
+        //             <div className="grid gap-6 md:grid-cols-2">
+        //                 <TopSellingProducts />
+        //                 <LowStockProducts />
+        //             </div>
+        //         </div>
+    );
 };
 
 export default Page;

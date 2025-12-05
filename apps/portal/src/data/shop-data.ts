@@ -52,7 +52,7 @@ export const shopTypes = [
         value: "groceries_household",
     },
     {
-        label: "Other",
+        label: "Variety Store",
         value: "other",
     },
 ];

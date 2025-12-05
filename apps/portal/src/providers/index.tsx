@@ -20,13 +20,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
             >
                 <AuthInitiatorFromCookies>
                     <TokenInitiatorInStore>
-                        <UserInfoProvider>
-                            <AlertProvider>
-                                <InstallPrompt />
-                                <Toaster position="top-center" richColors />
-                                {children}
-                            </AlertProvider>
-                        </UserInfoProvider>
+                        <AlertProvider>
+                            <InstallPrompt />
+                            <Toaster position="top-center" richColors />
+                            {children}
+                        </AlertProvider>
                     </TokenInitiatorInStore>
                 </AuthInitiatorFromCookies>
             </NextThemesProvider>

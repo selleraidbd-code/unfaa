@@ -8,6 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
             "Comprehensive e-commerce business solutions providing seamless online store management, inventory tracking, payment processing, and customer engagement tools for modern businesses",
         start_url: "/",
         display: "standalone",
+        orientation: "any",
         background_color: "#ffffff",
         theme_color: "#0636FF",
         icons: [

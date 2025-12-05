@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
-import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 interface ArrowBackButtonProps {
     onClick?: () => void;
@@ -35,22 +36,11 @@ export const ArrowBackButton = ({
     };
 
     const buttonContent = (
-        <ArrowLeft
-            className={cn(
-                iconSizes[size],
-                "transition-transform duration-200 group-hover:-translate-x-0.5"
-            )}
-        />
+        <ArrowLeft className={cn(iconSizes[size], "transition-transform duration-200 group-hover:-translate-x-0.5")} />
     );
 
     const baseClasses = cn(
-        "group rounded-full border shadow-sm transition-all duration-200",
-        "bg-white/80 backdrop-blur-sm hover:bg-white",
-        "border-gray-200/60 hover:border-gray-300",
-        "hover:shadow-md hover:scale-105",
-        "active:scale-95 active:shadow-sm",
-        "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
-        "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+        "group rounded-full border border-gray-200/60 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:border-gray-300 hover:bg-white hover:shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 active:scale-95 active:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100",
         sizeClasses[size]
     );
 
@@ -84,15 +74,9 @@ export const ArrowBackButton = ({
     );
 };
 
-export const HeaderBackButton = ({
-    title,
-    href,
-}: {
-    title: string;
-    href: string;
-}) => {
+export const HeaderBackButton = ({ title, href }: { title: string; href: string }) => {
     return (
-        <div className="flex items-center w-fit gap-4 group">
+        <div className="group flex w-fit items-center gap-4">
             <ArrowBackButton href={href} />
             <Link
                 href={href}

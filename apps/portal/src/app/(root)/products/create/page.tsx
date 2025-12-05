@@ -1,19 +1,16 @@
 "use client";
 
-import { useGetCategoriesQuery } from "@/redux/api/category-api";
-import { Plus, Trash2, X } from "lucide-react";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 
-import { Editor } from "@/components/editor";
-import { PhotoGridUpload } from "@/components/file-upload/photo-grid-upload";
-import { HeaderBackButton } from "@/components/ui/custom-back-button";
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { DiscardAndSaveButton } from "@/features/products/create/discard-and-save-button";
+import { ProductFormType, VariantCard } from "@/features/products/create/variant-card";
 import { createProductSchema } from "@/features/products/product-schema";
 import { useGetBrandsQuery } from "@/redux/api/brand-api";
+import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import { useGetDeliveriesQuery } from "@/redux/api/delivery-api";
 import { useCreateProductMutation } from "@/redux/api/product-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { ProductCeratePayload } from "@/types/product-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
@@ -25,36 +22,49 @@ import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-
 import { Form } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
 import { toast } from "@workspace/ui/components/sonner";
-import { cn } from "@workspace/ui/lib/utils";
-import { useRouter } from "next/navigation";
-import { useForm, UseFormReturn } from "react-hook-form";
-import { z } from "zod";
+import { Plus } from "lucide-react";
+import { useForm } from "react-hook-form";
 
-export type ProductFormType = z.infer<typeof createProductSchema>;
+import { ProductCeratePayload } from "@/types/product-type";
+import { loadDraft } from "@/lib/product-draft-utils";
+import { useProductDraft } from "@/hooks/useProductDraft";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { Editor } from "@/components/editor";
+import { PhotoGridUpload } from "@/components/file-upload/photo-grid-upload";
 
 const AddProduct = () => {
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
     const router = useRouter();
 
+    // Load draft data synchronously for form initialization
+    const draftData = loadDraft();
+    const defaultValues: ProductFormType = draftData || {
+        name: "",
+        banglaName: "",
+        price: 0,
+        discountPrice: 0,
+        photoURL: "",
+        images: [],
+        keywords: "",
+        stock: 0,
+        categoryIds: [],
+        description: "",
+        fullDescription: "",
+        productVariant: [],
+        activeStatus: "active",
+        deliveryId: undefined,
+    };
+
     const form = useForm<ProductFormType>({
         resolver: zodResolver(createProductSchema),
-        defaultValues: {
-            name: "",
-            banglaName: "",
-            price: 0,
-            discountPrice: 0,
-            photoURL: "",
-            images: [],
-            keywords: "",
-            stock: 0,
-            categoryIds: [],
-            description: "",
-            fullDescription: "",
-            productVariant: [],
-            activeStatus: "active",
-            deliveryId: undefined,
-        },
+        defaultValues,
+    });
+
+    // Initialize draft hook
+    const { saveDraft, autoSave, debouncedAutoSave, clearDraft } = useProductDraft({
+        form,
+        silentAutoSave: true,
     });
 
     const { data } = useGetCategoriesQuery({
@@ -87,8 +97,15 @@ const AddProduct = () => {
 
     const productVariants = form.watch("productVariant");
 
-    const [createProduct, { isLoading: isCreating }] =
-        useCreateProductMutation();
+    // Auto-save handler for onBlur events (optimized - only saves when field loses focus)
+    const handleFieldBlur = useCallback(() => {
+        // Small delay to ensure form state is updated after blur
+        setTimeout(() => {
+            autoSave(form.getValues());
+        }, 100);
+    }, [form, autoSave]);
+
+    const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
 
     const handleAddVariant = () => {
         form.setValue("productVariant", [
@@ -96,9 +113,7 @@ const AddProduct = () => {
             {
                 name: "",
                 isRequired: false,
-                productVariantOptions: [
-                    { name: "", sku: "", extraPrice: 0, imgUrl: "" },
-                ],
+                productVariantOptions: [{ name: "", sku: "", extraPrice: 0, imgUrl: "" }],
             },
         ]);
     };
@@ -124,6 +139,7 @@ const AddProduct = () => {
             .unwrap()
             .then(() => {
                 toast.success("Product created successfully");
+                clearDraft(); // Clear draft after successful creation
                 form.reset();
                 router.push("/products");
             })
@@ -132,18 +148,35 @@ const AddProduct = () => {
             });
     };
 
+    // Handle image changes with immediate auto-save
+    const handlePhotoURLChange = useCallback(
+        (url: string) => {
+            form.setValue("photoURL", url);
+            // Auto-save immediately for image changes
+            setTimeout(() => autoSave(form.getValues()), 100);
+        },
+        [form, autoSave]
+    );
+
+    const handleImagesChange = useCallback(
+        (images: string[]) => {
+            form.setValue("images", images);
+            // Auto-save immediately for image changes
+            setTimeout(() => autoSave(form.getValues()), 100);
+        },
+        [form, autoSave]
+    );
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} onBlur={handleFieldBlur} className="grid gap-4">
                 <div className="flex items-center gap-4">
-                    <HeaderBackButton
-                        title="Back to Products"
-                        href="/products"
-                    />
+                    <HeaderBackButton title="Back to Products" href="/products" />
 
                     <DiscardAndSaveButton
                         form={form}
                         isCreating={isCreating}
+                        onSaveDraft={saveDraft}
                         className="hidden sm:ml-auto sm:flex"
                     />
                 </div>
@@ -152,7 +185,7 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="General Information"
                         content={
-                            <div className="grid pt-2 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid gap-x-6 gap-y-4 pt-2 md:grid-cols-2">
                                 <CustomFormInput
                                     label="Product Name (English)"
                                     name="name"
@@ -199,16 +232,12 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Product Images"
                         content={
-                            <div className="sm:pt-2 max-w-6xl">
+                            <div className="max-w-6xl sm:pt-2">
                                 <PhotoGridUpload
                                     photoURL={form.watch("photoURL")}
                                     images={form.watch("images")}
-                                    onPhotoURLChange={(url) =>
-                                        form.setValue("photoURL", url)
-                                    }
-                                    onImagesChange={(images) =>
-                                        form.setValue("images", images)
-                                    }
+                                    onPhotoURLChange={handlePhotoURLChange}
+                                    onImagesChange={handleImagesChange}
                                 />
                             </div>
                         }
@@ -217,7 +246,7 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Price & Inventory"
                         content={
-                            <div className="grid pt-2 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid gap-x-6 gap-y-4 pt-2 md:grid-cols-2">
                                 <CustomFormInput
                                     label="Sell / Current Price"
                                     name="discountPrice"
@@ -271,10 +300,9 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Product Variants"
                         content={
-                            <div className="grid pt-1 md:gap-6 gap-4">
+                            <div className="grid gap-4 pt-1 md:gap-6">
                                 <p className="text-muted-foreground">
-                                    You can add multiple variant for a single
-                                    product here. Like Size, Color, and Weight
+                                    You can add multiple variant for a single product here. Like Size, Color, and Weight
                                     etc.
                                 </p>
 
@@ -283,19 +311,12 @@ const AddProduct = () => {
                                         key={index}
                                         index={index}
                                         variant={variant}
-                                        deleteVariant={() =>
-                                            handleDeleteVariant(index)
-                                        }
+                                        deleteVariant={() => handleDeleteVariant(index)}
                                         form={form}
                                     />
                                 ))}
 
-                                <Button
-                                    onClick={handleAddVariant}
-                                    variant="accent"
-                                    className="w-fit"
-                                    type="button"
-                                >
+                                <Button onClick={handleAddVariant} variant="accent" className="w-fit" type="button">
                                     <Plus className="size-4" />
                                     Add New Variant
                                 </Button>
@@ -306,7 +327,7 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Product Details"
                         content={
-                            <div className="grid pt-2 md:grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid gap-x-6 gap-y-4 pt-2 md:grid-cols-2">
                                 <CustomFormSearchSelect
                                     label="Delivery Charge"
                                     name="deliveryId"
@@ -325,26 +346,18 @@ const AddProduct = () => {
                                     className="col-span-2"
                                 />
                                 <div className="col-span-2 space-y-2.5">
-                                    <Label className="title">
-                                        Product Description
-                                    </Label>
+                                    <Label className="title">Product Description</Label>
                                     <Editor
                                         content={form.watch("fullDescription")}
                                         onChange={(content) => {
-                                            form.setValue(
-                                                "fullDescription",
-                                                content
-                                            );
+                                            form.setValue("fullDescription", content);
+                                            // Use debounced auto-save for editor
+                                            debouncedAutoSave(form.getValues());
                                         }}
                                     />
 
                                     {form.formState.errors.fullDescription && (
-                                        <p className="text-red-500">
-                                            {
-                                                form.formState.errors
-                                                    .fullDescription.message
-                                            }
-                                        </p>
+                                        <p className="text-red-500">{form.formState.errors.fullDescription.message}</p>
                                     )}
                                 </div>
                                 <CustomFormTextarea
@@ -364,7 +377,8 @@ const AddProduct = () => {
                 <DiscardAndSaveButton
                     form={form}
                     isCreating={isCreating}
-                    className="flex border-t justify-end p-4"
+                    onSaveDraft={saveDraft}
+                    className="flex justify-end border-t p-4"
                 />
             </form>
         </Form>
@@ -372,149 +386,3 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
-
-const VariantCard = ({
-    variant,
-    deleteVariant,
-    index,
-    form,
-}: {
-    variant: ProductFormType["productVariant"][number];
-    deleteVariant: () => void;
-    index: number;
-    form: UseFormReturn<ProductFormType>;
-}) => {
-    const handleAddOption = () => {
-        form.setValue(`productVariant.${index}.productVariantOptions`, [
-            ...variant.productVariantOptions,
-            { name: "", sku: "", extraPrice: 0, imgUrl: "" },
-        ]);
-    };
-
-    const handleDeleteOption = (optionIndex: number) => {
-        if (variant.productVariantOptions.length > 1) {
-            form.setValue(
-                `productVariant.${index}.productVariantOptions`,
-                variant.productVariantOptions.filter(
-                    (_, index) => index !== optionIndex
-                )
-            );
-        } else {
-            toast.error("At least one option is required for each variant");
-        }
-    };
-
-    return (
-        <div className="border rounded-lg max-w-6xl p-6 border-primary">
-            <div className="flex justify-between">
-                <CustomFormSwitch
-                    name={`productVariant.${index}.isRequired`}
-                    control={form.control}
-                    label="Make this variant mandatory"
-                    labelClassName="text-base"
-                    description="Toggle this on if you want your customer to select at
-                        least one of the variant options"
-                    parentClassName="justify-between max-w-[96%]"
-                />
-                <Button
-                    onClick={deleteVariant}
-                    variant="destructiveOutline"
-                    size="icon"
-                    type="button"
-                >
-                    <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-            </div>
-
-            <CustomFormInput
-                label="Title"
-                name={`productVariant.${index}.name`}
-                className="pt-6 mb-4"
-                control={form.control}
-                placeholder="Enter the name of the variant (e.g. Size, Color, Material, etc.)"
-                required
-            />
-
-            {variant.productVariantOptions.map((_option, optionIndex) => (
-                <div key={optionIndex} className="flex  gap-6 pt-4">
-                    <CustomFormInput
-                        label="Name"
-                        name={`productVariant.${index}.productVariantOptions.${optionIndex}.name`}
-                        control={form.control}
-                        placeholder="Enter variant option (e.g., Red, Large, Cotton)"
-                        required
-                    />
-                    <CustomFormInput
-                        label="SKU"
-                        name={`productVariant.${index}.productVariantOptions.${optionIndex}.sku`}
-                        control={form.control}
-                        placeholder="Enter variant option (e.g., Red, Large, Cotton)"
-                    />
-                    <CustomFormInput
-                        label="Extra Price"
-                        name={`productVariant.${index}.productVariantOptions.${optionIndex}.extraPrice`}
-                        control={form.control}
-                        type="number"
-                        placeholder="Enter the extra price of the variant"
-                    />
-                    <CustomFormImage
-                        name={`productVariant.${index}.productVariantOptions.${optionIndex}.imgUrl`}
-                        control={form.control}
-                        label="Image"
-                        className=""
-                        limit={1}
-                        isMinimal
-                    />
-                    <Button
-                        onClick={() => handleDeleteOption(optionIndex)}
-                        variant="destructiveOutline"
-                        size="icon"
-                        type="button"
-                        className="mt-6"
-                    >
-                        <X />
-                    </Button>
-                </div>
-            ))}
-
-            <Button
-                onClick={handleAddOption}
-                variant="accent"
-                className="w-fit mt-6"
-                type="button"
-            >
-                <Plus className="size-4" />
-                Add New Option
-            </Button>
-        </div>
-    );
-};
-
-const DiscardAndSaveButton = ({
-    form,
-    isCreating,
-    className,
-}: {
-    form: UseFormReturn<ProductFormType>;
-    isCreating: boolean;
-    className?: string;
-}) => {
-    return (
-        <div className={cn("items-center gap-2", className)}>
-            <CustomButton
-                href="/products"
-                variant="outline"
-                type="button"
-                disabled={form.formState.isSubmitting || isCreating}
-            >
-                Discard
-            </CustomButton>
-            <CustomButton
-                isLoading={isCreating || form.formState.isSubmitting}
-                type="submit"
-            >
-                Save Product
-            </CustomButton>
-        </div>
-    );
-};

@@ -23,6 +23,10 @@ const nextConfig = {
                 protocol: "https",
                 hostname: "evotechbd.info",
             },
+            {
+                protocol: "https",
+                hostname: "i.ibb.co.com",
+            },
         ],
     },
 };

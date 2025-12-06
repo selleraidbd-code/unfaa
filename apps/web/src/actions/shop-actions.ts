@@ -1,5 +1,6 @@
 import { config } from "@/config";
 import { ResponseObject } from "@/types";
+
 import { Shop } from "@/types/shop-type";
 
 export const getShops = async (): Promise<ResponseObject<Shop[]> | null> => {
@@ -17,15 +18,11 @@ export const getShops = async (): Promise<ResponseObject<Shop[]> | null> => {
     }
 };
 
-export const getShopDetails = async (
-    slug: string
-): Promise<ResponseObject<Shop> | null> => {
+export const getShopDetails = async (slug: string): Promise<ResponseObject<Shop> | null> => {
     const shopSlug = slug.split(".")[0];
 
     try {
-        const response = await fetch(
-            `${config.serverUrl}/shop/details/${shopSlug}`
-        );
+        const response = await fetch(`${config.serverUrl}/shop/details/${shopSlug}`);
 
         if (!response.ok) {
             throw new Error("Failed to fetch shop layout details");

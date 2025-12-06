@@ -31,11 +31,7 @@ export type ShopThemeCategory = {
 };
 
 // Shop section types
-export type ShopSectionType =
-    | "productSlider"
-    | "banner"
-    | "category"
-    | "featured";
+export type ShopSectionType = "productSlider" | "banner" | "category" | "featured";
 
 export type ShopSection = {
     id: string;
@@ -82,12 +78,7 @@ export type ShopType =
     | "automotive"
     | "other";
 
-export type ShopStatus =
-    | "active"
-    | "inactive"
-    | "underReview"
-    | "suspended"
-    | "pending";
+export type ShopStatus = "active" | "inactive" | "underReview" | "suspended" | "pending";
 
 export type Shop = {
     id: string;
@@ -116,6 +107,8 @@ export type Shop = {
     walmartLink?: string;
     linkedInLink?: string;
     whatsappNumber?: string;
+
+    delivery: Delivery[];
 };
 
 // Shop owner types
@@ -130,11 +123,13 @@ export type ShopOwner = {
 // Delivery types
 export type Delivery = {
     id: string;
+    shopId: string;
+    scope: string;
     name: string;
-    description?: string;
-    price: number;
-    estimatedDays: number;
-    isActive: boolean;
+    isFree: boolean;
+    createdAt: string;
+    updatedAt: string;
+    isRequired: boolean;
 };
 
 // Brand types

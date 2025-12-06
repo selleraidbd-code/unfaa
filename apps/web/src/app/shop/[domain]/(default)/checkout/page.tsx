@@ -1,23 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import BillingDetails from "@/features/shop/checkout/BillingDetails";
-import { CircleDot } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { makeOrder } from "@/actions/order-actions";
-import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 import { useShop } from "@/contexts/shop-context";
-import { getLink } from "@/lib/get-link";
-import { CartItem, cartStorage } from "@/lib/cart";
-import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
+import BillingDetails from "@/features/shop/checkout/BillingDetails";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { CircleDot } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
+import { CartItem, cartStorage } from "@/lib/cart";
+import { getLink } from "@/lib/get-link";
+import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 
 const formSchema = z.object({
     name: z
@@ -145,23 +145,22 @@ const Page = () => {
         });
     };
 
+    const formErrors = form.formState.errors;
+    console.log(formErrors);
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="container py-12 max-sm:px-3 lg:py-16">
                     <div className="flex gap-10 max-lg:flex-col lg:gap-16">
                         <div className="w-full lg:w-[55%]">
-                            <h2 className="font-medium lg:text-xl">
-                                অর্ডার সম্পর্কিত তথ্য
-                            </h2>
+                            <h2 className="font-medium lg:text-xl">অর্ডার সম্পর্কিত তথ্য</h2>
                             <BillingDetails />
                         </div>
                         <div className="w-full lg:w-[45%]">
-                            <h2 className="font-medium lg:text-xl">
-                                আপনার অর্ডার
-                            </h2>
+                            <h2 className="font-medium lg:text-xl">আপনার অর্ডার</h2>
                             <div className="py-6">
-                                <div className="flex items-center border-b border-dashed border-foreground/20 pb-3 max-lg:justify-between max-lg:text-sm lg:pb-4">
+                                <div className="border-foreground/20 flex items-center border-b border-dashed pb-3 max-lg:justify-between max-lg:text-sm lg:pb-4">
                                     <p className="lg:w-[70%]">প্রোডাক্ট</p>
                                     <p className="lg:w-[30%]">সাবটোটাল</p>
                                 </div>
@@ -181,16 +180,10 @@ const Page = () => {
                                                 />
                                                 <div>
                                                     <p>{item.name}</p>
-                                                    {item.selectedVariants
-                                                        .length > 0 && (
-                                                        <p className="text-sm text-muted-foreground">
+                                                    {item.selectedVariants.length > 0 && (
+                                                        <p className="text-muted-foreground text-sm">
                                                             Variant:{" "}
-                                                            {item.selectedVariants
-                                                                .map(
-                                                                    (v) =>
-                                                                        v.optionName
-                                                                )
-                                                                .join(", ")}
+                                                            {item.selectedVariants.map((v) => v.optionName).join(", ")}
                                                         </p>
                                                     )}
                                                 </div>
@@ -198,21 +191,17 @@ const Page = () => {
 
                                             <div className="w-[30%]">
                                                 <span>
-                                                    {item.quantity} × ৳{" "}
-                                                    {item.price || 0}
+                                                    {item.quantity} × ৳ {item.price || 0}
                                                 </span>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="space-y-4 border-y border-dashed border-foreground/20 py-3 max-lg:text-sm">
+                                <div className="border-foreground/20 space-y-4 border-y border-dashed py-3 max-lg:text-sm">
                                     <div className="flex items-center justify-between">
                                         <p className="w-[70%]">সাবটোটাল</p>
-                                        <p className="w-[30%]">
-                                            ৳{" "}
-                                            {summary.subtotal.toLocaleString()}
-                                        </p>
+                                        <p className="w-[30%]">৳ {summary.subtotal.toLocaleString()}</p>
                                     </div>
 
                                     <div className="flex items-center justify-between">
@@ -222,32 +211,24 @@ const Page = () => {
                                 </div>
                                 <div className="flex items-center justify-between pt-3 font-medium">
                                     <p className="w-[70%]">টোটাল</p>
-                                    <p className="w-[30%]">
-                                        ৳ {summary.total.toLocaleString()}
-                                    </p>
+                                    <p className="w-[30%]">৳ {summary.total.toLocaleString()}</p>
                                 </div>
                             </div>
 
                             <div className="bg-primary/10 p-4 lg:p-6">
                                 <h2 className="flex items-center gap-3 pb-4 font-medium lg:text-lg">
-                                    <CircleDot className="size-5 text-primary" />
+                                    <CircleDot className="text-primary size-5" />
                                     ক্যাশঅন ডেলিভারি
                                 </h2>
                                 <div className="relative flex items-center gap-2 bg-white p-2 px-3 max-lg:text-sm">
-                                    <p className="z-20">
-                                        পন্য হাতে পেয়ে মূল্য পরিশোধ করবেন
-                                    </p>
+                                    <p className="z-20">পন্য হাতে পেয়ে মূল্য পরিশোধ করবেন</p>
                                     <span className="absolute -top-px left-7 z-0 h-4 w-4 -translate-y-1/2 rotate-45 bg-white"></span>
                                 </div>
                             </div>
 
                             <div className="pt-10">
-                                <Button
-                                    type="submit"
-                                    className="h-12 w-full text-base lg:h-14 lg:text-lg"
-                                >
-                                    অর্ডার করুন ৳{" "}
-                                    {summary.total.toLocaleString()}
+                                <Button type="submit" className="h-12 w-full text-base lg:h-14 lg:text-lg">
+                                    অর্ডার করুন ৳ {summary.total.toLocaleString()}
                                 </Button>
                             </div>
                         </div>

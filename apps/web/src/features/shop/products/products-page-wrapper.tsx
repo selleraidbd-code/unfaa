@@ -1,22 +1,9 @@
 "use client";
 
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@workspace/ui/components/accordion";
-import { Checkbox } from "@workspace/ui/components/checkbox";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@workspace/ui/components/select";
-import { HomeIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { Brand, Category } from "@/types/shop-type";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@workspace/ui/components/accordion";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -26,11 +13,14 @@ import {
     BreadcrumbSeparator,
 } from "@workspace/ui/components/breadcrumb";
 import { Button } from "@workspace/ui/components/button";
+import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Label } from "@workspace/ui/components/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { Separator } from "@workspace/ui/components/separator";
 import { Slider } from "@workspace/ui/components/slider";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { HomeIcon } from "lucide-react";
+
+import { Brand, Category } from "@/types/shop-type";
 import { getLink } from "@/lib/get-link";
 
 type ProductsPageWrapperProps = {
@@ -59,10 +49,7 @@ export const ProductsPageWrapper = ({
         setSelectedSort(sort);
     };
 
-    const [priceRange, setPriceRange] = useState<[number, number]>([
-        minPrice,
-        maxPrice,
-    ]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([minPrice, maxPrice]);
 
     const updatePriceRangeInURL = (newRange: [number, number]) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -106,7 +93,7 @@ export const ProductsPageWrapper = ({
                             href={getLink({ shopSlug: shopSlug, path: "/" })}
                             className="flex items-center gap-2"
                         >
-                            <HomeIcon className="w-4 h-4" />
+                            <HomeIcon className="h-4 w-4" />
                             Home
                         </BreadcrumbLink>
                     </BreadcrumbItem>
@@ -117,87 +104,74 @@ export const ProductsPageWrapper = ({
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="grid lg:grid-cols-[250px_1fr] gap-10">
+            <div className="grid gap-10 lg:grid-cols-[250px_1fr]">
                 {/* Sidebar */}
                 <aside className="max-lg:hidden">
-                    <Accordion type="multiple" defaultValue={["category"]}>
-                        <AccordionItem value="category" className="space-y-4">
-                            <AccordionTrigger className="text-base font-semibold py-1">
-                                Category
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-4">
-                                {categories.map((category) => (
-                                    <div
-                                        key={category.id}
-                                        className="flex items-center space-x-2"
-                                    >
-                                        <Checkbox
-                                            className="border-muted-foreground"
-                                            id={category.id}
-                                        />
-                                        <label
-                                            htmlFor={category.id}
-                                            className="text-base cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                        >
-                                            {category.name}
-                                        </label>
-                                    </div>
-                                ))}
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                    {categories.length > 0 && (
+                        <>
+                            <Accordion type="multiple" defaultValue={["category"]}>
+                                <AccordionItem value="category" className="space-y-4">
+                                    <AccordionTrigger className="py-1 text-base font-semibold">
+                                        Category
+                                    </AccordionTrigger>
+                                    <AccordionContent className="space-y-4">
+                                        {categories.map((category) => (
+                                            <div key={category.id} className="flex items-center space-x-2">
+                                                <Checkbox className="border-muted-foreground" id={category.id} />
+                                                <label
+                                                    htmlFor={category.id}
+                                                    className="cursor-pointer text-base peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                >
+                                                    {category.name}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
 
-                    <Separator className="my-4 border-muted-foreground" />
+                            <Separator className="border-muted-foreground my-4" />
+                        </>
+                    )}
 
-                    <Accordion type="multiple" defaultValue={["brand"]}>
-                        <AccordionItem value="brand" className="space-y-4">
-                            <AccordionTrigger className="text-base font-semibold py-1">
-                                Brand
-                            </AccordionTrigger>
-                            <AccordionContent className="space-y-4">
-                                {brands.map((brand) => (
-                                    <div
-                                        key={brand.id}
-                                        className="flex items-center space-x-2"
-                                    >
-                                        <Checkbox
-                                            className="border-muted-foreground"
-                                            id={brand.id}
-                                        />
-                                        <label
-                                            htmlFor={brand.id}
-                                            className="text-base cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                        >
-                                            {brand.name}
-                                        </label>
-                                    </div>
-                                ))}
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                    {brands.length > 0 && (
+                        <>
+                            <Accordion type="multiple" defaultValue={["brand"]}>
+                                <AccordionItem value="brand" className="space-y-4">
+                                    <AccordionTrigger className="py-1 text-base font-semibold">Brand</AccordionTrigger>
+                                    <AccordionContent className="space-y-4">
+                                        {brands.map((brand) => (
+                                            <div key={brand.id} className="flex items-center space-x-2">
+                                                <Checkbox className="border-muted-foreground" id={brand.id} />
+                                                <label
+                                                    htmlFor={brand.id}
+                                                    className="cursor-pointer text-base peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                >
+                                                    {brand.name}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
 
-                    <Separator className="my-4 border-muted-foreground" />
+                            <Separator className="border-muted-foreground my-4" />
+                        </>
+                    )}
 
                     <Accordion type="multiple" defaultValue={["price"]}>
                         <AccordionItem value="price" className="space-y-4">
-                            <AccordionTrigger className="text-base font-semibold py-1">
-                                Price Range
-                            </AccordionTrigger>
+                            <AccordionTrigger className="py-1 text-base font-semibold">Price Range</AccordionTrigger>
                             <AccordionContent className="space-y-4">
                                 <div className="space-y-4">
                                     <div className="space-y-3">
                                         <Label className="text-sm font-medium">
-                                            Price:{" "}
-                                            <span>৳ {priceRange[0]}</span> -{" "}
-                                            <span>৳ {priceRange[1]}</span>
+                                            Price: <span>৳ {priceRange[0]}</span> - <span>৳ {priceRange[1]}</span>
                                         </Label>
                                         <Slider
                                             value={priceRange}
                                             onValueChange={(value) => {
-                                                const newRange = value as [
-                                                    number,
-                                                    number,
-                                                ];
+                                                const newRange = value as [number, number];
                                                 setPriceRange(newRange);
                                                 updatePriceRangeInURL(newRange);
                                             }}
@@ -207,7 +181,7 @@ export const ProductsPageWrapper = ({
                                             className="w-full"
                                         />
                                     </div>
-                                    <div className="flex justify-between text-sm text-muted-foreground">
+                                    <div className="text-muted-foreground flex justify-between text-sm">
                                         <span>৳ {0}</span>
                                         <span>৳ {1000}</span>
                                     </div>
@@ -217,11 +191,7 @@ export const ProductsPageWrapper = ({
                     </Accordion>
 
                     {hasActiveFilters() && (
-                        <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={clearFilters}
-                        >
+                        <Button variant="outline" className="w-full" onClick={clearFilters}>
                             Clear Filters
                         </Button>
                     )}
@@ -234,23 +204,14 @@ export const ProductsPageWrapper = ({
 
                         <div className="flex items-center gap-2">
                             <span>Sort By:</span>
-                            <Select
-                                value={selectedSort}
-                                onValueChange={handleSortChange}
-                            >
-                                <SelectTrigger className="w-40 h-8 text-sm">
+                            <Select value={selectedSort} onValueChange={handleSortChange}>
+                                <SelectTrigger className="h-8 w-40 text-sm">
                                     <SelectValue placeholder="Sort" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Low to High">
-                                        Low to High
-                                    </SelectItem>
-                                    <SelectItem value="High to Low">
-                                        High to Low
-                                    </SelectItem>
-                                    <SelectItem value="Newest Arrivals">
-                                        Newest Arrivals
-                                    </SelectItem>
+                                    <SelectItem value="Low to High">Low to High</SelectItem>
+                                    <SelectItem value="High to Low">High to Low</SelectItem>
+                                    <SelectItem value="Newest Arrivals">Newest Arrivals</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

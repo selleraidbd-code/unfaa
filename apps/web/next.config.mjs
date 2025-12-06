@@ -9,6 +9,10 @@ const nextConfig = {
             },
             {
                 protocol: "https",
+                hostname: "multi-media-server.naimurrhman.com",
+            },
+            {
+                protocol: "https",
                 hostname: "buytiq.com",
             },
             {

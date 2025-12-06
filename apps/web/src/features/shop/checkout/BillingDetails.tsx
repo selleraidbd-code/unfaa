@@ -3,29 +3,14 @@ import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-inp
 import { CustomFormSelect } from "@workspace/ui/components/custom/custom-form-select";
 import { useFormContext } from "react-hook-form";
 
-// Mock delivery zones - in a real app, this would come from an API
-const MOCK_DELIVERY_ZONES = [
-    {
-        value: "ae5255f5-49d9-492b-94d0-80d937c1260d",
-        label: "ঢাকা সিটি (ফ্রি)",
-    },
-    {
-        value: "be5255f5-49d9-492b-94d0-80d937c1260e",
-        label: "ঢাকা মেট্রো (৳50)",
-    },
-    {
-        value: "ce5255f5-49d9-492b-94d0-80d937c1260f",
-        label: "চট্টগ্রাম (৳100)",
-    },
-    {
-        value: "de5255f5-49d9-492b-94d0-80d937c1260g",
-        label: "সিলেট (৳150)",
-    },
-];
-
 const BillingDetails = () => {
     const { shop } = useShop();
-    console.log("shop", shop);
+
+    const deliveryZones = shop?.delivery?.map((delivery) => ({
+        value: delivery.id,
+        label: delivery.name,
+    }));
+
     const { control } = useFormContext();
 
     return (
@@ -57,7 +42,7 @@ const BillingDetails = () => {
                 control={control}
                 label="ডেলিভারি জোন নির্বাচন করুন"
                 placeholder="ডেলিভারি জোন বেছে নিন"
-                options={MOCK_DELIVERY_ZONES}
+                options={deliveryZones}
                 required
             />
         </div>

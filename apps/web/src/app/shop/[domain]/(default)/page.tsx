@@ -35,10 +35,9 @@ const page = async ({ params }: { params: Promise<{ domain: string }> }) => {
     return (
         <div>
             <HeroSection />
-            <HomeCategories
-                categories={categories}
-                shopSlug={shopDetails?.data?.slug as string}
-            />
+            {categories.length > 0 && (
+                <HomeCategories categories={categories} shopSlug={shopDetails?.data?.slug as string} />
+            )}
 
             {/* Top Selling Products  */}
 

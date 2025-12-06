@@ -1,6 +1,5 @@
 "use client";
 
-import { FileText, Package, Truck } from "lucide-react";
 import { useState } from "react";
 
 import { PendingParcel } from "@/features/orders/pending-percel";
@@ -12,6 +11,7 @@ import {
     CustomTabsList,
     CustomTabsTrigger,
 } from "@workspace/ui/components/custom/custom-tabs";
+import { FileText, Package, Truck } from "lucide-react";
 
 const Page = () => {
     const [activeTab, setActiveTab] = useState("pending-parcel");
@@ -22,27 +22,18 @@ const Page = () => {
 
             <CustomTabs value={activeTab} onValueChange={setActiveTab}>
                 <CustomTabsList>
-                    <CustomTabsTrigger
-                        value="ready-for-dispatch"
-                        icon={<Truck className="size-4 lg:size-5" />}
-                    >
+                    <CustomTabsTrigger value="ready-for-dispatch" icon={<Truck className="size-4 lg:size-5" />}>
                         Ready for Dispatch
                     </CustomTabsTrigger>
-                    <CustomTabsTrigger
-                        value="pending-parcel"
-                        icon={<Package className="size-4 lg:size-5" />}
-                    >
+                    <CustomTabsTrigger value="pending-parcel" icon={<Package className="size-4 lg:size-5" />}>
                         Pending Parcel
                     </CustomTabsTrigger>
-                    <CustomTabsTrigger
-                        value="rider-note"
-                        icon={<FileText className="size-4 lg:size-5" />}
-                    >
+                    <CustomTabsTrigger value="rider-note" icon={<FileText className="size-4 lg:size-5" />}>
                         Rider Note
                     </CustomTabsTrigger>
                 </CustomTabsList>
 
-                <CustomTabsContent value="ready-for-dispatch" className="mt-6">
+                <CustomTabsContent value="ready-for-dispatch">
                     <ReadyToDispatch />
                 </CustomTabsContent>
 

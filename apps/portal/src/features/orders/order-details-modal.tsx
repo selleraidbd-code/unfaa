@@ -1,18 +1,13 @@
-import Image from "next/image";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-
-import {
-    useDeleteOrderMutation,
-    useUpdateOrderMutation,
-} from "@/redux/api/order-api";
-import { PhoneCall, Trash2 } from "lucide-react";
-import { toast } from "@workspace/ui/components/sonner";
+import Image from "next/image";
 
 import { orderStatusOptions } from "@/features/orders/data";
-import { useAlert } from "@/hooks/useAlert";
-import { Order, OrderDetailsItem, OrderStatus } from "@/types/order-type";
+import { useDeleteOrderMutation, useUpdateOrderMutation } from "@/redux/api/order-api";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@workspace/ui/components/accordion";
 import { Button } from "@workspace/ui/components/button";
+import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
+import { CustomFormSelect } from "@workspace/ui/components/custom/custom-form-select";
+import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import { CustomSelect } from "@workspace/ui/components/custom/custom-select";
 import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
@@ -24,17 +19,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@workspace/ui/components/dialog";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@workspace/ui/components/accordion";
-import { formatDate } from "@workspace/ui/lib/formateDate";
 import { Form } from "@workspace/ui/components/form";
-import { CustomFormSelect } from "@workspace/ui/components/custom/custom-form-select";
-import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
-import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
+import { toast } from "@workspace/ui/components/sonner";
+import { formatDate } from "@workspace/ui/lib/formateDate";
+import { PhoneCall, Trash2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+
+import { Order, OrderDetailsItem, OrderStatus } from "@/types/order-type";
+import { useAlert } from "@/hooks/useAlert";
 
 type OrderFormData = {
     customerName: string;
@@ -71,11 +63,7 @@ export const OrderDetailsModal = ({
 
     const total = order?.orderItems.reduce(
         (acc, item) =>
-            acc +
-            (item?.product?.discountPrice ||
-                item?.productVariant?.[0]?.discountPrice ||
-                0) *
-                item.quantity,
+            acc + (item?.product?.discountPrice || item?.orderItemVariant?.[0]?.discountPrice || 0) * item.quantity,
         0
     );
 
@@ -115,9 +103,7 @@ export const OrderDetailsModal = ({
                             onOpenChange(false);
                         })
                         .catch((error) => {
-                            toast.error(
-                                error.data?.message || "Failed to delete order"
-                            );
+                            toast.error(error.data?.message || "Failed to delete order");
                         });
                 },
             });
@@ -131,22 +117,17 @@ export const OrderDetailsModal = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="md:max-w-4xl overflow-y-auto">
+            <DialogContent className="overflow-y-auto md:max-w-4xl">
                 <DialogHeader>
-                    <DialogTitle className="flex pr-5 justify-between">
+                    <DialogTitle className="flex justify-between pr-5">
                         <div className="space-y-1">
                             <p className="flex items-center gap-4">
-                                Order Details{" "}
-                                <CustomTextCopy
-                                    text={order?.orderNumber.toString() || ""}
-                                    copy={true}
-                                />
+                                Order Details <CustomTextCopy text={order?.orderNumber.toString() || ""} copy={true} />
                             </p>
-                            <span className="text-xs text-muted-foreground">
+                            <span className="text-muted-foreground text-xs">
                                 Last updated:{" "}
                                 <time dateTime={order?.updatedAt || ""}>
-                                    {formatDate(order?.updatedAt || "") ||
-                                        "N/A"}
+                                    {formatDate(order?.updatedAt || "") || "N/A"}
                                 </time>
                             </span>
                         </div>
@@ -156,26 +137,16 @@ export const OrderDetailsModal = ({
                             Call Customer
                         </Button>
                     </DialogTitle>
-                    <DialogDescription className="sr-only">
-                        Edit and manage order information
-                    </DialogDescription>
+                    <DialogDescription className="sr-only">Edit and manage order information</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(handleSubmit)}
-                        className="space-y-4"
-                    >
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
                         <div className="grid gap-4 pt-4 md:grid-cols-2">
                             <CustomInput
                                 label="Customer Name"
                                 placeholder="Enter customer name"
                                 value={form.watch("customerName")}
-                                onChange={(value) =>
-                                    form.setValue(
-                                        "customerName",
-                                        value as string
-                                    )
-                                }
+                                onChange={(value) => form.setValue("customerName", value as string)}
                                 required
                             />
                             <CustomInput
@@ -183,12 +154,7 @@ export const OrderDetailsModal = ({
                                 placeholder="Enter phone number"
                                 type="text"
                                 value={form.watch("customerPhoneNumber")}
-                                onChange={(value) =>
-                                    form.setValue(
-                                        "customerPhoneNumber",
-                                        value as string
-                                    )
-                                }
+                                onChange={(value) => form.setValue("customerPhoneNumber", value as string)}
                                 required
                             />
 
@@ -213,12 +179,7 @@ export const OrderDetailsModal = ({
                             label="Address"
                             placeholder="Enter customer address"
                             value={form.watch("customerAddress")}
-                            onChange={(value) =>
-                                form.setValue(
-                                    "customerAddress",
-                                    value as string
-                                )
-                            }
+                            onChange={(value) => form.setValue("customerAddress", value as string)}
                             required
                         />
 
@@ -231,28 +192,21 @@ export const OrderDetailsModal = ({
                             className="w-full"
                         />
 
-                        <Accordion
-                            type="single"
-                            collapsible
-                            className="w-full border rounded-lg px-4"
-                        >
+                        <Accordion type="single" collapsible className="w-full rounded-lg border px-4">
                             <AccordionItem value="order-items">
                                 <AccordionTrigger className="text-base hover:no-underline">
                                     View Order Items ({order.orderItems.length})
                                 </AccordionTrigger>
 
                                 <AccordionContent>
-                                    <div className="space-y-3 pt-2 max-h-60 overflow-y-auto">
+                                    <div className="max-h-60 space-y-3 overflow-y-auto pt-2">
                                         {order.orderItems.map((item) => (
-                                            <OrderItems
-                                                key={item.id}
-                                                item={item}
-                                            />
+                                            <OrderItems key={item.id} item={item} />
                                         ))}
                                     </div>
 
                                     {/* Order Summary */}
-                                    <div className="space-y-3 border-t pt-4 mt-4">
+                                    <div className="mt-4 space-y-3 border-t pt-4">
                                         {/* <div className="flex justify-between">
                                             <span className="text-muted-foreground">
                                                 Subtotal
@@ -266,7 +220,7 @@ export const OrderDetailsModal = ({
                                             <span>Free</span>
                                         </div>
                                         <Separator /> */}
-                                        <div className="flex justify-between font-semibold text-lg">
+                                        <div className="flex justify-between text-lg font-semibold">
                                             <span>Total</span>
                                             <span>৳ {total || 0}</span>
                                         </div>
@@ -287,7 +241,7 @@ export const OrderDetailsModal = ({
                                 Delete Order
                             </Button>
 
-                            <div className="flex  gap-5 items-center">
+                            <div className="flex items-center gap-5">
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -296,13 +250,8 @@ export const OrderDetailsModal = ({
                                 >
                                     Cancel
                                 </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={isUpdating || isDeleting}
-                                >
-                                    {isUpdating
-                                        ? "Updating..."
-                                        : "Update Order"}
+                                <Button type="submit" disabled={isUpdating || isDeleting}>
+                                    {isUpdating ? "Updating..." : "Update Order"}
                                 </Button>
                             </div>
                         </DialogFooter>
@@ -317,7 +266,7 @@ const OrderItems = ({ item }: { item: OrderDetailsItem }) => {
     return (
         <div
             key={`${item.productId}-${item.productVariantId}`}
-            className="flex items-center gap-3 p-3 border rounded-lg"
+            className="flex items-center gap-3 rounded-lg border p-3"
         >
             <Image
                 unoptimized
@@ -327,26 +276,16 @@ const OrderItems = ({ item }: { item: OrderDetailsItem }) => {
                 height={60}
                 className="size-16 rounded-sm object-cover"
             />
-            <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">
-                    {item.product?.banglaName || item.product?.name}
-                </p>
-                {item.productVariant?.length > 0 && (
-                    <p className="text-sm text-muted-foreground">
-                        Variant: {item.productVariant?.[0]?.name || ""}
-                    </p>
+            <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{item.product?.banglaName || item.product?.name}</p>
+                {item.orderItemVariant?.length > 0 && (
+                    <p className="text-muted-foreground text-sm">Variant: {item.orderItemVariant?.[0]?.name || ""}</p>
                 )}
-                <p className="text-sm text-muted-foreground">
-                    Qty: {item.quantity}
-                </p>
+                <p className="text-muted-foreground text-sm">Qty: {item.quantity}</p>
             </div>
             <div className="text-right">
-                <p className="font-medium">
-                    ৳ {item.product?.discountPrice || item.product?.price}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                    × {item.quantity}
-                </p>
+                <p className="font-medium">৳ {item.product?.discountPrice || item.product?.price}</p>
+                <p className="text-muted-foreground text-sm">× {item.quantity}</p>
             </div>
         </div>
     );

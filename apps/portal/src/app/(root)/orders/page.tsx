@@ -1,26 +1,23 @@
 "use client";
 
-import { PaginationState } from "@tanstack/react-table";
-import { Bot, DownloadCloud, Plus, Truck } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { Meta } from "@/components/table/data-table";
-import { CustomButton } from "@/components/ui/custom-button";
 import { orderStatusOptions } from "@/features/orders/data";
 import { OrderDetailsModal } from "@/features/orders/order-details-modal";
 import { OrderTable } from "@/features/orders/order-table";
-import { useAppSelector } from "@/redux/store/hook";
 import { useCourierEntryMutation } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
-import { Order, OrderStatus } from "@/types/order-type";
+import { useAppSelector } from "@/redux/store/hook";
+import { PaginationState } from "@tanstack/react-table";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
-import {
-    CustomTabs,
-    CustomTabsList,
-    CustomTabsTrigger,
-} from "@workspace/ui/components/custom/custom-tabs";
+import { CustomTabs, CustomTabsList, CustomTabsTrigger } from "@workspace/ui/components/custom/custom-tabs";
 import { toast } from "@workspace/ui/components/sonner";
+import { Bot, DownloadCloud, Plus, Truck } from "lucide-react";
+
+import { Order, OrderStatus } from "@/types/order-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { Meta } from "@/components/table/data-table";
 
 interface FilterParams {
     searchTerm?: string;
@@ -47,8 +44,7 @@ const OrdersPage = () => {
         limit: pageSize,
     });
 
-    const [courierEntry, { isLoading: isCourierEntryLoading }] =
-        useCourierEntryMutation();
+    const [courierEntry, { isLoading: isCourierEntryLoading }] = useCourierEntryMutation();
 
     const handleSearch = (value: string) => {
         setFilterParams({ ...filterParams, searchTerm: value });
@@ -73,12 +69,9 @@ const OrdersPage = () => {
     const handleCourierEntry = async () => {
         if (!user?.shop?.id || selectedRows.length === 0) return;
 
-        const confirmedIds = selectedRows
-            .filter((o) => o.orderStatus === OrderStatus.CONFIRMED)
-            .map((o) => o.id);
+        const confirmedIds = selectedRows.filter((o) => o.orderStatus === OrderStatus.CONFIRMED).map((o) => o.id);
 
-        if (confirmedIds.length === 0)
-            return toast.error("No confirmed orders to send to courier");
+        if (confirmedIds.length === 0) return toast.error("No confirmed orders to send to courier");
 
         await courierEntry({
             ids: confirmedIds,
@@ -90,9 +83,7 @@ const OrdersPage = () => {
                 setSelectedRows([]);
             })
             .catch((error) => {
-                toast.error(
-                    error.data?.message || "Failed to send orders to courier"
-                );
+                toast.error(error.data?.message || "Failed to send orders to courier");
                 setSelectedRows([]);
             });
     };
@@ -106,10 +97,8 @@ const OrdersPage = () => {
     return (
         <>
             <div className="grid gap-2 md:gap-4">
-                <div className="flex justify-between items-center">
-                    <h1 className="title">
-                        Orders ( {data?.meta?.total || 0} )
-                    </h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="title">Orders ( {data?.meta?.total || 0} )</h1>
 
                     <div className="flex items-center gap-4">
                         <CustomButton variant="accent">
@@ -137,11 +126,7 @@ const OrdersPage = () => {
                                 <CustomTabsTrigger
                                     key={tab.value}
                                     value={tab.value}
-                                    icon={
-                                        Icon ? (
-                                            <Icon className="size-4 lg:size-5" />
-                                        ) : undefined
-                                    }
+                                    icon={Icon ? <Icon className="size-4 lg:size-5" /> : undefined}
                                 >
                                     {tab.label}
                                 </CustomTabsTrigger>
@@ -150,19 +135,13 @@ const OrdersPage = () => {
                     </CustomTabsList>
                 </CustomTabs>
 
-                <div className="flex justify-between items-center">
-                    <CustomSearch
-                        onSearch={handleSearch}
-                        placeholder="Search orders"
-                    />
+                <div className="flex items-center justify-between">
+                    <CustomSearch onSearch={handleSearch} placeholder="Search orders" />
 
                     {activeTab === OrderStatus.CONFIRMED && (
                         <CustomButton
                             onClick={handleCourierEntry}
-                            disabled={
-                                selectedRows.length === 0 ||
-                                isCourierEntryLoading
-                            }
+                            disabled={selectedRows.length === 0 || isCourierEntryLoading}
                         >
                             <Truck />
                             Send to Courier
@@ -178,6 +157,7 @@ const OrdersPage = () => {
                     onPaginationChange={handlePaginationChange}
                     onRowClick={handleRowClick}
                     onSelectionChange={setSelectedRows}
+                    enableSelection={activeTab === OrderStatus.CONFIRMED}
                 />
             </div>
 

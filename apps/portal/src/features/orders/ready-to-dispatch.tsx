@@ -1,41 +1,113 @@
-import { DataStateHandler } from "@/components/shared/data-state-handler";
-import {
-    CustomPagination,
-    PaginationMeta,
-} from "@/components/ui/custom-pagination";
-import { useAppSelector } from "@/redux/store/hook";
+"use client";
+
+import { useCallback, useState } from "react";
+
 import { useGetOrdersQuery } from "@/redux/api/order-api";
-import { OrderStatus } from "@/types/order-type";
-import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
-import { cn } from "@workspace/ui/lib/utils";
-import { Calendar, MapPin, Package, Phone, Truck, User } from "lucide-react";
+import { useAppSelector } from "@/redux/store/hook";
+import { pdf } from "@react-pdf/renderer";
+import { CheckSquare, Square } from "lucide-react";
+
+import { Order, OrderStatus } from "@/types/order-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomPagination, PaginationMeta } from "@/components/ui/custom-pagination";
+import { OrderPDFDocument } from "@/components/pdf/order-pdf-document";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
+
+import { OrderCard } from "./order-card";
 
 export const ReadyToDispatch = () => {
     const user = useAppSelector((state) => state.auth.user);
+    const shop = user?.shop;
+    const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
+    const [isExporting, setIsExporting] = useState(false);
 
     const { data, isLoading } = useGetOrdersQuery({
-        shopId: user?.shop.id,
+        shopId: shop?.id,
         orderStatus: OrderStatus.SEND,
         page: 1,
         limit: 10,
     });
-
-    const getStatusColor = (status: OrderStatus) => {
-        switch (status) {
-            case OrderStatus.PROCESSING:
-                return "bg-indigo-100 text-indigo-800";
-            case OrderStatus.CONFIRMED:
-                return "bg-green-100 text-green-800";
-            default:
-                return "bg-gray-100 text-gray-800";
-        }
-    };
 
     const paginationMeta: PaginationMeta = {
         page: 1,
         limit: 10,
         total: data?.meta?.total || 0,
     };
+
+    const toggleOrderSelection = useCallback((orderId: string) => {
+        setSelectedOrders((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(orderId)) {
+                newSet.delete(orderId);
+            } else {
+                newSet.add(orderId);
+            }
+            return newSet;
+        });
+    }, []);
+
+    const toggleSelectAll = useCallback((orders: Order[]) => {
+        setSelectedOrders((prev) => {
+            if (prev.size === orders.length) {
+                return new Set();
+            }
+            return new Set(orders.map((order) => order.id));
+        });
+    }, []);
+
+    const handleSinglePDFExport = useCallback(
+        async (order: Order) => {
+            if (isExporting) return;
+            setIsExporting(true);
+            try {
+                const doc = (
+                    <OrderPDFDocument orders={[order]} shopLogo={shop?.photoURL} merchantId={shop?.merchantId} />
+                );
+                const blob = await pdf(doc).toBlob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `order-${order.consignmentId || order.orderNumber}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+            } finally {
+                setIsExporting(false);
+            }
+        },
+        [shop, isExporting]
+    );
+
+    const handleBulkPDFExport = useCallback(
+        async (orders: Order[]) => {
+            if (orders.length === 0 || isExporting) return;
+
+            setIsExporting(true);
+            try {
+                const doc = (
+                    <OrderPDFDocument orders={orders} shopLogo={shop?.photoURL} merchantId={shop?.merchantId} />
+                );
+                const blob = await pdf(doc).toBlob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `bulk-orders-${new Date().getTime()}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setSelectedOrders(new Set());
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+            } finally {
+                setIsExporting(false);
+            }
+        },
+        [shop, isExporting]
+    );
 
     return (
         <DataStateHandler
@@ -46,91 +118,76 @@ export const ReadyToDispatch = () => {
             emptyDescription="No orders found that haven't been sent to courier"
             emptyClassName="text-center py-12"
         >
-            {(notSentData) => (
-                <>
-                    <div className="mb-4 text-sm text-gray-600">
-                        Total Orders Not Sent: {notSentData?.meta?.total || 0}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {notSentData?.data?.map((order) => (
-                            <div
-                                key={order.id}
-                                className="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow"
-                            >
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Truck className="h-4 w-4 text-gray-500" />
-                                        <span className="font-semibold text-lg">
-                                            #{order.orderNumber}
-                                        </span>
-                                    </div>
-                                    <span
-                                        className={cn(
-                                            "px-2 py-1 rounded-full text-xs font-medium",
-                                            getStatusColor(order.orderStatus)
-                                        )}
-                                    >
-                                        {order.orderStatus}
-                                    </span>
-                                </div>
-                                {order.consignmentId && (
-                                    <div className="mb-3 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-md px-3 py-2">
-                                        <Package className="h-4 w-4 text-blue-600" />
-                                        <div className="flex-1">
-                                            <span className="text-xs text-blue-600 font-medium">
-                                                Consignment ID
-                                            </span>
-                                            <div className="text-sm font-semibold text-blue-900">
-                                                {order.consignmentId}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="space-y-2 mb-4">
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <User className="h-4 w-4" />
-                                        <span className="truncate">
-                                            {order.customerName}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <Phone className="h-4 w-4" />
-                                        <span>{order.customerPhoneNumber}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <MapPin className="h-4 w-4" />
-                                        <span className="truncate">
-                                            {order.customerAddress}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                        <Calendar className="h-4 w-4" />
-                                        <span>
-                                            {formatDateShortWithTime(
-                                                order.createdAt
-                                            )}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    {order.orderItems?.length || 0} items
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+            {(notSentData) => {
+                const orders = notSentData?.data || [];
+                const selectedOrdersList = orders.filter((order) => selectedOrders.has(order.id));
+                const allSelected = orders.length > 0 && selectedOrders.size === orders.length;
 
-                    <div className="mt-4 center">
-                        <CustomPagination
-                            paginationMeta={paginationMeta}
-                            showRowsPerPage={false}
-                            showRowSelection={false}
-                            showPageCount={false}
-                            onPageChange={() => {}}
-                            onLimitChange={() => {}}
-                        />
-                    </div>
-                </>
-            )}
+                return (
+                    <>
+                        <div className="mt-6 mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    Total Orders: {notSentData?.meta?.total || 0}
+                                </p>
+                                {orders.length > 0 && (
+                                    <button
+                                        onClick={() => toggleSelectAll(orders)}
+                                        className="text-primary hover:text-primary/80 flex items-center gap-2 text-sm font-medium transition-colors"
+                                    >
+                                        {allSelected ? (
+                                            <CheckSquare className="h-4 w-4" />
+                                        ) : (
+                                            <Square className="h-4 w-4" />
+                                        )}
+                                        <span>{allSelected ? "Deselect All" : "Select All"}</span>
+                                    </button>
+                                )}
+                                {selectedOrders.size > 0 && (
+                                    <p className="text-primary text-sm font-medium">{selectedOrders.size} selected</p>
+                                )}
+                            </div>
+
+                            <CustomButton
+                                onClick={() => handleBulkPDFExport(selectedOrdersList)}
+                                disabled={selectedOrders.size === 0 || isExporting}
+                                isLoading={isExporting}
+                                className="w-full sm:w-auto"
+                            >
+                                {isExporting
+                                    ? "Exporting..."
+                                    : selectedOrders.size > 0
+                                      ? `Export PDF${selectedOrders.size > 1 ? "s" : ""}`
+                                      : "Export PDF"}
+                            </CustomButton>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {orders.map((order) => (
+                                <OrderCard
+                                    key={order.id}
+                                    order={order}
+                                    isSelected={selectedOrders.has(order.id)}
+                                    isExporting={isExporting}
+                                    onToggleSelection={toggleOrderSelection}
+                                    onExportPDF={handleSinglePDFExport}
+                                />
+                            ))}
+                        </div>
+
+                        <div className="center mt-4">
+                            <CustomPagination
+                                paginationMeta={paginationMeta}
+                                showRowsPerPage={false}
+                                showRowSelection={false}
+                                showPageCount={false}
+                                onPageChange={() => {}}
+                                onLimitChange={() => {}}
+                            />
+                        </div>
+                    </>
+                );
+            }}
         </DataStateHandler>
     );
 };

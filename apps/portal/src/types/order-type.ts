@@ -24,6 +24,14 @@ export enum PaymentStatus {
     FAILED = "failed",
 }
 
+export enum CourierStatus {
+    PENDING = "pending",
+    DELIVERED = "Delivered",
+    PARTIAL_DELIVERED = "partial_delivered",
+    CANCELLED = "cancelled",
+    UNKNOWN = "unknown",
+}
+
 export type Order = {
     id: string;
     customerName: string;
@@ -31,7 +39,7 @@ export type Order = {
     customerAddress: string;
     notes: string;
     courierNote: string | null;
-    courierStatus: string | null;
+    courierStatus: CourierStatus | null;
     consignmentId: string | null;
     shopId: string;
     orderStatus: OrderStatus;
@@ -67,7 +75,7 @@ export interface OrderDetailsItem {
         shopId: string;
         categoryId: string;
     };
-    productVariant: {
+    orderItemVariant: {
         id: string;
         name: string;
         price: number;

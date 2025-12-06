@@ -36,6 +36,7 @@ export type Shop = {
     photoURL: string;
     theme?: string;
     shopOwnerId: string;
+    merchantId?: string;
     status: string;
     createdAt: string;
     updatedAt: string;

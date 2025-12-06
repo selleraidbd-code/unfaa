@@ -1,31 +1,22 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-
-import { useGetCategoriesQuery } from "@/redux/api/category-api";
-import {
-    useDeleteProductMutation,
-    useGetProductsQuery,
-} from "@/redux/api/product-api";
-import { toast } from "@workspace/ui/components/sonner";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { ProductCardList } from "@/features/products/product-card-list";
 import { ProductTableView } from "@/features/products/product-table-view";
-import { useAlert } from "@/hooks/useAlert";
+import { useGetCategoriesQuery } from "@/redux/api/category-api";
+import { useDeleteProductMutation, useGetProductsQuery } from "@/redux/api/product-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { Product } from "@/types/product-type";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@workspace/ui/components/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
+import { toast } from "@workspace/ui/components/sonner";
 import { Plus, Search } from "lucide-react";
-import Link from "next/link";
+
+import { Product } from "@/types/product-type";
+import { useAlert } from "@/hooks/useAlert";
 
 interface FilterParams {
     searchTerm?: string;
@@ -42,7 +33,7 @@ export default function ProductsPage() {
     const [filterParams, setFilterParams] = useState<FilterParams>({});
 
     const { data, isLoading, isError } = useGetProductsQuery({
-        shopName: user?.shop.name,
+        shopSlug: user?.shop.slug,
         ...filterParams,
         page: Number(page),
         limit: Number(limit),
@@ -57,8 +48,7 @@ export default function ProductsPage() {
     const handleDelete = async (id: string) => {
         fire({
             title: "Delete Product",
-            description:
-                "Are you sure you want to delete this product? This action cannot be undone.",
+            description: "Are you sure you want to delete this product? This action cannot be undone.",
             onConfirm: async () => {
                 await deleteProduct({ id })
                     .unwrap()
@@ -82,8 +72,7 @@ export default function ProductsPage() {
     const handleFilterChange = (filterId: string, filterValue: string[]) => {
         setFilterParams((prev) => ({
             ...prev,
-            [filterId]:
-                filterValue.length > 0 ? filterValue.join(",") : undefined,
+            [filterId]: filterValue.length > 0 ? filterValue.join(",") : undefined,
         }));
     };
 
@@ -103,10 +92,7 @@ export default function ProductsPage() {
             toast.success(`Successfully deleted ${ids.length} products`);
         } catch (error) {
             toast.error("Failed to delete products", {
-                description:
-                    error instanceof Error
-                        ? error.message
-                        : "An unknown error occurred",
+                description: error instanceof Error ? error.message : "An unknown error occurred",
             });
         }
     };
@@ -125,12 +111,12 @@ export default function ProductsPage() {
     return (
         <div className="space-y-6">
             {/* Mobile Header & Filters */}
-            <div className="lg:hidden space-y-4">
+            <div className="space-y-4 lg:hidden">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Products</h1>
                     <Button asChild>
                         <Link href="/products/create">
-                            <Plus className="h-4 w-4 mr-2" />
+                            <Plus className="mr-2 h-4 w-4" />
                             Add
                         </Link>
                     </Button>
@@ -138,37 +124,25 @@ export default function ProductsPage() {
 
                 <div className="space-y-2">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                         <Input
                             placeholder="Search products..."
                             className="pl-9"
-                            onChange={(e) =>
-                                handleSearch(e.target.value || undefined)
-                            }
+                            onChange={(e) => handleSearch(e.target.value || undefined)}
                         />
                     </div>
 
                     <div className="flex gap-2">
                         <Select
-                            onValueChange={(value) =>
-                                handleFilterChange(
-                                    "category",
-                                    value === "all" ? [] : [value]
-                                )
-                            }
+                            onValueChange={(value) => handleFilterChange("category", value === "all" ? [] : [value])}
                         >
                             <SelectTrigger className="flex-1">
                                 <SelectValue placeholder="Category" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">
-                                    All Categories
-                                </SelectItem>
+                                <SelectItem value="all">All Categories</SelectItem>
                                 {categoryOptions?.map((option) => (
-                                    <SelectItem
-                                        key={option.value}
-                                        value={option.value}
-                                    >
+                                    <SelectItem key={option.value} value={option.value}>
                                         {option.label}
                                     </SelectItem>
                                 ))}
@@ -177,10 +151,7 @@ export default function ProductsPage() {
 
                         <Select
                             onValueChange={(value) =>
-                                handleFilterChange(
-                                    "activeStatus",
-                                    value === "all" ? [] : [value]
-                                )
+                                handleFilterChange("activeStatus", value === "all" ? [] : [value])
                             }
                         >
                             <SelectTrigger className="flex-1">
@@ -189,9 +160,7 @@ export default function ProductsPage() {
                             <SelectContent>
                                 <SelectItem value="all">All Status</SelectItem>
                                 <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="inactive">
-                                    Inactive
-                                </SelectItem>
+                                <SelectItem value="inactive">Inactive</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -215,11 +184,7 @@ export default function ProductsPage() {
 
             {/* Mobile Card View */}
             <div className="lg:hidden">
-                <ProductCardList
-                    products={data?.data || []}
-                    isLoading={isLoading}
-                    onDelete={handleDelete}
-                />
+                <ProductCardList products={data?.data || []} isLoading={isLoading} onDelete={handleDelete} />
             </div>
         </div>
     );

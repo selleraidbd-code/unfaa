@@ -61,9 +61,12 @@ export interface UpdateCourierSetup {
 }
 
 export interface RiderNote {
-    id: string;
-    shopId: string;
-    riderNote: string;
+    consignmentId: string;
     createdAt: string;
+    deliveryStatus: string;
+    id: string;
+    notificationType: string;
+    orderId: string;
+    trackingMessage: string;
     updatedAt: string;
 }

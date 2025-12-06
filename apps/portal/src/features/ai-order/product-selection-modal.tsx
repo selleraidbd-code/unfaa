@@ -1,17 +1,10 @@
 "use client";
 
-import { DataStateHandler } from "@/components/shared/data-state-handler";
-import {
-    CustomPagination,
-    PaginationMeta,
-} from "@/components/ui/custom-pagination";
-import {
-    ProductCardSkeleton,
-    ProductSelectionCard,
-} from "@/features/ai-order/product-card";
+import { useState } from "react";
+
+import { ProductCardSkeleton, ProductSelectionCard } from "@/features/ai-order/product-card";
 import { useGetProductsQuery } from "@/redux/api/product-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { Product } from "@/types/product-type";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
     Dialog,
@@ -23,7 +16,10 @@ import {
     DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Package } from "lucide-react";
-import { useState } from "react";
+
+import { Product } from "@/types/product-type";
+import { CustomPagination, PaginationMeta } from "@/components/ui/custom-pagination";
+import { DataStateHandler } from "@/components/shared/data-state-handler";
 
 interface ProductSelectionModalProps {
     open: boolean;
@@ -31,11 +27,7 @@ interface ProductSelectionModalProps {
     onSelectProduct: (product: Product) => void;
 }
 
-export const ProductSelectionModal = ({
-    open,
-    onOpenChange,
-    onSelectProduct,
-}: ProductSelectionModalProps) => {
+export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: ProductSelectionModalProps) => {
     const user = useAppSelector((state) => state.auth.user);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -43,7 +35,7 @@ export const ProductSelectionModal = ({
     const { data, isLoading, isError } = useGetProductsQuery({
         page: currentPage,
         limit: 20,
-        shopName: user?.shop?.name || "",
+        shopSlug: user?.shop?.slug || "",
         searchTerm: searchTerm || undefined,
     });
 
@@ -66,15 +58,14 @@ export const ProductSelectionModal = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="md:max-w-4xl flex flex-col">
+            <DialogContent className="flex flex-col md:max-w-4xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Package className="h-5 w-5" />
                         Select Product
                     </DialogTitle>
                     <DialogDescription>
-                        Choose a product from your inventory or search for a
-                        specific one.
+                        Choose a product from your inventory or search for a specific one.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -90,7 +81,7 @@ export const ProductSelectionModal = ({
                         data={products}
                         isLoading={isLoading}
                         loadingComponent={
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {Array.from({ length: 6 }).map((_, index) => (
                                     <ProductCardSkeleton key={index} />
                                 ))}
@@ -98,14 +89,10 @@ export const ProductSelectionModal = ({
                         }
                         isError={isError}
                         isEmpty={products.length === 0}
-                        emptyDescription={
-                            searchTerm
-                                ? "No products found matching your search"
-                                : "No products found"
-                        }
+                        emptyDescription={searchTerm ? "No products found matching your search" : "No products found"}
                     >
                         {(products) => (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {products.map((product) => (
                                     <ProductSelectionCard
                                         key={product.id}

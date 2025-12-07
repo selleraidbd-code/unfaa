@@ -74,10 +74,12 @@ const AddProduct = () => {
 
     const { data: brands } = useGetBrandsQuery({
         shopId,
+        limit: 100,
     });
 
     const { data: deliveries } = useGetDeliveriesQuery({
         shopId,
+        limit: 100,
     });
 
     const categories = data?.data.map((category) => ({

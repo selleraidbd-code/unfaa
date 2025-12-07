@@ -69,6 +69,7 @@ const AddProduct = () => {
 
     const { data } = useGetCategoriesQuery({
         shopId,
+        limit: 100,
     });
 
     const { data: brands } = useGetBrandsQuery({

@@ -13,14 +13,10 @@ export const ROUTES = {
         "/subscriptions",
         "/tutorial",
         "/delivery-orders",
+        "/ai-order",
+        "/make-order",
     ] as const,
-    superAdminRoutes: [
-        "/shops",
-        "/users",
-        "/components",
-        "/upload-tutorial",
-        "/templates",
-    ] as const,
+    superAdminRoutes: ["/shops", "/users", "/components", "/upload-tutorial", "/templates"] as const,
     public: ["/onboarding"] as const,
     auth: ["/auth/sign-in", "/auth/sign-up"] as const,
     authNotVerified: ["/auth/verify-email"] as const,
@@ -29,7 +25,5 @@ export const ROUTES = {
 export const isRouteMatched = (pathname: string, routes: readonly string[]) =>
     routes.some((route) => pathname.startsWith(route));
 
-export const isRouteExactMatched = (
-    pathname: string,
-    routes: readonly string[]
-) => routes.some((route) => pathname === route);
+export const isRouteExactMatched = (pathname: string, routes: readonly string[]) =>
+    routes.some((route) => pathname === route);

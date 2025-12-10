@@ -1,8 +1,6 @@
-import { api } from "@/redux/api";
-import { METHOD, TagType } from "@/redux/type";
-import { PaginatedResponse, QueryParams, ResponseObject } from "@/redux/type";
-
 import { AuthResponse, User } from "@/features/auth/auth-type";
+import { api } from "@/redux/api";
+import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
 
 export const authApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -20,10 +18,7 @@ export const authApi = api.injectEndpoints({
                 body: payload,
             }),
         }),
-        verifySignupOTP: builder.mutation<
-            { user: User; accessToken: string },
-            { token: number }
-        >({
+        verifySignupOTP: builder.mutation<{ user: User; accessToken: string }, { token: number }>({
             query: (payload) => ({
                 url: `/auth/verify-signup-token`,
                 method: METHOD.POST,
@@ -37,10 +32,7 @@ export const authApi = api.injectEndpoints({
                 body: payload,
             }),
         }),
-        signIn: builder.mutation<
-            ResponseObject<AuthResponse>,
-            { email: string; password: string }
-        >({
+        signIn: builder.mutation<ResponseObject<AuthResponse>, { email: string; password: string }>({
             query: (payload) => ({
                 url: `/auth/signin`,
                 method: METHOD.POST,
@@ -61,6 +53,30 @@ export const authApi = api.injectEndpoints({
             }),
             providesTags: [TagType.User],
         }),
+        sendForgotPasswordEmail: builder.mutation<void, { email: string }>({
+            query: (payload) => ({
+                url: `/auth/send-forgot-email/${payload.email}`,
+                method: METHOD.POST,
+                body: payload,
+            }),
+        }),
+        verifyForgotPasswordOTP: builder.mutation<void, { email: string; otp: number }>({
+            query: (payload) => ({
+                url: `/auth/verify-forgot-token`,
+                method: METHOD.POST,
+                body: payload,
+            }),
+        }),
+        resetPassword: builder.mutation<
+            ResponseObject<AuthResponse>,
+            { token: number; email: string; password: string }
+        >({
+            query: (payload) => ({
+                url: `/auth/change-password`,
+                method: METHOD.POST,
+                body: payload,
+            }),
+        }),
         deleteUser: builder.mutation<void, string>({
             query: (id) => ({
                 url: `/user/${id}`,
@@ -79,4 +95,7 @@ export const {
     useGetUserQuery,
     useGetUsersQuery,
     useDeleteUserMutation,
+    useSendForgotPasswordEmailMutation,
+    useVerifyForgotPasswordOTPMutation,
+    useResetPasswordMutation,
 } = authApi;

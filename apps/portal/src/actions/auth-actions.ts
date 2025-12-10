@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 
 import { config } from "@/config";
 import { User } from "@/features/auth/auth-type";
+
 import { CreateShop } from "@/types/shop-type";
 
 export const loginAction = async (email: string, password: string) => {
@@ -41,17 +42,12 @@ export const loginAction = async (email: string, password: string) => {
         console.error(error);
         return {
             status: "error",
-            error:
-                error instanceof Error ? error.message : "Something went wrong",
+            error: error instanceof Error ? error.message : "Something went wrong",
         };
     }
 };
 
-export const registerAction = async (
-    name: string,
-    email: string,
-    password: string
-) => {
+export const registerAction = async (name: string, email: string, password: string) => {
     try {
         const response = await fetch(`${config.serverUrl}/auth/signup`, {
             method: "POST",
@@ -89,8 +85,7 @@ export const registerAction = async (
     } catch (error) {
         return {
             status: "error",
-            error:
-                error instanceof Error ? error.message : "Something went wrong",
+            error: error instanceof Error ? error.message : "Something went wrong",
         };
     }
 };
@@ -99,20 +94,17 @@ export const verifyEmailAction = async (email: string, token: number) => {
     try {
         const storedAccessToken = await getAccessTokenFromCookies();
 
-        const response = await fetch(
-            `${config.serverUrl}/auth/verify-signup-token`,
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    email,
-                    token,
-                }),
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `${storedAccessToken}`,
-                },
-            }
-        );
+        const response = await fetch(`${config.serverUrl}/auth/verify-signup-token`, {
+            method: "POST",
+            body: JSON.stringify({
+                email,
+                token,
+            }),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `${storedAccessToken}`,
+            },
+        });
 
         const data = await response.json();
 
@@ -138,8 +130,7 @@ export const verifyEmailAction = async (email: string, token: number) => {
     } catch (error) {
         return {
             status: "error",
-            error:
-                error instanceof Error ? error.message : "Something went wrong",
+            error: error instanceof Error ? error.message : "Something went wrong",
         };
     }
 };
@@ -184,17 +175,12 @@ export const createShopAction = async (shop: CreateShop) => {
     } catch (error) {
         return {
             status: "error",
-            error:
-                error instanceof Error ? error.message : "Something went wrong",
+            error: error instanceof Error ? error.message : "Something went wrong",
         };
     }
 };
 
-export const loginWithGoogleAction = async (body: {
-    credential?: string;
-    code?: string;
-    access_token?: string;
-}) => {
+export const loginWithGoogleAction = async (body: { credential?: string; code?: string; access_token?: string }) => {
     try {
         const response = await fetch(`${config.serverUrl}/auth/google-login`, {
             method: "POST",
@@ -228,8 +214,7 @@ export const loginWithGoogleAction = async (body: {
         console.error(error);
         return {
             status: "error",
-            error:
-                error instanceof Error ? error.message : "Something went wrong",
+            error: error instanceof Error ? error.message : "Something went wrong",
         };
     }
 };
@@ -240,10 +225,7 @@ export const logoutAction = async () => {
     cookieStore.delete({ name: "refreshToken", path: "/" });
 };
 
-const setTokensToCookies = async (
-    accessToken: string,
-    refreshToken: string
-) => {
+const setTokensToCookies = async (accessToken: string, refreshToken: string) => {
     const cookieStore = await cookies();
     const base = {
         httpOnly: true,
@@ -278,10 +260,7 @@ const setUserToCookies = async (user: User) => {
     });
 };
 
-export const revalidateTokensAction = async (
-    accessToken: string,
-    refreshToken: string
-) => {
+export const revalidateTokensAction = async (accessToken: string, refreshToken: string) => {
     await setTokensToCookies(accessToken, refreshToken);
 };
 

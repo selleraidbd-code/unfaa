@@ -1,18 +1,9 @@
 import { api } from "@/redux/api";
 import authReducer from "@/redux/slices/auth-slice";
-import landingPageReducer from "@/redux/slices/landing-page-slice";
 import componentsReducer from "@/redux/slices/components-slice";
+import landingPageReducer from "@/redux/slices/landing-page-slice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import {
-    FLUSH,
-    PAUSE,
-    PERSIST,
-    persistReducer,
-    persistStore,
-    PURGE,
-    REGISTER,
-    REHYDRATE,
-} from "redux-persist";
+import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist";
 
 import { storage } from "./storage";
 
@@ -20,7 +11,7 @@ const persistConfig = {
     auth: {
         key: "auth",
         storage: storage,
-        whitelist: ["accessToken", "user", "refreshToken"],
+        whitelist: ["accessToken", "refreshToken"],
     },
     components: {
         key: "components",
@@ -42,14 +33,7 @@ export const store = configureStore({
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
-                ignoredActions: [
-                    FLUSH,
-                    REHYDRATE,
-                    PAUSE,
-                    PERSIST,
-                    PURGE,
-                    REGISTER,
-                ],
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
         }).concat(api.middleware),
 });

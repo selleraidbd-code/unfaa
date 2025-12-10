@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { createShopAction } from "@/actions/auth-actions";
-import { shopTypes } from "@/data/shop-data";
+import { ShopTypeEnum, shopTypes } from "@/data/shop-data";
 import { logoutThunkWithoutReload, setUser } from "@/redux/slices/auth-slice";
 import { useAppDispatch } from "@/redux/store/hook";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,51 +46,49 @@ const Page = () => {
 
     const [isPending, startTransition] = useTransition();
 
-    // const getShopIdToClone = async (shopType: ShopTypeEnum) => {
-    //     switch (shopType) {
-    //         case ShopTypeEnum.CLOTHING_APPAREL:
-    //             return "be52c3b4-a534-4b88-a9ac-a02a9b25886a";
-    //         case ShopTypeEnum.SHOES_FOOTWEAR:
-    //             return "2";
-    //         case ShopTypeEnum.ACCESSORIES_JEWELRY:
-    //             return "3";
-    //         case ShopTypeEnum.BEAUTY_COSMETICS:
-    //             return "4";
-    //         case ShopTypeEnum.ELECTRONICS_GADGETS:
-    //             return "5";
-    //         case ShopTypeEnum.HEALTH_WELLNESS:
-    //             return "6";
-    //         case ShopTypeEnum.HOME_FURNITURE:
-    //             return "7";
-    //         case ShopTypeEnum.BOOKS_MEDIA:
-    //             return "8";
-    //         case ShopTypeEnum.TOYS_GAMES:
-    //             return "9";
-    //         case ShopTypeEnum.SPORTS_OUTDOORS:
-    //             return "10";
-    //         case ShopTypeEnum.FOOD_BEVERAGES:
-    //             return "11";
-    //         case ShopTypeEnum.PET_SUPPLIES_EQUIPMENT:
-    //             return "12";
-    //         case ShopTypeEnum.GROCERIES_HOUSEHOLD:
-    //             return "13";
-    //         case ShopTypeEnum.OTHER:
-    //             return "14";
-    //     }
-    // };
-
-    // Timer countdown when loading or complete
+    const getShopIdToClone = async (shopType: ShopTypeEnum) => {
+        switch (shopType) {
+            case ShopTypeEnum.CLOTHING_APPAREL:
+                return "0b52674b-086e-4069-922c-6310cc1d8e21";
+            case ShopTypeEnum.SHOES_FOOTWEAR:
+                return "2e26af52-5a7e-4b6e-988f-1120a628e87a";
+            case ShopTypeEnum.ACCESSORIES_JEWELRY:
+                return "8df283f6-637d-4a52-af4f-b0584afef679";
+            case ShopTypeEnum.BEAUTY_COSMETICS:
+                return "22b0358c-e435-4a17-8acd-da85d8ac82fe";
+            case ShopTypeEnum.ELECTRONICS_GADGETS:
+                return "35cb5e89-36d5-4f8e-bbdb-f97e7c51b344";
+            case ShopTypeEnum.HEALTH_WELLNESS:
+                return "9ee2ae15-234f-4a39-bd91-a6962967b7f1";
+            case ShopTypeEnum.HOME_FURNITURE:
+                return "6827f3d2-cc66-4766-8b14-94abf4cce11f";
+            case ShopTypeEnum.BOOKS_MEDIA:
+                return "abf6852b-de08-4bf3-b16a-fc1951f2befc";
+            case ShopTypeEnum.TOYS_GAMES:
+                return "93e2b90e-16e1-4a2b-8b1d-8edeb7ccf4bb";
+            case ShopTypeEnum.SPORTS_OUTDOORS:
+                return "67df99a9-7f18-478a-ac90-c2cd7dee4a2c";
+            case ShopTypeEnum.FOOD_BEVERAGES:
+                return "87825ac7-935e-40ce-9dd0-15e855a6580f";
+            case ShopTypeEnum.PET_SUPPLIES_EQUIPMENT:
+                return "1c7d6168-70a0-4b04-9907-00abe7a93c5d";
+            case ShopTypeEnum.GROCERIES_HOUSEHOLD:
+                return "45aaad4e-0d97-4a31-9066-d9b6275e57b2";
+            case ShopTypeEnum.OTHER:
+                return "d8681360-e9dc-46d4-8bba-f4a5b60deac3";
+        }
+    };
 
     const onSubmit = async (data: z.infer<typeof onboardingFormSchema>) => {
+        const shopIdToClone = await getShopIdToClone(data.shopType as ShopTypeEnum);
+
         const shopData: CreateShop = {
             name: data.name,
             description: data.description || "",
             shopType: data.shopType as ShopType,
             // photoURL: data.photoUrl || "",
             // banner: data.banner || "",
-            // shopIdToClone: await getShopIdToClone(
-            //     data.shopType as ShopTypeEnum
-            // ),
+            shopIdToClone,
         };
 
         startTransition(async () => {

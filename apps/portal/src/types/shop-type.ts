@@ -7,6 +7,7 @@ export type CreateShop = {
     banner?: string;
     photoURL?: string;
     shopType: ShopType;
+    shopIdToClone: string;
 };
 
 export enum ShopType {

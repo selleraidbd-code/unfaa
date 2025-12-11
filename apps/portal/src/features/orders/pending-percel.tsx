@@ -8,10 +8,15 @@ import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { CourierStatus, OrderStatus } from "@/types/order-type";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { cn } from "@workspace/ui/lib/utils";
-import { Calendar, MapPin, Package, Phone, User } from "lucide-react";
+import { Calendar, MapPin, Package, Phone, User, FileText } from "lucide-react";
+import { useState } from "react";
+import { RiderNoteModal } from "./rider-note-modal";
+import { Button } from "@workspace/ui/components/button";
 
 export const PendingParcel = () => {
     const user = useAppSelector((state) => state.auth.user);
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data: pendingData, isLoading: isPendingLoading } =
         useGetOrdersQuery({
@@ -113,6 +118,20 @@ export const PendingParcel = () => {
                                     )
                                  }
                                 </div>
+                                <div className="mt-4">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                        onClick={() => {
+                                            setSelectedOrderId(order.id);
+                                            setIsModalOpen(true);
+                                        }}
+                                    >
+                                        <FileText className="w-4 h-4 mr-2" />
+                                        View Rider Notes
+                                    </Button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -123,6 +142,11 @@ export const PendingParcel = () => {
                         showPageCount={false}
                         onPageChange={() => {}}
                         onLimitChange={() => {}}
+                    />
+                    <RiderNoteModal
+                        orderId={selectedOrderId}
+                        open={isModalOpen}
+                        onOpenChange={setIsModalOpen}
                     />
                 </>
             )}

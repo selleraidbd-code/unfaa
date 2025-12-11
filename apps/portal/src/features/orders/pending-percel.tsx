@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/custom-pagination";
 import { useAppSelector } from "@/redux/store/hook";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
-import { OrderStatus } from "@/types/order-type";
+import { CourierStatus, OrderStatus } from "@/types/order-type";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { cn } from "@workspace/ui/lib/utils";
 import { Calendar, MapPin, Package, Phone, User } from "lucide-react";
@@ -16,7 +16,8 @@ export const PendingParcel = () => {
     const { data: pendingData, isLoading: isPendingLoading } =
         useGetOrdersQuery({
             shopId: user?.shop.id,
-            orderStatus: OrderStatus.PROCESSING,
+            orderStatus: OrderStatus.SEND,
+            courierStatus: CourierStatus.PENDING,
             page: 1,
             limit: 10,
         });

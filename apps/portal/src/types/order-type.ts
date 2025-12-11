@@ -26,6 +26,7 @@ export enum PaymentStatus {
 
 export enum CourierStatus {
     PENDING = "pending",
+    IN_REVIEW="in_review",
     DELIVERED = "Delivered",
     PARTIAL_DELIVERED = "partial_delivered",
     CANCELLED = "cancelled",

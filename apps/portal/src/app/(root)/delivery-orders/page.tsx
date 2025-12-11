@@ -14,7 +14,7 @@ import {
 import { FileText, Package, Truck } from "lucide-react";
 
 const Page = () => {
-    const [activeTab, setActiveTab] = useState("pending-parcel");
+    const [activeTab, setActiveTab] = useState("ready-for-dispatch");
 
     return (
         <div className="grid gap-4 md:gap-6">

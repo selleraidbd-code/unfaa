@@ -5,18 +5,24 @@ import {
 } from "@/components/ui/custom-pagination";
 import { useAppSelector } from "@/redux/store/hook";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
-import { OrderStatus } from "@/types/order-type";
+import { CourierStatus, OrderStatus } from "@/types/order-type";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { cn } from "@workspace/ui/lib/utils";
-import { Calendar, MapPin, Package, Phone, User } from "lucide-react";
+import { Calendar, MapPin, Package, Phone, User, FileText } from "lucide-react";
+import { useState } from "react";
+import { RiderNoteModal } from "./rider-note-modal";
+import { Button } from "@workspace/ui/components/button";
 
 export const PendingParcel = () => {
     const user = useAppSelector((state) => state.auth.user);
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { data: pendingData, isLoading: isPendingLoading } =
         useGetOrdersQuery({
             shopId: user?.shop.id,
-            orderStatus: OrderStatus.PROCESSING,
+            orderStatus: OrderStatus.SEND,
+            courierStatus: CourierStatus.PENDING,
             page: 1,
             limit: 10,
         });
@@ -52,7 +58,7 @@ export const PendingParcel = () => {
                     <div className="mb-4 text-sm text-gray-600">
                         Total Pending Parcels: {pendingData?.meta?.total || 0}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-2">
                         {pendingData?.data?.map((order) => (
                             <div
                                 key={order.id}
@@ -103,6 +109,29 @@ export const PendingParcel = () => {
                                 <div className="text-sm text-gray-500">
                                     {order.orderItems?.length || 0} items
                                 </div>
+                                <div className=" mt-4">
+                                 {
+                                    order.courierNote && (
+                                        <div className="text-sm text-gray-500">
+                                           <p> {order.courierNote}</p>
+                                        </div>
+                                    )
+                                 }
+                                </div>
+                                <div className="mt-4">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                        onClick={() => {
+                                            setSelectedOrderId(order.id);
+                                            setIsModalOpen(true);
+                                        }}
+                                    >
+                                        <FileText className="w-4 h-4 mr-2" />
+                                        View Rider Notes
+                                    </Button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -113,6 +142,11 @@ export const PendingParcel = () => {
                         showPageCount={false}
                         onPageChange={() => {}}
                         onLimitChange={() => {}}
+                    />
+                    <RiderNoteModal
+                        orderId={selectedOrderId}
+                        open={isModalOpen}
+                        onOpenChange={setIsModalOpen}
                     />
                 </>
             )}

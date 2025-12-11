@@ -7,7 +7,7 @@ import { useAppSelector } from "@/redux/store/hook";
 import { pdf } from "@react-pdf/renderer";
 import { CheckSquare, Square } from "lucide-react";
 
-import { Order, OrderStatus } from "@/types/order-type";
+import { CourierStatus, Order, OrderStatus } from "@/types/order-type";
 import { CustomButton } from "@/components/ui/custom-button";
 import { CustomPagination, PaginationMeta } from "@/components/ui/custom-pagination";
 import { OrderPDFDocument } from "@/components/pdf/order-pdf-document";
@@ -24,6 +24,7 @@ export const ReadyToDispatch = () => {
     const { data, isLoading } = useGetOrdersQuery({
         shopId: shop?.id,
         orderStatus: OrderStatus.SEND,
+        courierStatus: CourierStatus.IN_REVIEW,
         page: 1,
         limit: 10,
     });

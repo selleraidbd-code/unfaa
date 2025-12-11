@@ -4,6 +4,7 @@ export interface CourierCredentials {
     steadfast?: {
         steadFastAPIKey: string;
         steadFastAPISecret: string;
+        merchantId: string;
     };
     pathao?: {
         storeId: string;
@@ -30,6 +31,7 @@ export interface CourierSetup {
     // Direct credential fields (as returned by API)
     steadFastAPIKey?: string;
     steadFastAPISecret?: string;
+    merchantId?: string;
     storeId?: string;
     clientId?: string;
     clientSecret?: string;
@@ -43,6 +45,7 @@ export interface CreateCourierSetup {
     // SteadFast fields
     steadFastAPIKey?: string;
     steadFastAPISecret?: string;
+    merchantId?: string;
     // Pathao fields
     storeId?: string;
     clientId?: string;

@@ -26,7 +26,7 @@ export enum PaymentStatus {
 
 export enum CourierStatus {
     PENDING = "pending",
-    IN_REVIEW="in_review",
+    IN_REVIEW = "in_review",
     DELIVERED = "Delivered",
     PARTIAL_DELIVERED = "partial_delivered",
     CANCELLED = "cancelled",
@@ -47,6 +47,7 @@ export type Order = {
     paymentStatus: PaymentStatus;
     orderNumber: number;
     totalAmount: number;
+    discountedPrice: number | null;
     createdAt: string;
     updatedAt: string;
     orderItems: OrderDetailsItem[];
@@ -119,6 +120,7 @@ export type CreateOrder = {
     orderStatus: OrderStatus;
     notes: string;
     deliveryZoneId: string;
+    discountedPrice?: number | null;
 };
 
 export interface CustomItem {
@@ -159,4 +161,5 @@ export interface AIOrderGenerationResult {
 
 export interface OrderDetailsType {
     deliveryZoneId: string;
+    discountedPrice?: number | null;
 }

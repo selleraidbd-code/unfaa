@@ -57,7 +57,7 @@ export const OrderDetailsModal = ({
             customerAddress: order?.customerAddress || "",
             orderStatus: order?.orderStatus || OrderStatus.PLACED,
             notes: order?.notes || "",
-            totalAmount: order?.totalAmount || 0,
+            totalAmount: order?.discountedPrice ?? order?.totalAmount ?? 0,
         },
     });
 
@@ -164,7 +164,7 @@ export const OrderDetailsModal = ({
                                 control={form.control}
                                 placeholder="Enter COD / Payable amount"
                                 type="number"
-                                defaultValue={order?.totalAmount || 0}
+                                defaultValue={order?.discountedPrice ?? order?.totalAmount ?? 0}
                             />
 
                             <CustomFormSelect

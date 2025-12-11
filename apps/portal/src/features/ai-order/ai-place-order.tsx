@@ -1,30 +1,22 @@
+import { isValidId } from "@/features/ai-order/lib";
 import { CustomerState } from "@/features/ai-order/types";
 import { useCreateOrderbyAdminMutation } from "@/redux/api/order-api";
+import { useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
 import { CheckCircle } from "lucide-react";
-import { useAppSelector } from "@/redux/store/hook";
-import {
-    CreateOrder,
-    OrderDetailsType,
-    OrderItem,
-    OrderStatus,
-} from "@/types/order-type";
-import { isValidId } from "@/features/ai-order/lib";
+
+import { CreateOrder, OrderDetailsType, OrderItem, OrderStatus } from "@/types/order-type";
 
 interface Props {
     onReset: () => void;
     customerInfo: CustomerState;
     orderItems: OrderItem[];
     orderDetails: OrderDetailsType;
+    setOrderDetails: (orderDetails: OrderDetailsType) => void;
 }
 
-export const AiPlaceOrder = ({
-    onReset,
-    customerInfo,
-    orderItems,
-    orderDetails,
-}: Props) => {
+export const AiPlaceOrder = ({ onReset, customerInfo, orderItems, orderDetails, setOrderDetails }: Props) => {
     const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
     const user = useAppSelector((state) => state.auth.user);
 
@@ -39,17 +31,30 @@ export const AiPlaceOrder = ({
         // Validate required fields
         const missingFields = [];
         if (orderItems.length === 0) missingFields.push("At least one product");
-        if (orderItems.some((p) => !p.id))
-            missingFields.push("Product selection");
+        if (orderItems.some((p) => !p.id)) missingFields.push("Product selection");
 
         if (missingFields.length > 0) {
             toast.error(`Please fill: ${missingFields.join(", ")}`);
             return;
         }
 
-        const customerId = isValidId(customerInfo.customerId)
-            ? customerInfo.customerId
-            : "";
+        const grandTotal = orderItems.reduce((sum, item) => {
+            const basePrice = Number(item.price ?? 0);
+            const extras = (item.selectedVariants ?? []).reduce(
+                (acc, sv) => acc + (Number(sv.extraPrice ?? 0) || 0),
+                0
+            );
+            const unitPrice = basePrice + extras;
+            const quantity = Number(item.quantity ?? 1) || 1;
+            return sum + unitPrice * quantity;
+        }, 0);
+
+        const customerId = isValidId(customerInfo.customerId) ? customerInfo.customerId : "";
+
+        if (orderDetails.discountedPrice && orderDetails.discountedPrice > grandTotal) {
+            toast.error("Discount amount cannot be greater than total");
+            return;
+        }
 
         // Build payload akin to make-order page
         const payload: CreateOrder = {
@@ -63,12 +68,10 @@ export const AiPlaceOrder = ({
                     0
                 );
                 const unitPrice = Number(item.price ?? 0) + extras;
-                const orderItemVariant = (item.selectedVariants ?? []).map(
-                    (sv) => ({
-                        productVariantId: String(sv.variantId),
-                        productVariantOptionId: String(sv.optionId),
-                    })
-                );
+                const orderItemVariant = (item.selectedVariants ?? []).map((sv) => ({
+                    productVariantId: String(sv.variantId),
+                    productVariantOptionId: String(sv.optionId),
+                }));
 
                 return {
                     productId: String(item.id),
@@ -82,22 +85,26 @@ export const AiPlaceOrder = ({
             notes: "",
             // Temporary delivery zone as requested
             deliveryZoneId: orderDetails.deliveryZoneId,
+            discountedPrice: orderDetails.discountedPrice ?? undefined,
         } as const;
 
-        try {
-            await createOrder({ assignedTo: user.id, payload }).unwrap();
-            toast.success("Order created successfully!");
-            onReset();
-        } catch (err: any) {
-            const message = err?.data?.message || "Failed to create order";
-            toast.error(message);
-            // eslint-disable-next-line no-console
-            console.log("Create order error :>> ", err);
-        }
+        await createOrder({ assignedTo: user.id, payload })
+            .unwrap()
+            .then(() => {
+                toast.success("Order created successfully!");
+                onReset();
+                setOrderDetails({
+                    deliveryZoneId: "",
+                    discountedPrice: undefined,
+                });
+            })
+            .catch((err) => {
+                toast.error(err.data?.message || "Failed to create order");
+            });
     };
 
     return (
-        <div className="flex gap-4 justify-end">
+        <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={onReset}>
                 Cancel
             </Button>
@@ -110,11 +117,7 @@ export const AiPlaceOrder = ({
                 <CheckCircle className="h-4 w-4" />
                 {isLoading ? "Confirming..." : "Confirm Order"}
             </Button> */}
-            <Button
-                onClick={() => handlePlaceOrder(OrderStatus.PLACED)}
-                className="min-w-40"
-                disabled={isLoading}
-            >
+            <Button onClick={() => handlePlaceOrder(OrderStatus.PLACED)} className="min-w-40" disabled={isLoading}>
                 <CheckCircle className="h-4 w-4" />
                 {isLoading ? "Placing..." : "Place Order"}
             </Button>

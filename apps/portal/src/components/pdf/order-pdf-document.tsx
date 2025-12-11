@@ -15,49 +15,59 @@ const styles = StyleSheet.create({
         padding: 8,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "stretch",
         justifyContent: "flex-start",
         backgroundColor: "#ffffff",
+        gap: 4,
+    },
+    header: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        width: "100%",
+    },
+    headerLeft: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
     },
     logoContainer: {
-        marginBottom: 6,
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: "flex-end",
+        justifyContent: "flex-end",
     },
     logo: {
         width: 40,
         height: 40,
         objectFit: "contain",
     },
-    value: {
-        fontSize: 8,
-        fontWeight: "bold",
-        marginBottom: 4,
-        textAlign: "center",
-    },
     consignmentIdTitle: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: "bold",
-        marginBottom: 4,
-        textAlign: "center",
+        textAlign: "left",
     },
-    section: {
-        width: "100%",
-        marginBottom: 3,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+    value: {
+        fontSize: 9,
+        fontWeight: "600",
+        textAlign: "left",
+    },
+    shopName: {
+        fontSize: 9,
+        fontWeight: "600",
+        textAlign: "left",
     },
     productSection: {
         width: "100%",
-        marginTop: 2,
-        paddingTop: 2,
+        marginTop: 4,
+        paddingTop: 4,
+        borderTop: "1 solid #000",
+        display: "flex",
+        gap: 2,
     },
     productItem: {
-        fontSize: 7,
-        marginBottom: 2,
-        textAlign: "center",
+        fontSize: 8,
+        textAlign: "left",
         lineHeight: 1.2,
     },
 });
@@ -66,45 +76,41 @@ interface OrderPDFDocumentProps {
     orders: Order[];
     shopLogo?: string;
     merchantId?: string;
+    shopName?: string;
 }
 
-export const OrderPDFDocument = ({ orders, shopLogo, merchantId }: OrderPDFDocumentProps) => {
+export const OrderPDFDocument = ({ orders, shopLogo, merchantId, shopName }: OrderPDFDocumentProps) => {
     return (
         <Document>
             {orders.map((order) => (
                 <Page key={order.id} size={[PAGE_WIDTH, PAGE_HEIGHT]} style={styles.page}>
-                    {/* Shop Logo */}
-                    {shopLogo && (
-                        <View style={styles.logoContainer}>
-                            <Image src={shopLogo} style={styles.logo} cache={false} />
+                    <View style={styles.header}>
+                        <View style={styles.headerLeft}>
+                            {shopName && <Text style={styles.shopName}>{shopName}</Text>}
+                            {merchantId && <Text style={styles.value}>{merchantId}</Text>}
+                            {order.consignmentId && (
+                                <Text style={styles.consignmentIdTitle}>{order.consignmentId}</Text>
+                            )}
                         </View>
-                    )}
-
-                    {/* Consignment ID - Value Only */}
-                    {order.consignmentId && (
-                        <View style={styles.section}>
-                            <Text style={styles.consignmentIdTitle}>{order.consignmentId}</Text>
-                        </View>
-                    )}
-
-                    {/* Merchant ID - Value Only */}
-                    {merchantId && (
-                        <View style={styles.section}>
-                            <Text style={styles.value}>{merchantId}</Text>
-                        </View>
-                    )}
+                        {shopLogo && (
+                            <View style={styles.logoContainer}>
+                                <Image src={shopLogo} style={styles.logo} />
+                            </View>
+                        )}
+                    </View>
 
                     {/* Products */}
                     {order.orderItems && order.orderItems.length > 0 && (
                         <View style={styles.productSection}>
-                            {order.orderItems.map((item) => {
+                            {order.orderItems.map((item, index) => {
                                 const variantName =
                                     item.orderItemVariant && item.orderItemVariant.length > 0
                                         ? item.orderItemVariant[0]?.name
                                         : null;
                                 return (
                                     <Text key={item.id} style={styles.productItem}>
-                                        {item.product.name} {variantName ? `- ${variantName}` : ""} - {item.quantity}
+                                        {index + 1}. {item.product.name} {variantName ? `- ${variantName}` : ""} -{" "}
+                                        {item.quantity}
                                     </Text>
                                 );
                             })}

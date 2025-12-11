@@ -1,36 +1,29 @@
 "use client";
 
-import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+
+import paperflyLogo from "@/assets/images/paperfly.png";
+import pathaoLogo from "@/assets/images/pathao.png";
+import redxLogo from "@/assets/images/redx.png";
+import steadfastLogo from "@/assets/images/steadfast.png";
+import { useCreateCourierSetupMutation, useGetCourierSetupQuery } from "@/redux/api/couriar-api";
 import { useAppSelector } from "@/redux/store/hook";
-import {
-    useCreateCourierSetupMutation,
-    useGetCourierSetupQuery,
-} from "@/redux/api/couriar-api";
-import { CourierCredentials, CourierType } from "@/types/courier-type";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@workspace/ui/components/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { toast } from "@workspace/ui/components/sonner";
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@workspace/ui/components/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import {
     AlertCircle,
     Check,
     Eye,
     EyeOff,
     Key,
+    Link2,
     Lock,
     Package,
     Plane,
@@ -40,14 +33,10 @@ import {
     Truck,
     User,
     Zap,
-    Link2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import steadfastLogo from "@/assets/images/steadfast.png";
-import pathaoLogo from "@/assets/images/pathao.png";
-import redxLogo from "@/assets/images/redx.png";
-import paperflyLogo from "@/assets/images/paperfly.png";
+
+import { CourierCredentials, CourierType } from "@/types/courier-type";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
 
 interface CourierConfig {
     name: string;
@@ -86,6 +75,14 @@ const courierConfigs: Record<CourierType, CourierConfig> = {
                 placeholder: "Enter your API secret",
                 required: true,
                 icon: Lock,
+            },
+            {
+                key: "merchantId",
+                label: "Merchant ID",
+                type: "text",
+                placeholder: "Enter your merchant ID",
+                required: true,
+                icon: User,
             },
         ],
     },
@@ -172,12 +169,9 @@ const courierLogos: Record<CourierType, any> = {
 };
 
 const DeliverySupport = () => {
-    const [selectedCourier, setSelectedCourier] =
-        useState<CourierType>("steadfast");
+    const [selectedCourier, setSelectedCourier] = useState<CourierType>("steadfast");
     const [credentials, setCredentials] = useState<CourierCredentials>({});
-    const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>(
-        {}
-    );
+    const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
     const [isLoading, setIsLoading] = useState(false);
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop?.id;
@@ -220,6 +214,7 @@ const DeliverySupport = () => {
                 mappedCredentials.steadfast = {
                     steadFastAPIKey: data.steadFastAPIKey || "",
                     steadFastAPISecret: data.steadFastAPISecret || "",
+                    merchantId: data.merchantId || "",
                 };
             } else if (courierType === "pathao") {
                 mappedCredentials.pathao = {
@@ -249,11 +244,7 @@ const DeliverySupport = () => {
         }));
     };
 
-    const handleCredentialChange = (
-        courierType: CourierType,
-        fieldKey: string,
-        value: string
-    ) => {
+    const handleCredentialChange = (courierType: CourierType, fieldKey: string, value: string) => {
         setCredentials((prev) => ({
             ...prev,
             [courierType]: {
@@ -308,6 +299,7 @@ const DeliverySupport = () => {
                         ...payload,
                         steadFastAPIKey: courierCreds.steadFastAPIKey,
                         steadFastAPISecret: courierCreds.steadFastAPISecret,
+                        merchantId: courierCreds.merchantId,
                     };
                 }
             } else if (selectedCourier === "pathao") {
@@ -383,19 +375,15 @@ const DeliverySupport = () => {
         }
 
         return (
-            <div className="space-y-6 max-w-5xl">
+            <div className="max-w-5xl space-y-6">
                 {/* Service Header */}
                 <div className="flex items-center gap-3">
-                    <div
-                        className={`w-10 h-10 ${config.color} rounded-lg flex items-center justify-center`}
-                    >
-                        <config.icon className="w-5 h-5 text-white" />
+                    <div className={`h-10 w-10 ${config.color} flex items-center justify-center rounded-lg`}>
+                        <config.icon className="h-5 w-5 text-white" />
                     </div>
                     <div>
                         <h2 className="text-xl font-semibold">{config.name}</h2>
-                        <p className="text-sm text-gray-600">
-                            {config.description}
-                        </p>
+                        <p className="text-sm text-gray-600">{config.description}</p>
                     </div>
                 </div>
 
@@ -403,45 +391,29 @@ const DeliverySupport = () => {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-blue-600" />
+                            <Shield className="h-5 w-5 text-blue-600" />
                             <span>Configure {config.name}</span>
                         </CardTitle>
                         <p className="text-sm text-gray-600">
-                            Enter your {config.name} credentials to enable
-                            delivery services
+                            Enter your {config.name} credentials to enable delivery services
                         </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {config.fields.map((field) => (
                             <div key={field.key} className="space-y-2">
-                                <Label
-                                    htmlFor={field.key}
-                                    className="text-sm font-medium flex items-center gap-2"
-                                >
-                                    <field.icon className="w-4 h-4 text-gray-500" />
-                                    {field.label}{" "}
-                                    {field.required && (
-                                        <span className="text-red-500">*</span>
-                                    )}
+                                <Label htmlFor={field.key} className="flex items-center gap-2 text-sm font-medium">
+                                    <field.icon className="h-4 w-4 text-gray-500" />
+                                    {field.label} {field.required && <span className="text-red-500">*</span>}
                                 </Label>
                                 <div className="relative">
                                     <Input
                                         id={field.key}
                                         type={
-                                            field.type === "password" &&
-                                            !showPasswords[field.key]
-                                                ? "password"
-                                                : "text"
+                                            field.type === "password" && !showPasswords[field.key] ? "password" : "text"
                                         }
                                         placeholder={field.placeholder}
                                         value={courierCreds[field.key] || ""}
-                                        onChange={(e) =>
-                                            handleCredentialChange(
-                                                courierType,
-                                                field.key,
-                                                e.target.value
-                                            )
-                                        }
+                                        onChange={(e) => handleCredentialChange(courierType, field.key, e.target.value)}
                                         className="pr-10"
                                     />
                                     {field.type === "password" && (
@@ -449,17 +421,13 @@ const DeliverySupport = () => {
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
-                                            onClick={() =>
-                                                togglePasswordVisibility(
-                                                    field.key
-                                                )
-                                            }
+                                            className="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2 p-0"
+                                            onClick={() => togglePasswordVisibility(field.key)}
                                         >
                                             {showPasswords[field.key] ? (
-                                                <EyeOff className="w-4 h-4" />
+                                                <EyeOff className="h-4 w-4" />
                                             ) : (
-                                                <Eye className="w-4 h-4" />
+                                                <Eye className="h-4 w-4" />
                                             )}
                                         </Button>
                                     )}
@@ -472,26 +440,22 @@ const DeliverySupport = () => {
                             <Alert className="border-red-200 bg-red-50">
                                 <AlertCircle className="h-4 w-4 text-red-600" />
                                 <AlertDescription className="text-red-800">
-                                    Please fill in all required fields to save
-                                    credentials.
+                                    Please fill in all required fields to save credentials.
                                 </AlertDescription>
                             </Alert>
                         )}
 
                         <Button
                             onClick={handleSaveCredentials}
-                            disabled={
-                                !validateCredentials(courierType) || isLoading
-                            }
+                            disabled={!validateCredentials(courierType) || isLoading}
                             className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
                         >
                             {isLoading ? (
                                 "Saving..."
                             ) : (
                                 <>
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    {courierData?.data ? "Update" : "Save"}{" "}
-                                    Credentials
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {courierData?.data ? "Update" : "Save"} Credentials
                                 </>
                             )}
                         </Button>
@@ -503,22 +467,18 @@ const DeliverySupport = () => {
 
     if (isFetching || !shopId) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="flex min-h-screen items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
                     <p className="text-gray-600">
-                        {!shopId
-                            ? "Loading shop information..."
-                            : "Loading courier setup..."}
+                        {!shopId ? "Loading shop information..." : "Loading courier setup..."}
                     </p>
                 </div>
             </div>
         );
     }
 
-    const webhookUrl = shopSlug
-        ? `https://server.unfaa.com/api/v1/webhook/stead-fast-webhook/${shopSlug}`
-        : "";
+    const webhookUrl = shopSlug ? `https://server.unfaa.com/api/v1/webhook/stead-fast-webhook/${shopSlug}` : "";
 
     return (
         <div className="max-w-5xl space-y-6">
@@ -529,20 +489,17 @@ const DeliverySupport = () => {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Link2 className="w-5 h-5 text-blue-600" />
+                            <Link2 className="h-5 w-5 text-blue-600" />
                             <span>Webhook URL</span>
                         </CardTitle>
                         <p className="text-sm text-gray-600">
-                            Copy this webhook URL and paste it in your merchant
-                            dashboard to receive order updates
+                            Copy this webhook URL and paste it in your merchant dashboard to receive order updates
                         </p>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2">
-                            <Label className="text-sm font-medium">
-                                Webhook URL
-                            </Label>
-                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                            <Label className="text-sm font-medium">Webhook URL</Label>
+                            <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 p-3">
                                 <CustomTextCopy
                                     text={webhookUrl}
                                     copy={true}
@@ -558,33 +515,19 @@ const DeliverySupport = () => {
             {/* Current Setup Status */}
             {currentCourierType && (
                 <Alert className="border-green-200 bg-green-50">
-                    <AlertDescription className=" text-green-800">
-                        <strong>
-                            {courierConfigs[currentCourierType].name}
-                        </strong>{" "}
-                        is currently configured and active.
+                    <AlertDescription className="text-green-800">
+                        <strong>{courierConfigs[currentCourierType].name}</strong> is currently configured and active.
                     </AlertDescription>
                 </Alert>
             )}
 
             {/* Tabs Layout */}
-            <Tabs
-                value={selectedCourier}
-                onValueChange={(value) =>
-                    setSelectedCourier(value as CourierType)
-                }
-            >
+            <Tabs value={selectedCourier} onValueChange={(value) => setSelectedCourier(value as CourierType)}>
                 <TabsList className="grid w-full grid-cols-4">
                     {Object.entries(courierConfigs).map(([type, config]) => (
-                        <TabsTrigger
-                            key={type}
-                            value={type}
-                            className="flex items-center gap-2"
-                        >
-                            <config.icon className="w-4 h-4" />
-                            <span className="hidden sm:inline">
-                                {config.name}
-                            </span>
+                        <TabsTrigger key={type} value={type} className="flex items-center gap-2">
+                            <config.icon className="h-4 w-4" />
+                            <span className="hidden sm:inline">{config.name}</span>
                         </TabsTrigger>
                     ))}
                 </TabsList>

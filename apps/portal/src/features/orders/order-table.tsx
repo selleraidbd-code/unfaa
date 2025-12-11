@@ -166,7 +166,7 @@ const createOrdersColumns = (enableSelection: boolean): ColumnDef<Order>[] => {
             accessorKey: "orderStatus",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Order Status" />,
             cell: ({ row }) => {
-                const status = row.getValue("orderStatus") as OrderStatus;
+                const status = row.original.orderStatus;
                 return (
                     <span className={cn("rounded-full px-2 py-1 text-xs font-medium", getStatusColor(status))}>
                         {status}
@@ -178,7 +178,7 @@ const createOrdersColumns = (enableSelection: boolean): ColumnDef<Order>[] => {
             accessorKey: "courierStatus",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Courier Status" />,
             cell: ({ row }) => {
-                const status = row.getValue("courierStatus") as CourierStatus;
+                const status = row.original.courierStatus as CourierStatus;
                 return (
                     <span className={cn("rounded-full px-2 py-1 text-xs font-medium", getCourierStatusColor(status))}>
                         {status}
@@ -199,8 +199,11 @@ const createOrdersColumns = (enableSelection: boolean): ColumnDef<Order>[] => {
             accessorKey: "totalAmount",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Total" />,
             cell: ({ row }) => {
-                const amount = row.getValue("totalAmount") as number;
-                return <span className="font-medium">৳{amount.toLocaleString()}</span>;
+                return (
+                    <span className="font-medium">
+                        ৳{(row.original.discountedPrice ?? row.original.totalAmount).toLocaleString()}
+                    </span>
+                );
             },
         },
         {

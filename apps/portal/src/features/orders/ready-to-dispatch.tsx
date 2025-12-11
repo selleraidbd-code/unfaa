@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useGetCourierSetupQuery } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { pdf } from "@react-pdf/renderer";
@@ -18,8 +19,15 @@ import { OrderCard } from "./order-card";
 export const ReadyToDispatch = () => {
     const user = useAppSelector((state) => state.auth.user);
     const shop = user?.shop;
+
     const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
     const [isExporting, setIsExporting] = useState(false);
+
+    // Cache generated blobs so repeated exports don't rebuild identical PDFs.
+    // Cache promises so duplicate exports reuse the same work and resolve once.
+    const pdfCacheRef = useRef<Map<string, Promise<Blob>>>(new Map());
+
+    const { data: courierSetup } = useGetCourierSetupQuery({ shopId: shop?.id || "" }, { skip: !shop?.id });
 
     const { data, isLoading } = useGetOrdersQuery({
         shopId: shop?.id,
@@ -29,11 +37,63 @@ export const ReadyToDispatch = () => {
         limit: 10,
     });
 
+    console.log(data?.data);
+
     const paginationMeta: PaginationMeta = {
         page: 1,
         limit: 10,
         total: data?.meta?.total || 0,
     };
+
+    // Clear cached blobs whenever the data set changes to prevent stale exports.
+    useEffect(() => {
+        pdfCacheRef.current.clear();
+    }, [data?.meta?.total, shop?.id]);
+
+    const buildCacheKey = useCallback((orders: Order[]) => {
+        const sorted = [...orders].map((order) => `${order.id}-${order.updatedAt || ""}`).sort();
+        return sorted.join("|");
+    }, []);
+
+    const downloadBlob = useCallback((blob: Blob, filename: string) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }, []);
+
+    const createPdfBlob = useCallback(
+        async (orders: Order[], merchantId?: string) => {
+            const cacheKey = buildCacheKey(orders);
+            const cachedPromise = pdfCacheRef.current.get(cacheKey);
+            if (cachedPromise) return cachedPromise;
+
+            const promise = (async () => {
+                const doc = (
+                    <OrderPDFDocument
+                        orders={orders}
+                        shopLogo={shop?.photoURL}
+                        shopName={shop?.name}
+                        merchantId={merchantId}
+                    />
+                );
+                return pdf(doc).toBlob();
+            })();
+
+            pdfCacheRef.current.set(cacheKey, promise);
+            try {
+                return await promise;
+            } catch (error) {
+                pdfCacheRef.current.delete(cacheKey);
+                throw error;
+            }
+        },
+        [buildCacheKey, shop?.photoURL]
+    );
 
     const toggleOrderSelection = useCallback((orderId: string) => {
         setSelectedOrders((prev) => {
@@ -61,25 +121,15 @@ export const ReadyToDispatch = () => {
             if (isExporting) return;
             setIsExporting(true);
             try {
-                const doc = (
-                    <OrderPDFDocument orders={[order]} shopLogo={shop?.photoURL} merchantId={shop?.merchantId} />
-                );
-                const blob = await pdf(doc).toBlob();
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `order-${order.consignmentId || order.orderNumber}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                const blob = await createPdfBlob([order], courierSetup?.data?.merchantId || shop?.merchantId);
+                downloadBlob(blob, `order-${order.consignmentId || order.orderNumber}.pdf`);
             } catch (error) {
                 console.error("Error generating PDF:", error);
             } finally {
                 setIsExporting(false);
             }
         },
-        [shop, isExporting]
+        [courierSetup?.data?.merchantId, createPdfBlob, downloadBlob, isExporting, shop?.merchantId]
     );
 
     const handleBulkPDFExport = useCallback(
@@ -88,18 +138,8 @@ export const ReadyToDispatch = () => {
 
             setIsExporting(true);
             try {
-                const doc = (
-                    <OrderPDFDocument orders={orders} shopLogo={shop?.photoURL} merchantId={shop?.merchantId} />
-                );
-                const blob = await pdf(doc).toBlob();
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `bulk-orders-${new Date().getTime()}.pdf`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                const blob = await createPdfBlob(orders, shop?.merchantId || courierSetup?.data?.merchantId);
+                downloadBlob(blob, `bulk-orders-${new Date().getTime()}.pdf`);
                 setSelectedOrders(new Set());
             } catch (error) {
                 console.error("Error generating PDF:", error);
@@ -107,7 +147,7 @@ export const ReadyToDispatch = () => {
                 setIsExporting(false);
             }
         },
-        [shop, isExporting]
+        [courierSetup?.data?.merchantId, createPdfBlob, downloadBlob, isExporting, shop?.merchantId]
     );
 
     return (
@@ -121,8 +161,16 @@ export const ReadyToDispatch = () => {
         >
             {(notSentData) => {
                 const orders = notSentData?.data || [];
-                const selectedOrdersList = orders.filter((order) => selectedOrders.has(order.id));
-                const allSelected = orders.length > 0 && selectedOrders.size === orders.length;
+                const selectedOrdersList = useMemo(
+                    () => orders.filter((order) => selectedOrders.has(order.id)),
+                    // eslint-disable-next-line react-hooks/exhaustive-deps
+                    [orders, selectedOrders]
+                );
+                const allSelected = useMemo(
+                    () => orders.length > 0 && selectedOrders.size === orders.length,
+                    // eslint-disable-next-line react-hooks/exhaustive-deps
+                    [orders.length, selectedOrders]
+                );
 
                 return (
                     <>

@@ -141,7 +141,7 @@ export const OrderCard = ({ order, isSelected, isExporting, onToggleSelection, o
                             style: "currency",
                             currency: "BDT",
                             minimumFractionDigits: 0,
-                        }).format(order.totalAmount)}
+                        }).format(order.discountedPrice ?? order.totalAmount ?? 0)}
                     </span>
                 )}
             </div>

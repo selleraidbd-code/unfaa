@@ -1,47 +1,37 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+
+import { AiPlaceOrder } from "@/features/ai-order/ai-place-order";
+import { ProductSelectionModal } from "@/features/ai-order/product-selection-modal";
+import { CustomerState } from "@/features/ai-order/types";
 import { useLazyGetProductByIdQuery } from "@/redux/api/product-api";
 import { ResponseObject } from "@/redux/type";
-import {
-    AIOrderGenerationProductInfo,
-    OrderDetailsType,
-    OrderItem,
-} from "@/types/order-type";
-import { Product } from "@/types/product-type";
-import { Button } from "@workspace/ui/components/button";
-import { Label } from "@workspace/ui/components/label";
-import { Input } from "@workspace/ui/components/input";
 import { Badge } from "@workspace/ui/components/badge";
-import { Separator } from "@workspace/ui/components/separator";
+import { Button } from "@workspace/ui/components/button";
 // removed Select-based UI in favor of button options
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@workspace/ui/components/card";
-import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { isValidId } from "./lib";
-import { ProductSelectionModal } from "@/features/ai-order/product-selection-modal";
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
+import { Separator } from "@workspace/ui/components/separator";
 import { toast } from "@workspace/ui/components/sonner";
 import { cn } from "@workspace/ui/lib/utils";
-import { AiPlaceOrder } from "@/features/ai-order/ai-place-order";
-import { CustomerState } from "@/features/ai-order/types";
+import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+
+import { AIOrderGenerationProductInfo, OrderDetailsType, OrderItem } from "@/types/order-type";
+import { Product } from "@/types/product-type";
+
+import { isValidId } from "./lib";
 
 interface Props {
     customerInfo: CustomerState;
     productInfo: AIOrderGenerationProductInfo[];
     onReset: () => void;
     orderDetails: OrderDetailsType;
+    setOrderDetails: (orderDetails: OrderDetailsType) => void;
 }
 
-export const ProductInfoOrder = ({
-    customerInfo,
-    productInfo,
-    onReset,
-    orderDetails,
-}: Props) => {
+export const ProductInfoOrder = ({ customerInfo, productInfo, onReset, orderDetails, setOrderDetails }: Props) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 
@@ -49,15 +39,26 @@ export const ProductInfoOrder = ({
 
     const [triggerGetProductById] = useLazyGetProductByIdQuery();
 
+    const grandTotal = useMemo(() => {
+        return orderItems.reduce((sum, item) => {
+            const basePrice = Number(item.price ?? 0);
+            const extras = (item.selectedVariants ?? []).reduce(
+                (acc, sv) => acc + (Number(sv.extraPrice ?? 0) || 0),
+                0
+            );
+            const unitPrice = basePrice + extras;
+            const quantity = Number(item.quantity ?? 1) || 1;
+            return sum + unitPrice * quantity;
+        }, 0);
+    }, [orderItems]);
+
     // When a valid productId exists, fetch full product
     useEffect(() => {
         const fetchProducts = async () => {
             if (!productInfo?.length) return;
 
             // Filter out invalid or missing product IDs
-            const validProducts = productInfo.filter((p) =>
-                isValidId(p.productId)
-            );
+            const validProducts = productInfo.filter((p) => isValidId(p.productId));
 
             if (!validProducts.length) return;
 
@@ -73,25 +74,20 @@ export const ProductInfoOrder = ({
 
             // Filter out failed responses
             const fetchedProducts = productResponses.filter(
-                (
-                    res
-                ): res is { data: ResponseObject<Product>; quantity: number } =>
-                    !!res
+                (res): res is { data: ResponseObject<Product>; quantity: number } => !!res
             );
 
             // Set products
             setProducts(fetchedProducts.map((res) => res.data.data));
 
             // Map to orderItems
-            const items: OrderItem[] = fetchedProducts.map(
-                ({ data, quantity }) => ({
-                    id: data.data.id,
-                    name: data.data.name,
-                    price: data.data.price || 0,
-                    quantity,
-                    selectedVariants: [], // can be filled later
-                })
-            );
+            const items: OrderItem[] = fetchedProducts.map(({ data, quantity }) => ({
+                id: data.data.id,
+                name: data.data.name,
+                price: data.data.discountPrice ?? data.data.price ?? 0,
+                quantity,
+                selectedVariants: [], // can be filled later
+            }));
 
             setOrderItems(items);
         };
@@ -113,9 +109,7 @@ export const ProductInfoOrder = ({
             if (idx === -1) return prev;
             const currentItem = next[idx] as OrderItem;
             const list = currentItem.selectedVariants ?? [];
-            const existingIdx = list.findIndex(
-                (sv) => sv.variantId === variantId
-            );
+            const existingIdx = list.findIndex((sv) => sv.variantId === variantId);
             const updated =
                 existingIdx === -1
                     ? [
@@ -128,11 +122,7 @@ export const ProductInfoOrder = ({
                               extraPrice,
                           },
                       ]
-                    : list.map((sv, i) =>
-                          i === existingIdx
-                              ? { ...sv, optionId, optionName, extraPrice }
-                              : sv
-                      );
+                    : list.map((sv, i) => (i === existingIdx ? { ...sv, optionId, optionName, extraPrice } : sv));
             next[idx] = {
                 ...currentItem,
                 selectedVariants: updated,
@@ -146,10 +136,7 @@ export const ProductInfoOrder = ({
             const next = [...prev];
             const idx = next.findIndex((o) => o.id === productId);
             if (idx === -1) return prev;
-            const normalized =
-                Number.isFinite(quantity) && quantity > 0
-                    ? Math.floor(quantity)
-                    : 1;
+            const normalized = Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1;
             next[idx] = { ...next[idx], quantity: normalized } as OrderItem;
             return next;
         });
@@ -161,7 +148,7 @@ export const ProductInfoOrder = ({
             {
                 id: product.id,
                 name: product.name,
-                price: product.price || 0,
+                price: product.discountPrice ?? product.price ?? 0,
                 quantity: 1,
             },
         ]);
@@ -180,7 +167,7 @@ export const ProductInfoOrder = ({
 
     return (
         <>
-            <div className="border rounded-md p-4 lg:p-6 space-y-3 md:space-y-6">
+            <div className="space-y-3 rounded-md border p-4 md:space-y-6 lg:p-6">
                 <div className="flex items-center justify-between">
                     <h2 className="flex items-center gap-2">
                         <ShoppingCart className="h-5 w-5" />
@@ -200,24 +187,14 @@ export const ProductInfoOrder = ({
 
                 <div className="space-y-3 md:space-y-6">
                     {products.map((product) => {
-                        const item = orderItems.find(
-                            (oi) => oi.id === product.id
-                        );
+                        const item = orderItems.find((oi) => oi.id === product.id);
                         return (
                             <ProductOrderControls
                                 key={product.id}
                                 product={product}
                                 item={item}
-                                onUpdateQuantity={(q) =>
-                                    updateQuantity(product.id, q)
-                                }
-                                onSelectVariant={(
-                                    variantId,
-                                    variantName,
-                                    optionId,
-                                    optionName,
-                                    extraPrice
-                                ) =>
+                                onUpdateQuantity={(q) => updateQuantity(product.id, q)}
+                                onSelectVariant={(variantId, variantName, optionId, optionName, extraPrice) =>
                                     upsertSelectedVariant(
                                         product.id,
                                         variantId,
@@ -233,30 +210,46 @@ export const ProductInfoOrder = ({
                     })}
                 </div>
 
-                {(() => {
-                    const grandTotal = orderItems.reduce((sum, item) => {
-                        const basePrice = Number(item.price ?? 0);
-                        const extras = (item.selectedVariants ?? []).reduce(
-                            (acc, sv) =>
-                                acc + (Number(sv.extraPrice ?? 0) || 0),
-                            0
-                        );
-                        const unitPrice = basePrice + extras;
-                        const quantity = Number(item.quantity ?? 1) || 1;
-                        return sum + unitPrice * quantity;
-                    }, 0);
+                <div className="flex items-center justify-end gap-2">
+                    <span className="text-sm md:text-base"> Total:</span>
+                    <span className="text-base font-semibold">{grandTotal.toLocaleString()}</span>
+                </div>
 
-                    return (
-                        <div className="flex items-center justify-end gap-2">
-                            <span className="text-sm md:text-base">
-                                Grand Total:
+                <div className="ms-auto flex gap-2 max-sm:flex-col md:max-w-md">
+                    <Label className="flex-shrink-0" htmlFor="cod-amount">
+                        COD Amount (optional)
+                    </Label>
+                    <Input
+                        id="cod-amount"
+                        type="number"
+                        placeholder="Enter COD amount"
+                        value={orderDetails.discountedPrice ?? ""}
+                        onChange={(e) => {
+                            const nextValue = e.target.value;
+                            const parsed = Number(nextValue);
+                            setOrderDetails({
+                                ...orderDetails,
+                                discountedPrice: nextValue === "" || !Number.isFinite(parsed) ? undefined : parsed,
+                            });
+                        }}
+                    />
+                </div>
+
+                {orderDetails.discountedPrice !== undefined && orderDetails.discountedPrice !== null && (
+                    <div className="flex flex-col items-end gap-2">
+                        <p>
+                            <span className="pr-2 text-sm md:text-base">Discount:</span>
+                            <span>
+                                {orderDetails.discountedPrice !== undefined && orderDetails.discountedPrice !== null
+                                    ? (grandTotal - orderDetails.discountedPrice).toLocaleString()
+                                    : "Not set"}
                             </span>
-                            <span className="font-semibold text-base">
-                                {grandTotal.toLocaleString()}
-                            </span>
-                        </div>
-                    );
-                })()}
+                        </p>
+                        {orderDetails.discountedPrice > grandTotal && (
+                            <p className="text-destructive text-xs md:text-sm">Please enter a valid discount amount</p>
+                        )}
+                    </div>
+                )}
             </div>
 
             <AiPlaceOrder
@@ -264,6 +257,7 @@ export const ProductInfoOrder = ({
                 customerInfo={customerInfo}
                 orderItems={orderItems}
                 orderDetails={orderDetails}
+                setOrderDetails={setOrderDetails}
             />
 
             {isModalOpen && (
@@ -301,13 +295,9 @@ const ProductOrderControls = ({
 }: ProductOrderControlsProps) => {
     const quantity = item?.quantity ?? 1;
     const hasMissingRequiredVariant = (() => {
-        const requiredVariantIds = (product?.productVariant ?? [])
-            .filter((v) => v.isRequired)
-            .map((v) => String(v.id));
+        const requiredVariantIds = (product?.productVariant ?? []).filter((v) => v.isRequired).map((v) => String(v.id));
         if (requiredVariantIds.length === 0) return false;
-        const selectedVariantIds = new Set(
-            (item?.selectedVariants ?? []).map((sv) => String(sv.variantId))
-        );
+        const selectedVariantIds = new Set((item?.selectedVariants ?? []).map((sv) => String(sv.variantId)));
         return requiredVariantIds.some((id) => !selectedVariantIds.has(id));
     })();
 
@@ -327,80 +317,56 @@ const ProductOrderControls = ({
     };
 
     const getSelectedOptionId = (variantId: string) => {
-        return (
-            item?.selectedVariants?.find(
-                (sv) => sv.variantId === String(variantId)
-            )?.optionId ?? undefined
-        );
+        return item?.selectedVariants?.find((sv) => sv.variantId === String(variantId))?.optionId ?? undefined;
     };
 
     return (
-        <div
-            className={cn(
-                "rounded-md border p-4",
-                hasMissingRequiredVariant && "border-destructive"
-            )}
-        >
-            <div className="flex max-md:flex-col items-start justify-between gap-2 md:gap-4">
-                <div className="flex items-start gap-1.5 sm:gap-3 min-w-0 flex-1">
+        <div className={cn("rounded-md border p-4", hasMissingRequiredVariant && "border-destructive")}>
+            <div className="flex items-start justify-between gap-2 max-md:flex-col md:gap-4">
+                <div className="flex min-w-0 flex-1 items-start gap-1.5 sm:gap-3">
                     {product?.photoURL ? (
                         <img
                             src={product.photoURL}
                             alt={product.name}
-                            className="size-20 max-sm:size-14 max-md:size-16 object-cover rounded"
+                            className="size-20 rounded object-cover max-md:size-16 max-sm:size-14"
                         />
                     ) : (
-                        <div className="size-20 max-sm:size-14 max-md:size-16 bg-muted rounded" />
+                        <div className="bg-muted size-20 rounded max-md:size-16 max-sm:size-14" />
                     )}
 
                     <div className="min-w-0 space-y-1">
-                        <h3 className="text-sm md:text-base font-medium line-clamp-2">
-                            {product.name}
-                        </h3>
-                        <p className="max-md:text-sm text-muted-foreground">
+                        <h3 className="line-clamp-2 text-sm font-medium md:text-base">{product.name}</h3>
+                        <p className="text-muted-foreground max-md:text-sm">
                             Base price:{" "}
-                            <span className="font-medium text-primary">
-                                {product.price ?? 0}
+                            <span className="text-primary font-medium">
+                                {product.discountPrice ?? product.price ?? 0}
                             </span>
                         </p>
 
                         {/* Selected variants/options */}
                         {product.productVariant.length > 0 ? (
-                            item?.selectedVariants &&
-                            item.selectedVariants.length > 0 ? (
+                            item?.selectedVariants && item.selectedVariants.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                     {item.selectedVariants.map((sv, i) => (
-                                        <Badge
-                                            key={`${sv.variantName}-${sv.optionName}-${i}`}
-                                            variant="secondary"
-                                        >
-                                            <span className="text-primary">
-                                                {sv.variantName}:
-                                            </span>{" "}
-                                            {sv.optionName}
-                                            {typeof sv.extraPrice ===
-                                                "number" && sv.extraPrice > 0
+                                        <Badge key={`${sv.variantName}-${sv.optionName}-${i}`} variant="secondary">
+                                            <span className="text-primary">{sv.variantName}:</span> {sv.optionName}
+                                            {typeof sv.extraPrice === "number" && sv.extraPrice > 0
                                                 ? ` (+${sv.extraPrice})`
                                                 : ""}
                                         </Badge>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-destructive text-sm">
-                                    No variant selected
-                                </p>
+                                <p className="text-destructive text-sm">No variant selected</p>
                             )
                         ) : null}
                     </div>
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-3 ms-auto">
+                <div className="ms-auto space-y-1.5 sm:space-y-3">
                     <div className="flex items-center gap-6">
                         <div className="flex items-center gap-2">
-                            <Label
-                                htmlFor={`qty-${product.id}`}
-                                className="text-sm max-sm:hidden"
-                            >
+                            <Label htmlFor={`qty-${product.id}`} className="text-sm max-sm:hidden">
                                 Quantity
                             </Label>
                             <div className="flex items-center gap-1">
@@ -419,9 +385,7 @@ const ProductOrderControls = ({
                                     min={1}
                                     className="w-16 text-center"
                                     value={quantity}
-                                    onChange={(e) =>
-                                        handleInputChange(e.target.value)
-                                    }
+                                    onChange={(e) => handleInputChange(e.target.value)}
                                 />
                                 <Button
                                     type="button"
@@ -448,24 +412,19 @@ const ProductOrderControls = ({
 
                     {/* Total price */}
                     {(() => {
-                        const basePrice = Number(product.price ?? 0);
+                        const basePrice = Number(product.discountPrice ?? product.price ?? 0);
                         const extras = (item?.selectedVariants ?? []).reduce(
-                            (sum, sv) =>
-                                sum + (Number(sv.extraPrice ?? 0) || 0),
+                            (sum, sv) => sum + (Number(sv.extraPrice ?? 0) || 0),
                             0
                         );
                         const unitPrice = basePrice + extras;
                         const total = unitPrice * (item?.quantity ?? 1);
                         return (
-                            <div className="flex items-center gap-2 justify-end">
+                            <div className="flex items-center justify-end gap-2">
                                 <span className="">
-                                    Unit: {unitPrice.toLocaleString()} x{" "}
-                                    {item?.quantity ?? 1}
+                                    Unit: {unitPrice.toLocaleString()} x {item?.quantity ?? 1}
                                 </span>{" "}
-                                =
-                                <span className="font-semibold text-base">
-                                    Total: {total.toLocaleString()}
-                                </span>
+                                =<span className="text-base font-semibold">Total: {total.toLocaleString()}</span>
                             </div>
                         );
                     })()}
@@ -475,39 +434,25 @@ const ProductOrderControls = ({
             <Separator className="my-3" />
 
             {/* Variant selection with buttons */}
-            {product &&
-            Array.isArray(product.productVariant) &&
-            product.productVariant.length > 0 ? (
+            {product && Array.isArray(product.productVariant) && product.productVariant.length > 0 ? (
                 <div className="mt-3 space-y-3">
                     {product.productVariant.map((v) => {
-                        const activeOptionId = getSelectedOptionId(
-                            String(v.id)
-                        );
+                        const activeOptionId = getSelectedOptionId(String(v.id));
                         return (
                             <div key={v.id} className="space-y-2">
-                                <Label className="text-sm text-muted-foreground">
-                                    {v.name}
-                                </Label>
+                                <Label className="text-muted-foreground text-sm">{v.name}</Label>
                                 <div className="flex flex-wrap gap-2">
                                     {v.options.map((o) => {
-                                        const isActive =
-                                            String(o.id) ===
-                                            String(activeOptionId);
+                                        const isActive = String(o.id) === String(activeOptionId);
                                         return (
                                             <Button
                                                 key={String(o.id)}
                                                 type="button"
                                                 size="sm"
-                                                variant={
-                                                    isActive
-                                                        ? "default"
-                                                        : "outline"
-                                                }
+                                                variant={isActive ? "default" : "outline"}
                                                 className={cn(
                                                     "max-md:text-xs",
-                                                    isActive
-                                                        ? "bg-primary text-primary-foreground"
-                                                        : ""
+                                                    isActive ? "bg-primary text-primary-foreground" : ""
                                                 )}
                                                 aria-pressed={isActive}
                                                 onClick={() =>
@@ -516,15 +461,12 @@ const ProductOrderControls = ({
                                                         v.name,
                                                         String(o.id ?? ""),
                                                         o.name,
-                                                        Number(
-                                                            o.extraPrice ?? 0
-                                                        )
+                                                        Number(o.extraPrice ?? 0)
                                                     )
                                                 }
                                             >
                                                 {o.name}
-                                                {typeof o.extraPrice ===
-                                                    "number" && o.extraPrice > 0
+                                                {typeof o.extraPrice === "number" && o.extraPrice > 0
                                                     ? ` (+${o.extraPrice})`
                                                     : ""}
                                             </Button>

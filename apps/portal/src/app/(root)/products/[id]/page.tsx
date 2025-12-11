@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+import { AddNewVariants } from "@/features/products/add-new-variants";
+import { updateProductSchema } from "@/features/products/product-schema";
+import { useGetBrandsQuery } from "@/redux/api/brand-api";
 import { useGetCategoriesQuery } from "@/redux/api/category-api";
 import {
     useDeleteProductVariantMutation,
@@ -9,20 +13,7 @@ import {
     useUpdateProductMutation,
     useUpdateProductVariantMutation,
 } from "@/redux/api/product-api";
-import { useForm, UseFormReturn } from "react-hook-form";
-
-import { Editor } from "@/components/editor";
-import { HeaderBackButton } from "@/components/ui/custom-back-button";
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomFormImage } from "@/components/ui/custom-form-image";
-import { CustomFormImages } from "@/components/ui/custom-form-images";
-import { AddNewVariants } from "@/features/products/add-new-variants";
-import { updateProductSchema } from "@/features/products/product-schema";
-import { useAlert } from "@/hooks/useAlert";
-import { getChangedFields } from "@/lib/get-changes-fields";
-import { useGetBrandsQuery } from "@/redux/api/brand-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { ProductVariantUpdate } from "@/types/product-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
@@ -37,8 +28,17 @@ import { Label } from "@workspace/ui/components/label";
 import { toast } from "@workspace/ui/components/sonner";
 import { cn } from "@workspace/ui/lib/utils";
 import { Pencil, Plus, Save, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+
+import { ProductVariantUpdate } from "@/types/product-type";
+import { getChangedFields } from "@/lib/get-changes-fields";
+import { useAlert } from "@/hooks/useAlert";
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { CustomFormImages } from "@/components/ui/custom-form-images";
+import { Editor } from "@/components/editor";
 
 type UpdateProductFormType = z.infer<typeof updateProductSchema>;
 
@@ -50,15 +50,12 @@ const EditProduct = () => {
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
 
-    const { data: product, isLoading: isLoadingProduct } =
-        useGetProductByIdQuery({
-            id: productId,
-        });
+    const { data: product, isLoading: isLoadingProduct } = useGetProductByIdQuery({
+        id: productId,
+    });
 
-    const [updateProduct, { isLoading: isUpdating }] =
-        useUpdateProductMutation();
-    const [deleteProductVariant, { isLoading: isDeletingVariant }] =
-        useDeleteProductVariantMutation();
+    const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
+    const [deleteProductVariant, { isLoading: isDeletingVariant }] = useDeleteProductVariantMutation();
 
     const form = useForm<UpdateProductFormType>({
         resolver: zodResolver(updateProductSchema),
@@ -72,10 +69,7 @@ const EditProduct = () => {
                   images: product.data.images || [],
                   keywords: product.data.keywords || "",
                   stock: product.data.stock || 0,
-                  categoryIds:
-                      product?.data?.categories?.map(
-                          (category) => category.categoryId
-                      ) || [],
+                  categoryIds: product?.data?.categories?.map((category) => category.categoryId) || [],
                   description: product.data.description || "",
                   fullDescription: product.data.fullDescription || "",
                   productVariant:
@@ -83,15 +77,13 @@ const EditProduct = () => {
                           id: variant.id || "",
                           name: variant.name,
                           isRequired: false,
-                          productVariantOptions: variant.options.map(
-                              (option) => ({
-                                  id: option.id || "",
-                                  name: option.name,
-                                  sku: option.sku || "",
-                                  extraPrice: option.extraPrice || 0,
-                                  imgUrl: option.imgUrl || "",
-                              })
-                          ),
+                          productVariantOptions: variant.options.map((option) => ({
+                              id: option.id || "",
+                              name: option.name,
+                              sku: option.sku || "",
+                              extraPrice: option.extraPrice || 0,
+                              imgUrl: option.imgUrl || "",
+                          })),
                       })) || [],
                   activeStatus: product.data.activeStatus || "active",
                   brandId: product.data.brandId || "",
@@ -104,10 +96,12 @@ const EditProduct = () => {
 
     const { data } = useGetCategoriesQuery({
         shopId,
+        limit: 100,
     });
 
     const { data: brands } = useGetBrandsQuery({
         shopId,
+        limit: 100,
     });
 
     const brandOptions = brands?.data.map((brand) => ({
@@ -133,10 +127,7 @@ const EditProduct = () => {
             images: product.data.images || [],
             keywords: product.data.keywords || "",
             stock: product.data.stock || 0,
-            categoryIds:
-                product?.data?.categories?.map(
-                    (category) => category.categoryId
-                ) || [],
+            categoryIds: product?.data?.categories?.map((category) => category.categoryId) || [],
             description: product.data.description || "",
             fullDescription: product.data.fullDescription || "",
             productVariant:
@@ -165,9 +156,7 @@ const EditProduct = () => {
         const originalData = getOriginalProductData();
 
         if (!originalData) {
-            toast.error(
-                "Unable to determine changes. Please refresh the page."
-            );
+            toast.error("Unable to determine changes. Please refresh the page.");
             return;
         }
 
@@ -210,8 +199,7 @@ const EditProduct = () => {
 
         fire({
             title: "Delete Product Variant",
-            description:
-                "Are you sure you want to delete this product variant?",
+            description: "Are you sure you want to delete this product variant?",
             onConfirm: async () => {
                 await deleteProductVariant({ id: variantId })
                     .unwrap()
@@ -233,23 +221,16 @@ const EditProduct = () => {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
                 <div className="flex items-center gap-4">
-                    <HeaderBackButton
-                        title="Back to Products"
-                        href="/products"
-                    />
+                    <HeaderBackButton title="Back to Products" href="/products" />
 
-                    <DiscardAndSaveButton
-                        form={form}
-                        isUpdating={isUpdating}
-                        className="hidden md:ml-auto md:flex"
-                    />
+                    <DiscardAndSaveButton form={form} isUpdating={isUpdating} className="hidden md:ml-auto md:flex" />
                 </div>
 
                 <div className="grid gap-4">
                     <CustomCollapsible
                         title="General Information"
                         content={
-                            <div className="grid pt-2 grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
                                 <CustomFormInput
                                     label="Product Name (English)"
                                     name="name"
@@ -296,7 +277,7 @@ const EditProduct = () => {
                     <CustomCollapsible
                         title="Media"
                         content={
-                            <div className="grid pt-2 gap-4">
+                            <div className="grid gap-4 pt-2">
                                 <CustomFormImage
                                     name="photoURL"
                                     control={form.control}
@@ -318,7 +299,7 @@ const EditProduct = () => {
                     <CustomCollapsible
                         title="Price & Inventory"
                         content={
-                            <div className="grid pt-2 grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
                                 <CustomFormInput
                                     label="Sell / Current Price"
                                     name="discountPrice"
@@ -372,10 +353,9 @@ const EditProduct = () => {
                     <CustomCollapsible
                         title="Product Variants"
                         content={
-                            <div className="grid pt-1 gap-6">
+                            <div className="grid gap-6 pt-1">
                                 <p className="text-muted-foreground">
-                                    You can add multiple variant for a single
-                                    product here. Like Size, Color, and Weight
+                                    You can add multiple variant for a single product here. Like Size, Color, and Weight
                                     etc.
                                 </p>
 
@@ -384,17 +364,13 @@ const EditProduct = () => {
                                         key={index}
                                         index={index}
                                         variant={variant}
-                                        deleteVariant={() =>
-                                            handleDeleteVariant(index)
-                                        }
+                                        deleteVariant={() => handleDeleteVariant(index)}
                                         form={form}
                                         isDeletingVariant={isDeletingVariant}
                                     />
                                 ))}
 
-                                {product?.data && (
-                                    <AddNewVariants productId={productId} />
-                                )}
+                                {product?.data && <AddNewVariants productId={productId} />}
                             </div>
                         }
                     />
@@ -402,7 +378,7 @@ const EditProduct = () => {
                     <CustomCollapsible
                         title="Product Details"
                         content={
-                            <div className="grid pt-2 grid-cols-2 gap-x-6 gap-y-4">
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
                                 <CustomFormTextarea
                                     label="Short Description (SEO & Data Feed)"
                                     name="description"
@@ -413,19 +389,11 @@ const EditProduct = () => {
                                     className="col-span-2"
                                 />
                                 <div className="col-span-2 space-y-2.5">
-                                    <Label className="title">
-                                        Product Description
-                                    </Label>
+                                    <Label className="title">Product Description</Label>
                                     <Editor
-                                        content={
-                                            form.watch("fullDescription") ||
-                                            product?.data?.fullDescription
-                                        }
+                                        content={form.watch("fullDescription") || product?.data?.fullDescription}
                                         onChange={(content) => {
-                                            form.setValue(
-                                                "fullDescription",
-                                                content
-                                            );
+                                            form.setValue("fullDescription", content);
                                         }}
                                     />
                                 </div>
@@ -444,11 +412,7 @@ const EditProduct = () => {
                     />
                 </div>
 
-                <DiscardAndSaveButton
-                    form={form}
-                    isUpdating={isUpdating}
-                    className="flex border-t justify-end p-4"
-                />
+                <DiscardAndSaveButton form={form} isUpdating={isUpdating} className="flex justify-end border-t p-4" />
             </form>
         </Form>
     );
@@ -470,8 +434,7 @@ const VariantCard = ({
     isDeletingVariant: boolean;
 }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [updateProductVariant, { isLoading: isUpdatingVariant }] =
-        useUpdateProductVariantMutation();
+    const [updateProductVariant, { isLoading: isUpdatingVariant }] = useUpdateProductVariantMutation();
 
     const handleAddOption = () => {
         form.setValue(`productVariant.${index}.productVariantOptions`, [
@@ -484,9 +447,7 @@ const VariantCard = ({
         if (variant.productVariantOptions.length > 1) {
             form.setValue(
                 `productVariant.${index}.productVariantOptions`,
-                variant.productVariantOptions.filter(
-                    (_, idx) => idx !== optionIndex
-                )
+                variant.productVariantOptions.filter((_, idx) => idx !== optionIndex)
             );
         } else {
             toast.error("At least one option is required for each variant");
@@ -524,7 +485,7 @@ const VariantCard = ({
     };
 
     return (
-        <div className="border rounded-lg max-w-6xl p-6 border-primary">
+        <div className="border-primary max-w-6xl rounded-lg border p-6">
             <div className="flex justify-between">
                 <CustomFormSwitch
                     name={`productVariant.${index}.isRequired`}
@@ -550,7 +511,7 @@ const VariantCard = ({
             <CustomFormInput
                 label="Title"
                 name={`productVariant.${index}.name`}
-                className="pt-6 mb-4"
+                className="mb-4 pt-6"
                 control={form.control}
                 placeholder="Enter the name of the variant (e.g. Size, Color, Material, etc.)"
                 required
@@ -558,7 +519,7 @@ const VariantCard = ({
             />
 
             {variant.productVariantOptions.map((_option, optionIndex) => (
-                <div key={optionIndex} className="flex  gap-6 pt-4">
+                <div key={optionIndex} className="flex gap-6 pt-4">
                     <CustomFormInput
                         label="Name"
                         name={`productVariant.${index}.productVariantOptions.${optionIndex}.name`}
@@ -605,29 +566,19 @@ const VariantCard = ({
                 </div>
             ))}
 
-            <div
-                className={cn(
-                    "flex  items-center",
-                    isEditing ? "justify-between" : "justify-end"
-                )}
-            >
+            <div className={cn("flex items-center", isEditing ? "justify-between" : "justify-end")}>
                 {isEditing && (
-                    <Button
-                        onClick={handleAddOption}
-                        variant="accent"
-                        className="w-fit mt-6"
-                        type="button"
-                    >
+                    <Button onClick={handleAddOption} variant="accent" className="mt-6 w-fit" type="button">
                         <Plus className="size-4" />
                         Add New Option
                     </Button>
                 )}
 
                 {isEditing ? (
-                    <div className="flex gap-4 items-center">
+                    <div className="flex items-center gap-4">
                         <Button
                             onClick={() => setIsEditing(false)}
-                            className="w-fit mt-6"
+                            className="mt-6 w-fit"
                             type="button"
                             variant="outline"
                         >
@@ -636,7 +587,7 @@ const VariantCard = ({
                         </Button>
                         <CustomButton
                             onClick={onSubmit}
-                            className="w-fit mt-6"
+                            className="mt-6 w-fit"
                             type="button"
                             isLoading={isUpdatingVariant}
                         >
@@ -645,11 +596,7 @@ const VariantCard = ({
                         </CustomButton>
                     </div>
                 ) : (
-                    <Button
-                        onClick={() => setIsEditing(true)}
-                        className="w-fit mt-6"
-                        type="button"
-                    >
+                    <Button onClick={() => setIsEditing(true)} className="mt-6 w-fit" type="button">
                         <Pencil className="size-4" />
                         Edit Variants
                     </Button>
@@ -678,10 +625,7 @@ const DiscardAndSaveButton = ({
             >
                 Discard
             </CustomButton>
-            <CustomButton
-                isLoading={form.formState.isSubmitting || isUpdating}
-                type="submit"
-            >
+            <CustomButton isLoading={form.formState.isSubmitting || isUpdating} type="submit">
                 Save Product
             </CustomButton>
         </div>

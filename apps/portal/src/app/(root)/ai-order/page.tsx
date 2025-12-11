@@ -1,12 +1,5 @@
 "use client";
 
-import { OrderInput } from "@/features/ai-order/order-input";
-import { useAiOrderGenerationMutation } from "@/redux/api/order-api";
-import {
-    AIOrderGenerationProductInfo,
-    OrderDetailsType,
-} from "@/types/order-type";
-import { toast } from "@workspace/ui/components/sonner";
 import { useState } from "react";
 
 import { CustomerInfo } from "@/features/ai-order/customer-info";
@@ -15,11 +8,16 @@ import { GenerateSkeleton } from "@/features/ai-order/generate-skeleton";
 import { isValidBdPhoneNumber, isValidId } from "@/features/ai-order/lib";
 import { OrderDetails } from "@/features/ai-order/order-details";
 import { OrderInfo } from "@/features/ai-order/order-info";
+import { OrderInput } from "@/features/ai-order/order-input";
 import { ProductInfoOrder } from "@/features/ai-order/product-info-order";
 import { CustomerState } from "@/features/ai-order/types";
 import { useGetFraudCheckerDataMutation } from "@/redux/api/customer-api";
+import { useAiOrderGenerationMutation } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
+import { toast } from "@workspace/ui/components/sonner";
+
 import { FraudCheckerData } from "@/types/customer-type";
+import { AIOrderGenerationProductInfo, OrderDetailsType } from "@/types/order-type";
 
 const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
@@ -29,14 +27,11 @@ const Page = () => {
     const [getFraudCheckerData] = useGetFraudCheckerDataMutation();
 
     const [orderText, setOrderText] = useState("");
-    const [customerState, setCustomerState] = useState<CustomerState | null>(
-        null
-    );
-    const [productInfo, setProductInfo] = useState<
-        AIOrderGenerationProductInfo[] | null
-    >(null);
+    const [customerState, setCustomerState] = useState<CustomerState | null>(null);
+    const [productInfo, setProductInfo] = useState<AIOrderGenerationProductInfo[] | null>(null);
     const [orderDetails, setOrderDetails] = useState<OrderDetailsType>({
         deliveryZoneId: "",
+        discountedPrice: undefined,
     });
     const [fraudState, setFraudState] = useState<FraudCheckerData | null>(null);
     const [fraudError, setFraudError] = useState<string | null>(null);
@@ -46,9 +41,7 @@ const Page = () => {
     const checkFraud = async (phoneNumber: string) => {
         // Phone number validation (Bangladesh format)
         if (!isValidBdPhoneNumber(phoneNumber)) {
-            setFraudError(
-                "Please provide a valid Bangladeshi phone number (e.g., 01XXXXXXXXX)"
-            );
+            setFraudError("Please provide a valid Bangladeshi phone number (e.g., 01XXXXXXXXX)");
             setFraudState(null);
             return;
         }
@@ -62,15 +55,8 @@ const Page = () => {
                 console.log(res);
                 // Check if response contains error status
                 const data = res.data as any;
-                if (
-                    data &&
-                    typeof data === "object" &&
-                    "status" in data &&
-                    data.status === "error"
-                ) {
-                    setFraudError(
-                        data.message || "Failed to check customer verification"
-                    );
+                if (data && typeof data === "object" && "status" in data && data.status === "error") {
+                    setFraudError(data.message || "Failed to check customer verification");
                     setFraudState(null);
                 } else {
                     setFraudState(res.data as FraudCheckerData);
@@ -80,9 +66,7 @@ const Page = () => {
             .catch((error) => {
                 console.log(error);
                 setFraudError(
-                    error.data?.message ||
-                        error.message ||
-                        "Failed to check customer verification. Please try again."
+                    error.data?.message || error.message || "Failed to check customer verification. Please try again."
                 );
                 setFraudState(null);
             })
@@ -147,7 +131,7 @@ const Page = () => {
     };
 
     return (
-        <div className="space-y-6 max-w-7xl">
+        <div className="max-w-7xl space-y-6">
             {/* Input Section */}
             <OrderInput
                 orderText={orderText}
@@ -176,19 +160,11 @@ const Page = () => {
                     )}
 
                     {/* Customer Information */}
-                    <CustomerInfo
-                        customerState={customerState}
-                        onCustomerStateChange={setCustomerState}
-                    />
+                    <CustomerInfo customerState={customerState} onCustomerStateChange={setCustomerState} />
 
-                    {isValidId(customerState.customerId) && (
-                        <OrderInfo customerId={customerState.customerId} />
-                    )}
+                    {isValidId(customerState.customerId) && <OrderInfo customerId={customerState.customerId} />}
 
-                    <OrderDetails
-                        orderDetails={orderDetails}
-                        setOrderDetails={setOrderDetails}
-                    />
+                    <OrderDetails orderDetails={orderDetails} setOrderDetails={setOrderDetails} />
 
                     {/* Product Information */}
                     <ProductInfoOrder
@@ -196,6 +172,7 @@ const Page = () => {
                         productInfo={productInfo}
                         onReset={resetForm}
                         orderDetails={orderDetails}
+                        setOrderDetails={setOrderDetails}
                     />
                 </div>
             )}

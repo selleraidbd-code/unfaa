@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { orderStatusOptions } from "@/features/orders/data";
 import { OrderDetailsModal } from "@/features/orders/order-details-modal";
+import { OrderMobileList } from "@/features/orders/order-mobile-list";
 import { OrderTable } from "@/features/orders/order-table";
 import { useCourierEntryMutation } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
@@ -97,10 +98,10 @@ const OrdersPage = () => {
     return (
         <>
             <div className="grid gap-2 md:gap-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                     <h1 className="title">Orders ( {data?.meta?.total || 0} )</h1>
 
-                    <div className="flex items-center gap-4">
+                    <div className="ms-auto flex items-center gap-4">
                         <CustomButton variant="accent">
                             <DownloadCloud />
                             Export
@@ -149,16 +150,34 @@ const OrdersPage = () => {
                     )}
                 </div>
 
-                <OrderTable
-                    data={data?.data || []}
-                    isLoading={isLoading}
-                    isError={isError}
-                    meta={meta}
-                    onPaginationChange={handlePaginationChange}
-                    onRowClick={handleRowClick}
-                    onSelectionChange={setSelectedRows}
-                    enableSelection={activeTab === OrderStatus.CONFIRMED}
-                />
+                {/* Desktop Table View */}
+                <div className="max-lg:hidden">
+                    <OrderTable
+                        data={data?.data || []}
+                        isLoading={isLoading}
+                        isError={isError}
+                        meta={meta}
+                        onPaginationChange={handlePaginationChange}
+                        onRowClick={handleRowClick}
+                        onSelectionChange={setSelectedRows}
+                        enableSelection={activeTab === OrderStatus.CONFIRMED}
+                    />
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="lg:hidden">
+                    <OrderMobileList
+                        data={data?.data || []}
+                        isLoading={isLoading}
+                        isError={isError}
+                        meta={meta}
+                        selectedRows={selectedRows}
+                        enableSelection={activeTab === OrderStatus.CONFIRMED}
+                        onPaginationChange={handlePaginationChange}
+                        onRowClick={handleRowClick}
+                        onSelectionChange={setSelectedRows}
+                    />
+                </div>
             </div>
 
             {selectedOrder && (

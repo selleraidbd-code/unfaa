@@ -165,6 +165,7 @@ const Page = () => {
                         onReset={resetForm}
                         orderDetails={orderDetails}
                         setOrderDetails={setOrderDetails}
+                        fraudState={fraudState}
                     />
                 </div>
             )}

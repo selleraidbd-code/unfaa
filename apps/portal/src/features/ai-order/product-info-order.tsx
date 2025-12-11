@@ -17,6 +17,7 @@ import { toast } from "@workspace/ui/components/sonner";
 import { cn } from "@workspace/ui/lib/utils";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 
+import { FraudCheckerData } from "@/types/customer-type";
 import { AIOrderGenerationProductInfo, OrderDetailsType, OrderItem } from "@/types/order-type";
 import { Product } from "@/types/product-type";
 
@@ -28,9 +29,17 @@ interface Props {
     onReset: () => void;
     orderDetails: OrderDetailsType;
     setOrderDetails: (orderDetails: OrderDetailsType) => void;
+    fraudState?: FraudCheckerData | null;
 }
 
-export const ProductInfoOrder = ({ customerInfo, productInfo, onReset, orderDetails, setOrderDetails }: Props) => {
+export const ProductInfoOrder = ({
+    customerInfo,
+    productInfo,
+    onReset,
+    orderDetails,
+    setOrderDetails,
+    fraudState,
+}: Props) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 
@@ -260,6 +269,7 @@ export const ProductInfoOrder = ({ customerInfo, productInfo, onReset, orderDeta
                 orderItems={orderItems}
                 orderDetails={orderDetails}
                 setOrderDetails={setOrderDetails}
+                fraudState={fraudState}
             />
 
             {isModalOpen && (

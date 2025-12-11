@@ -1,22 +1,18 @@
 "use client";
 
+import { useState } from "react";
+
 import { CustomerStep } from "@/features/make-order/customer-step/customer-step";
 import { OrderDetailsStep } from "@/features/make-order/details-step/order-details-step";
 import { ProductsStep } from "@/features/make-order/product-step/products-step";
 import { StepIndicator } from "@/features/make-order/StepIndicator";
 import { useCreateOrderbyAdminMutation } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { Customer } from "@/types/customer-type";
-import {
-    CreateOrder,
-    OrderItem,
-    OrderStatus,
-    OrderStepIndicator,
-} from "@/types/order-type";
-import { Product } from "@/types/product-type";
-import { useState } from "react";
-
 import { toast } from "@workspace/ui/components/sonner";
+
+import { Customer } from "@/types/customer-type";
+import { CreateOrder, OrderItem, OrderStatus, OrderStepIndicator } from "@/types/order-type";
+import { Product } from "@/types/product-type";
 
 export type OrderDetails = {
     orderNotes: string;
@@ -30,9 +26,7 @@ const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
     const [activeStep, setActiveStep] = useState(OrderStepIndicator.CUSTOMER);
     const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-        null
-    );
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
     const [orderDetails, setOrderDetails] = useState<OrderDetails>({
         orderNotes: "",
         deliveryAddress: "",
@@ -49,11 +43,7 @@ const Page = () => {
 
         if (existingItem) {
             setOrderItems(
-                orderItems.map((item) =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                )
+                orderItems.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item))
             );
         } else {
             setOrderItems([
@@ -71,35 +61,18 @@ const Page = () => {
     const updateQuantity = (productId: string, newQuantity: number) => {
         if (newQuantity < 1) return;
 
-        setOrderItems(
-            orderItems.map((item) =>
-                item.id === productId
-                    ? { ...item, quantity: newQuantity }
-                    : item
-            )
-        );
+        setOrderItems(orderItems.map((item) => (item.id === productId ? { ...item, quantity: newQuantity } : item)));
     };
 
     // Update order item variants
-    const updateOrderItemVariants = (
-        itemId: string,
-        selectedVariants: OrderItem["selectedVariants"]
-    ) => {
-        setOrderItems(
-            orderItems.map((item) =>
-                item.id === itemId ? { ...item, selectedVariants } : item
-            )
-        );
+    const updateOrderItemVariants = (itemId: string, selectedVariants: OrderItem["selectedVariants"]) => {
+        setOrderItems(orderItems.map((item) => (item.id === itemId ? { ...item, selectedVariants } : item)));
     };
 
     // Calculate order subtotal
     const calculateTotal = () => {
         return orderItems.reduce((total, item) => {
-            const extraPrice =
-                item.selectedVariants?.reduce(
-                    (sum, variant) => sum + variant.extraPrice,
-                    0
-                ) || 0;
+            const extraPrice = item.selectedVariants?.reduce((sum, variant) => sum + variant.extraPrice, 0) || 0;
             const finalPrice = item.price + extraPrice;
             const itemTotal = finalPrice * item.quantity;
             return total + itemTotal;
@@ -143,6 +116,8 @@ const Page = () => {
             orderStatus: OrderStatus.PLACED,
             notes: orderDetails.orderNotes,
             deliveryZoneId: orderDetails.deliveryId,
+            customerTotalConfirmOrder: 0,
+            customerTotalCancelOrder: 0,
         };
 
         await createOrder({
@@ -171,11 +146,7 @@ const Page = () => {
 
     return (
         <>
-            <StepIndicator
-                orderItems={orderItems}
-                activeStep={activeStep}
-                setActiveStep={setActiveStep}
-            />
+            <StepIndicator orderItems={orderItems} activeStep={activeStep} setActiveStep={setActiveStep} />
 
             <section>
                 {activeStep === OrderStepIndicator.CUSTOMER && (
@@ -204,9 +175,7 @@ const Page = () => {
                     <OrderDetailsStep
                         orderDetails={orderDetails}
                         setOrderDetails={setOrderDetails}
-                        canCompleteOrder={
-                            orderItems.length > 0 && Boolean(selectedCustomer)
-                        }
+                        canCompleteOrder={orderItems.length > 0 && Boolean(selectedCustomer)}
                         handleSubmitOrder={handleSubmitOrder}
                         setActiveStep={setActiveStep}
                         isLoading={isLoading}

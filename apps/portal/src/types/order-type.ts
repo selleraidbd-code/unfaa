@@ -121,6 +121,8 @@ export type CreateOrder = {
     notes: string;
     deliveryZoneId: string;
     discountedPrice?: number | null;
+    customerTotalConfirmOrder: number;
+    customerTotalCancelOrder: number;
 };
 
 export interface CustomItem {

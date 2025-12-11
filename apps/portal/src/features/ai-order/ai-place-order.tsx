@@ -6,6 +6,7 @@ import { Button } from "@workspace/ui/components/button";
 import { toast } from "@workspace/ui/components/sonner";
 import { CheckCircle } from "lucide-react";
 
+import { FraudCheckerData } from "@/types/customer-type";
 import { CreateOrder, OrderDetailsType, OrderItem, OrderStatus } from "@/types/order-type";
 
 interface Props {
@@ -14,9 +15,17 @@ interface Props {
     orderItems: OrderItem[];
     orderDetails: OrderDetailsType;
     setOrderDetails: (orderDetails: OrderDetailsType) => void;
+    fraudState?: FraudCheckerData | null;
 }
 
-export const AiPlaceOrder = ({ onReset, customerInfo, orderItems, orderDetails, setOrderDetails }: Props) => {
+export const AiPlaceOrder = ({
+    onReset,
+    customerInfo,
+    orderItems,
+    orderDetails,
+    setOrderDetails,
+    fraudState,
+}: Props) => {
     const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
     const user = useAppSelector((state) => state.auth.user);
 
@@ -56,6 +65,10 @@ export const AiPlaceOrder = ({ onReset, customerInfo, orderItems, orderDetails, 
             return;
         }
 
+        // Map fraudchecker data to order payload
+        const customerTotalConfirmOrder = fraudState?.total_delivered ?? 0;
+        const customerTotalCancelOrder = fraudState?.total_cancel ?? 0;
+
         // Build payload akin to make-order page
         const payload: CreateOrder = {
             shopId: user.shop.id,
@@ -86,6 +99,8 @@ export const AiPlaceOrder = ({ onReset, customerInfo, orderItems, orderDetails, 
             // Temporary delivery zone as requested
             deliveryZoneId: orderDetails.deliveryZoneId,
             discountedPrice: orderDetails.discountedPrice ?? undefined,
+            customerTotalConfirmOrder,
+            customerTotalCancelOrder,
         } as const;
 
         await createOrder({ assignedTo: user.id, payload })

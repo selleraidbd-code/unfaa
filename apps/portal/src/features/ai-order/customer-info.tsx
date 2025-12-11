@@ -1,31 +1,26 @@
 "use client";
 
+import { useState } from "react";
+
 import { CustomerState } from "@/features/ai-order/types";
-import { Customer } from "@/types/customer-type";
 import { Button } from "@workspace/ui/components/button";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@workspace/ui/components/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea";
+import { cn } from "@workspace/ui/lib/utils";
 import { User, Users } from "lucide-react";
-import { useState } from "react";
+
+import { Customer } from "@/types/customer-type";
+
 import { CustomerSelectionModal } from "./customer-selection-modal";
 import { isValidBdPhoneNumber } from "./lib";
-import { cn } from "@workspace/ui/lib/utils";
 
 type Props = {
     customerState: CustomerState;
     onCustomerStateChange: (newState: CustomerState) => void;
 };
 
-export const CustomerInfo = ({
-    customerState,
-    onCustomerStateChange,
-}: Props) => {
+export const CustomerInfo = ({ customerState, onCustomerStateChange }: Props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleFieldChange = (field: keyof CustomerState, value: string) => {
@@ -48,16 +43,14 @@ export const CustomerInfo = ({
         onCustomerStateChange(newState);
     };
 
-    const isInvalidPhoneNumber = !isValidBdPhoneNumber(
-        customerState.customerPhone
-    );
+    const isInvalidPhoneNumber = !isValidBdPhoneNumber(customerState.customerPhone);
 
     return (
         <Card className={cn(isInvalidPhoneNumber && "border-destructive")}>
             <CardHeader className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    Customer Information
+                    <User className="h-5 w-5 max-sm:hidden" /> Customer
+                    <span className="max-sm:hidden">Information</span>
                 </CardTitle>
 
                 <Button
@@ -71,35 +64,26 @@ export const CustomerInfo = ({
                 </Button>
             </CardHeader>
             <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid gap-4 md:grid-cols-2">
                     <CustomInput
                         label="Customer Name"
                         placeholder="Enter customer name"
                         value={customerState.customerName}
-                        onChange={(value) =>
-                            handleFieldChange("customerName", value.toString())
-                        }
+                        onChange={(value) => handleFieldChange("customerName", value.toString())}
                     />
                     <CustomInput
                         label="Phone Number"
                         placeholder="Enter phone number"
                         value={customerState.customerPhone}
-                        onChange={(value) =>
-                            handleFieldChange("customerPhone", value.toString())
-                        }
+                        onChange={(value) => handleFieldChange("customerPhone", value.toString())}
                         invalid={isInvalidPhoneNumber}
                     />
                     <CustomTextarea
                         label="Address"
                         placeholder="Enter address"
                         value={customerState.customerAddress}
-                        onChange={(value) =>
-                            handleFieldChange(
-                                "customerAddress",
-                                value.toString()
-                            )
-                        }
-                        className="col-span-2"
+                        onChange={(value) => handleFieldChange("customerAddress", value.toString())}
+                        className="md:col-span-2"
                     />
                 </div>
             </CardContent>

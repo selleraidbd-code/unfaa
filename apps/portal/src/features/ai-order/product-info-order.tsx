@@ -10,7 +10,6 @@ import { ResponseObject } from "@/redux/type";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 // removed Select-based UI in favor of button options
-import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
@@ -167,11 +166,11 @@ export const ProductInfoOrder = ({ customerInfo, productInfo, onReset, orderDeta
 
     return (
         <>
-            <div className="space-y-3 rounded-md border p-4 md:space-y-6 lg:p-6">
+            <div className="space-y-3 rounded-md md:space-y-6 md:border md:p-4 lg:p-6">
                 <div className="flex items-center justify-between">
                     <h2 className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5" />
-                        Product Information
+                        <ShoppingCart className="h-5 w-5 max-sm:hidden" /> Product
+                        <span className="max-sm:hidden">Information</span>
                     </h2>
 
                     <Button
@@ -215,7 +214,7 @@ export const ProductInfoOrder = ({ customerInfo, productInfo, onReset, orderDeta
                     <span className="text-base font-semibold">{grandTotal.toLocaleString()}</span>
                 </div>
 
-                <div className="ms-auto flex gap-2 max-sm:flex-col md:max-w-md">
+                <div className="ms-auto flex gap-2 md:max-w-md">
                     <Label className="flex-shrink-0" htmlFor="cod-amount">
                         COD Amount (optional)
                     </Label>
@@ -231,6 +230,9 @@ export const ProductInfoOrder = ({ customerInfo, productInfo, onReset, orderDeta
                                 ...orderDetails,
                                 discountedPrice: nextValue === "" || !Number.isFinite(parsed) ? undefined : parsed,
                             });
+                        }}
+                        onWheel={(e) => {
+                            e.currentTarget.blur();
                         }}
                     />
                 </div>
@@ -435,11 +437,11 @@ const ProductOrderControls = ({
 
             {/* Variant selection with buttons */}
             {product && Array.isArray(product.productVariant) && product.productVariant.length > 0 ? (
-                <div className="mt-3 space-y-3">
+                <div className="mt-3 space-y-2 sm:space-y-3">
                     {product.productVariant.map((v) => {
                         const activeOptionId = getSelectedOptionId(String(v.id));
                         return (
-                            <div key={v.id} className="space-y-2">
+                            <div key={v.id} className="space-y-1 sm:space-y-2">
                                 <Label className="text-muted-foreground text-sm">{v.name}</Label>
                                 <div className="flex flex-wrap gap-2">
                                     {v.options.map((o) => {

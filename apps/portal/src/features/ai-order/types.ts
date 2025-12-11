@@ -1,7 +1,4 @@
-import {
-    AIOrderGenerationData,
-    AIOrderGenerationProductInfo,
-} from "@/types/order-type";
+import { AIOrderGenerationData, AIOrderGenerationProductInfo } from "@/types/order-type";
 
 // Separate customer state interface
 export interface CustomerState {
@@ -33,9 +30,7 @@ export interface EditableOrderData extends AIOrderGenerationData {
 }
 
 export interface OrderInputProps {
-    orderText: string;
-    setOrderText: (text: string) => void;
-    onGenerate: () => void;
+    onGenerate: (orderText: string) => void;
     isProcessing: boolean;
     onReset: () => void;
     hasData: boolean;

@@ -26,7 +26,6 @@ const Page = () => {
     const [aiOrderGeneration] = useAiOrderGenerationMutation();
     const [getFraudCheckerData] = useGetFraudCheckerDataMutation();
 
-    const [orderText, setOrderText] = useState("");
     const [customerState, setCustomerState] = useState<CustomerState | null>(null);
     const [productInfo, setProductInfo] = useState<AIOrderGenerationProductInfo[] | null>(null);
     const [orderDetails, setOrderDetails] = useState<OrderDetailsType>({
@@ -75,11 +74,7 @@ const Page = () => {
             });
     };
 
-    const handleAiOrderGeneration = async () => {
-        if (!orderText.trim()) {
-            toast.error("Please enter order information");
-            return;
-        }
+    const handleAiOrderGeneration = async (orderText: string) => {
         clearFormData();
         setIsProcessing(true);
 
@@ -117,7 +112,6 @@ const Page = () => {
     };
 
     const resetForm = () => {
-        setOrderText("");
         setIsProcessing(false);
         clearFormData();
     };
@@ -134,8 +128,6 @@ const Page = () => {
         <div className="max-w-7xl space-y-6">
             {/* Input Section */}
             <OrderInput
-                orderText={orderText}
-                setOrderText={setOrderText}
                 onGenerate={handleAiOrderGeneration}
                 isProcessing={isProcessing}
                 onReset={resetForm}

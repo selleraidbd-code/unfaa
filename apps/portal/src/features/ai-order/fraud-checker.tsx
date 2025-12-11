@@ -1,7 +1,9 @@
 "use client";
 
-import { FraudCheckerData } from "@/types/customer-type";
+import { useState } from "react";
+
 import { Button } from "@workspace/ui/components/button";
+import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import {
     Dialog,
     DialogContent,
@@ -10,21 +12,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
 import { cn } from "@workspace/ui/lib/utils";
-import {
-    AlertCircle,
-    CheckCircle,
-    Loader2,
-    Package,
-    RotateCcw,
-    ShieldUser,
-    XCircle,
-} from "lucide-react";
-import { useState } from "react";
-import { FaPercentage } from "react-icons/fa";
+import { Eye, Loader2, RotateCcw, XCircle } from "lucide-react";
 import { FaCartShopping, FaTruckFast } from "react-icons/fa6";
+
+import { FraudCheckerData } from "@/types/customer-type";
 
 interface Props {
     fraudState: FraudCheckerData | null;
@@ -34,89 +26,13 @@ interface Props {
     isChecking?: boolean;
 }
 
-export const FraudChecker = ({
-    fraudState,
-    error,
-    onCheckFraud,
-    customerPhone,
-    isChecking = false,
-}: Props) => {
+export const FraudChecker = ({ fraudState, error, onCheckFraud, customerPhone, isChecking = false }: Props) => {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [phoneInput, setPhoneInput] = useState(customerPhone);
+    const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
-    if (!fraudState && !error && !isChecking) {
-        return null;
-    }
-
-    const handleRecheckClick = () => {
-        setPhoneInput(customerPhone);
-        setShowConfirmDialog(true);
-    };
-
-    const handleConfirmRecheck = () => {
+    const handleConfirmRecheck = (phoneInput: string) => {
         onCheckFraud(phoneInput);
         setShowConfirmDialog(false);
-    };
-
-    const handleCancelRecheck = () => {
-        setShowConfirmDialog(false);
-        setPhoneInput(customerPhone);
-    };
-
-    const deliveryRate = fraudState?.total_parcels
-        ? Math.round(
-              (fraudState.total_delivered / fraudState.total_parcels) * 100
-          )
-        : 0;
-
-    const getCustomerStatus = (rate: number) => {
-        if (fraudState && fraudState.total_parcels === 0) {
-            return {
-                icon: Package,
-                iconColor: "text-blue-600",
-                bgColor: "bg-blue-50 dark:bg-blue-950",
-                borderColor: "border-blue-200 dark:border-blue-800",
-                title: "New Customer (নতুন গ্রাহক)",
-                subtitle: "No delivery history found yet",
-            };
-        }
-        if (rate >= 70) {
-            return {
-                icon: CheckCircle,
-                iconColor: "text-green-600",
-                bgColor: "bg-green-50 dark:bg-green-950",
-                borderColor: "border-green-200 dark:border-green-800",
-                title: "Reliable Customer (এটি একটি নিরাপদ ডেলিভারি। )",
-                subtitle: "Excellent delivery record",
-            };
-        } else if (rate >= 50) {
-            return {
-                icon: AlertCircle,
-                iconColor: "text-yellow-600",
-                bgColor: "bg-yellow-50 dark:bg-yellow-950",
-                borderColor: "border-yellow-200 dark:border-yellow-800",
-                title: "Moderate Risk (এটি একটি মধ্যম রিস্ক ডেলিভারি। )",
-                subtitle: "Average delivery rate",
-            };
-        } else {
-            return {
-                icon: XCircle,
-                iconColor: "text-red-600",
-                bgColor: "bg-red-50 dark:bg-red-950",
-                borderColor: "border-red-200 dark:border-red-800",
-                title: "High Risk Customer (এটি একটি উচ্চ রিস্ক ডেলিভারি। )",
-                subtitle: "Low delivery success rate",
-            };
-        }
-    };
-
-    const customerStatus = getCustomerStatus(deliveryRate);
-    const StatusIcon = customerStatus.icon;
-
-    const getDeliveryRateColor = (rate: number) => {
-        if (rate >= 70) return "text-green-600";
-        if (rate >= 50) return "text-yellow-600";
-        return "text-red-600";
     };
 
     const summaryStats = fraudState
@@ -137,239 +53,65 @@ export const FraudChecker = ({
               },
               {
                   icon: XCircle,
-                  color: "text-red-600",
+                  color: "text-destructive",
                   value: fraudState.total_cancel,
                   labelBn: "মোট বাতিল",
                   labelEn: `Total Canceled`,
               },
-              {
-                  icon: FaPercentage,
-                  color: fraudState.total_parcels
-                      ? getDeliveryRateColor(deliveryRate)
-                      : "text-gray-600",
-                  value: fraudState.total_parcels ? `${deliveryRate}%` : "N/A",
-                  labelBn: "ডেলিভারি রেট",
-                  labelEn: `Success Rate`,
-              },
           ]
         : [];
 
-    return (
-        <div className="space-y-6 bg-card p-4 rounded-xl lg:p-6 max-w-7xl border">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <ShieldUser className="h-5 w-5 text-primary" />
-                    <h2 className="text-lg font-semibold">
-                        Customer Verification
-                    </h2>
+    if (isChecking) {
+        return (
+            <div className="flex items-center justify-center rounded-lg border p-4 py-12">
+                <div className="text-center">
+                    <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-blue-600" />
+                    <p className="text-sm text-gray-600">Checking customer history...</p>
                 </div>
-
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRecheckClick}
-                    className="flex items-center gap-1"
-                >
-                    <RotateCcw className="h-3 w-3" />
-                    Recheck
-                </Button>
             </div>
+        );
+    }
 
-            {/* Loading State */}
-            {isChecking && (
-                <div className="flex items-center justify-center py-12">
-                    <div className="text-center">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-blue-600" />
-                        <p className="text-sm text-gray-600">
-                            Checking customer history...
-                        </p>
-                    </div>
-                </div>
-            )}
+    if (error) {
+        return (
+            <div className="border-destructive/20 bg-destructive/5 flex flex-col items-center justify-center gap-1 rounded-lg border p-4">
+                <XCircle className="text-destructive h-6 w-6 flex-shrink-0" />
+                <p className="text-destructive text-lg font-medium">Customer Fraud Check Failed</p>
+                <p className="text-destructive">{error}</p>
+                {customerPhone && <p className="text-destructive text-sm">Phone: {customerPhone}</p>}
+            </div>
+        );
+    }
 
-            {/* Error State */}
-            {error && !isChecking && (
-                <div className="flex gap-4 p-4 rounded-lg border bg-red-50 border-red-200">
-                    <XCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1">
-                        <p className="text-lg font-medium text-red-600 mb-1">
-                            Verification Failed
-                        </p>
-                        <p className="text-red-700">{error}</p>
-                        {customerPhone && (
-                            <p className="text-sm text-red-600 mt-2">
-                                Phone: {customerPhone}
-                            </p>
-                        )}
-                    </div>
-                </div>
-            )}
-
+    return (
+        <div>
             {/* Customer Info */}
-            {fraudState && !error && (
-                <div className="space-y-6">
-                    {/* Customer Status */}
-                    <div
-                        className={`flex gap-5 p-4 rounded-lg border ${customerStatus.bgColor} ${customerStatus.borderColor}`}
-                    >
-                        <StatusIcon
-                            className={`size-8 ${customerStatus.iconColor}`}
-                        />
-                        <div className="flex-1">
-                            <p
-                                className={`text-lg font-medium ${customerStatus.iconColor}`}
-                            >
-                                {customerStatus.title}
-                            </p>
-                            <p className="text-gray-500">
-                                {customerStatus.subtitle} • Phone:{" "}
-                                {fraudState.mobile_number}
-                            </p>
-                            {deliveryRate > 0 && (
-                                <p className="mt-1">
-                                    Success Rate: {deliveryRate}%
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Summary Stats */}
-                    <SummaryStats stats={summaryStats} />
-
-                    {/* Courier History Table */}
-                    {fraudState &&
-                        fraudState.total_parcels > 0 &&
-                        Object?.keys(fraudState?.apis || {}).length > 0 && (
-                            <div className="overflow-x-auto border rounded-lg p-4">
-                                <table className="w-full">
-                                    <thead>
-                                        <tr className="border-b">
-                                            <th className="text-left py-3 px-2 font-medium text-gray-700">
-                                                কুরিয়ার
-                                            </th>
-                                            <th className="text-center py-3 px-2 font-medium text-primary">
-                                                অর্ডার
-                                            </th>
-                                            <th className="text-center py-3 px-2 font-medium text-green-700">
-                                                ডেলিভারি
-                                            </th>
-                                            <th className="text-center py-3 px-2 font-medium text-red-600">
-                                                বাতিল
-                                            </th>
-                                            <th
-                                                className={cn(
-                                                    "text-center py-3 px-2 font-medium",
-                                                    getDeliveryRateColor(
-                                                        deliveryRate
-                                                    )
-                                                )}
-                                            >
-                                                ডেলিভারি %
-                                            </th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        {Object.entries(
-                                            fraudState?.apis || {}
-                                        ).map(([courier, data]) => {
-                                            const courierDeliveryRate =
-                                                data.total_parcels
-                                                    ? Math.round(
-                                                          (data.total_delivered_parcels /
-                                                              data.total_parcels) *
-                                                              100
-                                                      )
-                                                    : 0;
-
-                                            return (
-                                                <tr
-                                                    key={courier}
-                                                    className="border-b last:border-b-0 border-dotted"
-                                                >
-                                                    <td className="py-3 px-2 font-medium text-gray-900">
-                                                        {courier}
-                                                    </td>
-                                                    <td className="text-center py-3 px-2 text-primary font-medium">
-                                                        {data.total_parcels}
-                                                    </td>
-                                                    <td className="text-center py-3 px-2 text-green-700 font-medium">
-                                                        {
-                                                            data.total_delivered_parcels
-                                                        }
-                                                    </td>
-                                                    <td className="text-center py-3 px-2 text-red-700 font-medium">
-                                                        {
-                                                            data.total_cancelled_parcels
-                                                        }
-                                                    </td>
-                                                    <td
-                                                        className={cn(
-                                                            "text-center py-3 px-2 font-medium",
-                                                            getDeliveryRateColor(
-                                                                courierDeliveryRate
-                                                            )
-                                                        )}
-                                                    >
-                                                        {data.total_parcels > 0
-                                                            ? `${courierDeliveryRate}%`
-                                                            : "N/A"}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                </div>
+            {fraudState && (
+                <SummaryStats
+                    stats={summaryStats}
+                    onRecheckClick={() => setShowConfirmDialog(true)}
+                    onDetailsClick={() => setShowDetailsDialog(true)}
+                    hasDetails={fraudState.total_parcels > 0 && Object?.keys(fraudState?.apis || {}).length > 0}
+                />
             )}
 
             {/* Confirmation Dialog */}
-            <Dialog
+            <RecheckConfirmDialog
                 open={showConfirmDialog}
                 onOpenChange={setShowConfirmDialog}
-            >
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <RotateCcw className="h-4 w-4" />
-                            Confirm Recheck
-                        </DialogTitle>
-                        <DialogDescription>
-                            Please confirm the phone number to recheck customer
-                            verification.
-                        </DialogDescription>
-                    </DialogHeader>
+                customerPhone={customerPhone}
+                onConfirm={handleConfirmRecheck}
+                onCancel={() => setShowConfirmDialog(false)}
+            />
 
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="phone-input">Phone Number</Label>
-                            <Input
-                                id="phone-input"
-                                type="tel"
-                                value={phoneInput}
-                                onChange={(e) => setPhoneInput(e.target.value)}
-                                placeholder="Enter phone number"
-                                className="w-full"
-                            />
-                        </div>
-                    </div>
-
-                    <DialogFooter className="gap-2">
-                        <Button variant="outline" onClick={handleCancelRecheck}>
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={handleConfirmRecheck}
-                            disabled={!phoneInput.trim()}
-                        >
-                            Confirm Recheck
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            {/* Details Dialog */}
+            {fraudState && (
+                <CourierHistoryDetailsDialog
+                    open={showDetailsDialog}
+                    onOpenChange={setShowDetailsDialog}
+                    fraudState={fraudState}
+                />
+            )}
         </div>
     );
 };
@@ -382,44 +124,152 @@ interface SummaryStat {
     labelEn: string;
 }
 
-const SummaryStats = ({ stats }: { stats: SummaryStat[] }) => {
+interface SummaryStatsProps {
+    stats: SummaryStat[];
+    onRecheckClick: () => void;
+    onDetailsClick: () => void;
+    hasDetails: boolean;
+}
+
+const SummaryStats = ({ stats, onRecheckClick, onDetailsClick, hasDetails }: SummaryStatsProps) => {
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {stats.map((stat, index) => {
                 const Icon = stat.icon;
-                return (
-                    <div
-                        key={index}
-                        className="rounded-lg flex items-center gap-5 border p-4"
-                    >
-                        <Icon
-                            className={`h-8 w-8 mx-auto mb-2 ${stat.color}`}
-                        />
-                        <div className="flex flex-col gap-1 flex-1">
-                            <h2
-                                className={cn(
-                                    "text-base font-medium",
-                                    stat.color
-                                )}
-                            >
-                                {stat.labelBn}
-                            </h2>
 
-                            <p className="text-sm">
-                                <span
-                                    className={cn(
-                                        "font-medium pr-1 text-lg",
-                                        stat.color
-                                    )}
-                                >
-                                    {stat.value}
-                                </span>{" "}
-                                {stat.labelEn}
-                            </p>
+                return (
+                    <div key={index} className="flex items-center gap-5 rounded-lg border p-2 max-sm:flex-col lg:p-4">
+                        <Icon className={cn("size-8 flex-shrink-0 max-sm:hidden", stat.color)} />
+                        <div className="flex flex-1 flex-col gap-1">
+                            <h2 className={cn("text-sm font-medium md:text-base", stat.color)}>{stat.labelBn}</h2>
+                            <p className={cn("text-center text-lg font-medium", stat.color)}>{stat.value}</p>{" "}
                         </div>
                     </div>
                 );
             })}
+
+            <div className="flex gap-2 rounded-lg border p-2 max-md:items-center max-md:justify-center md:flex-col">
+                <Button size="sm" onClick={onDetailsClick} disabled={!hasDetails}>
+                    <Eye className="h-3 w-3" />
+                    <span className="max-md:hidden">Details</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={onRecheckClick}>
+                    <RotateCcw className="h-3 w-3" />
+                    <span className="max-md:hidden">Recheck</span>
+                </Button>
+            </div>
         </div>
+    );
+};
+
+interface RecheckConfirmDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    customerPhone: string;
+    onConfirm: (phoneInput: string) => void;
+    onCancel: () => void;
+}
+
+const RecheckConfirmDialog = ({
+    open,
+    onOpenChange,
+    customerPhone,
+    onConfirm,
+    onCancel,
+}: RecheckConfirmDialogProps) => {
+    const [phoneInput, setPhoneInput] = useState(customerPhone);
+
+    const handleConfirm = () => {
+        onConfirm(phoneInput);
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Confirm Recheck</DialogTitle>
+                    <DialogDescription>
+                        Please confirm the phone number to recheck customer verification.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <CustomInput
+                    label="Phone Number"
+                    value={phoneInput}
+                    onChange={(value) => setPhoneInput(value.toString())}
+                    placeholder="Enter phone number"
+                    type="tel"
+                />
+
+                <DialogFooter className="flex-row justify-center! gap-2">
+                    <Button variant="outline" onClick={onCancel}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirm} disabled={!phoneInput.trim()}>
+                        Confirm Recheck
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
+interface CourierHistoryDetailsDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    fraudState: FraudCheckerData;
+}
+
+const CourierHistoryDetailsDialog = ({ open, onOpenChange, fraudState }: CourierHistoryDetailsDialogProps) => {
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>Courier History Details</DialogTitle>
+                    <DialogDescription>Detailed breakdown of orders by courier service.</DialogDescription>
+                </DialogHeader>
+
+                {fraudState.total_parcels > 0 && Object?.keys(fraudState?.apis || {}).length > 0 ? (
+                    <div className="overflow-x-auto rounded-md border md:rounded-lg">
+                        <table className="w-full text-sm md:text-base">
+                            <thead>
+                                <tr className="border-b bg-gray-50">
+                                    <th className="px-4 py-3 text-left font-medium text-gray-700">কুরিয়ার</th>
+                                    <th className="text-primary px-4 py-3 text-center font-medium">অর্ডার</th>
+                                    <th className="px-4 py-3 text-center font-medium text-green-700">ডেলিভারি</th>
+                                    <th className="text-destructive px-4 py-3 text-center font-medium">বাতিল</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {Object.entries(fraudState?.apis || {}).map(([courier, data]) => {
+                                    return (
+                                        <tr
+                                            key={courier}
+                                            className="border-b border-dotted last:border-b-0 hover:bg-gray-50"
+                                        >
+                                            <td className="px-4 py-3 font-medium text-gray-900">{courier}</td>
+                                            <td className="text-primary px-4 py-3 text-center font-medium">
+                                                {data.total_parcels}
+                                            </td>
+                                            <td className="px-4 py-3 text-center font-medium text-green-700">
+                                                {data.total_delivered_parcels}
+                                            </td>
+                                            <td className="px-4 py-3 text-center font-medium text-red-700">
+                                                {data.total_cancelled_parcels}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="py-8 text-center text-gray-500">
+                        <p>No courier history available.</p>
+                    </div>
+                )}
+            </DialogContent>
+        </Dialog>
     );
 };

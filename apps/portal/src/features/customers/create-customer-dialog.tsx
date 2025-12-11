@@ -1,10 +1,9 @@
 "use client";
 
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomFormPhoneInput } from "@/components/ui/custom-form-phone-input";
+import { useState } from "react";
+
 import { useCreateCustomerMutation } from "@/redux/api/customer-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { CreateCustomer } from "@/types/customer-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
@@ -20,10 +19,13 @@ import {
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
+
+import { CreateCustomer } from "@/types/customer-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormPhoneInput } from "@/components/ui/custom-form-phone-input";
 
 const customerFormSchema = z.object({
     name: z.string().min(3, {
@@ -35,9 +37,7 @@ const customerFormSchema = z.object({
             message: "Invalid email address.",
         })
         .or(z.literal("")),
-    phoneNumber: z
-        .string()
-        .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+    phoneNumber: z.string().refine(isValidPhoneNumber, { message: "Invalid phone number" }),
     address: z.string().min(3, {
         message: "Address is required.",
     }),
@@ -91,23 +91,16 @@ export const CreateCustomerDialog = () => {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <CustomButton>
-                    <Plus className="w-4 h-4" /> Add Customer
+                    <Plus className="h-4 w-4" /> Add Customer
                 </CustomButton>
             </DialogTrigger>
             <DialogContent className="sm:!w-[80vw] lg:!w-[45vw] xl:!w-[40vw] 2xl:!w-[35vw]">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Add New Customer
-                    </DialogTitle>
-                    <DialogDescription>
-                        Add a new customer for your shop.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Add New Customer</DialogTitle>
+                    <DialogDescription>Add a new customer for your shop.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <CustomFormInput
                             label="Name"
                             name="name"
@@ -130,6 +123,7 @@ export const CreateCustomerDialog = () => {
                             name="phoneNumber"
                             placeholder="Enter phone number"
                             control={form.control}
+                            defaultCountry="BD"
                             required
                         />
 

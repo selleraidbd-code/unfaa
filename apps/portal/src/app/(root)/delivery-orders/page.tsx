@@ -23,7 +23,7 @@ const Page = () => {
             <CustomTabs value={activeTab} onValueChange={setActiveTab}>
                 <CustomTabsList>
                     <CustomTabsTrigger value="ready-for-dispatch" icon={<Truck className="size-4 lg:size-5" />}>
-                        Ready for Dispatch
+                        <span className="max-sm:hidden">Ready for</span> Dispatch
                     </CustomTabsTrigger>
                     <CustomTabsTrigger value="pending-parcel" icon={<Package className="size-4 lg:size-5" />}>
                         Pending Parcel

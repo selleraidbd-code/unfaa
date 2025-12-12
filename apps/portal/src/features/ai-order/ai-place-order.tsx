@@ -123,16 +123,12 @@ export const AiPlaceOrder = ({
             <Button variant="outline" onClick={onReset}>
                 Cancel
             </Button>
-            {/* <Button
-                onClick={() => handlePlaceOrder(OrderStatus.CONFIRMED)}
-                variant="secondary"
-                className="min-w-40"
+
+            <Button
+                onClick={() => handlePlaceOrder(OrderStatus.PLACED)}
+                className="min-w-60 max-sm:flex-1"
                 disabled={isLoading}
             >
-                <CheckCircle className="h-4 w-4" />
-                {isLoading ? "Confirming..." : "Confirm Order"}
-            </Button> */}
-            <Button onClick={() => handlePlaceOrder(OrderStatus.PLACED)} className="min-w-40" disabled={isLoading}>
                 <CheckCircle className="h-4 w-4" />
                 {isLoading ? "Placing..." : "Place Order"}
             </Button>

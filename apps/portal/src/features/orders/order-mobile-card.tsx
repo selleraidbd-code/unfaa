@@ -99,7 +99,7 @@ export const OrderMobileCard = ({
         <div
             onClick={handleCardClick}
             className={cn(
-                "group bg-card relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200",
+                "group bg-card relative cursor-pointer rounded-sm border-2 p-4 transition-all duration-200",
                 "hover:shadow-primary/5 hover:shadow-lg",
                 isSelected
                     ? "border-primary bg-primary/5 shadow-primary/10 ring-primary/20 shadow-md ring-2"

@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 
+import { Badge } from "@workspace/ui/components/badge";
 import { cn } from "@workspace/ui/lib/utils";
 import { Check, Download, Package } from "lucide-react";
 
@@ -103,23 +104,34 @@ export const OrderCard = ({ order, isSelected, isExporting, onToggleSelection, o
             {order.orderItems && order.orderItems.length > 0 && (
                 <div className="space-y-2.5">
                     {order.orderItems.map((item) => {
-                        const itemVariantName = item.orderItemVariant?.[0]?.name || "N/A";
                         return (
                             <div
                                 key={item.id}
                                 className="border-border bg-muted/30 hover:bg-muted/50 rounded-lg border p-3 transition-colors"
                             >
                                 <div className="flex items-start justify-between gap-2">
-                                    <div className="min-w-0 flex-1">
+                                    <div className="min-w-0 flex-1 space-y-1">
                                         <h4 className="text-foreground truncate text-sm font-semibold">
                                             {item.product.name}
                                         </h4>
-                                        <div className="text-muted-foreground mt-1.5 flex flex-wrap items-center gap-3 text-xs">
-                                            <span className="flex items-center gap-1.5">
-                                                <span className="font-medium">Variant:</span>
-                                                <span className="text-foreground">{itemVariantName}</span>
-                                            </span>
-                                        </div>
+                                        {item.orderItemVariant?.length > 0 && (
+                                            <div className="flex flex-wrap gap-1.5">
+                                                {item.orderItemVariant.map((ov, i) => (
+                                                    <span
+                                                        key={`${ov.productVariant?.name}-${ov.productVariantOption?.name}-${i}`}
+                                                        className="text-muted-foreground text-xs"
+                                                    >
+                                                        <span className="text-primary">{ov.productVariant?.name}:</span>{" "}
+                                                        {ov.productVariantOption?.name}
+                                                        {typeof ov.productVariantOption?.extraPrice === "number" &&
+                                                        ov.productVariantOption?.extraPrice > 0
+                                                            ? ` (+${ov.productVariantOption?.extraPrice})`
+                                                            : ""}{" "}
+                                                        ,
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="bg-primary/10 flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1">
                                         <span className="text-muted-foreground text-xs font-medium">Qty:</span>

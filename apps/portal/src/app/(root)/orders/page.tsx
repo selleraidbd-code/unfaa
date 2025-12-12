@@ -102,7 +102,7 @@ const OrdersPage = () => {
                     <h1 className="title">Orders ( {data?.meta?.total || 0} )</h1>
 
                     <div className="ms-auto flex items-center gap-4">
-                        <CustomButton variant="accent">
+                        <CustomButton variant="accent" className="hidden">
                             <DownloadCloud />
                             Export
                         </CustomButton>

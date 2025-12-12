@@ -105,8 +105,12 @@ export const OrderPDFDocument = ({ orders, shopLogo, merchantId, shopName }: Ord
                             {order.orderItems.map((item, index) => {
                                 const variantName =
                                     item.orderItemVariant && item.orderItemVariant.length > 0
-                                        ? item.orderItemVariant[0]?.name
+                                        ? item.orderItemVariant
+                                              .map((v) => v.productVariantOption?.name)
+                                              .filter(Boolean)
+                                              .join(", ")
                                         : null;
+
                                 return (
                                     <Text key={item.id} style={styles.productItem}>
                                         {index + 1}. {item.product.name} {variantName ? `- ${variantName}` : ""} -{" "}

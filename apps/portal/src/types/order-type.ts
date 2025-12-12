@@ -51,6 +51,8 @@ export type Order = {
     createdAt: string;
     updatedAt: string;
     orderItems: OrderDetailsItem[];
+    customerTotalCancelOrder: number;
+    customerTotalConfirmOrder: number;
 };
 
 export interface OrderDetailsItem {
@@ -58,7 +60,6 @@ export interface OrderDetailsItem {
     orderId: string;
     quantity: number;
     productId: string;
-    productVariantId: string;
     createdAt: string;
     updatedAt: string;
     product: {
@@ -77,15 +78,31 @@ export interface OrderDetailsItem {
         shopId: string;
         categoryId: string;
     };
-    orderItemVariant: {
+    orderItemVariant: OrderItemVariant[];
+}
+
+export interface OrderItemVariant {
+    id: string;
+    productVariantId: string;
+    productVariantOptionId: string;
+    productVariantOptionExtraPrice: number;
+    orderItemId: string;
+    productVariantOption: {
         id: string;
         name: string;
-        price: number;
-        discountPrice: number;
+        isActive: boolean;
+        imgUrl: string;
+        sku: string;
+        extraPrice: number;
+    };
+    productVariant: {
+        id: string;
+        name: string;
+        isRequired: boolean;
         createdAt: string;
         updatedAt: string;
         productId: string;
-    }[];
+    };
 }
 
 export interface OrderItem {
@@ -137,6 +154,8 @@ export type UpdateOrderPayload = {
     customerPhoneNumber?: string;
     customerAddress?: string;
     quantity?: number;
+    notes?: string;
+    discountedPrice?: number;
 };
 
 // AI Order Generation Types

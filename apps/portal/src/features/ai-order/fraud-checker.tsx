@@ -91,7 +91,6 @@ export const FraudChecker = ({ fraudState, error, onCheckFraud, customerPhone, i
                     stats={summaryStats}
                     onRecheckClick={() => setShowConfirmDialog(true)}
                     onDetailsClick={() => setShowDetailsDialog(true)}
-                    hasDetails={fraudState.total_parcels > 0 && Object?.keys(fraudState?.apis || {}).length > 0}
                 />
             )}
 
@@ -128,10 +127,9 @@ interface SummaryStatsProps {
     stats: SummaryStat[];
     onRecheckClick: () => void;
     onDetailsClick: () => void;
-    hasDetails: boolean;
 }
 
-const SummaryStats = ({ stats, onRecheckClick, onDetailsClick, hasDetails }: SummaryStatsProps) => {
+const SummaryStats = ({ stats, onRecheckClick, onDetailsClick }: SummaryStatsProps) => {
     return (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {stats.map((stat, index) => {
@@ -142,14 +140,16 @@ const SummaryStats = ({ stats, onRecheckClick, onDetailsClick, hasDetails }: Sum
                         <Icon className={cn("size-8 flex-shrink-0 max-sm:hidden", stat.color)} />
                         <div className="flex flex-1 flex-col gap-1">
                             <h2 className={cn("text-sm font-medium md:text-base", stat.color)}>{stat.labelBn}</h2>
-                            <p className={cn("text-center text-lg font-medium", stat.color)}>{stat.value}</p>{" "}
+                            <p className={cn("text-lg font-medium max-md:text-center", stat.color)}>
+                                {stat.value}
+                            </p>{" "}
                         </div>
                     </div>
                 );
             })}
 
             <div className="flex gap-2 rounded-lg border p-2 max-md:items-center max-md:justify-center md:flex-col">
-                <Button size="sm" onClick={onDetailsClick} disabled={!hasDetails}>
+                <Button size="sm" onClick={onDetailsClick}>
                     <Eye className="h-3 w-3" />
                     <span className="max-md:hidden">Details</span>
                 </Button>
@@ -229,7 +229,7 @@ const CourierHistoryDetailsDialog = ({ open, onOpenChange, fraudState }: Courier
                     <DialogDescription>Detailed breakdown of orders by courier service.</DialogDescription>
                 </DialogHeader>
 
-                {fraudState.total_parcels > 0 && Object?.keys(fraudState?.apis || {}).length > 0 ? (
+                {Object?.keys(fraudState?.apis || {}).length > 0 ? (
                     <div className="overflow-x-auto rounded-md border md:rounded-lg">
                         <table className="w-full text-sm md:text-base">
                             <thead>

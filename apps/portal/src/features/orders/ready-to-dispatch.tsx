@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { useGetCourierSetupQuery } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
@@ -17,6 +18,9 @@ import { DataStateHandler } from "@/components/shared/data-state-handler";
 import { OrderCard } from "./order-card";
 
 export const ReadyToDispatch = () => {
+    const searchParams = useSearchParams();
+    const page = searchParams.get("page") || 1;
+    const limit = searchParams.get("limit") || 100;
     const user = useAppSelector((state) => state.auth.user);
     const shop = user?.shop;
 
@@ -33,15 +37,15 @@ export const ReadyToDispatch = () => {
         shopId: shop?.id,
         orderStatus: OrderStatus.SEND,
         courierStatus: CourierStatus.IN_REVIEW,
-        page: 1,
-        limit: 10,
+        page: Number(page),
+        limit: Number(limit),
     });
 
     console.log(data?.data);
 
     const paginationMeta: PaginationMeta = {
-        page: 1,
-        limit: 10,
+        page: Number(page),
+        limit: Number(limit),
         total: data?.meta?.total || 0,
     };
 

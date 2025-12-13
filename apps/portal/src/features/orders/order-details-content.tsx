@@ -9,10 +9,8 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { CustomFormSelect } from "@workspace/ui/components/custom/custom-form-select";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
-import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "@workspace/ui/components/sonner";
-import { formatDate } from "@workspace/ui/lib/formateDate";
 import { cn } from "@workspace/ui/lib/utils";
 import { Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -124,107 +122,90 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
     ];
 
     return (
-        <>
-            {/* Header */}
-            <div className="space-y-1 border-b pb-3">
-                <p className="flex items-center gap-4 text-lg font-semibold">
-                    Order Details <CustomTextCopy text={orderData?.orderNumber.toString() || ""} copy={true} />
-                </p>
-                <span className="text-muted-foreground text-xs">
-                    Last updated:{" "}
-                    <time dateTime={orderData?.updatedAt || ""}>{formatDate(orderData?.updatedAt || "") || "N/A"}</time>
-                </span>
-            </div>
+        <div className="max-h-[90dvh] space-y-3 overflow-y-auto max-sm:px-4 max-sm:pb-8 md:space-y-5">
+            <div className="flex gap-2 md:gap-4">
+                <Button
+                    type="button"
+                    disabled={isDeleting || isUpdating}
+                    variant="destructiveOutline"
+                    onClick={handleDelete}
+                >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span className="max-sm:hidden">Delete</span>
+                </Button>
 
-            {/* Content */}
-            <div className="space-y-3 md:space-y-5">
-                <div className="flex gap-2 md:gap-4">
-                    <Button
-                        type="button"
-                        disabled={isDeleting || isUpdating}
-                        variant="destructiveOutline"
-                        onClick={handleDelete}
-                    >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        <span className="max-sm:hidden">Delete</span>
-                    </Button>
-
-                    <div className="grid flex-1 grid-cols-3 gap-2 md:gap-4">
-                        {customerOrderHistory.map((item) => (
-                            <div
-                                key={item.label}
-                                className={cn(
-                                    "rounded-sm border px-3 py-1 text-center text-white transition-colors md:py-2",
-                                    item.className
-                                )}
-                            >
-                                <span className="text-sm max-sm:hidden">{item.label} :</span> {item.value}
-                            </div>
-                        ))}
-                    </div>
+                <div className="grid flex-1 grid-cols-3 gap-2 md:gap-4">
+                    {customerOrderHistory.map((item) => (
+                        <div
+                            key={item.label}
+                            className={cn(
+                                "rounded-sm border px-3 py-1 text-center text-white transition-colors md:py-2",
+                                item.className
+                            )}
+                        >
+                            <span className="text-sm max-sm:hidden">{item.label} :</span> {item.value}
+                        </div>
+                    ))}
                 </div>
-
-                {/* Customer Information Section */}
-                <CustomerInfoSection order={orderData} onUpdate={handleCustomerInfoUpdate} />
-
-                {/* Editable Order Status and Description Section */}
-                <Form {...orderForm}>
-                    <form
-                        onSubmit={orderForm.handleSubmit(handleOrderSubmit)}
-                        className="space-y-4 rounded-lg border p-4"
-                    >
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-base">
-                                <span className="max-sm:hidden">Order Status & Description</span>
-                                <span className="sm:hidden">Status & Des</span>
-                            </h3>
-                            <Button
-                                type="submit"
-                                className="lg:px-10"
-                                disabled={isUpdating || isDeleting || !orderForm.formState.isDirty}
-                            >
-                                {isUpdating ? "Updating..." : "Update Order"}
-                            </Button>
-                        </div>
-
-                        <div className="space-y-4">
-                            <CustomFormSelect
-                                label="Order Status"
-                                name="orderStatus"
-                                options={orderStatusOptions}
-                                control={orderForm.control}
-                            />
-
-                            <CustomFormTextarea
-                                label="Order Description"
-                                name="notes"
-                                control={orderForm.control}
-                                placeholder="Enter order description"
-                                rows={4}
-                                className="w-full"
-                            />
-                        </div>
-                    </form>
-                </Form>
-
-                {/* View Order Items */}
-                <Accordion type="single" collapsible className="w-full rounded-lg border px-4">
-                    <AccordionItem value="order-items">
-                        <AccordionTrigger className="text-base hover:no-underline">
-                            View Order Items ({orderData.orderItems.length})
-                        </AccordionTrigger>
-
-                        <AccordionContent>
-                            <div className="max-h-60 space-y-3 overflow-y-auto pt-2">
-                                {orderData.orderItems.map((item) => (
-                                    <OrderItems key={item.id} item={item} />
-                                ))}
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
             </div>
-        </>
+
+            {/* Customer Information Section */}
+            <CustomerInfoSection order={orderData} onUpdate={handleCustomerInfoUpdate} />
+
+            {/* Editable Order Status and Description Section */}
+            <Form {...orderForm}>
+                <form onSubmit={orderForm.handleSubmit(handleOrderSubmit)} className="space-y-4 rounded-lg border p-4">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-base">
+                            <span className="max-sm:hidden">Order Status & Description</span>
+                            <span className="sm:hidden">Status & Des</span>
+                        </h3>
+                        <Button
+                            type="submit"
+                            className="lg:px-10"
+                            disabled={isUpdating || isDeleting || !orderForm.formState.isDirty}
+                        >
+                            {isUpdating ? "Updating..." : "Update Order"}
+                        </Button>
+                    </div>
+
+                    <div className="space-y-4">
+                        <CustomFormSelect
+                            label="Order Status"
+                            name="orderStatus"
+                            options={orderStatusOptions}
+                            control={orderForm.control}
+                        />
+
+                        <CustomFormTextarea
+                            label="Order Description"
+                            name="notes"
+                            control={orderForm.control}
+                            placeholder="Enter order description"
+                            rows={4}
+                            className="w-full"
+                        />
+                    </div>
+                </form>
+            </Form>
+
+            {/* View Order Items */}
+            <Accordion type="single" collapsible className="w-full rounded-lg border px-4">
+                <AccordionItem value="order-items">
+                    <AccordionTrigger className="text-base hover:no-underline">
+                        View Order Items ({orderData.orderItems.length})
+                    </AccordionTrigger>
+
+                    <AccordionContent>
+                        <div className="max-h-60 space-y-3 overflow-y-auto pt-2">
+                            {orderData.orderItems.map((item) => (
+                                <OrderItems key={item.id} item={item} />
+                            ))}
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+        </div>
     );
 };
 

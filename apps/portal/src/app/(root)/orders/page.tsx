@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { orderStatusOptions } from "@/features/orders/data";
-import { OrderDetailsModal } from "@/features/orders/order-details-modal";
+import { OrderDetailsWrapper } from "@/features/orders/order-details-wrapper";
 import { OrderMobileList } from "@/features/orders/order-mobile-list";
 import { OrderTable } from "@/features/orders/order-table";
 import { useCourierEntryMutation } from "@/redux/api/couriar-api";
@@ -112,7 +112,7 @@ const OrdersPage = () => {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <h1 className="title">Orders ( {data?.meta?.total || 0} )</h1>
 
-                    <div className="ms-auto flex items-center gap-4">
+                    <div className="ms-auto flex items-center gap-2 md:gap-4">
                         <CustomButton variant="accent" className="hidden">
                             <DownloadCloud />
                             Export
@@ -120,12 +120,12 @@ const OrdersPage = () => {
 
                         <CustomButton href="/ai-order">
                             <Bot />
-                            AI Order
+                            AI <span className="max-sm:hidden">Order</span>
                         </CustomButton>
 
                         <CustomButton href="/make-order">
                             <Plus />
-                            Create Order
+                            Create <span className="max-sm:hidden">Order</span>
                         </CustomButton>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ const OrdersPage = () => {
             </div>
 
             {selectedOrder && (
-                <OrderDetailsModal
+                <OrderDetailsWrapper
                     open={!!selectedOrder}
                     onOpenChange={() => setSelectedOrder(null)}
                     order={selectedOrder}

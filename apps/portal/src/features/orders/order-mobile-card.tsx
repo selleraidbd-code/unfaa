@@ -151,8 +151,6 @@ export const OrderMobileCard = ({
                 </div>
             </div>
 
-            {/* Status Badges */}
-
             {/* Bottom Row: Items and Date */}
             <div className="flex items-center justify-between border-t pt-2">
                 <span className="text-muted-foreground text-xs">{order.orderItems?.length || 0} items</span>

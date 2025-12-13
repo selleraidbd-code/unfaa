@@ -26,6 +26,7 @@ const Page = () => {
     const [aiOrderGeneration] = useAiOrderGenerationMutation();
     const [getFraudCheckerData] = useGetFraudCheckerDataMutation();
 
+    const [orderText, setOrderText] = useState("");
     const [customerState, setCustomerState] = useState<CustomerState | null>(null);
     const [productInfo, setProductInfo] = useState<AIOrderGenerationProductInfo[] | null>(null);
     const [orderDetails, setOrderDetails] = useState<OrderDetailsType>({
@@ -122,6 +123,7 @@ const Page = () => {
         setFraudState(null);
         setFraudError(null);
         setIsCheckingFraud(false);
+        setOrderText("");
     };
 
     return (
@@ -132,6 +134,8 @@ const Page = () => {
                 isProcessing={isProcessing}
                 onReset={resetForm}
                 hasData={!!customerState || !!productInfo}
+                orderText={orderText}
+                setOrderText={setOrderText}
             />
 
             {/* Loading State */}

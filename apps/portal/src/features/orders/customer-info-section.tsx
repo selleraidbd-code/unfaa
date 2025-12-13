@@ -96,7 +96,7 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid gap-4 md:grid-cols-3">
                             <CustomFormInput
                                 label="Customer Name"
                                 name="customerName"
@@ -105,18 +105,18 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
                                 required
                             />
                             <CustomFormInput
-                                label="Phone Number"
-                                name="customerPhoneNumber"
-                                control={form.control}
-                                placeholder="Enter phone number"
-                                required
-                            />
-                            <CustomFormInput
                                 label="COD / Payable Amount"
                                 name="totalAmount"
                                 control={form.control}
                                 placeholder="Enter COD / Payable amount"
                                 type="number"
+                                required
+                            />
+                            <CustomFormInput
+                                label="Phone Number"
+                                name="customerPhoneNumber"
+                                control={form.control}
+                                placeholder="Enter phone number"
                                 required
                             />
                         </div>
@@ -159,12 +159,18 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
                 </CustomButton>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                 <div className="space-y-1">
                     <p className="text-muted-foreground text-sm">Customer Name</p>
                     <p className="font-medium max-sm:text-sm">{order?.customerName || "N/A"}</p>
                 </div>
-                <div className="flex items-end gap-4">
+                <div className="space-y-1">
+                    <p className="text-muted-foreground text-sm">
+                        COD <span className="max-md:hidden">/ Payable Amount</span>
+                    </p>
+                    <p className="font-medium">৳ {order?.discountedPrice ?? order?.totalAmount ?? 0}</p>
+                </div>
+                <div className="flex items-end gap-4 max-md:col-span-2">
                     <div className="space-y-1">
                         <p className="text-muted-foreground text-sm">Phone Number</p>
                         <p className="font-medium max-sm:text-sm">{order?.customerPhoneNumber || "N/A"}</p>
@@ -174,14 +180,11 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
                         Call
                     </Button>
                 </div>
-                <div className="space-y-1 md:col-span-2">
-                    <p className="text-muted-foreground text-sm">Address</p>
-                    <p className="font-medium max-sm:text-sm">{order?.customerAddress || "N/A"}</p>
-                </div>
-                <div className="space-y-1">
-                    <p className="text-muted-foreground text-sm">COD / Payable Amount</p>
-                    <p className="font-medium">৳ {order?.discountedPrice ?? order?.totalAmount ?? 0}</p>
-                </div>
+            </div>
+
+            <div className="space-y-1 md:col-span-2">
+                <p className="text-muted-foreground text-sm">Address</p>
+                <p className="font-medium max-sm:text-sm">{order?.customerAddress || "N/A"}</p>
             </div>
         </div>
     );

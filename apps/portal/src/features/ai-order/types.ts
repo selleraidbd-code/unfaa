@@ -28,10 +28,3 @@ export interface EditableOrderData extends AIOrderGenerationData {
         availableVariants?: any[];
     })[];
 }
-
-export interface OrderInputProps {
-    onGenerate: (orderText: string) => void;
-    isProcessing: boolean;
-    onReset: () => void;
-    hasData: boolean;
-}

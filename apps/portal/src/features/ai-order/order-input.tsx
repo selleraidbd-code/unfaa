@@ -1,17 +1,28 @@
 "use client";
 
-import { useState } from "react";
-
-import { OrderInputProps } from "@/features/ai-order/types";
 import { Button } from "@workspace/ui/components/button";
 import { Label } from "@workspace/ui/components/label";
 import { toast } from "@workspace/ui/components/sonner";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Bot, CircleXIcon, Clipboard, ClipboardPaste, Loader2 } from "lucide-react";
 
-export const OrderInput = ({ onGenerate, isProcessing, onReset, hasData }: OrderInputProps) => {
-    const [orderText, setOrderText] = useState("");
+export interface OrderInputProps {
+    onGenerate: (orderText: string) => void;
+    isProcessing: boolean;
+    onReset: () => void;
+    hasData: boolean;
+    orderText: string;
+    setOrderText: (text: string) => void;
+}
 
+export const OrderInput = ({
+    onGenerate,
+    isProcessing,
+    onReset,
+    hasData,
+    orderText,
+    setOrderText,
+}: OrderInputProps) => {
     const handlePaste = async () => {
         try {
             const text = await navigator.clipboard.readText();
@@ -27,12 +38,6 @@ export const OrderInput = ({ onGenerate, isProcessing, onReset, hasData }: Order
             return;
         }
         onGenerate(orderText);
-    };
-
-    const handleReset = () => {
-        console.log("handleReset");
-        setOrderText("");
-        onReset();
     };
 
     return (
@@ -71,7 +76,7 @@ export const OrderInput = ({ onGenerate, isProcessing, onReset, hasData }: Order
                 </Button>
 
                 {(hasData || orderText.trim()) && (
-                    <Button variant="outline" onClick={handleReset}>
+                    <Button variant="outline" onClick={onReset}>
                         <span className="max-sm:hidden">Reset</span>
                         <CircleXIcon className="h-4 w-4" />
                     </Button>

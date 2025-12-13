@@ -9,7 +9,7 @@ import { Checkbox } from "@workspace/ui/components/checkbox";
 import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { cn } from "@workspace/ui/lib/utils";
-import { Phone, PhoneCall, User } from "lucide-react";
+import { BookText, NotebookText, NotepadText, Phone, PhoneCall, User } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa6";
 
 import { Order, OrderStatus } from "@/types/order-type";
@@ -105,41 +105,37 @@ export const OrderMobileCard = ({
             )}
 
             {/* Top Row: Customer Name, Total, Status Badges */}
-            <div className="mb-2 flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+                <div>
                     <div className="mb-1 flex items-center gap-1.5">
                         <User className="text-muted-foreground h-3.5 w-3.5 flex-shrink-0" />
                         <CustomTextCopy text={order.customerName} textClassName="text-sm font-semibold truncate" />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Phone className="text-muted-foreground h-3.5 w-3.5 flex-shrink-0" />
-                        <span className="text-xs font-medium">{phoneNumber}</span>
-                        <div className="ml-1 flex items-center gap-0.5" data-action-button>
-                            <Link
-                                href={`tel:${phoneNumber}`}
-                                target="_blank"
-                                className="p-1"
-                                title="Call"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <PhoneCall className="text-primary size-3.5" />
-                            </Link>
-                            <Link
-                                href={`https://wa.me/${formatPhoneForWhatsApp(phoneNumber)}`}
-                                target="_blank"
-                                className="p-1"
-                                title="WhatsApp"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <FaWhatsapp className="size-3.5 text-green-600" />
-                            </Link>
-                        </div>
-                    </div>
+
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         <OrderStatusBadge status={order.orderStatus} />
                         {order.courierStatus && <CourierStatusBadge status={order.courierStatus} />}
+                        <Link
+                            href={`tel:${phoneNumber}`}
+                            target="_blank"
+                            className="p-1"
+                            title="Call"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <PhoneCall className="text-primary size-4" />
+                        </Link>
+                        <Link
+                            href={`https://wa.me/${formatPhoneForWhatsApp(phoneNumber)}`}
+                            target="_blank"
+                            className="p-1"
+                            title="WhatsApp"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <FaWhatsapp className="size-4 text-green-600" />
+                        </Link>
                     </div>
                 </div>
+
                 <div className="flex flex-shrink-0 flex-col items-end justify-between text-right">
                     <p className="text-base font-bold">
                         ৳{(order.discountedPrice ?? order.totalAmount).toLocaleString()}
@@ -149,6 +145,23 @@ export const OrderMobileCard = ({
                         cancelledOrders={order.customerTotalCancelOrder}
                     />
                 </div>
+            </div>
+
+            <div className="text-muted-foreground mb-2 text-sm">
+                {order.orderItems?.length > 0 &&
+                    order.orderItems.map((item) => (
+                        <p key={item.id}>
+                            {item.product?.banglaName || item.product?.name} x {item.quantity}{" "}
+                            {item?.orderItemVariant?.length > 0 && " - "}
+                            {item?.orderItemVariant?.map((variant) => variant.productVariantOption?.name).join(", ")}
+                        </p>
+                    ))}
+
+                {order.notes && (
+                    <p>
+                        <NotepadText className="inline-block size-3.5" /> {order.notes}
+                    </p>
+                )}
             </div>
 
             {/* Bottom Row: Items and Date */}

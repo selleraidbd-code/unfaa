@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { CourierStatusBadge } from "@/features/orders/courier-status-badge";
+import { CustomerOrderStatsChart } from "@/features/orders/customer-order-stats-chart";
 import { OrderStatusBadge } from "@/features/orders/order-status-badge";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
@@ -134,19 +135,23 @@ export const OrderMobileCard = ({
                             </Link>
                         </div>
                     </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        <OrderStatusBadge status={order.orderStatus} />
+                        {order.courierStatus && <CourierStatusBadge status={order.courierStatus} />}
+                    </div>
                 </div>
-                <div className="flex-shrink-0 text-right">
+                <div className="flex flex-shrink-0 flex-col items-end justify-between text-right">
                     <p className="text-base font-bold">
                         ৳{(order.discountedPrice ?? order.totalAmount).toLocaleString()}
                     </p>
+                    <CustomerOrderStatsChart
+                        confirmedOrders={order.customerTotalConfirmOrder}
+                        cancelledOrders={order.customerTotalCancelOrder}
+                    />
                 </div>
             </div>
 
             {/* Status Badges */}
-            <div className="mb-2 flex flex-wrap items-center gap-1.5">
-                <OrderStatusBadge status={order.orderStatus} />
-                {order.courierStatus && <CourierStatusBadge status={order.courierStatus} />}
-            </div>
 
             {/* Bottom Row: Items and Date */}
             <div className="flex items-center justify-between border-t pt-2">

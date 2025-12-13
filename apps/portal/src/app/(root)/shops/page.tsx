@@ -81,7 +81,7 @@ const ShopsPage = () => {
         {
             accessorKey: "id",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Shop ID" />,
-            cell: ({ row }) => <DataTableFieldCopy row={row} field="shopOwnerId" />,
+            cell: ({ row }) => <DataTableFieldCopy row={row} field="id" />,
             enableSorting: false,
             enableHiding: false,
         },
@@ -108,7 +108,7 @@ const ShopsPage = () => {
         {
             accessorKey: "shopOwnerId",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Shop Owner ID" />,
-            cell: ({ row }) => <p>{row.getValue("id")}</p>,
+            cell: ({ row }) => <DataTableFieldCopy row={row} field="shopOwnerId" />,
         },
         {
             accessorKey: "slug",

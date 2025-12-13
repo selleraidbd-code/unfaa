@@ -103,6 +103,20 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
         }
     };
 
+    // Check if current order status is in the available options
+    const isOrderStatusInOptions = orderStatusOptions.some((option) => option.value === orderData?.orderStatus);
+
+    // If current status is not in options, add it so it can be displayed
+    const displayOrderStatusOptions = isOrderStatusInOptions
+        ? orderStatusOptions
+        : [
+              ...orderStatusOptions,
+              {
+                  label: orderData?.orderStatus || "Unknown Status",
+                  value: orderData?.orderStatus,
+              },
+          ];
+
     const customerOrderHistory = [
         {
             label: "Total",
@@ -122,7 +136,7 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
     ];
 
     return (
-        <div className="max-h-[90dvh] space-y-3 overflow-y-auto max-sm:px-4 max-sm:pb-8 md:space-y-5">
+        <div className="flex max-h-[85dvh] flex-col space-y-3 overflow-y-auto max-sm:px-4 max-sm:pb-8 md:space-y-5">
             <div className="flex gap-2 md:gap-4">
                 <Button
                     type="button"
@@ -157,8 +171,8 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
                 <form onSubmit={orderForm.handleSubmit(handleOrderSubmit)} className="space-y-4 rounded-lg border p-4">
                     <div className="flex items-center justify-between">
                         <h3 className="text-base">
-                            <span className="max-sm:hidden">Order Status & Description</span>
-                            <span className="sm:hidden">Status & Des</span>
+                            <span className="max-sm:hidden">Order Status & Note</span>
+                            <span className="sm:hidden">Status & Note</span>
                         </h3>
                         <Button
                             type="submit"
@@ -173,16 +187,17 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
                         <CustomFormSelect
                             label="Order Status"
                             name="orderStatus"
-                            options={orderStatusOptions}
+                            options={displayOrderStatusOptions}
                             control={orderForm.control}
+                            disabled={!isOrderStatusInOptions}
                         />
 
                         <CustomFormTextarea
-                            label="Order Description"
+                            label="Order Note"
                             name="notes"
                             control={orderForm.control}
-                            placeholder="Enter order description"
-                            rows={4}
+                            placeholder="Enter order note"
+                            rows={2}
                             className="w-full"
                         />
                     </div>

@@ -22,8 +22,8 @@ export const OrderDetailsWrapper = ({ order, open, onOpenChange }: OrderDetailsW
 
     if (isMobile) {
         return (
-            <Drawer open={open} onOpenChange={onOpenChange}>
-                <DrawerContent>
+            <Drawer open={open} onOpenChange={onOpenChange} dismissible={false}>
+                <DrawerContent className="focus-within:max-h-[60dvh]">
                     <DrawerTitle className="sr-only">Order Details</DrawerTitle>
                     <DrawerDescription className="sr-only">Edit and manage order information</DrawerDescription>
                     <OrderDetailsContent order={order} onClose={handleClose} />

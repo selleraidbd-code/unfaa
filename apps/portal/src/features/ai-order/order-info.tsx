@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 
+import { CourierStatusBadge } from "@/features/orders/courier-status-badge";
+import { OrderStatusBadge } from "@/features/orders/order-status-badge";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
@@ -10,11 +12,7 @@ import { Card, CardContent } from "@workspace/ui/components/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@workspace/ui/components/dialog";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
-import { cn } from "@workspace/ui/lib/utils";
 import { Calendar, Clock, Eye } from "lucide-react";
-
-import { CourierStatus, OrderStatus } from "@/types/order-type";
-import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 
 type Props = {
     customerId: string;
@@ -37,69 +35,13 @@ export const OrderInfo = ({ customerId }: Props) => {
 
     const orders = data?.data || [];
 
-    const getStatusColor = (status: OrderStatus) => {
-        switch (status) {
-            case OrderStatus.PLACED:
-                return "bg-blue-100 text-blue-800";
-            case OrderStatus.CONFIRMED:
-                return "bg-green-100 text-green-800";
-            case OrderStatus.CANCELLED:
-                return "bg-red-100 text-red-800";
-            case OrderStatus.SEND:
-                return "bg-purple-100 text-purple-800";
-            case OrderStatus.HOLD:
-                return "bg-yellow-100 text-yellow-800";
-            case OrderStatus.WAITING:
-                return "bg-orange-100 text-orange-800";
-            case OrderStatus.RECEIVED:
-                return "bg-emerald-100 text-emerald-800";
-            case OrderStatus.PROCESSING:
-                return "bg-indigo-100 text-indigo-800";
-            case OrderStatus.NZC:
-                return "bg-gray-100 text-gray-800";
-            case OrderStatus.RETURN:
-                return "bg-pink-100 text-pink-800";
-            case OrderStatus.INCOMPLETE:
-                return "bg-slate-100 text-slate-800";
-            default:
-                return "bg-gray-100 text-gray-800";
-        }
-    };
-
-    const getCourierStatusColor = (status: CourierStatus) => {
-        switch (status) {
-            case CourierStatus.PENDING:
-                return "bg-green-100 text-green-800";
-            case CourierStatus.IN_REVIEW:
-                return "bg-blue-100 text-blue-800";
-            case CourierStatus.DELIVERED:
-                return "bg-yellow-100 text-yellow-800";
-            case CourierStatus.PARTIAL_DELIVERED:
-                return "bg-purple-100 text-purple-800";
-            case CourierStatus.CANCELLED:
-                return "bg-red-100 text-red-800";
-            case CourierStatus.UNKNOWN:
-                return "bg-gray-300 text-gray-800";
-            default:
-                return "bg-gray-100 text-gray-800";
-        }
-    };
-
     const mostRecentOrder = orders[0];
 
     if (isLoading) {
         return <OrderItemSkeleton />;
     }
 
-    if (isError) {
-        return <CustomErrorOrEmpty title="Failed to load orders" description="Failed to load orders" isError={true} />;
-    }
-
-    if (orders.length === 0) {
-        return <CustomErrorOrEmpty title="No orders found" description="No orders found" />;
-    }
-
-    if (!customerId) {
+    if (!customerId || orders.length === 0 || isError) {
         return null;
     }
 
@@ -148,25 +90,9 @@ export const OrderInfo = ({ customerId }: Props) => {
                                     <div className="mb-3 flex items-start justify-between">
                                         <p className="font-semibold">Order #{order.orderNumber}</p>
                                         <div className="flex gap-2">
-                                            <span
-                                                className={cn(
-                                                    "rounded-full px-2 py-1 text-xs font-medium",
-                                                    getStatusColor(order.orderStatus)
-                                                )}
-                                            >
-                                                {order.orderStatus}
-                                            </span>
+                                            <OrderStatusBadge status={order.orderStatus} />
 
-                                            {order.courierStatus && (
-                                                <span
-                                                    className={cn(
-                                                        "rounded-full px-2 py-1 text-xs font-medium",
-                                                        getCourierStatusColor(order.courierStatus)
-                                                    )}
-                                                >
-                                                    {order.courierStatus}
-                                                </span>
-                                            )}
+                                            {order.courierStatus && <CourierStatusBadge status={order.courierStatus} />}
                                         </div>
                                     </div>
 

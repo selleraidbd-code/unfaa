@@ -1,9 +1,10 @@
 import Image from "next/image";
 
+import noData from "@/assets/images/no-data.png";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
+
 import { CustomButton } from "@/components/ui/custom-button";
-import noData from "@/assets/images/no-data.png";
 
 interface CustomErrorOrEmptyProps {
     title?: string;
@@ -29,29 +30,27 @@ export const CustomErrorOrEmpty = ({
     button,
 }: CustomErrorOrEmptyProps) => {
     return (
-        <div className={cn("center h-[60vh] flex-col", className)}>
+        <div className={cn("center h-[50vh] flex-col md:h-[80vh]", className)}>
             <Image
                 src={noData}
                 alt="empty state"
                 width={400}
                 height={400}
-                className="opacity-80 transition-transform duration-300 hover:scale-110"
+                className="opacity-80 transition-transform duration-300 hover:scale-110 max-md:w-40"
             />
             <h1
                 className={cn(
-                    "text-gradient mt-8 text-2xl font-semibold",
+                    "text-gradient mt-4 text-base font-semibold md:mt-8 md:text-lg lg:text-2xl",
                     isError && "from-rose-400 to-red-500"
                 )}
             >
                 {title}
             </h1>
-            <p className="text-icon max-w-lg text-center text-lg leading-relaxed">
-                {description}
-            </p>
-            <div className="flex flex-col gap-4 mt-4">
+            <p className="text-icon max-w-lg pt-2 text-center text-sm leading-relaxed md:text-lg">{description}</p>
+            <div className="mt-4 flex flex-col gap-4">
                 {isTryAgain && (
                     <Button
-                        className="mt-6 w-[160px]"
+                        className="mt-4 w-[160px] md:mt-6"
                         onClick={() => {
                             if (onRetry) onRetry();
                             else window.location.reload();
@@ -61,7 +60,7 @@ export const CustomErrorOrEmpty = ({
                     </Button>
                 )}
                 {href && (
-                    <CustomButton className="mt-6 w-[160px]" href={href}>
+                    <CustomButton className="mt-4 w-[160px] md:mt-6" href={href}>
                         {buttonText}
                     </CustomButton>
                 )}

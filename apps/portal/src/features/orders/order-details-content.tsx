@@ -183,22 +183,21 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
                         </Button>
                     </div>
 
-                    <div className="space-y-4">
-                        <CustomFormSelect
-                            label="Order Status"
-                            name="orderStatus"
-                            options={displayOrderStatusOptions}
-                            control={orderForm.control}
-                            disabled={!isOrderStatusInOptions}
-                        />
-
+                    <div className="grid gap-4 sm:grid-cols-2">
                         <CustomFormTextarea
                             label="Order Note"
                             name="notes"
                             control={orderForm.control}
                             placeholder="Enter order note"
                             rows={2}
-                            className="w-full"
+                        />
+
+                        <CustomFormSelect
+                            label="Order Status"
+                            name="orderStatus"
+                            options={displayOrderStatusOptions}
+                            control={orderForm.control}
+                            disabled={!isOrderStatusInOptions}
                         />
                     </div>
                 </form>

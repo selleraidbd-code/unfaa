@@ -113,6 +113,7 @@ const Page = () => {
     };
 
     const resetForm = () => {
+        setOrderText("");
         setIsProcessing(false);
         clearFormData();
     };
@@ -123,19 +124,18 @@ const Page = () => {
         setFraudState(null);
         setFraudError(null);
         setIsCheckingFraud(false);
-        setOrderText("");
     };
 
     return (
         <div className="max-w-7xl space-y-6">
             {/* Input Section */}
             <OrderInput
+                orderText={orderText}
+                setOrderText={setOrderText}
                 onGenerate={handleAiOrderGeneration}
                 isProcessing={isProcessing}
                 onReset={resetForm}
                 hasData={!!customerState || !!productInfo}
-                orderText={orderText}
-                setOrderText={setOrderText}
             />
 
             {/* Loading State */}

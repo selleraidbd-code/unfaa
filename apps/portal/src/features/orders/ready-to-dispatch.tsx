@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
+import { DispatchOrderCard } from "@/features/orders/dispatch-order-card";
 import { useGetCourierSetupQuery } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
@@ -15,9 +16,8 @@ import { CustomPagination, PaginationMeta } from "@/components/ui/custom-paginat
 import { OrderPDFDocument } from "@/components/pdf/order-pdf-document";
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 
-import { OrderCard } from "./order-card";
-
 export const ReadyToDispatch = () => {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || 1;
     const limit = searchParams.get("limit") || 100;
@@ -154,6 +154,26 @@ export const ReadyToDispatch = () => {
         [courierSetup?.data?.merchantId, createPdfBlob, downloadBlob, isExporting, shop?.merchantId]
     );
 
+    const updateSearchParams = (key: string, value: string | number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(key, value.toString());
+
+        // Always reset page to 1 unless we're updating the page itself
+        if (key !== "page") {
+            params.set("page", "1");
+        }
+
+        router.push(`/delivery-orders?${params.toString()}`);
+    };
+
+    const handlePageChange = (page: number) => {
+        updateSearchParams("page", page);
+    };
+
+    const handleLimitChange = (limit: number) => {
+        updateSearchParams("limit", limit);
+    };
+
     return (
         <DataStateHandler
             data={data}
@@ -178,10 +198,10 @@ export const ReadyToDispatch = () => {
 
                 return (
                     <>
-                        <div className="mt-6 mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="mt-4 mb-4 flex items-center justify-between gap-4 md:mt-6">
                             <div className="flex items-center gap-2 sm:gap-4">
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    Total Orders: {notSentData?.meta?.total || 0}
+                                    Total <span className="max-sm:hidden">Orders</span>: {notSentData?.meta?.total || 0}
                                 </p>
                                 {orders.length > 0 && (
                                     <button
@@ -193,11 +213,21 @@ export const ReadyToDispatch = () => {
                                         ) : (
                                             <Square className="h-4 w-4" />
                                         )}
-                                        <span>{allSelected ? "Deselect All" : "Select All"}</span>
+                                        <span>
+                                            {allSelected ? (
+                                                <>
+                                                    Deselect <span className="max-sm:hidden"> All</span>
+                                                </>
+                                            ) : (
+                                                "Select All"
+                                            )}
+                                        </span>
                                     </button>
                                 )}
                                 {selectedOrders.size > 0 && (
-                                    <p className="text-primary text-sm font-medium">{selectedOrders.size} selected</p>
+                                    <p className="text-primary text-sm font-medium">
+                                        {selectedOrders.size} <span className="max-sm:hidden">selected</span>
+                                    </p>
                                 )}
                             </div>
 
@@ -205,7 +235,6 @@ export const ReadyToDispatch = () => {
                                 onClick={() => handleBulkPDFExport(selectedOrdersList)}
                                 disabled={selectedOrders.size === 0 || isExporting}
                                 isLoading={isExporting}
-                                className="w-full sm:w-auto"
                             >
                                 {isExporting
                                     ? "Exporting..."
@@ -215,9 +244,9 @@ export const ReadyToDispatch = () => {
                             </CustomButton>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                             {orders.map((order) => (
-                                <OrderCard
+                                <DispatchOrderCard
                                     key={order.id}
                                     order={order}
                                     isSelected={selectedOrders.has(order.id)}
@@ -234,8 +263,8 @@ export const ReadyToDispatch = () => {
                                 showRowsPerPage={false}
                                 showRowSelection={false}
                                 showPageCount={false}
-                                onPageChange={() => {}}
-                                onLimitChange={() => {}}
+                                onPageChange={handlePageChange}
+                                onLimitChange={handleLimitChange}
                             />
                         </div>
                     </>

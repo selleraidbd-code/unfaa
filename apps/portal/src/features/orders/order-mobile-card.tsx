@@ -109,7 +109,7 @@ export const OrderMobileCard = ({
                 <div>
                     <div className="mb-1 flex items-center gap-1.5">
                         <User className="text-muted-foreground h-3.5 w-3.5 flex-shrink-0" />
-                        <CustomTextCopy text={order.customerName} textClassName="text-sm font-semibold truncate" />
+                        <CustomTextCopy text={order.customerName} textClassName="text-sm text-foreground truncate" />
                     </div>
 
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">

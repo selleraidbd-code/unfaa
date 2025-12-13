@@ -175,7 +175,7 @@ export const ReadyToDispatch = () => {
                 return (
                     <>
                         <div className="mt-6 mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                            <div className="flex items-center gap-2 sm:gap-4">
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
                                     Total Orders: {notSentData?.meta?.total || 0}
                                 </p>

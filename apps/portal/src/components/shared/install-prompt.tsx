@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Download, Share } from "lucide-react";
+
 import { Button } from "@workspace/ui/components/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@workspace/ui/components/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
+import { Download, Share, X } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
     prompt: () => Promise<void>;
@@ -30,8 +25,7 @@ declare global {
 }
 
 export const InstallPrompt = () => {
-    const [deferredPrompt, setDeferredPrompt] =
-        useState<BeforeInstallPromptEvent | null>(null);
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [showPrompt, setShowPrompt] = useState(false);
     const [isStandalone, setIsStandalone] = useState(false);
     const [isIOS, setIsIOS] = useState(false);
@@ -44,8 +38,7 @@ export const InstallPrompt = () => {
                 (window.navigator as Navigator).standalone === true ||
                 document.referrer.includes("android-app://") ||
                 window.location.search.includes("utm_source=pwa") ||
-                (window.navigator as any).getInstalledRelatedApps?.() !==
-                    undefined
+                (window.navigator as any).getInstalledRelatedApps?.() !== undefined
             );
         };
 
@@ -58,71 +51,60 @@ export const InstallPrompt = () => {
         }
 
         // Check if already dismissed in this session
-        const sessionDismissed = sessionStorage.getItem(
-            "pwa-install-dismissed"
-        );
+        const sessionDismissed = sessionStorage.getItem("pwa-install-dismissed");
         if (sessionDismissed === "true") {
             return;
         }
 
         // Check if iOS
-        const iOS =
-            /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         setIsIOS(iOS);
 
-        let timeoutId: NodeJS.Timeout | null = null;
+        const timeoutIds: NodeJS.Timeout[] = [];
+
+        // Function to show prompt after delay (with checks)
+        const schedulePrompt = (delay: number = 3000) => {
+            const timeoutId = setTimeout(() => {
+                // Double-check standalone and session dismissal before showing
+                if (!checkStandalone() && !sessionStorage.getItem("pwa-install-dismissed")) {
+                    setShowPrompt(true);
+                }
+            }, delay);
+            timeoutIds.push(timeoutId);
+        };
 
         // Listen for beforeinstallprompt event (Android/Chrome)
+        // This event may not fire if browser already showed native prompt or criteria not met
         const handleBeforeInstallPrompt = (e: Event) => {
             e.preventDefault();
             const promptEvent = e as BeforeInstallPromptEvent;
             setDeferredPrompt(promptEvent);
 
-            // Only show prompt if not dismissed in this session and not standalone
+            // Schedule prompt to show after delay
             if (!sessionDismissed && !isInStandaloneMode) {
-                timeoutId = setTimeout(() => {
-                    // Double-check standalone and session dismissal before showing
-                    if (
-                        !checkStandalone() &&
-                        !sessionStorage.getItem("pwa-install-dismissed")
-                    ) {
-                        setShowPrompt(true);
-                    }
-                }, 3000);
+                schedulePrompt(3000);
             }
         };
 
-        window.addEventListener(
-            "beforeinstallprompt",
-            handleBeforeInstallPrompt
-        );
+        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
-        // Show iOS prompt if applicable (only if not dismissed in session)
-        if (iOS && !sessionDismissed) {
-            timeoutId = setTimeout(() => {
-                // Double-check standalone and session dismissal before showing
-                if (
-                    !checkStandalone() &&
-                    !sessionStorage.getItem("pwa-install-dismissed")
-                ) {
-                    setShowPrompt(true);
-                }
-            }, 3000);
-        }
+        // Fallback: Show prompt for all platforms after delay
+        // This ensures prompt shows even if beforeinstallprompt doesn't fire
+        // For iOS, show instructions; for others, show install button (if deferredPrompt available)
+        schedulePrompt(5000); // Slightly longer delay to give beforeinstallprompt time to fire
 
         return () => {
-            window.removeEventListener(
-                "beforeinstallprompt",
-                handleBeforeInstallPrompt
-            );
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
+            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+            timeoutIds.forEach((id) => clearTimeout(id));
         };
     }, []);
 
     const handleInstallClick = async () => {
         if (!deferredPrompt) {
+            // If no deferred prompt, provide instructions or try browser's native install
+            // For Chrome/Edge: User can click the install icon in address bar
+            // For other browsers: Show instructions
+            handleDismiss();
             return;
         }
 
@@ -155,23 +137,22 @@ export const InstallPrompt = () => {
     }
 
     return (
-        <div className="fixed md:bottom-4 bottom-20 right-4 z-50 animate-in slide-in-from-bottom-5 fade-in-0 duration-300 w-[calc(100%-2rem)] max-w-sm ">
-            <Card className="shadow-lg gap-2 border-2">
+        <div className="animate-in slide-in-from-bottom-5 fade-in-0 fixed right-4 bottom-20 z-50 w-[calc(100%-2rem)] max-w-sm duration-300 md:bottom-4">
+            <Card className="gap-2 border-2 shadow-lg">
                 <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
-                            <CardTitle className="text-lg font-semibold">
-                                Install Unfaa Store
-                            </CardTitle>
+                            <CardTitle className="text-lg font-semibold">Install Unfaa Store</CardTitle>
                             <CardDescription className="mt-1">
                                 {isIOS ? (
                                     <>
-                                        Tap the{" "}
-                                        <Share className="inline h-4 w-4 mx-1" />{" "}
-                                        button and select "Add to Home Screen"
+                                        Tap the <Share className="mx-1 inline h-4 w-4" /> button and select "Add to Home
+                                        Screen"
                                     </>
-                                ) : (
+                                ) : deferredPrompt ? (
                                     "Install our app for a better experience. Get quick access and work offline."
+                                ) : (
+                                    "Install our app for a better experience. Look for the install icon in your browser's address bar, or use the browser menu."
                                 )}
                             </CardDescription>
                         </div>
@@ -189,12 +170,9 @@ export const InstallPrompt = () => {
                 <CardContent className="pt-0">
                     {!isIOS && (
                         <div className="flex gap-2">
-                            <Button
-                                onClick={handleInstallClick}
-                                className="flex-1"
-                            >
+                            <Button onClick={handleInstallClick} className="flex-1">
                                 <Download className="mr-2 h-4 w-4" />
-                                Install App
+                                {deferredPrompt ? "Install App" : "Got It"}
                             </Button>
                             <Button variant="outline" onClick={handleDismiss}>
                                 Maybe Later

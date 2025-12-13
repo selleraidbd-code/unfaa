@@ -14,7 +14,7 @@ import { PaginationState } from "@tanstack/react-table";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import { CustomTabs, CustomTabsList, CustomTabsTrigger } from "@workspace/ui/components/custom/custom-tabs";
 import { toast } from "@workspace/ui/components/sonner";
-import { Bot, DownloadCloud, Plus, Truck } from "lucide-react";
+import { Bot, CheckSquare, DownloadCloud, Plus, Square, Truck } from "lucide-react";
 
 import { Order, OrderStatus } from "@/types/order-type";
 import { CustomButton } from "@/components/ui/custom-button";
@@ -29,20 +29,20 @@ const OrdersPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const status = searchParams.get("status") || "all";
+    const limit = Number(searchParams.get("limit")) || 50;
 
     const [filterParams, setFilterParams] = useState<FilterParams>({});
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [selectedRows, setSelectedRows] = useState<Order[]>([]);
     const [activeTab, setActiveTab] = useState<string>(status);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize] = useState(10);
 
     const { data, isLoading, isError } = useGetOrdersQuery({
         shopId: user?.shop?.id,
         ...filterParams,
         orderStatus: status === "all" ? undefined : status,
         page: currentPage,
-        limit: pageSize,
+        limit,
     });
 
     const [courierEntry, { isLoading: isCourierEntryLoading }] = useCourierEntryMutation();
@@ -66,6 +66,17 @@ const OrdersPage = () => {
     const handlePaginationChange = (state: PaginationState) => {
         setCurrentPage(state.pageIndex + 1);
     };
+
+    const toggleSelectAll = () => {
+        const orders = data?.data || [];
+        if (selectedRows.length === orders.length) {
+            setSelectedRows([]);
+        } else {
+            setSelectedRows([...orders]);
+        }
+    };
+
+    const allSelected = (data?.data || []).length > 0 && selectedRows.length === (data?.data || []).length;
 
     const handleCourierEntry = async () => {
         if (!user?.shop?.id || selectedRows.length === 0) return;
@@ -92,7 +103,7 @@ const OrdersPage = () => {
     const meta: Meta = {
         total: data?.meta?.total || 0,
         page: currentPage,
-        limit: pageSize,
+        limit: Number(limit),
     };
 
     return (
@@ -136,19 +147,46 @@ const OrdersPage = () => {
                     </CustomTabsList>
                 </CustomTabs>
 
-                <div className="flex items-center justify-between">
-                    <CustomSearch onSearch={handleSearch} placeholder="Search orders" />
+                {activeTab === OrderStatus.CONFIRMED ? (
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Total: {data?.meta?.total || 0}</p>
+                            {(data?.data || []).length > 0 && (
+                                <button
+                                    onClick={toggleSelectAll}
+                                    className="text-primary hover:text-primary/80 flex items-center gap-2 text-sm font-medium transition-colors"
+                                >
+                                    {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                                    <span>
+                                        {allSelected ? (
+                                            <>
+                                                Deselect <span className="max-sm:hidden">All</span>
+                                            </>
+                                        ) : (
+                                            "Select All"
+                                        )}
+                                    </span>
+                                </button>
+                            )}
+                            {selectedRows.length > 0 && (
+                                <p className="text-primary text-sm font-medium">
+                                    {selectedRows.length} <span className="max-sm:hidden">selected</span>
+                                </p>
+                            )}
+                        </div>
 
-                    {activeTab === OrderStatus.CONFIRMED && (
                         <CustomButton
                             onClick={handleCourierEntry}
                             disabled={selectedRows.length === 0 || isCourierEntryLoading}
                         >
                             <Truck />
-                            Send to Courier
+                            Send
+                            <span className="max-sm:hidden">to Courier</span>
                         </CustomButton>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <CustomSearch onSearch={handleSearch} placeholder="Search orders" />
+                )}
 
                 {/* Desktop Table View */}
                 <div className="max-lg:hidden">

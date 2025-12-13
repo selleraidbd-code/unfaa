@@ -1,8 +1,10 @@
 import { Inter } from "next/font/google";
 
 import "@workspace/ui/globals.css";
-import { Providers } from "@/providers";
+
 import { Metadata, Viewport } from "next";
+
+import { Providers } from "@/providers";
 
 const fontSans = Inter({
     subsets: ["latin"],
@@ -19,9 +21,7 @@ export const metadata: Metadata = {
     description:
         "Comprehensive e-commerce business solutions providing seamless online store management, inventory tracking, payment processing, and customer engagement tools for modern businesses",
     icons: {
-        icon: [
-            { url: "/favicon-196.png", sizes: "196x196", type: "image/png" },
-        ],
+        icon: [{ url: "/favicon-196.png", sizes: "196x196", type: "image/png" }],
         apple: [{ url: "/apple-icon-180.png" }],
     },
     appleWebApp: {
@@ -183,9 +183,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body
-                className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
-            >
+            <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}>
                 <Providers>{children}</Providers>
             </body>
         </html>

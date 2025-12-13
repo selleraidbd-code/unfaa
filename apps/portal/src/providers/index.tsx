@@ -8,6 +8,7 @@ import { Toaster } from "@workspace/ui/components/sonner";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 import { InstallPrompt } from "@/components/shared/install-prompt";
+import { OrientationLock } from "@/components/shared/orientation-lock";
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -22,6 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 <AuthInitiatorFromCookies>
                     <TokenInitiatorInStore>
                         <AlertProvider>
+                            <OrientationLock />
                             <InstallPrompt />
                             <Toaster position="top-center" richColors />
                             {children}

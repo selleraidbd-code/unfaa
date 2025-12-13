@@ -137,7 +137,7 @@ body {
 
 @layer utilities {
     .container {
-        @apply mx-auto w-full px-4 md:w-[92%] lg:w-[98%] xl:px-6 2xl:px-0 xl:w-[1280px] 2xl:w-[1400px];
+        @apply mx-auto w-full px-4 md:w-[92%] lg:w-[98%] xl:w-[1280px] xl:px-6 2xl:w-[1400px] 2xl:px-0;
     }
     .scrollbar-thin {
         scrollbar-width: thin;
@@ -149,16 +149,16 @@ body {
 
 @layer components {
     .center {
-        @apply flex items-center justify-center text-center flex-col;
+        @apply flex flex-col items-center justify-center text-center;
     }
     .title {
-        @apply text-lg md:text-xl lg:text-2xl font-semibold;
+        @apply text-lg font-semibold md:text-xl lg:text-2xl;
     }
     .sub-title {
-        @apply text-base md:text-lg lg:text-xl font-semibold;
+        @apply text-base font-semibold md:text-lg lg:text-xl;
     }
     .card {
-        @apply bg-card text-card-foreground rounded-lg p-4 lg:p-6 border;
+        @apply bg-card text-card-foreground rounded-lg border p-4 lg:p-6;
     }
 }
 
@@ -260,5 +260,11 @@ body {
 @media (max-width: 768px) {
     html {
         scrollbar-width: thin;
+    }
+
+    /* PWA mobile app styles */
+    body {
+        overscroll-behavior-y: none;
+        -webkit-overflow-scrolling: touch;
     }
 }

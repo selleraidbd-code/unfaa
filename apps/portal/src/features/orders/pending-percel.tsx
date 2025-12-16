@@ -17,7 +17,7 @@ export const PendingParcel = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || 1;
-    const limit = searchParams.get("limit") || 10;
+    const limit = searchParams.get("limit") || 30;
     const user = useAppSelector((state) => state.auth.user);
     const shop = user?.shop;
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -146,6 +146,7 @@ export const PendingParcel = () => {
                         ))}
                     </div>
                     <CustomPagination
+                        className="justify-center"
                         paginationMeta={paginationMeta}
                         showRowsPerPage={false}
                         showRowSelection={false}

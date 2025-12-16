@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { PendingParcel } from "@/features/orders/pending-percel";
 import { ReadyToDispatch } from "@/features/orders/ready-to-dispatch";
@@ -14,13 +14,21 @@ import {
 import { FileText, Package, Truck } from "lucide-react";
 
 const Page = () => {
-    const [activeTab, setActiveTab] = useState("ready-for-dispatch");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const activeTab = searchParams.get("tab") || "ready-for-dispatch";
+
+    const handleTabChange = (value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("tab", value);
+        router.push(`?${params.toString()}`);
+    };
 
     return (
         <div className="grid gap-4 md:gap-6">
             <h1 className="title">In Delivery Orders</h1>
 
-            <CustomTabs value={activeTab} onValueChange={setActiveTab}>
+            <CustomTabs value={activeTab} onValueChange={handleTabChange}>
                 <CustomTabsList>
                     <CustomTabsTrigger value="ready-for-dispatch" icon={<Truck className="size-4 lg:size-5" />}>
                         <span className="max-sm:hidden">Ready for</span> Dispatch

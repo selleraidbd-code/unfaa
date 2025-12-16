@@ -1,16 +1,51 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
+
 import { useGetSteadfastRiderNoteQuery } from "@/redux/api/couriar-api";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { Clock, FileText } from "lucide-react";
 
+import { CustomPagination, PaginationMeta } from "@/components/ui/custom-pagination";
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 
 export const RiderNote = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const page = searchParams.get("page") || 1;
+    const limit = searchParams.get("limit") || 30;
+
     const { data: riderNoteData, isLoading: isRiderNoteLoading } = useGetSteadfastRiderNoteQuery({
-        page: 1,
-        limit: 10,
+        page: Number(page),
+        limit: Number(limit),
+        searchTerm: "Parcel",
     });
+
+    const paginationMeta: PaginationMeta = {
+        page: Number(page),
+        limit: Number(limit),
+        total: riderNoteData?.meta?.total || 0,
+    };
+
+    const updateSearchParams = (key: string, value: string | number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(key, value.toString());
+
+        // Always reset page to 1 unless we're updating the page itself
+        if (key !== "page") {
+            params.set("page", "1");
+        }
+
+        router.push(`?${params.toString()}`);
+    };
+
+    const handlePageChange = (page: number) => {
+        updateSearchParams("page", page);
+    };
+
+    const handleLimitChange = (limit: number) => {
+        updateSearchParams("limit", limit);
+    };
 
     return (
         <DataStateHandler
@@ -26,7 +61,7 @@ export const RiderNote = () => {
                     <div className="mb-4 text-sm text-gray-600">
                         Total Rider Notes: {riderNoteData?.meta?.total || 0}
                     </div>
-                    <div className="space-y-4">
+                    <div className="mb-4 space-y-4">
                         {riderNoteData?.data?.map((note) => (
                             <div
                                 key={note.id}
@@ -52,6 +87,15 @@ export const RiderNote = () => {
                             </div>
                         ))}
                     </div>
+                    <CustomPagination
+                        className="justify-center"
+                        paginationMeta={paginationMeta}
+                        showRowsPerPage={false}
+                        showRowSelection={false}
+                        showPageCount={false}
+                        onPageChange={handlePageChange}
+                        onLimitChange={handleLimitChange}
+                    />
                 </>
             )}
         </DataStateHandler>

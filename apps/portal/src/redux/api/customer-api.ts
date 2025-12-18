@@ -1,25 +1,11 @@
 import { api } from "@/redux/api";
-import {
-    METHOD,
-    PaginatedResponse,
-    QueryParams,
-    ResponseObject,
-    TagType,
-} from "@/redux/type";
+import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
 
-import {
-    CreateCustomer,
-    Customer,
-    FraudCheckerData,
-    UpdateCustomer,
-} from "@/types/customer-type";
+import { CreateCustomer, Customer, FraudCheckerData, UpdateCustomer } from "@/types/customer-type";
 
 const customerApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        createCustomer: builder.mutation<
-            ResponseObject<Customer>,
-            CreateCustomer
-        >({
+        createCustomer: builder.mutation<ResponseObject<Customer>, CreateCustomer>({
             query: (payload) => ({
                 url: `/customer/`,
                 method: METHOD.POST,
@@ -57,10 +43,7 @@ const customerApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Customer],
         }),
-        getFraudCheckerData: builder.mutation<
-            ResponseObject<FraudCheckerData>,
-            { phoneNumber: string }
-        >({
+        getFraudCheckerData: builder.mutation<ResponseObject<FraudCheckerData>, { phoneNumber: string }>({
             query: ({ phoneNumber }) => ({
                 url: `/customer/get-customer-fraudchecker-by-phone-number`,
                 method: METHOD.POST,

@@ -2,17 +2,19 @@
 
 import { useState } from "react";
 
-import { CustomerStep } from "@/features/make-order/customer-step/customer-step";
-import { OrderDetailsStep } from "@/features/make-order/details-step/order-details-step";
-import { ProductsStep } from "@/features/make-order/product-step/products-step";
-import { StepIndicator } from "@/features/make-order/StepIndicator";
-import { useCreateOrderbyAdminMutation } from "@/redux/api/order-api";
-import { useAppSelector } from "@/redux/store/hook";
+import { CustomerInfo } from "@/features/ai-order/customer-info";
+import { FraudChecker } from "@/features/ai-order/fraud-checker";
+import { isValidBdPhoneNumber, isValidId } from "@/features/ai-order/lib";
+import { OrderDetails } from "@/features/ai-order/order-details";
+import { OrderInfo } from "@/features/ai-order/order-info";
+import { OrderInput } from "@/features/ai-order/order-input";
+import { ProductInfoOrder } from "@/features/ai-order/product-info-order";
+import { CustomerState } from "@/features/ai-order/types";
+import { useGetFraudCheckerDataMutation } from "@/redux/api/customer-api";
 import { toast } from "@workspace/ui/components/sonner";
 
-import { Customer } from "@/types/customer-type";
-import { CreateOrder, OrderItem, OrderStatus, OrderStepIndicator } from "@/types/order-type";
-import { Product } from "@/types/product-type";
+import { Customer, FraudCheckerData } from "@/types/customer-type";
+import { AIOrderGenerationProductInfo, OrderDetailsType, OrderStatus } from "@/types/order-type";
 
 export type OrderDetails = {
     orderNotes: string;
@@ -23,166 +25,203 @@ export type OrderDetails = {
 };
 
 const Page = () => {
-    const user = useAppSelector((state) => state.auth.user);
-    const [activeStep, setActiveStep] = useState(OrderStepIndicator.CUSTOMER);
-    const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-    const [orderDetails, setOrderDetails] = useState<OrderDetails>({
-        orderNotes: "",
-        deliveryAddress: "",
-        orderStatus: OrderStatus.CONFIRMED,
-        assignedTo: "",
-        deliveryId: "",
+    const [orderText, setOrderText] = useState("");
+    const [customerState, setCustomerState] = useState<CustomerState | null>(null);
+    const [productInfo, setProductInfo] = useState<AIOrderGenerationProductInfo[] | null>(null);
+    const [orderDetails, setOrderDetails] = useState<OrderDetailsType>({
+        deliveryZoneId: "",
+        discountedPrice: undefined,
     });
+    const [fraudState, setFraudState] = useState<FraudCheckerData | null>(null);
+    const [fraudError, setFraudError] = useState<string | null>(null);
+    const [isCheckingFraud, setIsCheckingFraud] = useState(false);
 
-    const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
+    const [getFraudCheckerData] = useGetFraudCheckerDataMutation();
 
-    // Add product to order
-    const addProductToOrder = (product: Product) => {
-        const existingItem = orderItems.find((item) => item.id === product.id);
+    // Handle customer state changes (including from CustomerInfo component)
+    const handleCustomerStateChange = (newState: CustomerState) => {
+        const oldPhone = customerState?.customerPhone;
+        setCustomerState(newState);
 
-        if (existingItem) {
-            setOrderItems(
-                orderItems.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item))
-            );
-        } else {
-            setOrderItems([
-                ...orderItems,
-                {
-                    ...product,
-                    quantity: 1,
-                    price: product.price || 0,
-                },
-            ]);
+        // Trigger fraud check if phone number changed and is valid
+        if (newState.customerPhone && newState.customerPhone !== oldPhone) {
+            checkFraud(newState.customerPhone);
         }
     };
 
-    // Update quantity of a product
-    const updateQuantity = (productId: string, newQuantity: number) => {
-        if (newQuantity < 1) return;
-
-        setOrderItems(orderItems.map((item) => (item.id === productId ? { ...item, quantity: newQuantity } : item)));
-    };
-
-    // Update order item variants
-    const updateOrderItemVariants = (itemId: string, selectedVariants: OrderItem["selectedVariants"]) => {
-        setOrderItems(orderItems.map((item) => (item.id === itemId ? { ...item, selectedVariants } : item)));
-    };
-
-    // Calculate order subtotal
-    const calculateTotal = () => {
-        return orderItems.reduce((total, item) => {
-            const extraPrice = item.selectedVariants?.reduce((sum, variant) => sum + variant.extraPrice, 0) || 0;
-            const finalPrice = item.price + extraPrice;
-            const itemTotal = finalPrice * item.quantity;
-            return total + itemTotal;
-        }, 0);
-    };
-
-    // Remove product from order
-    const removeOrderItem = (productId: string) => {
-        setOrderItems(orderItems.filter((item) => item.id !== productId));
-    };
-
-    const handleSubmitOrder = async () => {
-        if (!user) {
-            toast.error("You are not authorized to create an order");
+    // Check fraud for customer phone number
+    const checkFraud = async (phoneNumber: string) => {
+        // Phone number validation (Bangladesh format)
+        if (!isValidBdPhoneNumber(phoneNumber)) {
+            setFraudError("Please provide a valid Bangladeshi phone number (e.g., 01XXXXXXXXX)");
+            setFraudState(null);
             return;
         }
 
-        if (!selectedCustomer) {
-            toast.error("Please select a customer");
-            return;
-        }
-        if (orderItems.length === 0) {
-            toast.error("Please add at least one product to the order");
-            return;
-        }
-
-        const payload: CreateOrder = {
-            shopId: user.shop.id,
-            orderItems: orderItems.map((item) => ({
-                productId: item.id,
-                quantity: item.quantity,
-                productPrice: item.price,
-                orderItemVariant:
-                    item.selectedVariants?.map((variant) => ({
-                        productVariantId: variant.variantId,
-                        productVariantOptionId: variant.optionId,
-                    })) || [],
-            })),
-            customerId: selectedCustomer.id,
-            customerAddress: orderDetails.deliveryAddress,
-            orderStatus: OrderStatus.PLACED,
-            notes: orderDetails.orderNotes,
-            deliveryZoneId: orderDetails.deliveryId,
-            customerTotalConfirmOrder: 0,
-            customerTotalCancelOrder: 0,
-        };
-
-        await createOrder({
-            assignedTo: orderDetails.assignedTo || user.id,
-            payload,
-        })
+        setIsCheckingFraud(true);
+        setFraudError(null);
+        const sanitizedPhone = phoneNumber.replace(/\D/g, "");
+        await getFraudCheckerData({ phoneNumber: sanitizedPhone })
             .unwrap()
-            .then(() => {
-                toast.success("Order created successfully!");
-                setActiveStep(OrderStepIndicator.CUSTOMER);
-                setOrderItems([]);
-                setOrderDetails({
-                    orderNotes: "",
-                    deliveryAddress: "",
-                    orderStatus: OrderStatus.CONFIRMED,
-                    assignedTo: "",
-                    deliveryId: "",
-                });
-                setSelectedCustomer(null);
+            .then((res) => {
+                console.log(res);
+                // Check if response contains error status
+                const data = res.data as any;
+                if (data && typeof data === "object" && "status" in data && data.status === "error") {
+                    setFraudError(data.message || "Failed to check customer verification");
+                    setFraudState(null);
+                } else {
+                    setFraudState(res.data as FraudCheckerData);
+                    setFraudError(null);
+                }
             })
-            .catch((err) => {
-                toast.error(err.data.message);
-                console.log("err :>> ", err);
+            .catch((error) => {
+                console.log(error);
+                setFraudError(
+                    error.data?.message || error.message || "Failed to check customer verification. Please try again."
+                );
+                setFraudState(null);
+            })
+            .finally(() => {
+                setIsCheckingFraud(false);
             });
     };
 
+    // Parse customer data from order text
+    const parseCustomerData = (text: string): Partial<Customer> | null => {
+        if (!text.trim()) return null;
+
+        const lines = text.split("\n");
+        let customerName = "";
+        let customerPhone = "";
+        let customerAddress = "";
+
+        for (const line of lines) {
+            const lowerLine = line.toLowerCase().trim();
+
+            // Extract Name
+            if (lowerLine.startsWith("name:")) {
+                customerName = line.substring(line.indexOf(":") + 1).trim();
+            }
+            // Extract Phone
+            else if (lowerLine.startsWith("phone:")) {
+                customerPhone = line.substring(line.indexOf(":") + 1).trim();
+            }
+            // Extract Address
+            else if (lowerLine.startsWith("address:") || lowerLine.startsWith("adress:")) {
+                customerAddress = line.substring(line.indexOf(":") + 1).trim();
+            }
+        }
+
+        // Return parsed data if at least name or phone is found
+        if (customerName || customerPhone) {
+            return {
+                name: customerName,
+                phoneNumber: customerPhone,
+                address: customerAddress,
+                email: "", // Default empty email
+                id: "", // ID will be generated on creation
+                createdAt: "",
+                updatedAt: "",
+            };
+        }
+
+        return null;
+    };
+
+    // Handle Generate button click
+    const handleGenerateOrder = () => {
+        const parsedCustomer = parseCustomerData(orderText);
+
+        if (parsedCustomer) {
+            // Set the parsed customer data
+
+            // Set customer state for the CustomerInfo component
+            setCustomerState({
+                customerName: parsedCustomer.name || "",
+                customerPhone: parsedCustomer.phoneNumber || "",
+                customerAddress: parsedCustomer.address || "",
+                customerId: parsedCustomer.id || "",
+            });
+
+            // Initialize empty product info so users can add products manually
+            setProductInfo([]);
+
+            toast.success("Customer data extracted successfully!");
+
+            // Check fraud if phone number is available
+            if (parsedCustomer.phoneNumber) {
+                checkFraud(parsedCustomer.phoneNumber);
+            }
+        } else {
+            toast.error(
+                "Could not extract customer data. Please use format: Name: [name], Phone: [phone], Address: [address]"
+            );
+        }
+    };
+
+    const resetForm = () => {
+        setOrderText("");
+        setCustomerState(null);
+        setProductInfo(null);
+        setOrderDetails({
+            deliveryZoneId: "",
+            discountedPrice: undefined,
+        });
+        setFraudState(null);
+        setFraudError(null);
+        setIsCheckingFraud(false);
+    };
+
     return (
-        <>
-            <StepIndicator orderItems={orderItems} activeStep={activeStep} setActiveStep={setActiveStep} />
+        <section className="max-w-7xl space-y-6">
+            <OrderInput
+                orderText={orderText}
+                setOrderText={setOrderText}
+                onGenerate={handleGenerateOrder}
+                isProcessing={false}
+                onReset={resetForm}
+                hasData={Boolean(customerState || productInfo)}
+            />
 
-            <section>
-                {activeStep === OrderStepIndicator.CUSTOMER && (
-                    <CustomerStep
-                        selectedCustomer={selectedCustomer}
-                        setSelectedCustomer={setSelectedCustomer}
-                        setActiveStep={setActiveStep}
-                        shopId={user?.shop.id || ""}
-                    />
-                )}
+            {/* Fraud Checker Section */}
+            {customerState && (fraudState || fraudError || isCheckingFraud) && (
+                <FraudChecker
+                    fraudState={fraudState}
+                    error={fraudError}
+                    onCheckFraud={checkFraud}
+                    customerPhone={customerState.customerPhone}
+                    isChecking={isCheckingFraud}
+                />
+            )}
 
-                {activeStep === OrderStepIndicator.PRODUCTS && (
-                    <ProductsStep
-                        orderItems={orderItems}
-                        addProductToOrder={addProductToOrder}
-                        updateQuantity={updateQuantity}
-                        removeOrderItem={removeOrderItem}
-                        updateOrderItemVariants={updateOrderItemVariants}
-                        setActiveStep={setActiveStep}
-                        calculateTotal={calculateTotal}
-                        shopId={user?.shop.id || ""}
-                    />
-                )}
+            {/* customer info  */}
+            {customerState && (
+                <CustomerInfo customerState={customerState} onCustomerStateChange={handleCustomerStateChange} />
+            )}
 
-                {activeStep === OrderStepIndicator.DETAILS && (
-                    <OrderDetailsStep
-                        orderDetails={orderDetails}
-                        setOrderDetails={setOrderDetails}
-                        canCompleteOrder={orderItems.length > 0 && Boolean(selectedCustomer)}
-                        handleSubmitOrder={handleSubmitOrder}
-                        setActiveStep={setActiveStep}
-                        isLoading={isLoading}
-                    />
-                )}
-            </section>
-        </>
+            {/* Order Details */}
+            {customerState && productInfo !== null && (
+                <OrderDetails orderDetails={orderDetails} setOrderDetails={setOrderDetails} />
+            )}
+
+            {/* Order History */}
+            {customerState && isValidId(customerState.customerId) && (
+                <OrderInfo customerId={customerState.customerId} />
+            )}
+
+            {/* Product Info */}
+            {customerState && productInfo !== null && (
+                <ProductInfoOrder
+                    customerInfo={customerState}
+                    productInfo={productInfo}
+                    onReset={resetForm}
+                    orderDetails={orderDetails}
+                    setOrderDetails={setOrderDetails}
+                    fraudState={fraudState}
+                />
+            )}
+        </section>
     );
 };
 

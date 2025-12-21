@@ -106,14 +106,14 @@ export const OrderPDFDocument = ({ orders, shopLogo, merchantId, shopName }: Ord
                                 const variantName =
                                     item.orderItemVariant && item.orderItemVariant.length > 0
                                         ? item.orderItemVariant
-                                              .map((v) => v.productVariantOption?.name)
+                                              .map((v) => v.productVariantOptionName)
                                               .filter(Boolean)
                                               .join(", ")
                                         : null;
 
                                 return (
                                     <Text key={item.id} style={styles.productItem}>
-                                        {index + 1}. {item.product.name} {variantName ? `- ${variantName}` : ""} -{" "}
+                                        {index + 1}. {item.productName} {variantName ? `- ${variantName}` : ""} -{" "}
                                         {item.quantity}
                                     </Text>
                                 );

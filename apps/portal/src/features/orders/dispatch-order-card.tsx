@@ -115,13 +115,10 @@ export const DispatchOrderCard = ({
                         return (
                             <div key={item.id} className="flex items-center justify-between gap-2 text-xs">
                                 <span className="min-w-0 flex-1 truncate">
-                                    {item.product.name}
+                                    {item.productName}
                                     {item.orderItemVariant?.length > 0 && (
                                         <span className="text-primary ml-1">
-                                            (
-                                            {item.orderItemVariant
-                                                .map((ov) => ov.productVariantOption?.name)
-                                                .join(", ")}
+                                            ({item.orderItemVariant.map((ov) => ov.productVariantOptionName).join(", ")}
                                             )
                                         </span>
                                     )}

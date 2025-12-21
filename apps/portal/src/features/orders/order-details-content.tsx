@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { CustomerInfoSection } from "@/features/orders/customer-info-section";
 import { orderStatusOptions } from "@/features/orders/data";
+import { PreviousOrdersSection } from "@/features/orders/previous-orders-section";
 import { useDeleteOrderMutation, useUpdateOrderMutation } from "@/redux/api/order-api";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@workspace/ui/components/accordion";
 import { Badge } from "@workspace/ui/components/badge";
@@ -26,9 +27,10 @@ type OrderFormData = {
 interface OrderDetailsContentProps {
     order: Order;
     onClose: () => void;
+    className?: string;
 }
 
-export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps) => {
+export const OrderDetailsContent = ({ order, onClose, className }: OrderDetailsContentProps) => {
     const { fire } = useAlert();
     const [updateOrder, { isLoading: isUpdating }] = useUpdateOrderMutation();
     const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
@@ -136,7 +138,7 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
     ];
 
     return (
-        <div className="flex max-h-[85dvh] flex-col space-y-3 overflow-y-auto max-sm:px-4 max-sm:pb-8 md:space-y-5">
+        <div className={cn("flex flex-col space-y-3 max-sm:px-4 max-sm:pb-8 md:space-y-5", className)}>
             <div className="flex gap-2 md:gap-4">
                 <Button
                     type="button"
@@ -219,6 +221,9 @@ export const OrderDetailsContent = ({ order, onClose }: OrderDetailsContentProps
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
+
+            {/* Previous Orders */}
+            <PreviousOrdersSection orders={orderData.customer.orders} />
         </div>
     );
 };
@@ -228,19 +233,19 @@ const OrderItems = ({ item }: { item: OrderDetailsItem }) => {
         <div className="flex items-center gap-3 rounded-md border-b pb-2 last:border-b-0 max-sm:flex-col md:border md:p-3">
             <div className="items-center gap-2 max-sm:flex">
                 <Image
-                    src={item.product?.photoURL || "/placeholder.jpg"}
-                    alt={item.product?.name || ""}
+                    src={item.productImage || "/placeholder.jpg"}
+                    alt={item.productName || ""}
                     width={60}
                     height={60}
                     className="size-12 rounded-sm object-cover sm:size-16"
                 />
 
-                <p className="font-medium sm:hidden">৳ {item.product?.discountPrice || item.product?.price}</p>
+                <p className="font-medium sm:hidden">৳ {item.productPrice}</p>
             </div>
 
             <div className="min-w-0 flex-1 space-y-1.5">
                 <p className="truncate font-medium">
-                    {item.product?.banglaName || item.product?.name}{" "}
+                    {item.productName}{" "}
                     <span className="text-muted-foreground pl-2 text-sm">(Qty: {item.quantity})</span>
                 </p>
 
@@ -248,14 +253,14 @@ const OrderItems = ({ item }: { item: OrderDetailsItem }) => {
                     <div className="flex flex-wrap gap-2">
                         {item.orderItemVariant.map((ov, i) => (
                             <Badge
-                                key={`${ov.productVariant?.name}-${ov.productVariantOption?.name}-${i}`}
+                                key={`${ov.productVariantName}-${ov.productVariantOptionName}-${i}`}
                                 variant="secondary"
                             >
-                                <span className="text-primary">{ov.productVariant?.name}:</span>{" "}
-                                {ov.productVariantOption?.name}
-                                {typeof ov.productVariantOption?.extraPrice === "number" &&
-                                ov.productVariantOption?.extraPrice > 0
-                                    ? ` (+${ov.productVariantOption?.extraPrice})`
+                                <span className="text-primary">{ov.productVariantName}:</span>{" "}
+                                {ov.productVariantOptionName}
+                                {typeof ov.productVariantOptionExtraPrice === "number" &&
+                                ov.productVariantOptionExtraPrice > 0
+                                    ? ` (+${ov.productVariantOptionExtraPrice})`
                                     : ""}
                             </Badge>
                         ))}
@@ -264,7 +269,7 @@ const OrderItems = ({ item }: { item: OrderDetailsItem }) => {
             </div>
 
             <div className="text-right max-sm:hidden">
-                <p className="font-medium">৳ {item.product?.discountPrice || item.product?.price}</p>
+                <p className="font-medium">৳ {item.productPrice}</p>
                 <p className="text-muted-foreground text-sm">× {item.quantity}</p>
             </div>
         </div>

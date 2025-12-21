@@ -50,34 +50,65 @@ export type Order = {
     discountedPrice: number | null;
     createdAt: string;
     updatedAt: string;
+    customer: CustomerOrders;
     orderItems: OrderDetailsItem[];
     customerTotalCancelOrder: number;
     customerTotalConfirmOrder: number;
 };
+
+export interface CustomerOrders {
+    id: string;
+    _count: {
+        orders: number;
+    };
+    orders: {
+        orderStatus: OrderStatus;
+        courierStatus: CourierStatus | null;
+        discountedPrice: number | null;
+        createdAt: string;
+        customerName: string;
+        orderItems: {
+            quantity: number;
+            productName: string | null;
+            productImage: string | null;
+            productPrice: number;
+            orderItemVariant: CustomerOrderItemVariant[];
+        }[];
+    }[];
+}
+
+export interface CustomerOrderItemVariant {
+    productVariantName: string | null;
+    productVariantOptionName: string | null;
+    productVariantOptionExtraPrice: number;
+}
 
 export interface OrderDetailsItem {
     id: string;
     orderId: string;
     quantity: number;
     productId: string;
+    productName: string;
+    productPrice: number;
+    productImage: string | null;
     createdAt: string;
     updatedAt: string;
-    product: {
-        id: string;
-        name: string;
-        banglaName: string;
-        description: string;
-        price: number | null;
-        discountPrice: number | null;
-        photoURL: string;
-        activeStatus: string;
-        keywords: string;
-        stock: number;
-        createdAt: string;
-        updatedAt: string;
-        shopId: string;
-        categoryId: string;
-    };
+    // product: {
+    //     id: string;
+    //     name: string;
+    //     banglaName: string;
+    //     description: string;
+    //     price: number | null;
+    //     discountPrice: number | null;
+    //     photoURL: string;
+    //     activeStatus: string;
+    //     keywords: string;
+    //     stock: number;
+    //     createdAt: string;
+    //     updatedAt: string;
+    //     shopId: string;
+    //     categoryId: string;
+    // };
     orderItemVariant: OrderItemVariant[];
 }
 
@@ -86,23 +117,9 @@ export interface OrderItemVariant {
     productVariantId: string;
     productVariantOptionId: string;
     productVariantOptionExtraPrice: number;
+    productVariantName: string | null;
+    productVariantOptionName: string | null;
     orderItemId: string;
-    productVariantOption: {
-        id: string;
-        name: string;
-        isActive: boolean;
-        imgUrl: string;
-        sku: string;
-        extraPrice: number;
-    };
-    productVariant: {
-        id: string;
-        name: string;
-        isRequired: boolean;
-        createdAt: string;
-        updatedAt: string;
-        productId: string;
-    };
 }
 
 export interface OrderItem {

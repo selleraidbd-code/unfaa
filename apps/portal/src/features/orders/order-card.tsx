@@ -112,20 +112,20 @@ export const OrderCard = ({ order, isSelected, isExporting, onToggleSelection, o
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="min-w-0 flex-1 space-y-1">
                                         <h4 className="text-foreground truncate text-sm font-semibold">
-                                            {item.product.name}
+                                            {item.productName}
                                         </h4>
                                         {item.orderItemVariant?.length > 0 && (
                                             <div className="flex flex-wrap gap-1.5">
                                                 {item.orderItemVariant.map((ov, i) => (
                                                     <span
-                                                        key={`${ov.productVariant?.name}-${ov.productVariantOption?.name}-${i}`}
+                                                        key={`${ov.productVariantName}-${ov.productVariantOptionName}-${i}`}
                                                         className="text-muted-foreground text-xs"
                                                     >
-                                                        <span className="text-primary">{ov.productVariant?.name}:</span>{" "}
-                                                        {ov.productVariantOption?.name}
-                                                        {typeof ov.productVariantOption?.extraPrice === "number" &&
-                                                        ov.productVariantOption?.extraPrice > 0
-                                                            ? ` (+${ov.productVariantOption?.extraPrice})`
+                                                        <span className="text-primary">{ov.productVariantName}:</span>{" "}
+                                                        {ov.productVariantOptionName}
+                                                        {typeof ov.productVariantOptionExtraPrice === "number" &&
+                                                        ov.productVariantOptionExtraPrice > 0
+                                                            ? ` (+${ov.productVariantOptionExtraPrice})`
                                                             : ""}{" "}
                                                         ,
                                                     </span>

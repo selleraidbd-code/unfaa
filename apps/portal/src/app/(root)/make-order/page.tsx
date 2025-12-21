@@ -206,9 +206,7 @@ const Page = () => {
             )}
 
             {/* Order History */}
-            {customerState && isValidId(customerState.customerId) && (
-                <OrderInfo customerId={customerState.customerId} />
-            )}
+            {customerState && <OrderInfo customerPhoneNumber={customerState.customerPhone} />}
 
             {/* Product Info */}
             {customerState && productInfo !== null && (

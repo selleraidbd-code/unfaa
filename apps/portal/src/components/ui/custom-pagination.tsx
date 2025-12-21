@@ -1,7 +1,5 @@
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
-
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -11,14 +9,9 @@ import {
     PaginationItem,
     PaginationLink,
 } from "@workspace/ui/components/pagination";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@workspace/ui/components/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface PaginationMeta {
     page: number;
@@ -148,23 +141,18 @@ export const CustomPagination = ({
     };
 
     return (
-        <div
-            className={cn("flex items-center justify-between px-2", className)}
-        >
+        <div className={cn("flex items-center justify-between px-2", className)}>
             {showRowSelection && (
-                <div className="flex-1 text-sm text-muted-foreground">
+                <div className="text-muted-foreground flex-1 text-sm max-md:hidden">
                     {selectedRows} of {totalItems} row(s) selected.
                 </div>
             )}
 
             <div className="flex items-center space-x-6 lg:space-x-8">
                 {showRowsPerPage && (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 max-md:hidden">
                         <p className="text-sm font-medium">Rows per page</p>
-                        <Select
-                            value={`${pageSize}`}
-                            onValueChange={handleLimitChange}
-                        >
+                        <Select value={`${pageSize}`} onValueChange={handleLimitChange}>
                             <SelectTrigger className="h-8 w-[70px]">
                                 <SelectValue placeholder={pageSize} />
                             </SelectTrigger>
@@ -180,18 +168,13 @@ export const CustomPagination = ({
                 )}
 
                 {showPageCount && (
-                    <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                    <div className="flex w-[100px] items-center justify-center text-sm font-medium max-md:hidden">
                         Page {currentPage} of {totalPages}
                     </div>
                 )}
 
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handlePreviousClick}
-                        disabled={currentPage <= 1}
-                    >
+                    <Button variant="outline" size="icon" onClick={handlePreviousClick} disabled={currentPage <= 1}>
                         <span className="sr-only">Go to previous page</span>
                         <ChevronLeft className="size-5" />
                     </Button>
@@ -204,14 +187,8 @@ export const CustomPagination = ({
                                         <PaginationEllipsis />
                                     ) : (
                                         <PaginationLink
-                                            isActive={
-                                                pageNumber === currentPage
-                                            }
-                                            onClick={() =>
-                                                handlePaginationLinkClick(
-                                                    pageNumber
-                                                )
-                                            }
+                                            isActive={pageNumber === currentPage}
+                                            onClick={() => handlePaginationLinkClick(pageNumber)}
                                             className={buttonClassName}
                                         >
                                             {pageNumber}

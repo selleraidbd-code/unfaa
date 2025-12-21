@@ -151,9 +151,8 @@ export const OrderMobileCard = ({
                 {order.orderItems?.length > 0 &&
                     order.orderItems.map((item) => (
                         <p key={item.id}>
-                            {item.product?.banglaName || item.product?.name} x {item.quantity}{" "}
-                            {item?.orderItemVariant?.length > 0 && " - "}
-                            {item?.orderItemVariant?.map((variant) => variant.productVariantOption?.name).join(", ")}
+                            {item.productName} x {item.quantity} {item?.orderItemVariant?.length > 0 && " - "}
+                            {item?.orderItemVariant?.map((variant) => variant.productVariantOptionName).join(", ")}
                         </p>
                     ))}
 

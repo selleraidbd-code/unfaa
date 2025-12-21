@@ -15,21 +15,24 @@ import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { Calendar, Clock, Eye } from "lucide-react";
 
 type Props = {
-    customerId: string;
+    customerId?: string;
+    customerPhoneNumber?: string;
 };
 
-export const OrderInfo = ({ customerId }: Props) => {
+export const OrderInfo = ({ customerId, customerPhoneNumber }: Props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const user = useAppSelector((state) => state.auth.user);
+
     const { data, isLoading, isError } = useGetOrdersQuery(
         {
-            customerId,
+            customerId: customerId || undefined,
+            customerPhoneNumber: customerPhoneNumber || undefined,
             shopId: user?.shop?.id,
             limit: 10,
             page: 1,
         },
         {
-            skip: !customerId || !user?.shop?.id,
+            skip: (!customerPhoneNumber && !customerId) || !user?.shop?.id,
         }
     );
 
@@ -41,7 +44,7 @@ export const OrderInfo = ({ customerId }: Props) => {
         return <OrderItemSkeleton />;
     }
 
-    if (!customerId || orders.length === 0 || isError) {
+    if ((!customerPhoneNumber && !customerId) || orders.length === 0 || isError) {
         return null;
     }
 
@@ -111,13 +114,13 @@ export const OrderInfo = ({ customerId }: Props) => {
                                                 {order.orderItems.map((item) => (
                                                     <div key={item.id} className="flex items-start gap-3 text-sm">
                                                         <Image
-                                                            src={item.product.photoURL}
-                                                            alt={item.product.name}
+                                                            src={item.productImage || "/placeholder.jpg"}
+                                                            alt={item.productName || ""}
                                                             width={40}
                                                             height={40}
                                                             className="size-8 rounded object-cover"
                                                         />
-                                                        <div className="font-medium">{item.product.name}</div>
+                                                        <div className="font-medium">{item.productName}</div>
                                                         <span className="text-muted-foreground font-medium whitespace-nowrap">
                                                             Qty: {item.quantity}
                                                         </span>

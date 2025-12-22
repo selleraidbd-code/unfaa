@@ -1,5 +1,5 @@
-import { isValidId } from "@/features/ai-order/lib";
-import { CustomerState } from "@/features/ai-order/types";
+import { isValidId } from "@/features/create-order/lib";
+import { CustomerState } from "@/features/create-order/types";
 import { useCreateOrderbyAdminMutation } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
@@ -18,14 +18,7 @@ interface Props {
     fraudState?: FraudCheckerData | null;
 }
 
-export const AiPlaceOrder = ({
-    onReset,
-    customerInfo,
-    orderItems,
-    orderDetails,
-    setOrderDetails,
-    fraudState,
-}: Props) => {
+export const PlaceOrder = ({ onReset, customerInfo, orderItems, orderDetails, setOrderDetails, fraudState }: Props) => {
     const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
     const user = useAppSelector((state) => state.auth.user);
 
@@ -69,12 +62,15 @@ export const AiPlaceOrder = ({
         const customerTotalConfirmOrder = fraudState?.total_delivered ?? 0;
         const customerTotalCancelOrder = fraudState?.total_cancel ?? 0;
 
+        // Remove country code from phone number if present
+        const phoneNumber = customerInfo.customerPhone.replace(/^\+88/, "");
+
         // Build payload akin to make-order page
         const payload: CreateOrder = {
             shopId: user.shop.id,
             customerId,
             customerName: customerInfo.customerName,
-            customerPhoneNumber: customerInfo.customerPhone,
+            customerPhoneNumber: phoneNumber,
             orderItems: orderItems.map((item) => {
                 const extras = (item.selectedVariants ?? []).reduce(
                     (sum, sv) => sum + (Number(sv.extraPrice ?? 0) || 0),

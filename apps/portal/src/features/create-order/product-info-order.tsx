@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { AiPlaceOrder } from "@/features/ai-order/ai-place-order";
-import { ProductSelectionModal } from "@/features/ai-order/product-selection-modal";
-import { CustomerState } from "@/features/ai-order/types";
+import { PlaceOrder } from "@/features/create-order/place-order";
+import { ProductSelectionModal } from "@/features/create-order/product-selection-modal";
+import { CustomerState } from "@/features/create-order/types";
 import { useLazyGetProductByIdQuery } from "@/redux/api/product-api";
 import { ResponseObject } from "@/redux/type";
 import { Badge } from "@workspace/ui/components/badge";
@@ -263,7 +263,7 @@ export const ProductInfoOrder = ({
                 )}
             </div>
 
-            <AiPlaceOrder
+            <PlaceOrder
                 onReset={onReset}
                 customerInfo={customerInfo}
                 orderItems={orderItems}

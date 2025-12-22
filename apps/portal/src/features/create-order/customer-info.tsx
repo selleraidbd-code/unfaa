@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { CustomerState } from "@/features/ai-order/types";
+import { CustomerState } from "@/features/create-order/types";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";

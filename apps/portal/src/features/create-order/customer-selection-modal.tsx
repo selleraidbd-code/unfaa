@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 
-import { ProductCardSkeleton, ProductSelectionCard } from "@/features/ai-order/product-card";
-import { useGetProductsQuery } from "@/redux/api/product-api";
+import {
+    CustomerCardSkeleton,
+    CustomerSelectionCard,
+    SelectedCustomerCard,
+} from "@/features/create-order/customer-card";
+import { useGetCustomersQuery } from "@/redux/api/customer-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
@@ -15,27 +19,33 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@workspace/ui/components/dialog";
-import { Package } from "lucide-react";
+import { User } from "lucide-react";
 
-import { Product } from "@/types/product-type";
+import { Customer } from "@/types/customer-type";
 import { CustomPagination, PaginationMeta } from "@/components/ui/custom-pagination";
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 
-interface ProductSelectionModalProps {
+interface CustomerSelectionModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSelectProduct: (product: Product) => void;
+    onSelectCustomer: (customer: Customer) => void;
+    currentCustomerPhone?: string;
 }
 
-export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: ProductSelectionModalProps) => {
+export const CustomerSelectionModal = ({
+    open,
+    onOpenChange,
+    onSelectCustomer,
+    currentCustomerPhone,
+}: CustomerSelectionModalProps) => {
     const user = useAppSelector((state) => state.auth.user);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
-    const { data, isLoading, isError } = useGetProductsQuery({
+    const { data, isLoading, isError } = useGetCustomersQuery({
         page: currentPage,
         limit: 20,
-        shopSlug: user?.shop?.slug || "",
+        shopId: user?.shop?.id,
         searchTerm: searchTerm || undefined,
     });
 
@@ -44,28 +54,30 @@ export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: P
         setCurrentPage(1);
     };
 
-    const handleSelectProduct = (product: Product) => {
-        onSelectProduct(product);
+    const handleSelectCustomer = (customer: Customer) => {
+        onSelectCustomer(customer);
         onOpenChange(false);
     };
 
-    const products = data?.data || [];
+    const customers = data?.data || [];
     const paginationMeta: PaginationMeta = {
         page: currentPage,
         limit: 20,
         total: data?.meta?.total || 0,
     };
 
+    const selectedCustomer = customers.find((customer) => customer.phoneNumber === currentCustomerPhone);
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="flex flex-col md:max-w-4xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <Package className="h-5 w-5" />
-                        Select Product
+                        <User className="h-5 w-5" />
+                        Select Customer
                     </DialogTitle>
                     <DialogDescription>
-                        Choose a product from your inventory or search for a specific one.
+                        Choose a customer from your existing customers or search for a specific one.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -73,32 +85,36 @@ export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: P
                     {/* Search */}
                     <CustomSearch
                         onSearch={handleSearch}
-                        placeholder="Search products by name, category, or SKU..."
+                        placeholder="Search customers by name, phone, or email..."
                         className="md:w-full"
                     />
 
                     <DataStateHandler
-                        data={products}
+                        data={customers}
                         isLoading={isLoading}
                         loadingComponent={
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {Array.from({ length: 6 }).map((_, index) => (
-                                    <ProductCardSkeleton key={index} />
+                                    <CustomerCardSkeleton key={index} />
                                 ))}
                             </div>
                         }
                         isError={isError}
-                        isEmpty={products.length === 0}
-                        emptyDescription={searchTerm ? "No products found matching your search" : "No products found"}
+                        isEmpty={customers.length === 0}
+                        emptyDescription={searchTerm ? "No customers found matching your search" : "No customers found"}
                     >
-                        {(products) => (
+                        {(customers) => (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {products.map((product) => (
-                                    <ProductSelectionCard
-                                        key={product.id}
-                                        product={product}
-                                        onSelectProduct={handleSelectProduct}
-                                        currentProductId={undefined}
+                                {selectedCustomer && (
+                                    <SelectedCustomerCard customer={selectedCustomer} className="col-span-2" />
+                                )}
+
+                                {customers.map((customer) => (
+                                    <CustomerSelectionCard
+                                        key={customer.id}
+                                        customer={customer}
+                                        onSelectCustomer={handleSelectCustomer}
+                                        currentCustomerPhone={currentCustomerPhone}
                                     />
                                 ))}
                             </div>
@@ -108,7 +124,7 @@ export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: P
 
                 <DialogFooter>
                     {/* Pagination */}
-                    {products.length > 0 && (
+                    {customers.length > 0 && (
                         <CustomPagination
                             paginationMeta={paginationMeta}
                             showRowSelection={false}

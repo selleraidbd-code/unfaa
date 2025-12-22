@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 
-import { CustomerInfo } from "@/features/ai-order/customer-info";
-import { FraudChecker } from "@/features/ai-order/fraud-checker";
-import { isValidBdPhoneNumber, isValidId } from "@/features/ai-order/lib";
-import { OrderDetails } from "@/features/ai-order/order-details";
-import { OrderInfo } from "@/features/ai-order/order-info";
-import { OrderInput } from "@/features/ai-order/order-input";
-import { ProductInfoOrder } from "@/features/ai-order/product-info-order";
-import { CustomerState } from "@/features/ai-order/types";
+import { CustomerInfo } from "@/features/create-order/customer-info";
+import { FraudChecker } from "@/features/create-order/fraud-checker";
+import { isValidBdPhoneNumber } from "@/features/create-order/lib";
+import { OrderDetails } from "@/features/create-order/order-details";
+import { OrderInfo } from "@/features/create-order/order-info";
+import { OrderInput } from "@/features/create-order/order-input";
+import { ProductInfoOrder } from "@/features/create-order/product-info-order";
+import { CustomerState } from "@/features/create-order/types";
 import { useGetFraudCheckerDataMutation } from "@/redux/api/customer-api";
 import { toast } from "@workspace/ui/components/sonner";
 

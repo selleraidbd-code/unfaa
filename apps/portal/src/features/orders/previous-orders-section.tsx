@@ -30,7 +30,7 @@ export const PreviousOrdersSection = ({ orders }: PreviousOrdersSectionProps) =>
     if (!orders || orders.length === 0) {
         return null;
     }
-
+    //  these are the previous orders
     return (
         <Accordion type="single" collapsible className="w-full rounded-lg border px-4">
             <AccordionItem value="previous-orders">

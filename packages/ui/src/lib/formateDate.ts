@@ -6,6 +6,28 @@ export const formatDate = (date: string) => {
     });
 };
 
+export const formatDateShort = (date: string) => {
+    return new Date(date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
+};
+
+export const formatDateNumeric = (dateString: string): string => {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+        return "";
+    }
+
+    return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+    });
+};
+
 export const formatDateShortWithTime = (date: string) => {
     return new Date(date).toLocaleString("en-US", {
         month: "long",

@@ -1,4 +1,4 @@
-import { Product } from "@/types/product-type";
+import { DeliveryZone, Product } from "@/types/product-type";
 
 // Product in shop section (junction table)
 export type ShopSectionProduct = {
@@ -130,6 +130,7 @@ export type Delivery = {
     createdAt: string;
     updatedAt: string;
     isRequired: boolean;
+    deliveryZones: DeliveryZone[];
 };
 
 // Brand types

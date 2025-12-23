@@ -6,10 +6,11 @@ import { useFormContext } from "react-hook-form";
 const BillingDetails = () => {
     const { shop } = useShop();
 
-    const deliveryZones = shop?.delivery?.map((delivery) => ({
-        value: delivery.id,
-        label: delivery.name,
-    }));
+    const deliveryZones =
+        shop?.delivery[0]?.deliveryZones?.map((deliveryZone) => ({
+            value: deliveryZone.id,
+            label: deliveryZone.name,
+        })) || [];
 
     const { control } = useFormContext();
 

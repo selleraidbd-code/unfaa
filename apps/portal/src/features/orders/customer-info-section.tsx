@@ -144,7 +144,7 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
     }
 
     return (
-        <div className="space-y-4 rounded-lg border p-4">
+        <div className="space-y-2 border-b pb-2 md:space-y-4 md:rounded-lg md:border md:p-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-base">Customer Information</h3>
                 <CustomButton
@@ -159,32 +159,42 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
                 </CustomButton>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                <div className="space-y-1">
-                    <p className="text-muted-foreground text-sm">Customer Name</p>
-                    <p className="font-medium max-sm:text-sm">{order?.customerName || "N/A"}</p>
-                </div>
-                <div className="space-y-1">
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
+                <div className="flex gap-1 max-md:items-center md:flex-col">
                     <p className="text-muted-foreground text-sm">
-                        COD <span className="max-md:hidden">/ Payable Amount</span>
+                        <span className="max-md:hidden">Customer</span> Name <span className="md:hidden">:</span>
+                    </p>
+                    <p className="truncate font-medium max-sm:text-sm">{order?.customerName || "N/A"}</p>
+                </div>
+                <div className="flex gap-1 max-md:items-center md:flex-col">
+                    <p className="text-muted-foreground text-sm">
+                        COD <span className="max-md:hidden">/ Payable Amount</span> <span className="md:hidden">:</span>
                     </p>
                     <p className="font-medium">৳ {order?.discountedPrice ?? order?.totalAmount ?? 0}</p>
                 </div>
+
                 <div className="flex items-end gap-4 max-md:col-span-2">
-                    <div className="space-y-1">
-                        <p className="text-muted-foreground text-sm">Phone Number</p>
+                    <div className="flex gap-1 max-md:items-center md:flex-col">
+                        <p className="text-muted-foreground text-sm">
+                            Phone <span className="max-md:hidden">Number</span> <span className="md:hidden">:</span>
+                        </p>
                         <p className="font-medium max-sm:text-sm">{order?.customerPhoneNumber || "N/A"}</p>
                     </div>
-                    <Button type="button" size="sm" onClick={handleCallCustomer}>
-                        <Phone />
+                    <button
+                        className="bg-primary text-primary-foreground flex items-center gap-1 rounded-sm px-4 py-1 text-xs sm:px-2 sm:text-sm"
+                        onClick={handleCallCustomer}
+                    >
+                        <Phone className="size-4 max-sm:hidden" />
                         Call
-                    </Button>
+                    </button>
                 </div>
             </div>
 
-            <div className="space-y-1 md:col-span-2">
-                <p className="text-muted-foreground text-sm">Address</p>
-                <p className="font-medium max-sm:text-sm">{order?.customerAddress || "N/A"}</p>
+            <div className="gap-1 max-md:space-x-1 md:col-span-2 md:flex md:flex-col">
+                <span className="text-muted-foreground text-sm">
+                    Address <span className="md:hidden">:</span>
+                </span>
+                <span className="font-medium max-sm:text-sm">{order?.customerAddress || "N/A"}</span>
             </div>
         </div>
     );

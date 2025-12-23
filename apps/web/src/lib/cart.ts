@@ -28,10 +28,7 @@ export const MAX_QUANTITY = 20;
 
 export const calculateItemTotal = (item: CartItem) => {
     const basePrice = item.price || 0;
-    const variantExtraPrice = item.selectedVariants.reduce(
-        (sum, variant) => sum + variant.extraPrice,
-        0
-    );
+    const variantExtraPrice = item.selectedVariants.reduce((sum, variant) => sum + variant.extraPrice, 0);
     return (basePrice + variantExtraPrice) * item.quantity;
 };
 
@@ -53,8 +50,7 @@ export const cartStorage = {
             (i) =>
                 i.productId === item.productId &&
                 i.shopId === item.shopId &&
-                JSON.stringify(i.selectedVariants) ===
-                    JSON.stringify(item.selectedVariants)
+                JSON.stringify(i.selectedVariants) === JSON.stringify(item.selectedVariants)
         );
 
         if (existingItemIndex !== -1) {
@@ -63,9 +59,7 @@ export const cartStorage = {
 
             const newQuantity = existingItem.quantity + item.quantity;
             if (newQuantity > MAX_QUANTITY) {
-                console.warn(
-                    `Cannot add more items. Maximum quantity of ${MAX_QUANTITY} would be exceeded`
-                );
+                console.warn(`Cannot add more items. Maximum quantity of ${MAX_QUANTITY} would be exceeded`);
                 return;
             }
             if (cart[existingItemIndex]) {
@@ -73,9 +67,7 @@ export const cartStorage = {
             }
         } else {
             if (item.quantity > MAX_QUANTITY) {
-                console.warn(
-                    `Cannot add items. Maximum quantity of ${MAX_QUANTITY} would be exceeded`
-                );
+                console.warn(`Cannot add items. Maximum quantity of ${MAX_QUANTITY} would be exceeded`);
                 return;
             }
             cart.push(item);
@@ -85,31 +77,21 @@ export const cartStorage = {
         window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
-    removeItem: (
-        productId: string,
-        shopId: string,
-        selectedVariants: SelectedVariant[]
-    ) => {
+    removeItem: (productId: string, shopId: string, selectedVariants: SelectedVariant[]) => {
         const cart = cartStorage.getCart();
         const updatedCart = cart.filter(
             (item) =>
                 !(
                     item.productId === productId &&
                     item.shopId === shopId &&
-                    JSON.stringify(item.selectedVariants) ===
-                        JSON.stringify(selectedVariants)
+                    JSON.stringify(item.selectedVariants) === JSON.stringify(selectedVariants)
                 )
         );
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updatedCart));
         window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
-    updateQuantity: (
-        productId: string,
-        shopId: string,
-        selectedVariants: SelectedVariant[],
-        newQuantity: number
-    ) => {
+    updateQuantity: (productId: string, shopId: string, selectedVariants: SelectedVariant[], newQuantity: number) => {
         if (newQuantity > MAX_QUANTITY) {
             console.warn(`Maximum quantity of ${MAX_QUANTITY} exceeded`);
             return;
@@ -119,8 +101,7 @@ export const cartStorage = {
         const updatedCart = cart.map((item) =>
             item.productId === productId &&
             item.shopId === shopId &&
-            JSON.stringify(item.selectedVariants) ===
-                JSON.stringify(selectedVariants)
+            JSON.stringify(item.selectedVariants) === JSON.stringify(selectedVariants)
                 ? { ...item, quantity: newQuantity }
                 : item
         );
@@ -159,9 +140,7 @@ export const cartStorage = {
 };
 
 // Helper functions for variant selection
-export const getDefaultVariantSelection = (
-    variants: ProductVariant[]
-): VariantSelection => {
+export const getDefaultVariantSelection = (variants: ProductVariant[]): VariantSelection => {
     const selection: VariantSelection = {};
 
     variants.forEach((variant) => {
@@ -177,16 +156,11 @@ export const getDefaultVariantSelection = (
     return selection;
 };
 
-export const createSelectedVariants = (
-    variants: ProductVariant[],
-    selection: VariantSelection
-): SelectedVariant[] => {
+export const createSelectedVariants = (variants: ProductVariant[], selection: VariantSelection): SelectedVariant[] => {
     return variants
         .filter((variant) => selection[variant.id])
         .map((variant) => {
-            const option = variant.options.find(
-                (opt) => opt.id === selection[variant.id]
-            );
+            const option = variant.options.find((opt) => opt.id === selection[variant.id]);
             if (!option) return null;
 
             return {

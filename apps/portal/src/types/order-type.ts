@@ -61,19 +61,22 @@ export interface CustomerOrders {
     _count: {
         orders: number;
     };
-    orders: {
-        orderStatus: OrderStatus;
-        courierStatus: CourierStatus | null;
-        discountedPrice: number | null;
-        createdAt: string;
-        customerName: string;
-        orderItems: {
-            quantity: number;
-            productName: string | null;
-            productImage: string | null;
-            productPrice: number;
-            orderItemVariant: CustomerOrderItemVariant[];
-        }[];
+    orders: CustomerOrderItem[];
+}
+
+export interface CustomerOrderItem {
+    id: string;
+    orderStatus: OrderStatus;
+    courierStatus: CourierStatus | null;
+    discountedPrice: number | null;
+    createdAt: string;
+    customerName: string;
+    orderItems: {
+        quantity: number;
+        productName: string | null;
+        productImage: string | null;
+        productPrice: number;
+        orderItemVariant: CustomerOrderItemVariant[];
     }[];
 }
 
@@ -93,22 +96,6 @@ export interface OrderDetailsItem {
     productImage: string | null;
     createdAt: string;
     updatedAt: string;
-    // product: {
-    //     id: string;
-    //     name: string;
-    //     banglaName: string;
-    //     description: string;
-    //     price: number | null;
-    //     discountPrice: number | null;
-    //     photoURL: string;
-    //     activeStatus: string;
-    //     keywords: string;
-    //     stock: number;
-    //     createdAt: string;
-    //     updatedAt: string;
-    //     shopId: string;
-    //     categoryId: string;
-    // };
     orderItemVariant: OrderItemVariant[];
 }
 

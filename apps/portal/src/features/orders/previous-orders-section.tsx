@@ -1,11 +1,58 @@
 import Image from "next/image";
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@workspace/ui/components/accordion";
+import { CourierStatusBadge } from "@/features/orders/courier-status-badge";
+import { OrderStatusBadge } from "@/features/orders/order-status-badge";
 import { Badge } from "@workspace/ui/components/badge";
+import { formatDate, formatDateNumeric, formatDateShort, formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 
-import { CustomerOrderItemVariant, OrderStatus } from "@/types/order-type";
+import { CustomerOrderItem, CustomerOrderItemVariant } from "@/types/order-type";
 
-type PreviousOrderItemType = {
+interface PreviousOrdersSectionProps {
+    orders: CustomerOrderItem[];
+}
+
+export const PreviousOrdersSection = ({ orders }: PreviousOrdersSectionProps) => {
+    if (!orders || orders.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className="md:card space-y-2 pb-3 md:space-y-4 md:py-4">
+            <h2 className="pb-2 text-base max-sm:text-sm md:border-b">Previous Orders ({orders.length})</h2>
+
+            {orders.map((prevOrder, index) => (
+                <div key={index} className="space-y-2 border-b pb-2 last:border-b-0">
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 text-sm">
+                            <span className="text-muted-foreground max-sm:hidden">Order {index + 1}:</span>
+                            {prevOrder.discountedPrice && (
+                                <p className="text-sm font-semibold">৳ {prevOrder.discountedPrice}</p>
+                            )}
+                            <OrderStatusBadge status={prevOrder.orderStatus} />
+                            <CourierStatusBadge status={prevOrder.courierStatus} />
+                        </div>
+                        <span className="text-xs sm:text-sm">{formatDateNumeric(prevOrder.createdAt)}</span>
+                    </div>
+
+                    <div className="grid gap-2 sm:grid-cols-2">
+                        {prevOrder.orderItems.map((item, itemIndex) => (
+                            <OrderItem
+                                key={itemIndex}
+                                quantity={item.quantity}
+                                productName={item.productName}
+                                productImage={item.productImage}
+                                productPrice={item.productPrice}
+                                orderItemVariant={item.orderItemVariant}
+                            />
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+type OrderItemProps = {
     quantity: number;
     productName: string | null;
     productImage: string | null;
@@ -13,96 +60,27 @@ type PreviousOrderItemType = {
     orderItemVariant: CustomerOrderItemVariant[];
 };
 
-type PreviousOrder = {
-    orderStatus: OrderStatus;
-    courierStatus: string | null;
-    discountedPrice: number | null;
-    createdAt: string;
-    customerName: string;
-    orderItems: PreviousOrderItemType[];
-};
-
-interface PreviousOrdersSectionProps {
-    orders: PreviousOrder[];
-}
-
-export const PreviousOrdersSection = ({ orders }: PreviousOrdersSectionProps) => {
-    if (!orders || orders.length === 0) {
-        return null;
-    }
-    //  these are the previous orders
+export const OrderItem = ({ quantity, productName, productImage, productPrice, orderItemVariant }: OrderItemProps) => {
     return (
-        <Accordion type="single" collapsible className="w-full rounded-lg border px-4">
-            <AccordionItem value="previous-orders">
-                <AccordionTrigger className="text-base hover:no-underline">
-                    View Previous Orders ({orders.length})
-                </AccordionTrigger>
-
-                <AccordionContent>
-                    <div className="max-h-96 space-y-4 overflow-y-auto pt-2">
-                        {orders.map((prevOrder, index) => (
-                            <div key={index} className="space-y-2 rounded-lg border p-3">
-                                <div className="flex items-center justify-between border-b pb-2">
-                                    <div className="space-y-1">
-                                        <p className="text-sm font-medium">{prevOrder.customerName}</p>
-                                        <p className="text-muted-foreground text-xs">
-                                            {new Date(prevOrder.createdAt).toLocaleDateString("en-US", {
-                                                year: "numeric",
-                                                month: "short",
-                                                day: "numeric",
-                                            })}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Badge
-                                            variant={
-                                                prevOrder.orderStatus === OrderStatus.CONFIRMED
-                                                    ? "default"
-                                                    : prevOrder.orderStatus === OrderStatus.CANCELLED
-                                                      ? "destructive"
-                                                      : "secondary"
-                                            }
-                                        >
-                                            {prevOrder.orderStatus}
-                                        </Badge>
-                                        {prevOrder.discountedPrice && (
-                                            <p className="text-sm font-semibold">৳ {prevOrder.discountedPrice}</p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    {prevOrder.orderItems.map((item, itemIndex) => (
-                                        <PreviousOrderItem key={itemIndex} item={item} />
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </AccordionContent>
-            </AccordionItem>
-        </Accordion>
-    );
-};
-
-const PreviousOrderItem = ({ item }: { item: PreviousOrderItemType }) => {
-    return (
-        <div className="bg-muted/30 flex items-center gap-2 rounded-md p-2">
+        <div className="flex items-center gap-2 rounded-md">
             <Image
-                src={item.productImage || "/placeholder.jpg"}
-                alt={item.productName || ""}
+                src={productImage || "/placeholder.jpg"}
+                alt={productName || ""}
                 width={40}
                 height={40}
-                className="size-10 rounded-sm object-cover"
+                className="size-6 rounded object-cover sm:size-8"
             />
 
             <div className="min-w-0 flex-1 space-y-1">
-                <p className="truncate text-sm font-medium">
-                    {item.productName} <span className="text-muted-foreground text-xs">(Qty: {item.quantity})</span>
+                <p className="flex flex-wrap items-center gap-x-2 truncate text-xs font-medium sm:text-sm">
+                    <span className="">{productName}</span>
+                    <span className="text-primary font-medium">৳ {productPrice}</span>
+                    <span className="text-muted-foreground text-xs">x {quantity}</span>
                 </p>
 
-                {item.orderItemVariant?.length > 0 && (
+                {orderItemVariant?.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                        {item.orderItemVariant.map((ov, i) => (
+                        {orderItemVariant.map((ov, i) => (
                             <Badge key={i} variant="outline" className="h-5 text-xs">
                                 <span className="text-primary">{ov.productVariantName}:</span>{" "}
                                 {ov.productVariantOptionName}
@@ -114,10 +92,6 @@ const PreviousOrderItem = ({ item }: { item: PreviousOrderItemType }) => {
                         ))}
                     </div>
                 )}
-            </div>
-
-            <div className="text-right">
-                <p className="text-sm font-medium">৳ {item.productPrice}</p>
             </div>
         </div>
     );

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+
+
 import { makeOrder } from "@/actions/order-actions";
 import { useShop } from "@/contexts/shop-context";
 import BillingDetails from "@/features/shop/checkout/BillingDetails";
@@ -14,10 +16,16 @@ import { CircleDot } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+
+
 import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
 import { CartItem, cartStorage } from "@/lib/cart";
 import { getLink } from "@/lib/get-link";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
+
+
+
+
 
 const formSchema = z.object({
     name: z
@@ -112,6 +120,7 @@ const Page = () => {
     }
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        console.log("values", values);
         const cartItems = cartStorage.getCart();
 
         const orderItems = cartItems?.map((item: CartItem) => ({
@@ -139,7 +148,7 @@ const Page = () => {
             router.replace(
                 getLink({
                     shopSlug: shop.slug,
-                    path: `/order-success?order=${res?.data?.id}`,
+                    path: `/order-success?order=${res?.data?.orderSerialNumber}`,
                 })
             );
         });

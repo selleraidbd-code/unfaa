@@ -44,7 +44,7 @@ export type OrderResponse = {
     customerName: string;
     customerPhoneNumber: string;
     customerAddress: string;
-    orderNumber?: string;
+    orderSerialNumber: string;
     createdAt: string;
     status: string;
     totalAmount: number;

@@ -3,11 +3,14 @@ import { cn } from "@workspace/ui/lib/utils";
 import { CourierStatus } from "@/types/order-type";
 
 interface CourierStatusBadgeProps {
-    status: CourierStatus;
+    status: CourierStatus | string | null;
     className?: string;
 }
 
-const getCourierStatusColor = (status: CourierStatus) => {
+const getCourierStatusColor = (status: CourierStatus | string) => {
+    if (typeof status === "string") {
+        status = status.toLowerCase();
+    }
     switch (status) {
         case CourierStatus.PENDING:
             // Yellow - Pending, waiting
@@ -34,6 +37,9 @@ const getCourierStatusColor = (status: CourierStatus) => {
 };
 
 export const CourierStatusBadge = ({ status, className }: CourierStatusBadgeProps) => {
+    if (!status) {
+        return null;
+    }
     return (
         <span
             className={cn(

@@ -3,24 +3,28 @@ import Image from "next/image";
 import { CourierStatusBadge } from "@/features/orders/courier-status-badge";
 import { OrderStatusBadge } from "@/features/orders/order-status-badge";
 import { Badge } from "@workspace/ui/components/badge";
-import { formatDate, formatDateNumeric, formatDateShort, formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
+import { formatDateNumeric } from "@workspace/ui/lib/formateDate";
 
 import { CustomerOrderItem, CustomerOrderItemVariant } from "@/types/order-type";
 
 interface PreviousOrdersSectionProps {
     orders: CustomerOrderItem[];
+    orderId: string;
 }
 
-export const PreviousOrdersSection = ({ orders }: PreviousOrdersSectionProps) => {
-    if (!orders || orders.length === 0) {
+export const PreviousOrdersSection = ({ orders, orderId }: PreviousOrdersSectionProps) => {
+    // Filter out the current order from the list
+    const filteredOrders = orders.filter((order) => order.id !== orderId);
+
+    if (!filteredOrders || filteredOrders.length === 0) {
         return null;
     }
 
     return (
         <div className="md:card space-y-2 pb-3 md:space-y-4 md:py-4">
-            <h2 className="pb-2 text-base max-sm:text-sm md:border-b">Previous Orders ({orders.length})</h2>
+            <h2 className="pb-2 text-base max-sm:text-sm md:border-b">Previous Orders ({filteredOrders.length})</h2>
 
-            {orders.map((prevOrder, index) => (
+            {filteredOrders.map((prevOrder, index) => (
                 <div key={index} className="space-y-2 border-b pb-2 last:border-b-0">
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 text-sm">

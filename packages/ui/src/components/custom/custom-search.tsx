@@ -1,23 +1,18 @@
 import { useState } from "react";
 
-import { Search } from "lucide-react";
-
-import { cn } from "@workspace/ui/lib/utils";
 import { Input } from "@workspace/ui/components/input";
+import { cn } from "@workspace/ui/lib/utils";
+import { Search } from "lucide-react";
 
 interface CustomSearchProps {
     value?: string;
     onSearch?: (value: string) => void;
     placeholder?: string;
     className?: string;
+    autoFocus?: boolean;
 }
 
-export const CustomSearch = ({
-    onSearch,
-    placeholder,
-    className,
-    value,
-}: CustomSearchProps) => {
+export const CustomSearch = ({ onSearch, placeholder, className, value, autoFocus = false }: CustomSearchProps) => {
     const [searchTerm, setSearchTerm] = useState(value || "");
 
     const handleSearchTerm = (value: string) => {
@@ -43,6 +38,7 @@ export const CustomSearch = ({
                 onChange={(event) => handleSearchTerm(event.target.value)}
                 onKeyDown={handleSearch}
                 className="pl-8"
+                autoFocus={autoFocus}
             />
             <Search className="text-muted-foreground absolute top-[50%] left-2.5 h-4 w-4 -translate-y-1/2" />
         </div>

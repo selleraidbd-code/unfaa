@@ -13,7 +13,7 @@ import { CustomerState } from "@/features/create-order/types";
 import { useGetFraudCheckerDataMutation } from "@/redux/api/customer-api";
 import { toast } from "@workspace/ui/components/sonner";
 
-import { Customer, FraudCheckerData } from "@/types/customer-type";
+import { FraudCheckerData } from "@/types/customer-type";
 import { AIOrderGenerationProductInfo, OrderDetailsType, OrderStatus } from "@/types/order-type";
 
 export type OrderDetails = {
@@ -22,6 +22,13 @@ export type OrderDetails = {
     orderStatus: OrderStatus;
     assignedTo: string;
     deliveryId: string;
+};
+
+type parsedCustomerData = {
+    customerName: string;
+    customerPhone: string;
+    customerAddress: string;
+    CODAmount: string;
 };
 
 const Page = () => {
@@ -88,13 +95,14 @@ const Page = () => {
     };
 
     // Parse customer data from order text
-    const parseCustomerData = (text: string): Partial<Customer> | null => {
+    const parseCustomerData = (text: string): parsedCustomerData | null => {
         if (!text.trim()) return null;
 
         const lines = text.split("\n");
         let customerName = "";
         let customerPhone = "";
         let customerAddress = "";
+        let CODAmount = "";
 
         for (const line of lines) {
             const lowerLine = line.toLowerCase().trim();
@@ -111,18 +119,20 @@ const Page = () => {
             else if (lowerLine.startsWith("address:") || lowerLine.startsWith("adress:")) {
                 customerAddress = line.substring(line.indexOf(":") + 1).trim();
             }
+
+            // Extract Price
+            else if (lowerLine.startsWith("price:")) {
+                CODAmount = line.substring(line.indexOf(":") + 1).trim();
+            }
         }
 
         // Return parsed data if at least name or phone is found
         if (customerName || customerPhone) {
             return {
-                name: customerName,
-                phoneNumber: customerPhone,
-                address: customerAddress,
-                email: "", // Default empty email
-                id: "", // ID will be generated on creation
-                createdAt: "",
-                updatedAt: "",
+                customerName: customerName,
+                customerPhone: customerPhone,
+                customerAddress: customerAddress,
+                CODAmount: CODAmount,
             };
         }
 
@@ -134,14 +144,16 @@ const Page = () => {
         const parsedCustomer = parseCustomerData(orderText);
 
         if (parsedCustomer) {
-            // Set the parsed customer data
-
-            // Set customer state for the CustomerInfo component
             setCustomerState({
-                customerName: parsedCustomer.name || "",
-                customerPhone: parsedCustomer.phoneNumber || "",
-                customerAddress: parsedCustomer.address || "",
-                customerId: parsedCustomer.id || "",
+                customerName: parsedCustomer.customerName || "",
+                customerPhone: parsedCustomer.customerPhone || "",
+                customerAddress: parsedCustomer.customerAddress || "",
+                customerId: "",
+            });
+
+            setOrderDetails({
+                deliveryZoneId: "",
+                discountedPrice: parseFloat(parsedCustomer.CODAmount) || 0,
             });
 
             // Initialize empty product info so users can add products manually
@@ -150,8 +162,8 @@ const Page = () => {
             toast.success("Customer data extracted successfully!");
 
             // Check fraud if phone number is available
-            if (parsedCustomer.phoneNumber) {
-                checkFraud(parsedCustomer.phoneNumber);
+            if (parsedCustomer.customerPhone) {
+                checkFraud(parsedCustomer.customerPhone);
             }
         } else {
             toast.error(

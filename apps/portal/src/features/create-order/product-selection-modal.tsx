@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ProductCardSkeleton, ProductSelectionCard } from "@/features/create-order/product-card";
+import { ProductCardSkeleton, ProductSelectionCard } from "@/features/create-order/product-selection-card";
 import { useGetProductsQuery } from "@/redux/api/product-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
@@ -75,6 +75,7 @@ export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: P
                         onSearch={handleSearch}
                         placeholder="Search products by name, category, or SKU..."
                         className="md:w-full"
+                        autoFocus={false}
                     />
 
                     <DataStateHandler

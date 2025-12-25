@@ -161,13 +161,13 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
 
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
                 <div className="flex gap-1 max-md:items-center md:flex-col">
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-muted-foreground flex-shrink-0 text-sm">
                         <span className="max-md:hidden">Customer</span> Name <span className="md:hidden">:</span>
                     </p>
                     <p className="truncate font-medium max-sm:text-sm">{order?.customerName || "N/A"}</p>
                 </div>
                 <div className="flex gap-1 max-md:items-center md:flex-col">
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-muted-foreground flex-shrink-0 text-sm">
                         COD <span className="max-md:hidden">/ Payable Amount</span> <span className="md:hidden">:</span>
                     </p>
                     <p className="font-medium">৳ {order?.discountedPrice ?? order?.totalAmount ?? 0}</p>
@@ -175,7 +175,7 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
 
                 <div className="flex items-end gap-4 max-md:col-span-2">
                     <div className="flex gap-1 max-md:items-center md:flex-col">
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-muted-foreground flex-shrink-0 text-sm">
                             Phone <span className="max-md:hidden">Number</span> <span className="md:hidden">:</span>
                         </p>
                         <p className="font-medium max-sm:text-sm">{order?.customerPhoneNumber || "N/A"}</p>
@@ -191,7 +191,7 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
             </div>
 
             <div className="gap-1 max-md:space-x-1 md:col-span-2 md:flex md:flex-col">
-                <span className="text-muted-foreground text-sm">
+                <span className="text-muted-foreground flex-shrink-0 text-sm">
                     Address <span className="md:hidden">:</span>
                 </span>
                 <span className="font-medium max-sm:text-sm">{order?.customerAddress || "N/A"}</span>

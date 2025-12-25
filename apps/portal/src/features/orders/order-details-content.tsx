@@ -147,7 +147,7 @@ export const OrderDetailsContent = ({ order, onClose, className }: OrderDetailsC
             </div>
 
             {/* Previous Orders */}
-            <PreviousOrdersSection orders={orderData.customer.orders} />
+            <PreviousOrdersSection orders={orderData.customer.orders} orderId={order.id} />
         </div>
     );
 };

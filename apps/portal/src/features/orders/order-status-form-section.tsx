@@ -70,7 +70,7 @@ export const OrderStatusFormSection = ({
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(handleUpdateStatus)}
-                className="space-y-2 border-b pb-3 md:space-y-4 md:rounded-lg md:border md:p-4"
+                className="space-y-2 rounded-sm border p-3 md:space-y-4 md:rounded-lg md:p-4"
             >
                 <div className="flex items-center justify-between">
                     <h3 className="text-base">

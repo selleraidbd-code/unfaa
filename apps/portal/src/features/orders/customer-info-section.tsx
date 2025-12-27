@@ -144,7 +144,7 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
     }
 
     return (
-        <div className="space-y-2 border-b pb-2 md:space-y-4 md:rounded-lg md:border md:p-4">
+        <div className="space-y-2 rounded-sm border p-3 md:space-y-4 md:rounded-lg md:p-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-base">Customer Information</h3>
                 <CustomButton

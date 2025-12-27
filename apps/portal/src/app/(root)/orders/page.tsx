@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { orderStatusOptions } from "@/features/orders/data";
+import { orderStatusOptions, orderStatusOptionsMobile } from "@/features/orders/data";
 import { OrderDetailsWrapper } from "@/features/orders/order-details-wrapper";
 import { OrderMobileList } from "@/features/orders/order-mobile-list";
 import { OrderTable } from "@/features/orders/order-table";
@@ -14,6 +14,7 @@ import { PaginationState } from "@tanstack/react-table";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import { CustomTabs, CustomTabsList, CustomTabsTrigger } from "@workspace/ui/components/custom/custom-tabs";
 import { toast } from "@workspace/ui/components/sonner";
+import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
 import { Bot, CheckSquare, DownloadCloud, Plus, Square, Truck } from "lucide-react";
 
 import { Order, OrderStatus } from "@/types/order-type";
@@ -28,6 +29,8 @@ const OrdersPage = () => {
     const user = useAppSelector((state) => state.auth.user);
     const router = useRouter();
     const searchParams = useSearchParams();
+    const isMobile = useBreakpoint();
+    const tabItems = isMobile ? orderStatusOptionsMobile : orderStatusOptions;
     const status = searchParams.get("status") || "all";
     const limit = Number(searchParams.get("limit")) || 50;
 
@@ -132,7 +135,7 @@ const OrdersPage = () => {
 
                 <CustomTabs value={activeTab} onValueChange={handleTabClick}>
                     <CustomTabsList>
-                        {orderStatusOptions.map((tab) => {
+                        {tabItems.map((tab) => {
                             const Icon = tab.icon;
                             return (
                                 <CustomTabsTrigger

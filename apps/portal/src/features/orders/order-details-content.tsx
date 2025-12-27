@@ -127,7 +127,7 @@ export const OrderDetailsContent = ({ order, onClose, className }: OrderDetailsC
             />
 
             {/* View Order Items */}
-            <div className="md:card space-y-2 border-b pb-3 md:space-y-4 md:py-4">
+            <div className="md:card space-y-2 rounded-sm border p-3 md:space-y-4 md:py-4">
                 <div className="flex items-center justify-between pb-2 md:border-b">
                     <h2 className="text-base max-sm:text-sm">Order Items ({orderData.orderItems.length})</h2>
                 </div>

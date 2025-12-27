@@ -5,11 +5,12 @@ import Link from "next/link";
 import { CourierStatusBadge } from "@/features/orders/courier-status-badge";
 import { CustomerOrderStatsChart } from "@/features/orders/customer-order-stats-chart";
 import { OrderStatusBadge } from "@/features/orders/order-status-badge";
+import { Badge } from "@workspace/ui/components/badge";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { formatDateShortWithTime } from "@workspace/ui/lib/formateDate";
 import { cn } from "@workspace/ui/lib/utils";
-import { BookText, NotebookText, NotepadText, Phone, PhoneCall, User } from "lucide-react";
+import { NotepadText, PhoneCall, User } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa6";
 
 import { Order, OrderStatus } from "@/types/order-type";
@@ -81,6 +82,9 @@ export const OrderMobileCard = ({
         onToggleSelection(order.id);
     };
 
+    const previousOrders = order.customer.orders.filter((o) => o.id !== order.id);
+    const previousOrdersCount = previousOrders.length;
+
     return (
         <div
             onClick={handleCardClick}
@@ -115,6 +119,9 @@ export const OrderMobileCard = ({
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
                         <OrderStatusBadge status={order.orderStatus} />
                         {order.courierStatus && <CourierStatusBadge status={order.courierStatus} />}
+
+                        {previousOrdersCount > 0 && <Badge className="rounded-full text-xs">Repeat</Badge>}
+
                         <Link
                             href={`tel:${phoneNumber}`}
                             target="_blank"

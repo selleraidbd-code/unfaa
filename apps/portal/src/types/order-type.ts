@@ -69,6 +69,7 @@ export interface CustomerOrderItem {
     orderStatus: OrderStatus;
     courierStatus: CourierStatus | null;
     discountedPrice: number | null;
+    totalAmount: number | null;
     createdAt: string;
     customerName: string;
     orderItems: {

@@ -15,6 +15,16 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@workspace/ui/components/dialog";
+import {
+    Drawer,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+} from "@workspace/ui/components/drawer";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
+import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
 import { Package } from "lucide-react";
 
 import { Product } from "@/types/product-type";
@@ -29,6 +39,7 @@ interface ProductSelectionModalProps {
 
 export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: ProductSelectionModalProps) => {
     const user = useAppSelector((state) => state.auth.user);
+    const isMobile = useBreakpoint();
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -56,6 +67,77 @@ export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: P
         total: data?.meta?.total || 0,
     };
 
+    const content = (
+        <>
+            {/* Search */}
+            <CustomSearch
+                onSearch={handleSearch}
+                placeholder="Search products by name, category, or SKU..."
+                className="md:w-full"
+                autoFocus={false}
+            />
+
+            <DataStateHandler
+                data={products}
+                isLoading={isLoading}
+                loadingComponent={
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <ProductCardSkeleton key={index} />
+                        ))}
+                    </div>
+                }
+                isError={isError}
+                isEmpty={products.length === 0}
+                emptyDescription={searchTerm ? "No products found matching your search" : "No products found"}
+            >
+                {(products) => (
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {products.map((product) => (
+                            <ProductSelectionCard
+                                key={product.id}
+                                product={product}
+                                onSelectProduct={handleSelectProduct}
+                                currentProductId={undefined}
+                            />
+                        ))}
+                    </div>
+                )}
+            </DataStateHandler>
+
+            {/* Pagination */}
+            {products.length > 0 && (
+                <CustomPagination
+                    paginationMeta={paginationMeta}
+                    showRowSelection={false}
+                    showRowsPerPage={false}
+                    showPageCount={false}
+                    onPageChange={setCurrentPage}
+                    className="w-full justify-center"
+                />
+            )}
+        </>
+    );
+
+    if (isMobile) {
+        return (
+            <Drawer open={open} onOpenChange={onOpenChange}>
+                <DrawerContent>
+                    <DrawerHeader className="pb-0">
+                        <DrawerTitle className="pb-0 text-left">Select Product</DrawerTitle>
+                        <DrawerDescription className="sr-only">
+                            Choose a product from your inventory or search for a specific one.
+                        </DrawerDescription>
+                    </DrawerHeader>
+
+                    <ScrollArea className="flex-1 overflow-auto">
+                        <div className="space-y-4 p-4">{content}</div>
+                    </ScrollArea>
+                </DrawerContent>
+            </Drawer>
+        );
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="flex flex-col md:max-w-4xl">
@@ -69,57 +151,7 @@ export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: P
                     </DialogDescription>
                 </DialogHeader>
 
-                <DialogContainer className="space-y-4">
-                    {/* Search */}
-                    <CustomSearch
-                        onSearch={handleSearch}
-                        placeholder="Search products by name, category, or SKU..."
-                        className="md:w-full"
-                        autoFocus={false}
-                    />
-
-                    <DataStateHandler
-                        data={products}
-                        isLoading={isLoading}
-                        loadingComponent={
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {Array.from({ length: 6 }).map((_, index) => (
-                                    <ProductCardSkeleton key={index} />
-                                ))}
-                            </div>
-                        }
-                        isError={isError}
-                        isEmpty={products.length === 0}
-                        emptyDescription={searchTerm ? "No products found matching your search" : "No products found"}
-                    >
-                        {(products) => (
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                {products.map((product) => (
-                                    <ProductSelectionCard
-                                        key={product.id}
-                                        product={product}
-                                        onSelectProduct={handleSelectProduct}
-                                        currentProductId={undefined}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </DataStateHandler>
-                </DialogContainer>
-
-                <DialogFooter>
-                    {/* Pagination */}
-                    {products.length > 0 && (
-                        <CustomPagination
-                            paginationMeta={paginationMeta}
-                            showRowSelection={false}
-                            showRowsPerPage={false}
-                            showPageCount={false}
-                            onPageChange={setCurrentPage}
-                            className="w-full justify-center"
-                        />
-                    )}
-                </DialogFooter>
+                <DialogContainer className="space-y-4">{content}</DialogContainer>
             </DialogContent>
         </Dialog>
     );

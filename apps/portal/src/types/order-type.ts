@@ -175,6 +175,7 @@ export interface AIOrderGenerationData {
     customerPhone: string;
     customerAddress: string;
     customerId: string | null;
+    overallPrice: number | null;
     productInfo: AIOrderGenerationProductInfo[];
 }
 

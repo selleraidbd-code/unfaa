@@ -31,7 +31,7 @@ const Page = () => {
     const [productInfo, setProductInfo] = useState<AIOrderGenerationProductInfo[] | null>(null);
     const [orderDetails, setOrderDetails] = useState<OrderDetailsType>({
         deliveryZoneId: "",
-        discountedPrice: undefined,
+        discountedPrice: null,
     });
     const [fraudState, setFraudState] = useState<FraudCheckerData | null>(null);
     const [fraudError, setFraudError] = useState<string | null>(null);
@@ -52,7 +52,6 @@ const Page = () => {
         await getFraudCheckerData({ phoneNumber: sanitizedPhone })
             .unwrap()
             .then((res) => {
-                console.log(res);
                 // Check if response contains error status
                 const data = res.data as any;
                 if (data && typeof data === "object" && "status" in data && data.status === "error") {
@@ -85,8 +84,6 @@ const Page = () => {
         })
             .unwrap()
             .then((res) => {
-                console.log(res);
-
                 const result = res.data.result;
 
                 // Set customer state
@@ -95,6 +92,13 @@ const Page = () => {
                     customerPhone: result.data.customerPhone || "",
                     customerAddress: result.data.customerAddress || "",
                     customerId: result.data.customerId || "",
+                });
+
+                const overallPrice = result.data.overallPrice || 0;
+
+                setOrderDetails({
+                    deliveryZoneId: "",
+                    discountedPrice: overallPrice,
                 });
 
                 setProductInfo(result.data.productInfo);

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { config } from "@/config";
 import { toast } from "@workspace/ui/components/sonner";
 import { cn } from "@workspace/ui/lib/utils";
-import { ChevronLeft, ChevronRight, Package, Shield, Tag, Truck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Package, Shield, Truck } from "lucide-react";
 
 import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
@@ -493,24 +493,6 @@ export const ProductPageDetails = ({ product, shopSlug }: Props) => {
                         © {new Date().getFullYear()} {product.banglaName}
                     </p>
                 </footer>
-            </div>
-
-            <div className="fixed right-0 bottom-0 left-0 z-50 border-t-2 border-gray-200 bg-white p-3 shadow-2xl md:hidden">
-                <div className="mx-auto flex max-w-3xl items-center gap-3">
-                    <div className="flex-1">
-                        <div className="text-xs text-gray-500">মূল্য</div>
-                        <div className="text-xl font-bold text-green-600">
-                            ৳{product.discountPrice.toLocaleString()}
-                        </div>
-                    </div>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="flex-1 rounded-xl bg-green-600 px-6 py-3 font-bold text-white transition hover:bg-green-700 active:bg-green-800 disabled:cursor-not-allowed disabled:bg-gray-400"
-                    >
-                        {isSubmitting ? "অর্ডার করা হচ্ছে..." : "অর্ডার করুন"}
-                    </button>
-                </div>
             </div>
         </div>
     );

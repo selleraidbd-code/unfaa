@@ -13,6 +13,10 @@ const nextConfig = {
             },
             {
                 protocol: "https",
+                hostname: "mediaserver.unfaa.com",
+            },
+            {
+                protocol: "https",
                 hostname: "buytiq.com",
             },
             {

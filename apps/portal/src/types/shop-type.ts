@@ -80,6 +80,7 @@ export type ShopSection = {
     index: number;
     shopThemeId: string;
     products: ShopThemeProduct[];
+    shouldShow: boolean;
 };
 
 export type ShopThemeCategory = {

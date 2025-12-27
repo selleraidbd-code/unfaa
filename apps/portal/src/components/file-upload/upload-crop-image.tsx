@@ -1,48 +1,42 @@
 "use client";
 
+import { useCallback, useState } from "react";
+
 import { useUploadImageMutation } from "@/redux/api/media-api";
 import { Button } from "@workspace/ui/components/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@workspace/ui/components/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@workspace/ui/components/dialog";
 import { Slider } from "@workspace/ui/components/slider";
 import { toast } from "@workspace/ui/components/sonner";
 import { cn } from "@workspace/ui/lib/utils";
 import { Loader, Upload, UploadCloud, X } from "lucide-react";
-import { useCallback, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
 
 interface UploadCropImageProps {
     onImageUpload?: (url: string) => void;
     className?: string;
     label?: string;
+    aspectRatio?: number;
+    aspectRatioText?: string;
 }
 
 export const UploadCropImage = ({
     onImageUpload,
     className,
     label,
+    aspectRatio = 1,
+    aspectRatioText = "1:1",
 }: UploadCropImageProps) => {
     const [uploadImage, { isLoading }] = useUploadImageMutation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [imageSrc, setImageSrc] = useState<string>("");
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(
-        null
-    );
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
     const [fileName, setFileName] = useState<string>("");
 
-    const onCropComplete = useCallback(
-        (_croppedArea: Area, croppedAreaPixels: Area) => {
-            setCroppedAreaPixels(croppedAreaPixels);
-        },
-        []
-    );
+    const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
 
     const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -68,10 +62,7 @@ export const UploadCropImage = ({
             image.src = url;
         });
 
-    const getCroppedImg = async (
-        imageSrc: string,
-        pixelCrop: Area
-    ): Promise<Blob | null> => {
+    const getCroppedImg = async (imageSrc: string, pixelCrop: Area): Promise<Blob | null> => {
         const image = await createImage(imageSrc);
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -113,10 +104,7 @@ export const UploadCropImage = ({
         }
 
         try {
-            const croppedImageBlob = await getCroppedImg(
-                imageSrc,
-                croppedAreaPixels
-            );
+            const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
 
             if (!croppedImageBlob) {
                 toast.error("Failed to crop image");
@@ -124,11 +112,7 @@ export const UploadCropImage = ({
             }
 
             const formData = new FormData();
-            formData.append(
-                "image",
-                croppedImageBlob,
-                fileName || "cropped-image.jpg"
-            );
+            formData.append("image", croppedImageBlob, fileName || "cropped-image.jpg");
             formData.append("type", "image");
 
             const res = await uploadImage(formData).unwrap();
@@ -157,23 +141,17 @@ export const UploadCropImage = ({
 
     return (
         <>
-            <div className={cn("space-y-2 h-full w-full", className)}>
-                {label && (
-                    <label className="text-sm font-medium">{label}</label>
-                )}
+            <div className={cn("h-full w-full space-y-2", className)}>
+                {label && <label className="text-sm font-medium">{label}</label>}
                 <div
-                    className="bg-muted h-full w-full flex cursor-pointer flex-col items-center justify-center space-y-4 rounded-md border-2 border-dashed border-muted-foreground/25 p-6 transition-colors hover:border-primary hover:bg-primary/5"
-                    onClick={() =>
-                        document.getElementById("crop-file-input")?.click()
-                    }
+                    className="bg-muted border-muted-foreground/25 hover:border-primary hover:bg-primary/5 flex h-full w-full cursor-pointer flex-col items-center justify-center space-y-4 rounded-md border-2 border-dashed p-6 transition-colors"
+                    onClick={() => document.getElementById("crop-file-input")?.click()}
                 >
                     <UploadCloud className="text-muted-foreground size-10" />
                     <div className="space-y-1.5 text-center">
-                        <p className="text-foreground/80 text-sm font-medium">
-                            Click to upload an image
-                        </p>
+                        <p className="text-foreground/80 text-sm font-medium">Click to upload an image</p>
                         <p className="text-muted-foreground text-xs">
-                            Image will be cropped to 1:1 ratio
+                            Image will be cropped to {aspectRatioText} ratio
                         </p>
                     </div>
                     <input
@@ -186,27 +164,24 @@ export const UploadCropImage = ({
                 </div>
             </div>
 
-            <Dialog
-                open={isModalOpen}
-                onOpenChange={(open) => !open && handleClose()}
-            >
+            <Dialog open={isModalOpen} onOpenChange={(open) => !open && handleClose()}>
                 <DialogContent className="max-w-4xl">
                     <DialogHeader>
                         <DialogTitle>Resize your image</DialogTitle>
                         <DialogDescription>
-                            Adjust the crop area to select the part of the image
-                            you want to keep (1:1 aspect ratio)
+                            Adjust the crop area to select the part of the image you want to keep ({aspectRatioText}{" "}
+                            aspect ratio)
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4">
-                        <div className="relative h-96 w-full rounded-lg overflow-hidden bg-muted">
+                        <div className="bg-muted relative h-96 w-full overflow-hidden rounded-lg">
                             {imageSrc && (
                                 <Cropper
                                     image={imageSrc}
                                     crop={crop}
                                     zoom={zoom}
-                                    aspect={1}
+                                    aspect={aspectRatio}
                                     onCropChange={setCrop}
                                     onCropComplete={onCropComplete}
                                     onZoomChange={setZoom}
@@ -218,9 +193,7 @@ export const UploadCropImage = ({
                             <label className="text-sm font-medium">Zoom</label>
                             <Slider
                                 value={[zoom]}
-                                onValueChange={(value) =>
-                                    setZoom(value[0] ?? 1)
-                                }
+                                onValueChange={(value) => setZoom(value[0] ?? 1)}
                                 min={1}
                                 max={3}
                                 step={0.1}
@@ -229,18 +202,11 @@ export const UploadCropImage = ({
                         </div>
 
                         <div className="flex justify-end gap-2">
-                            <Button
-                                onClick={handleClose}
-                                variant="outline"
-                                disabled={isLoading}
-                            >
+                            <Button onClick={handleClose} variant="outline" disabled={isLoading}>
                                 <X className="h-4 w-4" />
                                 <span>Cancel</span>
                             </Button>
-                            <Button
-                                onClick={handleUpload}
-                                disabled={isLoading || !croppedAreaPixels}
-                            >
+                            <Button onClick={handleUpload} disabled={isLoading || !croppedAreaPixels}>
                                 {isLoading ? (
                                     <>
                                         <Loader className="h-4 w-4 animate-spin" />

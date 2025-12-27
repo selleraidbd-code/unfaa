@@ -3,7 +3,6 @@ import { useState } from "react";
 import { EditSectionDialog } from "@/features/manage-shop/website-customization/edit-section-dialog";
 import { SelectProductDialog } from "@/features/manage-shop/website-customization/select-product-dialog";
 import { WebCustomizationEmptyMessage } from "@/features/manage-shop/website-customization/web-customization-empty-message";
-import { WebCustomizationHeader } from "@/features/manage-shop/website-customization/web-customization-header";
 import { ProductSelectionCard } from "@/features/products/product-selection-card";
 import { AlertType } from "@/providers/AlertProvider";
 import {
@@ -52,82 +51,83 @@ export const ManageSection = ({ section, totalSections }: { section: ShopSection
     };
 
     const handleToggleVisibility = async (checked: boolean) => {
-        setShouldShow(checked);
-        await updateShopSectionCore({
-            sectionId: section.id,
-            payload: {
-                title: section.title,
-                description: section.description,
-                index: section.index,
-                shouldShow: checked,
+        fire({
+            title: checked ? "Show Section" : "Hide Section",
+            description: checked
+                ? "Are you sure you want to make this section visible on your website?"
+                : "Are you sure you want to hide this section from your website?",
+            type: checked ? AlertType.INFO : AlertType.WARNING,
+            onConfirm: async () => {
+                setShouldShow(checked);
+                await updateShopSectionCore({
+                    sectionId: section.id,
+                    payload: {
+                        title: section.title,
+                        description: section.description,
+                        index: section.index,
+                        shouldShow: checked,
+                    },
+                })
+                    .unwrap()
+                    .then(() => {
+                        toast.success(
+                            checked
+                                ? "Section is now visible on your website"
+                                : "Section is now hidden from your website"
+                        );
+                    })
+                    .catch((error) => {
+                        toast.error(error.data?.message || "Something went wrong");
+                    });
             },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success(
-                    checked ? "Section is now visible on your website" : "Section is now hidden from your website"
-                );
-            })
-            .catch((error) => {
-                toast.error(error.data?.message || "Something went wrong");
-            });
+        });
     };
 
-    const handleMoveUp = async () => {
-        if (section.index === 0) return;
-        await updateShopSectionCore({
-            sectionId: section.id,
-            payload: {
-                title: section.title,
-                description: section.description,
-                index: section.index - 1,
-                shouldShow: section.shouldShow,
-            },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("Section moved up");
-            })
-            .catch((error) => {
-                toast.error(error.data?.message || "Something went wrong");
-            });
-    };
+    const handleMoveSection = async (direction: "up" | "down") => {
+        const isUp = direction === "up";
+        const canMove = isUp ? section.index !== 0 : section.index < totalSections - 1;
 
-    const handleMoveDown = async () => {
-        if (section.index >= totalSections - 1) return;
+        if (!canMove) return;
 
-        await updateShopSectionCore({
-            sectionId: section.id,
-            payload: {
-                title: section.title,
-                description: section.description,
-                index: section.index + 1,
-                shouldShow: section.shouldShow,
+        const newIndex = isUp ? section.index - 1 : section.index + 1;
+        const successMessage = `Section moved ${direction}`;
+
+        fire({
+            title: `Move Section ${direction === "up" ? "Up" : "Down"}`,
+            description: `Are you sure you want to move this section ${direction}? This will change the order of sections on your website.`,
+            type: AlertType.INFO,
+            onConfirm: async () => {
+                await updateShopSectionCore({
+                    sectionId: section.id,
+                    payload: {
+                        index: newIndex,
+                    },
+                })
+                    .unwrap()
+                    .then(() => {
+                        toast.success(successMessage);
+                    })
+                    .catch((error) => {
+                        toast.error(error.data?.message || "Something went wrong");
+                    });
             },
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("Section moved down");
-            })
-            .catch((error) => {
-                toast.error(error.data?.message || "Something went wrong");
-            });
+        });
     };
 
     return (
-        <div className="flex w-full flex-col rounded-lg border-2 border-dashed border-slate-300 p-6">
-            <div className="mb-6 flex items-start justify-between">
+        <div className="flex w-full flex-col gap-2 rounded-sm border-2 border-dashed border-slate-300 p-4 sm:gap-3 sm:p-6 md:rounded-lg dark:border-slate-700">
+            <div className="flex items-start justify-between gap-1 max-sm:flex-col">
                 <div className="flex-1">
                     <h3 className="mb-1 text-lg font-semibold">{section.title}</h3>
                     <p className="text-muted-foreground text-sm">{section.description}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 rounded-md border p-1">
+                <div className="flex items-center gap-2 max-sm:justify-between sm:gap-3">
+                    <div className="flex items-center rounded-md border p-1 sm:gap-1">
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8"
-                            onClick={handleMoveUp}
+                            className="h-8 w-8 max-sm:h-7 max-sm:w-7"
+                            onClick={() => handleMoveSection("up")}
                             disabled={section.index === 0}
                             title="Move section up"
                         >
@@ -136,9 +136,9 @@ export const ManageSection = ({ section, totalSections }: { section: ShopSection
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8"
-                            onClick={handleMoveDown}
-                            disabled={section.index >= totalSections - 1}
+                            className="h-8 w-8 max-sm:h-7 max-sm:w-7"
+                            onClick={() => handleMoveSection("down")}
+                            disabled={section.index === totalSections - 1}
                             title="Move section down"
                         >
                             <ArrowDown className="h-4 w-4" />
@@ -147,7 +147,7 @@ export const ManageSection = ({ section, totalSections }: { section: ShopSection
                     <div className="flex items-center gap-2">
                         <Label
                             htmlFor={`section-visibility-${section.id}`}
-                            className="flex cursor-pointer items-center gap-1.5 text-sm"
+                            className="flex cursor-pointer items-center gap-1.5 text-sm max-sm:hidden"
                         >
                             {shouldShow ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                             {shouldShow ? "Visible" : "Hidden"}
@@ -172,7 +172,7 @@ export const ManageSection = ({ section, totalSections }: { section: ShopSection
                     description="Add products to create an engaging homepage experience for your customers."
                 />
             ) : (
-                <div className="mt-6 flex flex-wrap gap-5">
+                <div className="mt-2 flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
                     {section.products.map((product) => (
                         <ProductSelectionCard
                             key={product.id}

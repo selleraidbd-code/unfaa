@@ -1,23 +1,25 @@
 "use client";
 
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { useState } from "react";
+
 import { shopTypes } from "@/data/shop-data";
+import { ShopBasicInfoSkeleton } from "@/features/manage-shop/shop-basic-info-skeleton";
 import { useGetMyShopQuery, useUpdateShopMutation } from "@/redux/api/shop-api";
-import { Shop, ShopType } from "@/types/shop-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomCollapsible } from "@workspace/ui/components/custom/custom-collapsible";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
-import { CustomLoading } from "@workspace/ui/components/custom/custom-loading";
 import { Form } from "@workspace/ui/components/form";
 import { Label } from "@workspace/ui/components/label";
-import { cn } from "@workspace/ui/lib/utils";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
+import { cn } from "@workspace/ui/lib/utils";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { Shop, ShopType } from "@/types/shop-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
 
 const shopInfoSchema = z.object({
     name: z.string().min(1),
@@ -38,7 +40,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
     const { data: shop, isLoading: isLoadingShop } = useGetMyShopQuery();
     const shopData = shop?.data;
     const [theme, setTheme] = useState("#2563eb");
-    console.log("shopData :>> ", shopData);
+
     const [updateShop, { isLoading: isUpdatingShop }] = useUpdateShopMutation();
 
     const form = useForm<z.infer<typeof shopInfoSchema>>({
@@ -87,7 +89,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
             });
     };
 
-    if (isLoadingShop) return <CustomLoading />;
+    if (isLoadingShop) return <ShopBasicInfoSkeleton className={className} />;
 
     return (
         <div className={cn("space-y-6", className)}>
@@ -179,11 +181,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     className="col-span-2"
                                 /> */}
 
-                                <CustomFormImage
-                                    label="Shop Logo"
-                                    name="photoURL"
-                                    control={form.control}
-                                />
+                                <CustomFormImage label="Shop Logo" name="photoURL" control={form.control} />
 
                                 <div className="space-y-">
                                     <Label>Shop Theme Color</Label>
@@ -191,19 +189,14 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     <input
                                         type="color"
                                         value={theme}
-                                        onChange={(e) =>
-                                            setTheme(e.target.value)
-                                        }
-                                        className="w-full h-32 2xl:h-40 rounded-md border-none outline-none ring-0 [&::-webkit-color-swatch-wrapper]:rounded-md [&::-webkit-color-swatch]:rounded-md [&::-moz-color-swatch]:rounded-md"
+                                        onChange={(e) => setTheme(e.target.value)}
+                                        className="h-32 w-full rounded-md border-none ring-0 outline-none 2xl:h-40 [&::-moz-color-swatch]:rounded-md [&::-webkit-color-swatch]:rounded-md [&::-webkit-color-swatch-wrapper]:rounded-md"
                                     />
                                 </div>
                             </div>
 
                             <div className="flex justify-end pt-4">
-                                <CustomButton
-                                    isLoading={isUpdatingShop}
-                                    type="submit"
-                                >
+                                <CustomButton isLoading={isUpdatingShop} type="submit">
                                     Update Shop Info
                                 </CustomButton>
                             </div>

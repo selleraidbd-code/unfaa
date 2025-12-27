@@ -18,15 +18,16 @@ const WebsiteCustomization = () => {
     const theme = data?.data;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4 lg:space-y-6">
             <HeaderBackButton title="Website Customization" href="/manage-shop" />
+
             <DataStateHandler
                 data={theme}
                 isLoading={isLoading}
                 loadingClassName="py-40"
                 isError={isError}
                 isEmpty={!theme}
-                className="space-y-6"
+                className="space-y-3 sm:space-y-4 lg:space-y-6"
             >
                 {(themeData) => (
                     <>

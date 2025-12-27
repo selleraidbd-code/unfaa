@@ -1,10 +1,11 @@
 "use client";
 
-import { Product } from "@/types/product-type";
-import { cn } from "@workspace/ui/lib/utils";
 import Image from "next/image";
 
+import { cn } from "@workspace/ui/lib/utils";
 import { CircleCheckBig, X } from "lucide-react";
+
+import { Product } from "@/types/product-type";
 
 export const ProductSelectionCard = ({
     product,
@@ -20,21 +21,19 @@ export const ProductSelectionCard = ({
     return (
         <div
             className={cn(
-                "space-y-2 relative w-44 h-fit border-2 rounded-md p-2 sm:p-4",
+                "relative h-fit w-[156px] space-y-2 rounded-md border-2 p-2 sm:w-40 sm:p-4 lg:w-44",
                 isSelected && "border-primary"
             )}
             onClick={() => onSelect?.(product.id)}
         >
-            {isSelected && (
-                <CircleCheckBig className="absolute top-2 right-1 size-6 text-primary" />
-            )}
+            {isSelected && <CircleCheckBig className="text-primary absolute top-2 right-1 size-6" />}
 
             {onRemove && (
                 <button
-                    className="absolute -top-2.5 -right-2.5 bg-primary text-primary-foreground rounded-full p-1.5"
+                    className="bg-primary text-primary-foreground absolute -top-2.5 -right-2.5 rounded-full p-1.5"
                     onClick={() => onRemove?.(product.id)}
                 >
-                    <X className="size-6" />
+                    <X className="size-5 sm:size-6" />
                 </button>
             )}
             <Image
@@ -42,11 +41,9 @@ export const ProductSelectionCard = ({
                 alt={product.name}
                 width={300}
                 height={300}
-                className="size-28 object-cover mx-auto rounded-sm"
+                className="mx-auto size-28 rounded-sm object-cover"
             />
-            <p className="text-sm line-clamp-2 min-h-9 font-medium text-center">
-                {product.name}
-            </p>
+            <p className="line-clamp-2 min-h-9 text-center text-sm font-medium">{product.name}</p>
         </div>
     );
 };

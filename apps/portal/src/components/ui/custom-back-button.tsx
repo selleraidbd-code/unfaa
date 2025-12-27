@@ -24,15 +24,15 @@ export const ArrowBackButton = ({
     disabled = false,
 }: ArrowBackButtonProps) => {
     const sizeClasses = {
-        sm: "h-8 w-8",
-        md: "h-10 w-10",
-        lg: "h-12 w-12",
+        sm: "h-7 w-7 sm:h-8 sm:w-8",
+        md: "h-9 w-9 sm:h-10 sm:w-10",
+        lg: "h-11 w-11 sm:h-12 sm:w-12",
     };
 
     const iconSizes = {
-        sm: "h-4 w-4",
-        md: "h-5 w-5",
-        lg: "h-6 w-6",
+        sm: "h-3 w-3 sm:h-4 sm:w-4",
+        md: "h-4 w-4 sm:h-5 sm:w-5",
+        lg: "h-5 w-5 sm:h-6 sm:w-6",
     };
 
     const buttonContent = (
@@ -40,7 +40,7 @@ export const ArrowBackButton = ({
     );
 
     const baseClasses = cn(
-        "group rounded-full border border-gray-200/60 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:border-gray-300 hover:bg-white hover:shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 active:scale-95 active:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100",
+        "group rounded-full! border border-gray-200/60 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:border-gray-300 hover:bg-white hover:shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 active:scale-95 active:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100",
         sizeClasses[size]
     );
 
@@ -76,11 +76,11 @@ export const ArrowBackButton = ({
 
 export const HeaderBackButton = ({ title, href }: { title: string; href: string }) => {
     return (
-        <div className="group flex w-fit items-center gap-4">
-            <ArrowBackButton href={href} />
+        <div className="group flex w-fit items-center gap-2 sm:gap-4">
+            <ArrowBackButton href={href} size="md" />
             <Link
                 href={href}
-                className="flex-1 shrink-0 text-xl font-medium tracking-tight whitespace-nowrap sm:grow-0"
+                className="flex-1 shrink-0 text-lg font-medium tracking-tight whitespace-nowrap sm:grow-0 sm:text-xl"
             >
                 {title}
             </Link>

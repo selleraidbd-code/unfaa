@@ -40,7 +40,7 @@ export const ManageBanner = ({ theme }: { theme: ShopTheme }) => {
     };
 
     return (
-        <div className="flex w-full flex-col rounded-lg border-2 border-dashed border-slate-300 p-6">
+        <div className="flex w-full flex-col gap-2 rounded-sm border-2 border-dashed border-slate-300 p-4 md:gap-3 md:rounded-lg md:p-6 dark:border-slate-700">
             <WebCustomizationHeader
                 title="Homepage Banners"
                 description="Select upto 5 items to get a better visual impact on your
@@ -48,32 +48,24 @@ export const ManageBanner = ({ theme }: { theme: ShopTheme }) => {
                 button={<UploadBannerDialog bannerImg={bannerImg} themeId={theme.id} />}
             />
 
-            <br />
-
             {bannerImg.length === 0 ? (
                 <WebCustomizationEmptyMessage
                     title="No banners uploaded yet"
                     description="Upload up to 5 banner images to create an engaging homepage experience for your customers."
                 />
             ) : (
-                <div className="grid gap-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                     {bannerImg.map((img) => (
-                        <div key={img} className="relative w-full rounded-lg">
-                            <Image
-                                src={img}
-                                alt="banner"
-                                className="h-auto w-full rounded-lg"
-                                width={800}
-                                height={400}
-                            />
+                        <div key={img} className="relative w-full">
+                            <Image src={img} alt="banner" className="h-auto w-full" width={800} height={400} />
                             <Button
                                 variant="destructive"
                                 size="icon"
-                                className="absolute top-3 right-3"
+                                className="absolute top-1 right-1 md:top-3 md:right-3"
                                 onClick={() => handleDeleteBanner(img)}
                                 disabled={isLoading}
                             >
-                                <Trash2 />
+                                <Trash2 className="max-sm:size-4" />
                             </Button>
                         </div>
                     ))}

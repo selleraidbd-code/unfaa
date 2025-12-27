@@ -19,17 +19,10 @@ import {
     type SortingState,
     type VisibilityState,
 } from "@tanstack/react-table";
-
-import { Skeleton } from "@workspace/ui/components/skeleton";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@workspace/ui/components/table";
 import { Button } from "@workspace/ui/components/button";
+import { Skeleton } from "@workspace/ui/components/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
+
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -115,10 +108,8 @@ export function DataTable<TData, TValue>({
     onSelectionChange,
 }: DataTableProps<TData, TValue>) {
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({});
-    const [columnFilters, setColumnFilters] =
-        React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
         pageIndex: paginationMeta.page - 1, // Convert from 1-based to 0-based
@@ -128,9 +119,7 @@ export function DataTable<TData, TValue>({
     const handleRowSelectionChange = (updater: Updater<RowSelectionState>) => {
         setRowSelection(updater);
         setTimeout(() => {
-            const selectedRows = table
-                .getSelectedRowModel()
-                .rows.map((row) => row.original);
+            const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original);
             onSelectionChange?.(selectedRows);
         }, 0);
     };
@@ -138,9 +127,7 @@ export function DataTable<TData, TValue>({
     const table = useReactTable({
         data,
         columns,
-        pageCount: paginationMeta
-            ? Math.ceil(paginationMeta.total / paginationMeta.limit)
-            : -1,
+        pageCount: paginationMeta ? Math.ceil(paginationMeta.total / paginationMeta.limit) : -1,
         state: {
             sorting,
             columnVisibility,
@@ -157,10 +144,7 @@ export function DataTable<TData, TValue>({
         onColumnFiltersChange: setColumnFilters,
         onColumnVisibilityChange: setColumnVisibility,
         onPaginationChange: (updater) => {
-            const newState =
-                typeof updater === "function"
-                    ? updater({ pageIndex, pageSize })
-                    : updater;
+            const newState = typeof updater === "function" ? updater({ pageIndex, pageSize }) : updater;
             setPagination(newState);
             onPaginationChange?.(newState);
         },
@@ -173,9 +157,7 @@ export function DataTable<TData, TValue>({
         getFacetedUniqueValues: getFacetedUniqueValues(),
     });
 
-    const selectedRows = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original);
+    const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original);
 
     const handleBulkAction = async (action: BulkAction<TData>) => {
         await action.onClick(selectedRows);
@@ -190,12 +172,8 @@ export function DataTable<TData, TValue>({
         return (
             <div className="center h-[80dvh] flex-col space-y-4 py-12">
                 <div className="space-y-2 text-center">
-                    <h3 className="text-xl font-semibold">
-                        Something went wrong
-                    </h3>
-                    <p className="text-muted-foreground">
-                        There was an error loading the data.
-                    </p>
+                    <h3 className="text-xl font-semibold">Something went wrong</h3>
+                    <p className="text-muted-foreground">There was an error loading the data.</p>
                 </div>
 
                 <Button onClick={handleTryAgain}>Try Again</Button>
@@ -207,13 +185,9 @@ export function DataTable<TData, TValue>({
         <div className="space-y-4">
             {title && (
                 <div>
-                    <h2 className="text-2xl font-semibold tracking-tight">
-                        {title}
-                    </h2>
+                    <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
                     {isSubtitleShown && (
-                        <p className="text-muted-foreground">
-                            {subtitle || `Here's a list of your ${title}!`}
-                        </p>
+                        <p className="text-muted-foreground">{subtitle || `Here's a list of your ${title}!`}</p>
                     )}
                 </div>
             )}
@@ -231,23 +205,16 @@ export function DataTable<TData, TValue>({
                 onFilterChange={onFilterChange}
             />
 
-            <div className="rounded-md min-h-[60vh] overflow-x-auto border">
+            <div className="min-h-[60vh] overflow-x-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead
-                                        key={header.id}
-                                        colSpan={header.colSpan}
-                                    >
+                                    <TableHead key={header.id} colSpan={header.colSpan}>
                                         {header.isPlaceholder
                                             ? null
-                                            : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext()
-                                              )}
+                                            : flexRender(header.column.columnDef.header, header.getContext())}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -255,47 +222,35 @@ export function DataTable<TData, TValue>({
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
-                            Array.from({ length: skeletonRows }).map(
-                                (_, index) => (
-                                    <TableRow key={index}>
-                                        {Array.from({
-                                            length: columns.length,
-                                        }).map((_, cellIndex) => (
-                                            <TableCell key={cellIndex}>
-                                                <Skeleton className="h-6 w-full" />
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                )
-                            )
+                            Array.from({ length: skeletonRows }).map((_, index) => (
+                                <TableRow key={index}>
+                                    {Array.from({
+                                        length: columns.length,
+                                    }).map((_, cellIndex) => (
+                                        <TableCell key={cellIndex}>
+                                            <Skeleton className="h-6 w-full" />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
                         ) : table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && "selected"
-                                    }
+                                    data-state={row.getIsSelected() && "selected"}
                                     onClick={() => onRowClick?.(row.original)}
-                                    className={
-                                        onRowClick ? "cursor-pointer" : ""
-                                    }
+                                    className={onRowClick ? "cursor-pointer" : ""}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
                                     No results.
                                 </TableCell>
                             </TableRow>
@@ -305,11 +260,7 @@ export function DataTable<TData, TValue>({
             </div>
 
             {pagination && paginationMeta && (
-                <DataTablePagination
-                    table={table}
-                    totalRows={paginationMeta.total}
-                    paginationMeta={paginationMeta}
-                />
+                <DataTablePagination table={table} totalRows={paginationMeta.total} paginationMeta={paginationMeta} />
             )}
         </div>
     );

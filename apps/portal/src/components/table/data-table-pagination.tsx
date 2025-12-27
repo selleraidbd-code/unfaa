@@ -1,9 +1,7 @@
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import type { Table } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
 import { Button } from "@workspace/ui/components/button";
 import {
     Pagination,
@@ -12,14 +10,10 @@ import {
     PaginationItem,
     PaginationLink,
 } from "@workspace/ui/components/pagination";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@workspace/ui/components/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { Meta } from "@/components/table/data-table";
 
 interface DataTablePaginationProps<TData> {
@@ -133,26 +127,19 @@ export function DataTablePagination<TData>({
 
     return (
         <div className="flex items-center justify-between px-2">
-            <div className="flex-1 text-sm text-muted-foreground">
-                {table.getFilteredSelectedRowModel().rows.length} of {totalRows}{" "}
-                row(s) selected.
+            <div className="text-muted-foreground flex-1 text-sm">
+                {table.getFilteredSelectedRowModel().rows.length} of {totalRows} row(s) selected.
             </div>
             <div className="flex items-center space-x-6 lg:space-x-8">
                 <div className="flex items-center space-x-2">
                     <p className="text-sm font-medium">Rows per page</p>
-                    <Select
-                        value={`${currentPageSize}`}
-                        onValueChange={handleLimitChange}
-                    >
+                    <Select value={`${currentPageSize}`} onValueChange={handleLimitChange}>
                         <SelectTrigger className="h-8 w-[70px]">
                             <SelectValue placeholder={currentPageSize} />
                         </SelectTrigger>
                         <SelectContent side="top">
                             {[10, 20, 30, 40, 50].map((pageSize) => (
-                                <SelectItem
-                                    key={pageSize}
-                                    value={`${pageSize}`}
-                                >
+                                <SelectItem key={pageSize} value={`${pageSize}`}>
                                     {pageSize}
                                 </SelectItem>
                             ))}
@@ -164,14 +151,9 @@ export function DataTablePagination<TData>({
                     Page {currentPage} of {totalPages}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                     {/* Previous Page Button */}
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handlePreviousClick}
-                        disabled={currentPage <= 1}
-                    >
+                    <Button variant="outline" size="icon" onClick={handlePreviousClick} disabled={currentPage <= 1}>
                         <span className="sr-only">Go to previous page</span>
                         <ChevronLeft className="size-5" />
                     </Button>
@@ -185,14 +167,8 @@ export function DataTablePagination<TData>({
                                         <PaginationEllipsis />
                                     ) : (
                                         <PaginationLink
-                                            isActive={
-                                                pageNumber === currentPage
-                                            }
-                                            onClick={() =>
-                                                handlePaginationLinkClick(
-                                                    pageNumber
-                                                )
-                                            }
+                                            isActive={pageNumber === currentPage}
+                                            onClick={() => handlePaginationLinkClick(pageNumber)}
                                             className={buttonClassName}
                                         >
                                             {pageNumber}

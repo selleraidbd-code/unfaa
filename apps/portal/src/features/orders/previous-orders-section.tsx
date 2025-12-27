@@ -87,8 +87,8 @@ export const OrderItem = ({ quantity, productName, productImage, productPrice, o
                 className="size-10 rounded-sm object-cover"
             />
 
-            <div className="min-w-0 flex-1 space-y-1">
-                <p className="truncate text-sm font-medium">{productName}</p>
+            <div className="min-w-0 flex-1">
+                <p className="line-clamp-1 text-sm font-medium">{productName}</p>
 
                 <div className="flex flex-wrap items-center gap-1">
                     {/* <span className="text-muted-foreground text-xs">x {quantity}</span> */}

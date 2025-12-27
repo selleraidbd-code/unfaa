@@ -1,6 +1,7 @@
 "use client";
 
 import { PaginationState } from "@tanstack/react-table";
+import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
 
 import { Order } from "@/types/order-type";
 import { CustomPagination } from "@/components/ui/custom-pagination";
@@ -32,6 +33,7 @@ export const OrderMobileList = ({
     onRowClick,
     onSelectionChange,
 }: OrderMobileListProps) => {
+    const isMobile = useBreakpoint();
     const handleToggleSelection = (orderId: string) => {
         const order = data.find((o) => o.id === orderId);
         if (!order) return;
@@ -80,7 +82,7 @@ export const OrderMobileList = ({
             </DataStateHandler>
 
             {data.length > 0 && (
-                <div className="mt-6">
+                <div className="mt-4 sm:mt-6">
                     <CustomPagination
                         paginationMeta={{
                             page: meta.page,
@@ -89,6 +91,7 @@ export const OrderMobileList = ({
                         }}
                         onPageChange={handlePageChange}
                         showRowsPerPage={false}
+                        maxVisiblePages={isMobile ? 5 : 7}
                     />
                 </div>
             )}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/ui/lib/utils";
@@ -10,21 +10,55 @@ interface CustomSearchProps {
     placeholder?: string;
     className?: string;
     autoFocus?: boolean;
+    debounceDelay?: number; // Delay in milliseconds
 }
 
-export const CustomSearch = ({ onSearch, placeholder, className, value, autoFocus = false }: CustomSearchProps) => {
+export const CustomSearch = ({
+    onSearch,
+    placeholder,
+    className,
+    value,
+    autoFocus = false,
+    debounceDelay = 500,
+}: CustomSearchProps) => {
     const [searchTerm, setSearchTerm] = useState(value || "");
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
 
     const handleSearchTerm = (value: string) => {
         setSearchTerm(value);
 
+        // Clear existing timer
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        // Immediately trigger search if value is empty
         if (value === "") {
             onSearch?.(value);
+            return;
         }
+
+        // Set new debounce timer
+        debounceTimerRef.current = setTimeout(() => {
+            onSearch?.(value);
+        }, debounceDelay);
     };
 
     const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
+            // Clear debounce timer and immediately trigger search on Enter
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
             onSearch?.(searchTerm);
         }
     };

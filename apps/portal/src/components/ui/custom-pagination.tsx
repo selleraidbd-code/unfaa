@@ -173,7 +173,7 @@ export const CustomPagination = ({
                     </div>
                 )}
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2">
                     <Button variant="outline" size="icon" onClick={handlePreviousClick} disabled={currentPage <= 1}>
                         <span className="sr-only">Go to previous page</span>
                         <ChevronLeft className="size-5" />

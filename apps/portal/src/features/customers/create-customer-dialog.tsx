@@ -82,7 +82,7 @@ export const CreateCustomerDialog = () => {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                console.error(error);
                 toast.error(error.data.message);
             });
     };

@@ -19,7 +19,7 @@ export const CustomSearch = ({
     className,
     value,
     autoFocus = false,
-    debounceDelay = 500,
+    debounceDelay = 700,
 }: CustomSearchProps) => {
     const [searchTerm, setSearchTerm] = useState(value || "");
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);

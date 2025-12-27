@@ -5,6 +5,9 @@ import { ShopProvider } from "@/contexts/shop-context";
 
 import { ShopNotFound } from "@/components/shop-not-found";
 
+// Enable ISR with 1 hour revalidation
+export const revalidate = 3600; // 1 hour in seconds
+
 // Generate static params for all shops at build time
 export async function generateStaticParams() {
     const shops = await getShops();
@@ -20,6 +23,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
     const { domain } = await params;
+    // React cache() ensures this call is deduplicated with the one in Layout component
     const shopDetails = await getShopDetails(domain);
 
     if (!shopDetails?.data) {
@@ -43,6 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
 
 const Layout = async ({ children, params }: { children: React.ReactNode; params: Promise<{ domain: string }> }) => {
     const { domain } = await params;
+    // React cache() ensures this is deduplicated with generateMetadata call
     const shopDetails = await getShopDetails(domain);
 
     // If no shop is found, show the ShopNotFound component

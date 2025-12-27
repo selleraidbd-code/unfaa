@@ -1,6 +1,4 @@
-import { CustomButton } from "@/components/ui/custom-button";
 import { useUpdateCustomerMutation } from "@/redux/api/customer-api";
-import { Customer, UpdateCustomer } from "@/types/customer-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
@@ -13,9 +11,12 @@ import {
     DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
-import { useForm } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { Customer, UpdateCustomer } from "@/types/customer-type";
+import { CustomButton } from "@/components/ui/custom-button";
 
 const customerFormSchema = z.object({
     name: z.string().min(3, {
@@ -72,7 +73,7 @@ export const UpdateCustomerDialog = ({
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                console.error(error);
                 toast.error(error.data.message);
             });
     };
@@ -81,18 +82,11 @@ export const UpdateCustomerDialog = ({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:!w-[80vw] lg:!w-[45vw] xl:!w-[40vw] 2xl:!w-[35vw]">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Update Customer
-                    </DialogTitle>
-                    <DialogDescription>
-                        Update the customer details.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Update Customer</DialogTitle>
+                    <DialogDescription>Update the customer details.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <CustomFormInput
                             label="Name"
                             name="name"

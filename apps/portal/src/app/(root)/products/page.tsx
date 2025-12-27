@@ -77,24 +77,7 @@ export default function ProductsPage() {
     };
 
     const handleBulkDelete = async (selectedRows: Product[]) => {
-        try {
-            const ids = selectedRows.map((row) => row.id);
-
-            // Mock bulk delete with DummyJSON API
-            const deletePromises = ids.map((id) =>
-                fetch(`https://dummyjson.com/products/${id}`, {
-                    method: "DELETE",
-                })
-            );
-
-            await Promise.all(deletePromises);
-
-            toast.success(`Successfully deleted ${ids.length} products`);
-        } catch (error) {
-            toast.error("Failed to delete products", {
-                description: error instanceof Error ? error.message : "An unknown error occurred",
-            });
-        }
+        console.warn(selectedRows);
     };
 
     const categoryOptions = categories?.data.map((category) => ({

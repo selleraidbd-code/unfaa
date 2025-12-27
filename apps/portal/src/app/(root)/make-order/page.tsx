@@ -71,7 +71,6 @@ const Page = () => {
         await getFraudCheckerData({ phoneNumber: sanitizedPhone })
             .unwrap()
             .then((res) => {
-                console.log(res);
                 // Check if response contains error status
                 const data = res.data as any;
                 if (data && typeof data === "object" && "status" in data && data.status === "error") {

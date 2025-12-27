@@ -50,6 +50,7 @@ const AddProduct = () => {
         stock: 0,
         categoryIds: [],
         description: "",
+        videoLink: "",
         fullDescription: "",
         productVariant: [],
         activeStatus: "active",
@@ -337,6 +338,14 @@ const AddProduct = () => {
                                     control={form.control}
                                     options={deliveryOptions}
                                     placeholder="Select delivery charge"
+                                />
+
+                                <CustomFormInput
+                                    label="Video Link"
+                                    name="videoLink"
+                                    type="text"
+                                    control={form.control}
+                                    placeholder="Enter Your video link"
                                 />
 
                                 <CustomFormTextarea

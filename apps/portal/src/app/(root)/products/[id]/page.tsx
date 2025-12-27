@@ -71,6 +71,7 @@ const EditProduct = () => {
                   stock: product.data.stock || 0,
                   categoryIds: product?.data?.categories?.map((category) => category.categoryId) || [],
                   description: product.data.description || "",
+                  videoLink: product.data.videoLink || "",
                   fullDescription: product.data.fullDescription || "",
                   productVariant:
                       product.data.productVariant?.map((variant) => ({
@@ -129,6 +130,7 @@ const EditProduct = () => {
             stock: product.data.stock || 0,
             categoryIds: product?.data?.categories?.map((category) => category.categoryId) || [],
             description: product.data.description || "",
+            videoLink: product.data.videoLink || "",
             fullDescription: product.data.fullDescription || "",
             productVariant:
                 product.data.productVariant?.map((variant) => ({
@@ -379,6 +381,14 @@ const EditProduct = () => {
                         title="Product Details"
                         content={
                             <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
+                                <CustomFormInput
+                                    label="Video Link"
+                                    name="videoLink"
+                                    type="url"
+                                    control={form.control}
+                                    placeholder="Enter Your video link"
+                                />
+
                                 <CustomFormTextarea
                                     label="Short Description (SEO & Data Feed)"
                                     name="description"

@@ -1,20 +1,18 @@
 "use client";
 
-import { Product } from "@/types/product-type";
-import { DataTable, Meta } from "@/components/table/data-table";
-import { DataTableRowActions } from "@/components/table/data-table-row-actions";
-import { ColumnDef } from "@tanstack/react-table";
-import { Trash } from "lucide-react";
-import { Checkbox } from "@workspace/ui/components/checkbox";
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@workspace/ui/components/avatar";
-import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
-import { Badge } from "@workspace/ui/components/badge";
-import { CustomButton } from "@/components/ui/custom-button";
 import { useRouter } from "next/navigation";
+
+import { ColumnDef } from "@tanstack/react-table";
+import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
+import { Badge } from "@workspace/ui/components/badge";
+import { Checkbox } from "@workspace/ui/components/checkbox";
+import { Trash } from "lucide-react";
+
+import { Product } from "@/types/product-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { DataTable, Meta } from "@/components/table/data-table";
+import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 
 interface ProductTableViewProps {
     products: Product[];
@@ -46,13 +44,8 @@ export function ProductTableView({
             id: "select",
             header: ({ table }) => (
                 <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
-                    }
+                    checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
                     className="translate-y-[2px]"
                 />
@@ -74,34 +67,26 @@ export function ProductTableView({
             cell: ({ row }) => {
                 return (
                     <Avatar className="h-8 w-8">
-                        <AvatarImage
-                            src={row.original.photoURL}
-                            alt={row.original.name}
-                        />
-                        <AvatarFallback>
-                            {row.original.name.slice(0, 2)}
-                        </AvatarFallback>
+                        <AvatarImage src={row.original.photoURL} alt={row.original.name} />
+                        <AvatarFallback>{row.original.name.slice(0, 2)}</AvatarFallback>
                     </Avatar>
                 );
             },
         },
         {
             accessorKey: "name",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Name" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
         },
         {
             accessorKey: "banglaName",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Bangla Name" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Bangla Name" />,
+            cell: ({ row }) => {
+                return <p className="max-w-40 truncate overflow-hidden text-ellipsis">{row.original.banglaName}</p>;
+            },
         },
         {
             accessorKey: "category",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Categories" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Categories" />,
             cell: ({ row }) => {
                 return (
                     <div className="flex flex-wrap gap-1">
@@ -114,43 +99,29 @@ export function ProductTableView({
                 );
             },
             filterFn: (row, id, filterValue) => {
-                return row.original.categories.some(
-                    (cat) => String(cat.category.id) === String(filterValue)
-                );
+                return row.original.categories.some((cat) => String(cat.category.id) === String(filterValue));
             },
         },
         {
             accessorKey: "price",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Price" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
             cell: ({ row }) => {
                 return row.original.price;
             },
         },
         {
             accessorKey: "stock",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Stock" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Stock" />,
             cell: ({ row }) => {
                 const stock = row.original.stock;
-                return (
-                    <Badge variant={stock < 10 ? "destructive" : "default"}>
-                        {stock}
-                    </Badge>
-                );
+                return <Badge variant={stock < 10 ? "destructive" : "default"}>{stock}</Badge>;
             },
         },
         {
             accessorKey: "activeStatus",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Status" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
             cell: ({ row }) => {
-                return (
-                    <Badge variant="default">{row.original.activeStatus}</Badge>
-                );
+                return <Badge variant="default">{row.original.activeStatus}</Badge>;
             },
         },
         {
@@ -158,10 +129,7 @@ export function ProductTableView({
             header: "Make Page",
             cell: ({ row }) => {
                 return (
-                    <CustomButton
-                        size="sm"
-                        href={`/landing-page/add?productId=${row.original.id}`}
-                    >
+                    <CustomButton size="sm" href={`/landing-page/add?productId=${row.original.id}`}>
                         Make Page
                     </CustomButton>
                 );
@@ -175,8 +143,7 @@ export function ProductTableView({
                     actions={[
                         {
                             label: "Edit",
-                            onClick: () =>
-                                router.push(`/products/${row.original.id}`),
+                            onClick: () => router.push(`/products/${row.original.id}`),
                         },
                         {
                             label: "Delete",

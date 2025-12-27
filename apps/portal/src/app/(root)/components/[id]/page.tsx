@@ -1,25 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import {
-    useCreateComponentMutation,
-    useGetComponentQuery,
-} from "@/redux/api/component-api";
+import { useCreateComponentMutation, useGetComponentQuery } from "@/redux/api/component-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@workspace/ui/components/sonner";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { FileUpload } from "@/components/file-upload";
-import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { Button } from "@workspace/ui/components/button";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
 import CustomRadioGroup from "@workspace/ui/components/custom/custom-radio-group";
 import { Form } from "@workspace/ui/components/form";
+import { toast } from "@workspace/ui/components/sonner";
 import { EComponentType } from "@workspace/ui/landing/types";
-import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { HeaderBackButton } from "@/components/ui/custom-back-button";
+import { FileUpload } from "@/components/file-upload";
 
 enum ERequiredFiled {
     REQUIRED = "required",
@@ -28,46 +25,14 @@ enum ERequiredFiled {
 }
 
 const requiredFieldSchema = z.object({
-    title: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
-    subTitle: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
-    description: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
-    customizeDescription: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
-    buttonText: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
-    buttonUrl: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
-    imgURL: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
-    bgURL: z.enum([
-        ERequiredFiled.REQUIRED,
-        ERequiredFiled.OPTIONAL,
-        ERequiredFiled.NULLABLE,
-    ]),
+    title: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
+    subTitle: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
+    description: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
+    customizeDescription: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
+    buttonText: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
+    buttonUrl: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
+    imgURL: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
+    bgURL: z.enum([ERequiredFiled.REQUIRED, ERequiredFiled.OPTIONAL, ERequiredFiled.NULLABLE]),
 });
 
 const formSchema = z.object({
@@ -103,9 +68,7 @@ const EditComponent = () => {
     const router = useRouter();
     const { id } = useParams();
 
-    const { data, isLoading: isLoadingComponent } = useGetComponentQuery(
-        id as string
-    );
+    const { data, isLoading: isLoadingComponent } = useGetComponentQuery(id as string);
 
     const form = useForm<AddComponentFormSchema>({
         resolver: zodResolver(formSchema),
@@ -142,7 +105,6 @@ const EditComponent = () => {
     const [createComponent, { isLoading }] = useCreateComponentMutation();
 
     const onSubmit = (data: AddComponentFormSchema) => {
-        console.log(data);
         createComponent(data)
             .unwrap()
             .then(() => {
@@ -212,11 +174,7 @@ const EditComponent = () => {
         { value: "nullable", label: "Nullable" },
     ];
 
-    const isShowSectionList = form.watch(
-        "requiredFiled.sectionList.0.booleanValue"
-    );
-
-    console.log(data?.data);
+    const isShowSectionList = form.watch("requiredFiled.sectionList.0.booleanValue");
 
     useEffect(() => {
         if (data && data.data) {
@@ -233,10 +191,7 @@ const EditComponent = () => {
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid gap-4">
-                    <HeaderBackButton
-                        title="Edit Component"
-                        href="/components"
-                    />
+                    <HeaderBackButton title="Edit Component" href="/components" />
 
                     <div className="grid gap-4">
                         <div className="grid grid-cols-2 gap-4">
@@ -262,14 +217,9 @@ const EditComponent = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                         {componentFields.map((field) => (
-                            <div
-                                key={field.value}
-                                className="rounded-md border p-4"
-                            >
+                            <div key={field.value} className="rounded-md border p-4">
                                 <CustomRadioGroup
-                                    name={
-                                        field.value as keyof AddComponentFormSchema
-                                    }
+                                    name={field.value as keyof AddComponentFormSchema}
                                     label={field.label}
                                     control={form.control}
                                     options={componentFieldsOptions}
@@ -283,12 +233,7 @@ const EditComponent = () => {
                         <div className="flex justify-center">
                             <Button
                                 variant="outline"
-                                onClick={() =>
-                                    form.setValue(
-                                        "requiredFiled.sectionList.0.booleanValue",
-                                        true
-                                    )
-                                }
+                                onClick={() => form.setValue("requiredFiled.sectionList.0.booleanValue", true)}
                             >
                                 Add Section List
                             </Button>
@@ -297,18 +242,11 @@ const EditComponent = () => {
 
                     {isShowSectionList && (
                         <div className="grid grid-cols-2 gap-4">
-                            <h2 className="col-span-2 pt-6 text-center text-2xl font-medium">
-                                Section List
-                            </h2>
+                            <h2 className="col-span-2 pt-6 text-center text-2xl font-medium">Section List</h2>
                             {sectionListFields.map((field) => (
-                                <div
-                                    key={field.value}
-                                    className="rounded-md border p-4"
-                                >
+                                <div key={field.value} className="rounded-md border p-4">
                                     <CustomRadioGroup
-                                        name={
-                                            field.value as keyof AddComponentFormSchema
-                                        }
+                                        name={field.value as keyof AddComponentFormSchema}
                                         label={field.label}
                                         control={form.control}
                                         options={componentFieldsOptions}

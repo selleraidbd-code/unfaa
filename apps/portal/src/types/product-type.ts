@@ -69,6 +69,7 @@ export interface Product {
     unitName?: string;
     warranty?: string;
     deliveryId?: string;
+    videoLink: string | null;
     categories: {
         categoryId: string;
         productId: string;

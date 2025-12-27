@@ -11,10 +11,9 @@ export const productVariantOptionSchema = z.object({
     imgUrl: z.string().optional(),
 });
 
-export const productVariantOptionSchemaWithId =
-    productVariantOptionSchema.extend({
-        id: z.string().optional(),
-    });
+export const productVariantOptionSchemaWithId = productVariantOptionSchema.extend({
+    id: z.string().optional(),
+});
 
 export const productVariantSchema = z.object({
     name: z.string().min(1, { message: "Variant title is required" }),
@@ -32,18 +31,12 @@ export const updateProductVariantSchema = productVariantSchema.extend({
 const productBaseSchema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
     banglaName: z.string().min(1, { message: "Bangla name is required" }),
-    price: z
-        .number({ invalid_type_error: "Price must be a number" })
-        .optional(),
-    discountPrice: z
-        .number({ invalid_type_error: "Discount price must be a number" })
-        .optional(),
+    price: z.number({ invalid_type_error: "Price must be a number" }).optional(),
+    discountPrice: z.number({ invalid_type_error: "Discount price must be a number" }).optional(),
     photoURL: z.string().min(1, { message: "Product image is required" }),
     images: z.array(z.string()),
     keywords: z.string().min(1, { message: "Keywords are required" }),
-    stock: z
-        .number({ invalid_type_error: "Stock must be a number" })
-        .min(1, { message: "Stock must be positive" }),
+    stock: z.number({ invalid_type_error: "Stock must be a number" }).min(1, { message: "Stock must be positive" }),
     sku: z.string().optional(),
     unitName: z.string().optional(),
     warranty: z.string().optional(),
@@ -51,9 +44,8 @@ const productBaseSchema = z.object({
     brandId: z.string().optional(),
     deliveryId: z.string().optional(),
     description: z.string().min(1, { message: "Description is required" }),
-    fullDescription: z
-        .string()
-        .min(1, { message: "Full description is required" }),
+    videoLink: z.string().url({ message: "Please enter a valid video URL" }).optional(),
+    fullDescription: z.string().min(1, { message: "Full description is required" }),
     activeStatus: z.enum(["active", "inactive"]),
 });
 

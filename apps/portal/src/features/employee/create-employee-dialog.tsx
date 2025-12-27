@@ -1,10 +1,10 @@
 "use client";
 
-import { CustomButton } from "@/components/ui/custom-button";
+import { useState } from "react";
+
 import { getEmployeeRoleOptions } from "@/features/employee/employee-role-options";
 import { useCreateEmployeeMutation } from "@/redux/api/employee-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { CreateEmployee } from "@/types/employee-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSearchMultiSelect } from "@workspace/ui/components/custom/custom-form-search-multi-select";
@@ -20,9 +20,11 @@ import {
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { CreateEmployee } from "@/types/employee-type";
+import { CustomButton } from "@/components/ui/custom-button";
 
 const employeeFormSchema = z.object({
     name: z.string().min(2, {
@@ -77,7 +79,7 @@ export const CreateEmployeeDialog = () => {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                console.warn(error);
                 toast.error(error.data.message);
             });
     };
@@ -88,23 +90,16 @@ export const CreateEmployeeDialog = () => {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <CustomButton>
-                    <Plus className="w-4 h-4" /> Add Employee
+                    <Plus className="h-4 w-4" /> Add Employee
                 </CustomButton>
             </DialogTrigger>
             <DialogContent className="sm:!w-[80vw] lg:!w-[45vw] xl:!w-[40vw] 2xl:!w-[35vw]">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Add New Employee
-                    </DialogTitle>
-                    <DialogDescription>
-                        Add a new employee for your shop.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Add New Employee</DialogTitle>
+                    <DialogDescription>Add a new employee for your shop.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <CustomFormSearchMultiSelect
                             label="Roles"
                             name="roles"

@@ -1,10 +1,10 @@
 "use server";
 
+import { getUrlWithQueryParams } from "@/lib";
 import { PaginatedResponse, ResponseObject } from "@/types";
 
-import { CustomFetch } from "@/lib/CustomFetch";
 import { Product } from "@/types/product-type";
-import { getUrlWithQueryParams } from "@/lib";
+import { CustomFetch } from "@/lib/CustomFetch";
 
 export const getProducts = async ({
     page,
@@ -39,9 +39,7 @@ export const getProducts = async ({
 };
 
 export const getProductById = async (id: string) => {
-    const product = await CustomFetch<ResponseObject<Product>>(
-        `/product/${id}`
-    );
+    const product = await CustomFetch<ResponseObject<Product>>(`/product/${id}`);
     return product;
 };
 
@@ -51,13 +49,12 @@ export const getProductBySlug = async (shopSlug: string, slug: string) => {
     return product;
 };
 
-// export const getAllProducts = async (): Promise<PaginatedResponse<Product>> => {
-//     const products = await fetch(`${config.serverUrl}/product?shopId=${config.shopId}&limit=500`, {
-//         next: {
-//             revalidate: 3600,
-//         },
-//     });
+export const getProductsByShopId = async (shopId: string) => {
+    const url = getUrlWithQueryParams("/product", {
+        shopId,
+        limit: 1000,
+    });
 
-//     const data = await products.json();
-//     return data;
-// };
+    const products = await CustomFetch<PaginatedResponse<Product>>(url);
+    return products;
+};

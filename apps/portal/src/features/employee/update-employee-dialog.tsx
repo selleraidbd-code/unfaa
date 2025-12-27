@@ -1,10 +1,5 @@
-import { CustomButton } from "@/components/ui/custom-button";
-import {
-    getEmployeeRoleLabel,
-    getEmployeeRoleOptions,
-} from "@/features/employee/employee-role-options";
+import { getEmployeeRoleLabel, getEmployeeRoleOptions } from "@/features/employee/employee-role-options";
 import { useUpdateEmployeeMutation } from "@/redux/api/employee-api";
-import { Employee, UpdateEmployee } from "@/types/employee-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormMultiSelect } from "@workspace/ui/components/custom/custom-form-multi-select";
 import {
@@ -16,9 +11,12 @@ import {
     DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
-import { useForm } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { Employee, UpdateEmployee } from "@/types/employee-type";
+import { CustomButton } from "@/components/ui/custom-button";
 
 const employeeFormSchema = z.object({
     roles: z.array(z.object({ value: z.string(), label: z.string() })),
@@ -63,7 +61,7 @@ export const UpdateEmployeeDialog = ({
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
+                console.warn(error);
                 toast.error(error.data.message);
             });
     };
@@ -74,18 +72,11 @@ export const UpdateEmployeeDialog = ({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:!w-[80vw] lg:!w-[45vw] xl:!w-[40vw] 2xl:!w-[35vw]">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Update Employee
-                    </DialogTitle>
-                    <DialogDescription>
-                        Update the employee details.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Update Employee</DialogTitle>
+                    <DialogDescription>Update the employee details.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <CustomFormMultiSelect
                             label="Roles"
                             name="roles"

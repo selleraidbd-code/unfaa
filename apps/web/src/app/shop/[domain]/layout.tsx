@@ -1,9 +1,22 @@
 import type { Metadata } from "next";
 
-import { getShopDetails } from "@/actions/shop-actions";
+import { getShopDetails, getShops } from "@/actions/shop-actions";
 import { ShopProvider } from "@/contexts/shop-context";
 
 import { ShopNotFound } from "@/components/shop-not-found";
+
+// Generate static params for all shops at build time
+export async function generateStaticParams() {
+    const shops = await getShops();
+
+    if (!shops?.data) {
+        return [];
+    }
+
+    return shops.data.map((shop) => ({
+        domain: shop.slug,
+    }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
     const { domain } = await params;

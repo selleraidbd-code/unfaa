@@ -1,12 +1,14 @@
 "use client";
 
-import { ThemeProvider } from "@/contexts/theme-provider";
-import { Shop, ShopTheme } from "@/types/shop-type";
 import { createContext, ReactNode, useContext } from "react";
+
+import { ThemeProvider } from "@/contexts/theme-provider";
+
+import { Shop, ShopTheme } from "@/types/shop-type";
 
 interface ShopContextType {
     shop: Shop;
-    shopTheme: ShopTheme;
+    shopTheme: ShopTheme | null;
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);

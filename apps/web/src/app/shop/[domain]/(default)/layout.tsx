@@ -1,16 +1,11 @@
-import { Footer } from "@/components/shop/Footer";
-import { Navbar } from "@/components/shop/navbar/Navbar";
 import { getShopDetails } from "@/actions/shop-actions";
+
 import { ShopNotFound } from "@/components/shop-not-found";
 import { FloatingCall } from "@/components/shop/floating-call";
+import { Footer } from "@/components/shop/Footer";
+import { Navbar } from "@/components/shop/navbar/Navbar";
 
-const Layout = async ({
-    children,
-    params,
-}: {
-    children: React.ReactNode;
-    params: Promise<{ domain: string }>;
-}) => {
+const Layout = async ({ children, params }: { children: React.ReactNode; params: Promise<{ domain: string }> }) => {
     const { domain } = await params;
     const shopDetails = await getShopDetails(domain);
 

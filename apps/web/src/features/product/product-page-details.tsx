@@ -12,7 +12,7 @@ import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { getLink } from "@/lib/get-link";
 import { HtmlRenderer } from "@/components/shared/html-renderer";
-import { YouTubeVideo } from "@/components/shared/youtube-video";
+import { UniversalVideoPlayer } from "@/components/shared/universal-video-player";
 
 // const faqs = [
 //     { question: "এটি কি নিরাপদ?", answer: "হ্যাঁ, এটি সম্পূর্ণ নিরাপদ এবং শক-প্রুফ বডি সহ আসে।" },
@@ -294,7 +294,7 @@ export const ProductPageDetails = ({ product, shopSlug }: Props) => {
                 {product.videoLink && (
                     <div className="mb-6">
                         <h3 className="mb-3 text-xl font-bold text-gray-900">প্রোডাক্ট ভিডিও</h3>
-                        <YouTubeVideo url={product.videoLink} title="প্রোডাক্ট ভিডিও" />
+                        <UniversalVideoPlayer url={product.videoLink} title="প্রোডাক্ট ভিডিও" />
                     </div>
                 )}
 

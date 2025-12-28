@@ -6,7 +6,6 @@ import { ProductCard } from "@/features/shop/home-page/product-card";
 import { ProductsPageWrapper } from "@/features/shop/products/products-page-wrapper";
 
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-import { PageViewTracker } from "@/components/page-view-tracker";
 
 const page = async ({
     params,
@@ -41,15 +40,6 @@ const page = async ({
             maxPrice={maxPrice ? parseInt(maxPrice) : 1000}
             shopSlug={domain}
         >
-            <PageViewTracker
-                pageName="Products"
-                pageData={{
-                    shopSlug: shopDetails?.data?.slug,
-                    totalProducts: products?.length || 0,
-                    minPrice,
-                    maxPrice,
-                }}
-            />
             {products?.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4">
                     {products.map((product, index) => (

@@ -4,6 +4,7 @@ import { getProductBySlug, getProducts } from "@/actions/product-actions";
 import { ProductPageDetails } from "@/features/product/product-page-details";
 
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
+import { ProductViewTracker } from "@/components/product-view-tracker";
 
 export async function generateStaticParams() {
     const products = await getProducts({
@@ -42,7 +43,20 @@ const page = async ({ params }: { params: Promise<{ slug: string; domain: string
         return <CustomErrorOrEmpty title="Product not found" description="Please try again with different filters" />;
     }
 
-    return <ProductPageDetails product={product?.data} shopSlug={shopSlug} />;
+    return (
+        <>
+            <ProductViewTracker
+                productId={product.data.id}
+                productName={product.data.name}
+                productSlug={slug}
+                price={product.data.price}
+                discountPrice={product.data.discountPrice}
+                category={product.data.categories?.[0]?.category?.name}
+                shopSlug={shopSlug}
+            />
+            <ProductPageDetails product={product?.data} shopSlug={shopSlug} />
+        </>
+    );
 };
 
 export default page;

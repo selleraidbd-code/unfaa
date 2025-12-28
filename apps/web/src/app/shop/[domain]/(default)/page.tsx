@@ -3,8 +3,6 @@ import { FeaturedProducts } from "@/features/shop/home-page/featured-products";
 import { HeroSection } from "@/features/shop/home-page/hero-section";
 import { HomeCategories } from "@/features/shop/home-page/home-categories";
 
-import { PageViewTracker } from "@/components/page-view-tracker";
-
 const page = async ({ params }: { params: Promise<{ domain: string }> }) => {
     const { domain } = await params;
 
@@ -14,13 +12,6 @@ const page = async ({ params }: { params: Promise<{ domain: string }> }) => {
 
     return (
         <div>
-            <PageViewTracker
-                pageName="Home"
-                pageData={{
-                    shopSlug: shopDetails?.data?.slug,
-                    shopName: shopDetails?.data?.name,
-                }}
-            />
             <HeroSection />
             {categories.length > 0 && (
                 <HomeCategories categories={categories} shopSlug={shopDetails?.data?.slug as string} />

@@ -34,6 +34,10 @@ const shopInfoSchema = z.object({
     // maintainStockQuantity: z.boolean(),
     // showProductSoldCount: z.boolean(),
     photoURL: z.string().optional(),
+    facebookPixelId: z.string().trim().optional().or(z.literal("")),
+    facebookPixelAccessToken: z.string().trim().optional().or(z.literal("")),
+    tiktokPixelId: z.string().trim().optional().or(z.literal("")),
+    tiktokPixelAccessToken: z.string().trim().optional().or(z.literal("")),
 });
 
 export const ShopBasicInfo = ({ className }: { className?: string }) => {
@@ -58,6 +62,10 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
             // maintainStockQuantity: shopData?.maintainStockQuantity || true,
             // showProductSoldCount: shopData?.showProductSoldCount || false,
             photoURL: shopData?.photoURL || "",
+            facebookPixelId: shopData?.facebookPixelId || "",
+            facebookPixelAccessToken: shopData?.facebookPixelAccessToken || "",
+            tiktokPixelId: shopData?.tiktokPixelId || "",
+            tiktokPixelAccessToken: shopData?.tiktokPixelAccessToken || "",
         },
     });
 
@@ -74,6 +82,18 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
             whatsappNumber: data.whatsappNumber,
             shopEmail: data.shopEmail,
             theme,
+            facebookPixelId:
+                data.facebookPixelId && data.facebookPixelId.trim() !== "" ? data.facebookPixelId.trim() : undefined,
+            facebookPixelAccessToken:
+                data.facebookPixelAccessToken && data.facebookPixelAccessToken.trim() !== ""
+                    ? data.facebookPixelAccessToken.trim()
+                    : undefined,
+            tiktokPixelId:
+                data.tiktokPixelId && data.tiktokPixelId.trim() !== "" ? data.tiktokPixelId.trim() : undefined,
+            tiktokPixelAccessToken:
+                data.tiktokPixelAccessToken && data.tiktokPixelAccessToken.trim() !== ""
+                    ? data.tiktokPixelAccessToken.trim()
+                    : undefined,
         };
         await updateShop({
             id: shopId,
@@ -132,6 +152,31 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     placeholder="Enter Shop Description"
                                     control={form.control}
                                     className="col-span-2"
+                                />
+
+                                <CustomFormInput
+                                    label="Facebook Pixel ID"
+                                    name="facebookPixelId"
+                                    placeholder="Enter Facebook Pixel ID"
+                                    control={form.control}
+                                />
+                                <CustomFormInput
+                                    label="Facebook Pixel Access Token"
+                                    name="facebookPixelAccessToken"
+                                    placeholder="Enter Facebook Pixel Access Token"
+                                    control={form.control}
+                                />
+                                <CustomFormInput
+                                    label="TikTok Pixel ID"
+                                    name="tiktokPixelId"
+                                    placeholder="Enter TikTok Pixel ID"
+                                    control={form.control}
+                                />
+                                <CustomFormInput
+                                    label="TikTok Pixel Access Token"
+                                    name="tiktokPixelAccessToken"
+                                    placeholder="Enter TikTok Pixel Access Token"
+                                    control={form.control}
                                 />
 
                                 {/* <CustomFormTextarea

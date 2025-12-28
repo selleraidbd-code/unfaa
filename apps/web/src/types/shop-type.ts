@@ -96,6 +96,11 @@ export type Shop = {
     landingPageLayout: string[];
     shopTheme: ShopTheme;
 
+    facebookPixelId?: string;
+    facebookPixelAccessToken?: string;
+    tiktokPixelId?: string;
+    tiktokPixelAccessToken?: string;
+
     facebookLink?: string;
     twitterLink?: string;
     instagramLink?: string;

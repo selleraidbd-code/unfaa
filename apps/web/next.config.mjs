@@ -9,6 +9,10 @@ const nextConfig = {
             },
             {
                 protocol: "https",
+                hostname: "mediaserver.unfaa.com",
+            },
+            {
+                protocol: "https",
                 hostname: "multi-media-server.naimurrhman.com",
             },
             {

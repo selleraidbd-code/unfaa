@@ -41,6 +41,12 @@ export type Shop = {
     status: string;
     createdAt: string;
     updatedAt: string;
+
+    facebookPixelId?: string;
+    facebookPixelAccessToken?: string;
+    tiktokPixelId?: string;
+    tiktokPixelAccessToken?: string;
+
     shopEmail?: string;
     whatsappNumber?: string;
     facebookLink?: string;

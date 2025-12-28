@@ -4,6 +4,7 @@ import { getShopDetails, getShops } from "@/actions/shop-actions";
 import { ShopProvider } from "@/contexts/shop-context";
 
 import { ShopNotFound } from "@/components/shop-not-found";
+import { TrackingPixels } from "@/components/tracking-pixels";
 
 // Enable ISR with 1 hour revalidation
 export const revalidate = 3600; // 1 hour in seconds
@@ -55,7 +56,14 @@ const Layout = async ({ children, params }: { children: React.ReactNode; params:
         return <ShopNotFound />;
     }
 
-    return <ShopProvider shop={shopDetails.data}>{children}</ShopProvider>;
+    const shop = shopDetails.data;
+
+    return (
+        <>
+            <TrackingPixels facebookPixelId={shop.facebookPixelId} tiktokPixelId={shop.tiktokPixelId} />
+            <ShopProvider shop={shop}>{children}</ShopProvider>
+        </>
+    );
 };
 
 export default Layout;

@@ -44,7 +44,7 @@ const productBaseSchema = z.object({
     brandId: z.string().optional(),
     deliveryId: z.string().optional(),
     description: z.string().min(1, { message: "Description is required" }),
-    videoLink: z.string().url({ message: "Please enter a valid video URL" }).optional(),
+    videoLink: z.string().optional(),
     fullDescription: z.string().min(1, { message: "Full description is required" }),
     activeStatus: z.enum(["active", "inactive"]),
 });

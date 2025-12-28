@@ -381,12 +381,13 @@ const EditProduct = () => {
                         title="Product Details"
                         content={
                             <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
-                                <CustomFormInput
+                                <CustomFormTextarea
                                     label="Video Link"
                                     name="videoLink"
-                                    type="url"
+                                    rows={5}
                                     control={form.control}
                                     placeholder="Enter Your video link"
+                                    className="col-span-2"
                                 />
 
                                 <CustomFormTextarea

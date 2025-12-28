@@ -4,28 +4,22 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-
-
-import { makeOrder } from "@/actions/order-actions";
+import { config } from "@/config";
 import { useShop } from "@/contexts/shop-context";
 import BillingDetails from "@/features/shop/checkout/BillingDetails";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
+import { toast } from "@workspace/ui/components/sonner";
 import { CircleDot } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-
-
 import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
 import { CartItem, cartStorage } from "@/lib/cart";
 import { getLink } from "@/lib/get-link";
+import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-
-
-
-
 
 const formSchema = z.object({
     name: z
@@ -65,6 +59,7 @@ const Page = () => {
     const router = useRouter();
     const { shop } = useShop();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [summary, setSummary] = useState({
         subtotal: 0,
         shipping: 0,
@@ -120,42 +115,81 @@ const Page = () => {
     }
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log("values", values);
-        const cartItems = cartStorage.getCart();
+        setIsSubmitting(true);
 
-        const orderItems = cartItems?.map((item: CartItem) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            orderItemVariant: item.selectedVariants.map((variant) => ({
-                productVariantId: variant.variantId,
-                productVariantOptionId: variant.optionId,
-            })),
-        }));
+        try {
+            const cartItems = cartStorage.getCart();
 
-        const order: CreateOrderPayload = {
-            shopId: shop.id,
-            orderItems,
-            customerName: values.name,
-            customerPhoneNumber: values.phone,
-            customerAddress: values.address,
-            deliveryZoneId: values.deliveryZoneId,
-            orderStatus: OrderStatus.PLACED,
-        };
+            const orderItems = cartItems?.map((item: CartItem) => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                orderItemVariant: item.selectedVariants.map((variant) => ({
+                    productVariantId: variant.variantId,
+                    productVariantOptionId: variant.optionId,
+                })),
+            }));
 
-        await makeOrder(order).then((res) => {
+            // Normalize phone number (remove country code if present)
+            const normalizedPhone = normalizePhoneNumber(values.phone);
+
+            // Collect tracking data (include phone number in phRaw)
+            const trackingData = collectTrackingData(values.phone);
+
+            const order: CreateOrderPayload = {
+                shopId: shop.id,
+                orderItems,
+                customerName: values.name,
+                customerPhoneNumber: normalizedPhone,
+                customerAddress: values.address,
+                deliveryZoneId: values.deliveryZoneId,
+                orderStatus: OrderStatus.PLACED,
+                trackingData,
+            };
+
+            const url = `${config.serverUrl}/order`;
+
+            const response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify(order),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                toast.error(errorData.message || "অর্ডার তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+                return;
+            }
+
+            const data = await response.json();
+            console.log("Order created:", data);
+
+            // Clear cart and save form data
             cartStorage.clearCart();
             localStorage.setItem("checkout_form", JSON.stringify(values));
+
+            toast.success("অর্ডার সফলভাবে সম্পন্ন হয়েছে! ✅");
+
+            // Redirect to success page
             router.replace(
                 getLink({
                     shopSlug: shop.slug,
-                    path: `/order-success?order=${res?.data?.orderSerialNumber}`,
+                    path: `/order-success?order=${data?.data?.orderSerialNumber}`,
                 })
             );
-        });
+        } catch (error) {
+            console.error("Error creating order:", error);
+            const errorMessage =
+                error instanceof Error ? error.message : "অর্ডার তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const formErrors = form.formState.errors;
-    console.log(formErrors);
+    console.log("formErrors", formErrors);
 
     return (
         <Form {...form}>
@@ -236,8 +270,14 @@ const Page = () => {
                             </div>
 
                             <div className="pt-10">
-                                <Button type="submit" className="h-12 w-full text-base lg:h-14 lg:text-lg">
-                                    অর্ডার করুন ৳ {summary.total.toLocaleString()}
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="h-12 w-full text-base lg:h-14 lg:text-lg"
+                                >
+                                    {isSubmitting
+                                        ? "অর্ডার করা হচ্ছে..."
+                                        : `অর্ডার করুন ৳ ${summary.total.toLocaleString()}`}
                                 </Button>
                             </div>
                         </div>

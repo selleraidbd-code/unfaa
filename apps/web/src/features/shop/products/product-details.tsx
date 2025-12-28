@@ -1,8 +1,5 @@
-import { getLink } from "@/lib/get-link";
 import { ProductDetailsActionButtons } from "@/features/shop/products/product-details-action-buttons";
 import { ProductDetailsImages } from "@/features/shop/products/product-details-images";
-import { ProductDetailsSidebar } from "@/features/shop/products/product-details-sidebar";
-import { Product } from "@/types/product-type";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,13 +11,10 @@ import {
 import { Separator } from "@workspace/ui/components/separator";
 import { HomeIcon } from "lucide-react";
 
-export const ProductDetails = ({
-    product,
-    shopSlug,
-}: {
-    product: Product;
-    shopSlug: string;
-}) => {
+import { Product } from "@/types/product-type";
+import { getLink } from "@/lib/get-link";
+
+export const ProductDetails = ({ product, shopSlug }: { product: Product; shopSlug: string }) => {
     return (
         <section className="container pb-12">
             <Breadcrumb className="my-6">
@@ -44,73 +38,49 @@ export const ProductDetails = ({
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="grid lg:grid-cols-12">
-                <div className="grid gap-8 col-span-9 pr-10 lg:grid-cols-2">
-                    <ProductDetailsImages
-                        images={product?.images}
-                        photoURL={product?.photoURL}
-                    />
+            <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr]">
+                <ProductDetailsImages images={product?.images} photoURL={product?.photoURL} />
 
-                    {/* Product Details */}
-                    <div>
-                        <h1 className="text-xl font-medium lg:text-[26px] lg:leading-[38px]">
-                            {product?.name}
-                        </h1>
+                {/* Product Details */}
+                <div>
+                    <h1 className="text-xl font-medium lg:text-[26px] lg:leading-[38px]">{product?.name}</h1>
 
-                        <div className="mt-2.5 mb-5 space-y-1">
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold text-foreground">
-                                    Category:
-                                </span>{" "}
-                                {product?.slug}
-                            </p>
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold text-foreground">
-                                    Warranty:
-                                </span>{" "}
-                                {product?.warranty}
-                            </p>
-                        </div>
-
-                        <div className="flex mb-5 items-baseline gap-4">
-                            <span className="text-4xl font-semibold text-primary">
-                                ৳
-                                <span className="pl-0.5">
-                                    {product?.discountPrice}
-                                </span>
-                            </span>
-                            <span className="text-2xl text-muted-foreground line-through">
-                                {" "}
-                                ৳
-                                <span className="pl-0.5">{product?.price}</span>
-                            </span>
-                        </div>
-
-                        <div className="flex gap-5 text-base mb-2">
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold">Total:</span>{" "}
-                                {product?.stock}
-                            </p>
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold">Sold:</span> 5
-                            </p>
-                        </div>
-
-                        {product?.stock > 0 && (
-                            <p className="text-sm font-medium text-green-500 mb-2">
-                                In Stock
-                            </p>
-                        )}
-
-                        <p className="text-base">{product?.description}</p>
-
-                        <Separator className="my-4" />
-
-                        <ProductDetailsActionButtons product={product} />
+                    <div className="mt-2.5 mb-5 space-y-1">
+                        <p className="flex items-center gap-2">
+                            <span className="text-foreground font-semibold">Category:</span> {product?.slug}
+                        </p>
+                        <p className="flex items-center gap-2">
+                            <span className="text-foreground font-semibold">Warranty:</span> {product?.warranty}
+                        </p>
                     </div>
-                </div>
 
-                <ProductDetailsSidebar product={product} />
+                    <div className="mb-5 flex items-baseline gap-4">
+                        <span className="text-primary text-4xl font-semibold">
+                            ৳<span className="pl-0.5">{product?.discountPrice}</span>
+                        </span>
+                        <span className="text-muted-foreground text-2xl line-through">
+                            {" "}
+                            ৳<span className="pl-0.5">{product?.price}</span>
+                        </span>
+                    </div>
+
+                    <div className="mb-2 flex gap-5 text-base">
+                        <p className="flex items-center gap-2">
+                            <span className="font-semibold">Total:</span> {product?.stock}
+                        </p>
+                        <p className="flex items-center gap-2">
+                            <span className="font-semibold">Sold:</span> 5
+                        </p>
+                    </div>
+
+                    {product?.stock > 0 && <p className="mb-2 text-sm font-medium text-green-500">In Stock</p>}
+
+                    <p className="text-base">{product?.description}</p>
+
+                    <Separator className="my-4" />
+
+                    <ProductDetailsActionButtons product={product} />
+                </div>
             </div>
         </section>
     );

@@ -14,6 +14,26 @@ export enum OrderStatus {
     RETURN = "return",
 }
 
+export type TrackingData = {
+    fbp?: string;
+    fbc?: string;
+    eventId?: string;
+    ttclid?: string;
+    ttp?: string;
+    utmSource?: string;
+    utmMedium?: string;
+    utmCampaign?: string;
+    utmContent?: string;
+    utmTerm?: string;
+    utmId?: string;
+    fbclid?: string;
+    phRaw?: string;
+    phHashed?: string;
+    emailHashed?: string;
+    pageUrl?: string;
+    referrerUrl?: string;
+};
+
 export type CreateOrderPayload = {
     shopId: string;
     customerName: string;
@@ -29,6 +49,7 @@ export type CreateOrderPayload = {
             productVariantOptionId: string;
         }[];
     }[];
+    trackingData?: TrackingData | null;
 };
 
 export type OrderResponse = {
@@ -37,9 +58,10 @@ export type OrderResponse = {
     orderItems: {
         id: string;
         productId: string;
+        productName: string;
+        productPrice: number;
         productVariant?: ProductVariant;
         quantity: number;
-        product: Product;
     }[];
     customerName: string;
     customerPhoneNumber: string;

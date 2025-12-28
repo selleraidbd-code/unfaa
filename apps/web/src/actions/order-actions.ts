@@ -1,3 +1,4 @@
+import { config } from "@/config";
 import { ResponseObject } from "@/types";
 
 import { CreateOrderPayload, OrderResponse } from "@/types/order-type";
@@ -18,4 +19,18 @@ const getOrderById = async (orderId: string) => {
     return response;
 };
 
-export { makeOrder, getOrderById };
+const getOrderBySerialNumber = async (orderSerialNumber: string) => {
+    const url = `${config.serverUrl}/order/order-serial-number/${orderSerialNumber}`;
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    const data = await response.json();
+    return data as ResponseObject<OrderResponse>;
+};
+
+export { makeOrder, getOrderById, getOrderBySerialNumber };

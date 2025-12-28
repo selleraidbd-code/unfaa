@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { X, Maximize2 } from "lucide-react";
-import { Button } from "@workspace/ui/components/button";
 import Image from "next/image";
+
+import { Button } from "@workspace/ui/components/button";
+import { Maximize2, X } from "lucide-react";
 
 export const ProductDetailsImageModal = ({
     allImages,
@@ -20,19 +21,18 @@ export const ProductDetailsImageModal = ({
     return (
         <>
             {/* Main Product Image with Expand Button */}
-
-            <div className="relative cursor-pointer group">
+            <div className="group relative cursor-pointer">
                 <Image
                     src={selectedImage ?? ""}
                     alt="Selected Product"
-                    width={400}
-                    height={400}
+                    width={600}
+                    height={600}
                     className="aspect-square w-full rounded-lg object-cover"
                 />
                 {/* Expand Icon Overlay */}
                 <div
                     onClick={openModal}
-                    className="absolute top-4 right-4 bg-purple-600 text-white p-4 rounded-full opacity-80 group-hover:opacity-100 transition-opacity"
+                    className="bg-primary absolute top-4 right-4 rounded-full p-4 text-white opacity-80 transition-opacity group-hover:opacity-100"
                 >
                     <Maximize2 size={20} />
                 </div>
@@ -43,17 +43,17 @@ export const ProductDetailsImageModal = ({
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                     {/* Background Overlay */}
                     <div
-                        className="absolute inset-0 bg-gray-500/10 bg-opacity-10 backdrop-blur-sm transition-opacity"
+                        className="bg-opacity-10 absolute inset-0 bg-gray-500/10 backdrop-blur-sm transition-opacity"
                         onClick={closeModal}
                     />
 
                     {/* Modal Content */}
-                    <div className="relative z-10 max-w-6xl max-h-[90vh] mx-4">
+                    <div className="relative z-10 mx-4 max-h-[90vh] max-w-6xl">
                         {/* Close Button */}
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="absolute -top-12 bg-gray-400 rounded-full right-0 text-white hover:bg-white/20 z-20"
+                            className="absolute -top-12 right-0 z-20 rounded-full bg-gray-400 text-white hover:bg-white/20"
                             onClick={closeModal}
                         >
                             <X size={24} />
@@ -61,12 +61,9 @@ export const ProductDetailsImageModal = ({
 
                         {/* Full Size Image */}
                         <img
-                            src={
-                                selectedImage ??
-                                "/products/water-drop-bb-cream.png"
-                            }
+                            src={selectedImage ?? "/products/water-drop-bb-cream.png"}
                             alt="Water Drop BB Foundation - Lightweight & Non-Greasy with SPF 15"
-                            className="w-full h-auto max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                            className="h-auto max-h-[80vh] w-full rounded-lg object-contain shadow-2xl"
                         />
                     </div>
                 </div>

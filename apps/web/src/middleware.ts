@@ -7,9 +7,7 @@ export async function middleware(req: NextRequest) {
     const host = req.headers.get("host");
 
     // Skip middleware for static files
-    if (
-        pathname.match(/\.(mp3|mp4|wav|ogg|pdf|jpg|jpeg|png|gif|svg|webp|ico)$/)
-    ) {
+    if (pathname.match(/\.(mp3|mp4|wav|ogg|pdf|jpg|jpeg|png|gif|svg|webp|ico)$/)) {
         return NextResponse.next();
     }
 
@@ -30,19 +28,20 @@ export async function middleware(req: NextRequest) {
     }
 
     // Tenant domain - rewrite /shop/domain to /domain
-    // if (pathname.startsWith(`/shop/${domain}`)) {
-    //     const newPath = pathname.replace(`/shop/${domain}`, `/${domain}`);
-    //     const rewriteUrl = new URL(newPath, req.url);
-    //     rewriteUrl.search = search;
-    //     return NextResponse.rewrite(rewriteUrl);
-    // }
+    // If NOT primary domain, always redirect to `/shop/{domain}`
+    if (!isPrimary) {
+        const shopPath = `/shop/${domain}`;
+        // If we are not already on `/shop/{domain}`, redirect there
+        if (!pathname.startsWith(shopPath)) {
+            const redirectUrl = new URL(shopPath, req.url);
+            return NextResponse.redirect(redirectUrl);
+        }
+    }
 
     return NextResponse.next();
 }
 
 // Matcher configuration - exclude static files and API routes
 export const config = {
-    matcher: [
-        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
-    ],
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)"],
 };

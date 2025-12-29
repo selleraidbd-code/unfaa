@@ -49,6 +49,7 @@ export type Shop = {
 
     shopEmail?: string;
     whatsappNumber?: string;
+    domain?: string | null;
     facebookLink?: string;
     twitterLink?: string;
     instagramLink?: string;

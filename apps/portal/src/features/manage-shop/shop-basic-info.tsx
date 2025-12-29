@@ -34,6 +34,7 @@ const shopInfoSchema = z.object({
     // maintainStockQuantity: z.boolean(),
     // showProductSoldCount: z.boolean(),
     photoURL: z.string().optional(),
+    domain: z.string().trim().optional().or(z.literal("")),
     facebookPixelId: z.string().trim().optional().or(z.literal("")),
     facebookPixelAccessToken: z.string().trim().optional().or(z.literal("")),
     tiktokPixelId: z.string().trim().optional().or(z.literal("")),
@@ -62,6 +63,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
             // maintainStockQuantity: shopData?.maintainStockQuantity || true,
             // showProductSoldCount: shopData?.showProductSoldCount || false,
             photoURL: shopData?.photoURL || "",
+            domain: shopData?.domain || "",
             facebookPixelId: shopData?.facebookPixelId || "",
             facebookPixelAccessToken: shopData?.facebookPixelAccessToken || "",
             tiktokPixelId: shopData?.tiktokPixelId || "",
@@ -82,6 +84,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
             whatsappNumber: data.whatsappNumber,
             shopEmail: data.shopEmail,
             theme,
+            domain: data.domain && data.domain.trim() !== "" ? data.domain.trim() : null,
             facebookPixelId:
                 data.facebookPixelId && data.facebookPixelId.trim() !== "" ? data.facebookPixelId.trim() : undefined,
             facebookPixelAccessToken:
@@ -150,6 +153,14 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
                                     label="Shop Details (SEO & Data Feed)"
                                     name="description"
                                     placeholder="Enter Shop Description"
+                                    control={form.control}
+                                    className="col-span-2"
+                                />
+
+                                <CustomFormInput
+                                    label="Shop Domain"
+                                    name="domain"
+                                    placeholder="Enter Shop Domain (e.g., example.com)"
                                     control={form.control}
                                     className="col-span-2"
                                 />
@@ -228,7 +239,7 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
 
                                 <CustomFormImage label="Shop Logo" name="photoURL" control={form.control} />
 
-                                <div className="space-y-">
+                                <div className="space-y-2">
                                     <Label>Shop Theme Color</Label>
 
                                     <input

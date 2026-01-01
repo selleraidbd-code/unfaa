@@ -70,7 +70,10 @@ export const OrderDetailsContent = ({ order, onClose, className }: OrderDetailsC
                     orderItems={orderData.orderItems}
                     discountedPrice={orderData.discountedPrice}
                     onCancel={() => setIsEditOrderItem(false)}
-                    onSuccess={() => setIsEditOrderItem(false)}
+                    onSuccess={() => {
+                        setIsEditOrderItem(false);
+                        onClose();
+                    }}
                 />
             ) : (
                 <>
@@ -87,12 +90,7 @@ export const OrderDetailsContent = ({ order, onClose, className }: OrderDetailsC
                         <div className="flex items-center justify-between pb-2 md:border-b">
                             <h2 className="text-base max-sm:text-sm">Order Items ({orderData.orderItems.length})</h2>
 
-                            <Button
-                                variant="outline"
-                                className="hidden"
-                                size="sm"
-                                onClick={() => setIsEditOrderItem(true)}
-                            >
+                            <Button variant="outline" size="sm" onClick={() => setIsEditOrderItem(true)}>
                                 <Edit2 className="h-3.5 w-3.5" />
                                 Edit
                             </Button>

@@ -229,7 +229,7 @@ export const OrderItemsEdit = ({
                 },
             })
                 .unwrap()
-                .then(() => {
+                .then((res) => {
                     toast.success("Order updated successfully");
                     onSuccess?.();
                 })

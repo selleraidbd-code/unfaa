@@ -24,7 +24,7 @@ import { CustomFormImage } from "@/components/ui/custom-form-image";
 const shopInfoSchema = z.object({
     name: z.string().min(1),
     description: z.string().min(1),
-    shopEmail: z.string().email(),
+    shopEmail: z.string().email().optional(),
     whatsappNumber: z.string(),
     // address: z.string().min(1),
     // topBarMessage: z.string().min(1),
@@ -75,7 +75,6 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
         const shopId = shopData?.id || "";
         if (!shopId) return toast.error("Shop ID not found");
 
-        console.log(data);
         const payload: Partial<Shop> = {
             name: data.name,
             description: data.description,

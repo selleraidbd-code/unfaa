@@ -44,8 +44,8 @@ const orderApi = api.injectEndpoints({
         }),
         editOrderItems: builder.mutation<void, { id: string; payload: UpdateOrderItemsPayload }>({
             query: ({ id, payload }) => ({
-                url: `/order/add-new-items/${id}`,
-                method: METHOD.POST,
+                url: `/order/manage-items/${id}`,
+                method: METHOD.PATCH,
                 body: payload,
             }),
             invalidatesTags: [TagType.Order],

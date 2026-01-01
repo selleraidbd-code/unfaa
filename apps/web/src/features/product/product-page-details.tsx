@@ -21,10 +21,6 @@ type Props = {
 };
 
 export const ProductPageDetails = ({ product, shopSlug }: Props) => {
-    const images = useMemo(
-        () => (product.images?.length > 0 ? product.images : [product.photoURL]),
-        [product.images, product.photoURL]
-    );
     const discountPercent = useMemo(
         () =>
             product.discountPrice < product.price
@@ -45,22 +41,35 @@ export const ProductPageDetails = ({ product, shopSlug }: Props) => {
         handleSubmit,
     } = useOrderForm(product, shopSlug);
 
+    const imageOne = product.images?.[0];
+    const imageTwo = product.images?.[1];
+    const imageThree = product.images?.[2];
+    const imageFour = product.images?.[3];
+
     return (
         <div className="min-h-screen bg-gray-50 pb-4" style={{ fontFamily: "'Noto Sans Bengali', sans-serif" }}>
             <ProductHeader product={product} />
 
             <div className="mx-auto my-6 max-w-3xl rounded-xl bg-white px-4 py-6 shadow-lg">
-                <ProductImageGallery images={images} productName={product.name} discountPercent={discountPercent} />
+                <ProductImageGallery
+                    photoURL={product.photoURL}
+                    productName={product.name}
+                    discountPercent={discountPercent}
+                />
 
                 <ProductPricing product={product} />
 
-                <ProductDescription product={product} images={images} />
+                {imageOne && <img src={imageOne} alt="Product" className="mb-4 w-full rounded-xl shadow-md" />}
+
+                <ProductDescription product={product} imageTwo={imageTwo} imageThree={imageThree} />
 
                 {product.warranty && <ProductWarranty warranty={product.warranty} />}
 
                 <CashOnDeliveryBanner />
 
                 {product.videoLink && <ProductVideo videoLink={product.videoLink} />}
+
+                {imageFour && <img src={imageFour} alt="Product" className="mb-4 w-full rounded-xl shadow-md" />}
 
                 <OrderSection
                     product={product}

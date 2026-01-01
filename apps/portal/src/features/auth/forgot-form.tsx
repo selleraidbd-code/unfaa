@@ -57,7 +57,9 @@ export const ForgotForm = () => {
                                 </FormItem>
                             )}
                         />
-                        <CustomButton isLoading={isLoading}>Continue</CustomButton>
+                        <CustomButton type="submit" isLoading={isLoading}>
+                            Continue
+                        </CustomButton>
                     </div>
                 </form>
             </Form>

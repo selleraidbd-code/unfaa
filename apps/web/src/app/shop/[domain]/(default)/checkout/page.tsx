@@ -15,7 +15,7 @@ import { CircleDot } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
+import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { CartItem, cartStorage } from "@/lib/cart";
 import { getLink } from "@/lib/get-link";
 import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
@@ -135,6 +135,22 @@ const Page = () => {
             // Collect tracking data (include phone number in phRaw)
             const trackingData = collectTrackingData(values.phone);
 
+            // Determine order source based on tracking data
+            let orderSource = OrderSource.WEBSITE; // Default to website
+
+            if (trackingData) {
+                // Check for Facebook tracking parameters
+                const isFacebook = trackingData.fbclid || trackingData.fbc || trackingData.fbp;
+                // Check for TikTok tracking parameters
+                const isTikTok = trackingData.ttclid || trackingData.ttp;
+
+                if (isFacebook) {
+                    orderSource = OrderSource.WEBSITE_FACEBOOK;
+                } else if (isTikTok) {
+                    orderSource = OrderSource.WEBSITE_TIKTOK;
+                }
+            }
+
             const order: CreateOrderPayload = {
                 shopId: shop.id,
                 orderItems,
@@ -143,6 +159,7 @@ const Page = () => {
                 customerAddress: values.address,
                 deliveryZoneId: values.deliveryZoneId,
                 orderStatus: OrderStatus.PLACED,
+                orderSource,
                 trackingData,
             };
 

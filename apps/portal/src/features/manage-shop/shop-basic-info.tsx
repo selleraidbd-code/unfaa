@@ -115,14 +115,14 @@ export const ShopBasicInfo = ({ className }: { className?: string }) => {
     if (isLoadingShop) return <ShopBasicInfoSkeleton className={className} />;
 
     return (
-        <div className={cn("space-y-6", className)}>
+        <div className={cn("space-y-4 lg:space-y-6", className)}>
             <CustomCollapsible
                 collapsible={false}
                 title="Shop Basic Info"
                 content={
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)}>
-                            <div className="grid grid-cols-2 gap-4 pt-2">
+                            <div className="grid-cols-2 gap-4 max-md:space-y-4 md:grid md:pt-2">
                                 <CustomFormInput
                                     label="Shop Name"
                                     name="name"

@@ -7,7 +7,7 @@ import { toast } from "@workspace/ui/components/sonner";
 import { CheckCircle } from "lucide-react";
 
 import { FraudCheckerData } from "@/types/customer-type";
-import { CreateOrder, OrderDetailsType, OrderItem, OrderStatus } from "@/types/order-type";
+import { CreateOrder, OrderDetailsType, OrderItem, OrderSource, OrderStatus } from "@/types/order-type";
 
 interface Props {
     onReset: () => void;
@@ -16,9 +16,18 @@ interface Props {
     orderDetails: OrderDetailsType;
     setOrderDetails: (orderDetails: OrderDetailsType) => void;
     fraudState?: FraudCheckerData | null;
+    orderSource: OrderSource;
 }
 
-export const PlaceOrder = ({ onReset, customerInfo, orderItems, orderDetails, setOrderDetails, fraudState }: Props) => {
+export const PlaceOrder = ({
+    onReset,
+    customerInfo,
+    orderItems,
+    orderDetails,
+    setOrderDetails,
+    fraudState,
+    orderSource,
+}: Props) => {
     const [createOrder, { isLoading }] = useCreateOrderbyAdminMutation();
     const user = useAppSelector((state) => state.auth.user);
 
@@ -97,6 +106,7 @@ export const PlaceOrder = ({ onReset, customerInfo, orderItems, orderDetails, se
             discountedPrice: orderDetails.discountedPrice ?? undefined,
             customerTotalConfirmOrder,
             customerTotalCancelOrder,
+            orderSource,
         } as const;
 
         await createOrder({ assignedTo: user.id, payload })

@@ -13,7 +13,7 @@ export const signUpFormSchema = z.object({
     password: z
         .string({ message: "Password is required" })
         .min(8, { message: "Password must be at least 8 characters long" }),
-    confirmPassword: z
-        .string({ message: "Confirm Password is required" })
-        .min(8, { message: "Confirm Password must be at least 8 characters long" }),
+    // confirmPassword: z
+    //     .string({ message: "Confirm Password is required" })
+    //     .min(8, { message: "Confirm Password must be at least 8 characters long" }),
 });

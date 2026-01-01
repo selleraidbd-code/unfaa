@@ -390,15 +390,15 @@ const EditProduct = () => {
                                     className="col-span-2"
                                 />
 
-                                <CustomFormTextarea
-                                    label="Short Description (SEO & Data Feed)"
-                                    name="description"
-                                    rows={5}
-                                    control={form.control}
-                                    placeholder="Enter Your description"
-                                    required
-                                    className="col-span-2"
-                                />
+                                <div className="col-span-2 space-y-2.5">
+                                    <Label className="title">Short Description (SEO & Data Feed)</Label>
+                                    <Editor
+                                        content={form.watch("description") || product?.data?.description}
+                                        onChange={(content) => {
+                                            form.setValue("description", content);
+                                        }}
+                                    />
+                                </div>
                                 <div className="col-span-2 space-y-2.5">
                                     <Label className="title">Product Description</Label>
                                     <Editor

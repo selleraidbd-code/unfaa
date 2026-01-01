@@ -13,6 +13,7 @@ import { HomeIcon } from "lucide-react";
 
 import { Product } from "@/types/product-type";
 import { getLink } from "@/lib/get-link";
+import { HtmlRenderer } from "@/components/shared/html-renderer";
 
 export const ProductDetails = ({ product, shopSlug }: { product: Product; shopSlug: string }) => {
     return (
@@ -75,7 +76,7 @@ export const ProductDetails = ({ product, shopSlug }: { product: Product; shopSl
 
                     {product?.stock > 0 && <p className="mb-2 text-sm font-medium text-green-500">In Stock</p>}
 
-                    <p className="text-base">{product?.description}</p>
+                    <HtmlRenderer html={product?.description} />
 
                     <Separator className="my-4" />
 

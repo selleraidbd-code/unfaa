@@ -9,7 +9,7 @@ const Loading = () => {
             <HeaderBackButton title="Shop Settings" href="/manage-shop" />
 
             <div className="mt-4 flex gap-4 max-lg:flex-col xl:!gap-6">
-                <ShopBasicInfoSkeleton className="w-2/3" />
+                <ShopBasicInfoSkeleton className="lg:w-2/3" />
                 <ShopSettingsRightSideSkeleton />
             </div>
         </>

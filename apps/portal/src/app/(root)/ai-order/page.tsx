@@ -17,7 +17,7 @@ import { useAppSelector } from "@/redux/store/hook";
 import { toast } from "@workspace/ui/components/sonner";
 
 import { FraudCheckerData } from "@/types/customer-type";
-import { AIOrderGenerationProductInfo, OrderDetailsType } from "@/types/order-type";
+import { AIOrderGenerationProductInfo, OrderDetailsType, OrderSource } from "@/types/order-type";
 
 const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
@@ -174,6 +174,7 @@ const Page = () => {
                         orderDetails={orderDetails}
                         setOrderDetails={setOrderDetails}
                         fraudState={fraudState}
+                        orderSource={OrderSource.AI_ORDER}
                     />
                 </div>
             )}

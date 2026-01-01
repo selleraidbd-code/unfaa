@@ -34,6 +34,16 @@ export type TrackingData = {
     referrerUrl?: string;
 };
 
+export enum OrderSource {
+    AI_ORDER = "aiOrder",
+    MANUAL_ORDER = "manualOrder",
+    WEBSITE_FACEBOOK = "websiteFacebook",
+    WEBSITE_TIKTOK = "websiteTiktok",
+    LANDING_PAGE_FACEBOOK = "landingPageFacebook",
+    LANDING_PAGE_TIKTOK = "landingPageTiktok",
+    WEBSITE = "website",
+}
+
 export type CreateOrderPayload = {
     shopId: string;
     customerName: string;
@@ -41,6 +51,7 @@ export type CreateOrderPayload = {
     customerAddress: string;
     deliveryZoneId: string;
     orderStatus: OrderStatus;
+    orderSource: OrderSource;
     orderItems: {
         productId: string;
         quantity: number;
@@ -55,6 +66,7 @@ export type CreateOrderPayload = {
 export type OrderResponse = {
     id: string;
     shopId: string;
+    discountedPrice: number | null;
     orderItems: {
         id: string;
         productId: string;

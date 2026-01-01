@@ -59,18 +59,20 @@ export const ProductOrderControls = ({
         return item?.selectedVariants?.find((sv) => sv.variantId === String(variantId))?.optionId ?? undefined;
     };
 
+    const isHaveProductVariant = product && Array.isArray(product.productVariant) && product.productVariant.length > 0;
+
     return (
-        <div className={cn("rounded-md border p-4", hasMissingRequiredVariant && "border-destructive")}>
+        <div className={cn("rounded-md border p-3 md:p-4", hasMissingRequiredVariant && "border-destructive")}>
             <div className="flex items-start justify-between gap-2 max-md:flex-col md:gap-4">
                 <div className="flex min-w-0 flex-1 items-start gap-1.5 sm:gap-3">
                     {product?.photoURL ? (
                         <img
                             src={product.photoURL}
                             alt={product.name}
-                            className="size-20 rounded object-cover max-md:size-16 max-sm:size-14"
+                            className="size-14 rounded object-cover md:size-16 lg:size-20"
                         />
                     ) : (
-                        <div className="bg-muted size-20 rounded max-md:size-16 max-sm:size-14" />
+                        <div className="bg-muted size-14 rounded md:size-16 lg:size-20" />
                     )}
 
                     <div className="min-w-0 space-y-1">
@@ -170,53 +172,55 @@ export const ProductOrderControls = ({
                 </div>
             </div>
 
-            <Separator className="my-3" />
-
             {/* Variant selection with buttons */}
-            {product && Array.isArray(product.productVariant) && product.productVariant.length > 0 ? (
-                <div className="mt-3 space-y-2 sm:space-y-3">
-                    {product.productVariant.map((v) => {
-                        const activeOptionId = getSelectedOptionId(String(v.id));
-                        return (
-                            <div key={v.id} className="space-y-1 sm:space-y-2">
-                                <Label className="text-muted-foreground text-sm">{v.name}</Label>
-                                <div className="flex flex-wrap gap-2">
-                                    {v.options.map((o) => {
-                                        const isActive = String(o.id) === String(activeOptionId);
-                                        return (
-                                            <Button
-                                                key={String(o.id)}
-                                                type="button"
-                                                size="sm"
-                                                variant={isActive ? "default" : "outline"}
-                                                className={cn(
-                                                    "max-md:text-xs",
-                                                    isActive ? "bg-primary text-primary-foreground" : ""
-                                                )}
-                                                aria-pressed={isActive}
-                                                onClick={() =>
-                                                    onSelectVariant(
-                                                        String(v.id),
-                                                        v.name,
-                                                        String(o.id ?? ""),
-                                                        o.name,
-                                                        Number(o.extraPrice ?? 0)
-                                                    )
-                                                }
-                                            >
-                                                {o.name}
-                                                {typeof o.extraPrice === "number" && o.extraPrice > 0
-                                                    ? ` (+${o.extraPrice})`
-                                                    : ""}
-                                            </Button>
-                                        );
-                                    })}
+            {isHaveProductVariant && (
+                <>
+                    <Separator className="my-3" />
+
+                    <div className="mt-3 space-y-2 sm:space-y-3">
+                        {product.productVariant.map((v) => {
+                            const activeOptionId = getSelectedOptionId(String(v.id));
+                            return (
+                                <div key={v.id} className="space-y-1 sm:space-y-2">
+                                    <Label className="text-muted-foreground text-sm">{v.name}</Label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {v.options.map((o) => {
+                                            const isActive = String(o.id) === String(activeOptionId);
+                                            return (
+                                                <Button
+                                                    key={String(o.id)}
+                                                    type="button"
+                                                    size="sm"
+                                                    variant={isActive ? "default" : "outline"}
+                                                    className={cn(
+                                                        "max-md:text-xs",
+                                                        isActive ? "bg-primary text-primary-foreground" : ""
+                                                    )}
+                                                    aria-pressed={isActive}
+                                                    onClick={() =>
+                                                        onSelectVariant(
+                                                            String(v.id),
+                                                            v.name,
+                                                            String(o.id ?? ""),
+                                                            o.name,
+                                                            Number(o.extraPrice ?? 0)
+                                                        )
+                                                    }
+                                                >
+                                                    {o.name}
+                                                    {typeof o.extraPrice === "number" && o.extraPrice > 0
+                                                        ? ` (+${o.extraPrice})`
+                                                        : ""}
+                                                </Button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            ) : null}
+                            );
+                        })}
+                    </div>
+                </>
+            )}
         </div>
     );
 };

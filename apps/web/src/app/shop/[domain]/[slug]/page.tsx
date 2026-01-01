@@ -1,38 +1,35 @@
 import { getLandingPages } from "@/actions/landing-page-actions";
 import { config } from "@/config";
-import { LandingPage } from "@/types/landing-type";
 import { allComponents } from "@workspace/ui/landing/index";
-
 import { Section } from "@workspace/ui/landing/types";
+
+import { LandingPage } from "@/types/landing-type";
 
 type Props = {
     params: Promise<{ slug: string }>;
 };
 
 // Function to fetch all available slugs for static generation
-export async function generateStaticParams() {
-    try {
-        const response = await getLandingPages();
-        if (!response?.data) {
-            return [];
-        }
-        return response.data.map((layout: LandingPage) => ({
-            slug: layout.slug,
-        }));
-    } catch (error) {
-        console.error("Error fetching landing page layouts:", error);
-        return [];
-    }
-}
+// export async function generateStaticParams() {
+//     try {
+//         const response = await getLandingPages();
+//         if (!response?.data) {
+//             return [];
+//         }
+//         return response.data.map((layout: LandingPage) => ({
+//             slug: layout.slug,
+//         }));
+//     } catch (error) {
+//         console.error("Error fetching landing page layouts:", error);
+//         return [];
+//     }
+// }
 
 async function getShopLayoutDetails(slug: string) {
     try {
-        const response = await fetch(
-            `${config.serverUrl}/landingPageLayout/details/${slug}`,
-            {
-                cache: "force-cache",
-            }
-        );
+        const response = await fetch(`${config.serverUrl}/landingPageLayout/details/${slug}`, {
+            cache: "force-cache",
+        });
 
         if (!response.ok) {
             throw new Error("Failed to fetch shop layout details");
@@ -56,17 +53,12 @@ const PreviewPage = async ({ params }: Props) => {
 
     return (
         <section>
-            {shopLayoutData.data.section.map(
-                (section: Section, index: number) => {
-                    const findComponent = allComponents.find(
-                        (single) => single.name === section.componentName
-                    );
-                    if (!findComponent)
-                        return <div key={index}>Component Not Found</div>;
-                    const Component = findComponent.component;
-                    return <Component key={index} data={section} />;
-                }
-            )}
+            {shopLayoutData.data.section.map((section: Section, index: number) => {
+                const findComponent = allComponents.find((single) => single.name === section.componentName);
+                if (!findComponent) return <div key={index}>Component Not Found</div>;
+                const Component = findComponent.component;
+                return <Component key={index} data={section} />;
+            })}
         </section>
     );
 };

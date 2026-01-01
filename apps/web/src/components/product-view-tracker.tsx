@@ -143,6 +143,7 @@ export function ProductViewTracker({
                     content_type: "product",
                     content_name: productName,
                     content_category: category || "Uncategorized",
+                    value: discountPrice,
                     price: discountPrice,
                     currency: "BDT",
                     // Custom parameters

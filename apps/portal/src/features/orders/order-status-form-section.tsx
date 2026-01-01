@@ -17,7 +17,6 @@ type OrderFormData = {
 interface OrderStatusFormSectionProps {
     orderData: Order;
     setOrderData: (updatedOrder: Order) => void;
-    isDeleting: boolean;
     displayOrderStatusOptions: Array<{ label: string; value: string }>;
     isOrderStatusInOptions: boolean;
 }
@@ -25,7 +24,6 @@ interface OrderStatusFormSectionProps {
 export const OrderStatusFormSection = ({
     orderData,
     setOrderData,
-    isDeleting,
     displayOrderStatusOptions,
     isOrderStatusInOptions,
 }: OrderStatusFormSectionProps) => {
@@ -81,7 +79,7 @@ export const OrderStatusFormSection = ({
                         type="submit"
                         size={isMobile ? "sm" : "default"}
                         className="lg:px-10"
-                        disabled={isUpdating || isDeleting || !form.formState.isDirty}
+                        disabled={isUpdating || !form.formState.isDirty}
                     >
                         {isUpdating ? "Updating..." : "Update Order"}
                     </Button>

@@ -11,10 +11,7 @@ interface FetchOptions extends RequestInit {
     };
 }
 
-export const CustomFetch = async <T>(
-    endpoint: string,
-    options: FetchOptions = {}
-): Promise<T | undefined> => {
+export const CustomFetch = async <T>(endpoint: string, options: FetchOptions = {}): Promise<T | undefined> => {
     const url: string = `${config.serverUrl}${endpoint}`;
 
     const { next, formData, ...fetchOptions } = options;
@@ -23,8 +20,7 @@ export const CustomFetch = async <T>(
         ...fetchOptions,
         headers: {
             ...fetchOptions.headers,
-            ...(!formData &&
-            (!fetchOptions.headers || !("Content-Type" in fetchOptions.headers))
+            ...(!formData && (!fetchOptions.headers || !("Content-Type" in fetchOptions.headers))
                 ? { "Content-Type": "application/json" }
                 : {}),
         },

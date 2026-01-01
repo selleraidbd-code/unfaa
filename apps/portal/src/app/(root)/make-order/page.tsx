@@ -14,7 +14,7 @@ import { useGetFraudCheckerDataMutation } from "@/redux/api/customer-api";
 import { toast } from "@workspace/ui/components/sonner";
 
 import { FraudCheckerData } from "@/types/customer-type";
-import { AIOrderGenerationProductInfo, OrderDetailsType, OrderStatus } from "@/types/order-type";
+import { AIOrderGenerationProductInfo, OrderDetailsType, OrderSource, OrderStatus } from "@/types/order-type";
 
 export type OrderDetails = {
     orderNotes: string;
@@ -228,6 +228,7 @@ const Page = () => {
                     orderDetails={orderDetails}
                     setOrderDetails={setOrderDetails}
                     fraudState={fraudState}
+                    orderSource={OrderSource.MANUAL_ORDER}
                 />
             )}
         </section>

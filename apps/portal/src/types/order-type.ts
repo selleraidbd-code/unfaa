@@ -124,6 +124,15 @@ export interface OrderItem {
     }[];
 }
 
+export enum OrderSource {
+    AI_ORDER = "aiOrder",
+    MANUAL_ORDER = "manualOrder",
+    WEBSITE_FACEBOOK = "websiteFacebook",
+    WEBSITE_TIKTOK = "websiteTiktok",
+    LANDING_PAGE_FACEBOOK = "landingPageFacebook",
+    LANDING_PAGE_TIKTOK = "landingPageTiktok",
+}
+
 export type CreateOrder = {
     shopId: string;
     customerId: string;
@@ -140,6 +149,7 @@ export type CreateOrder = {
     }[];
     customerAddress: string;
     orderStatus: OrderStatus;
+    orderSource: OrderSource;
     notes: string;
     deliveryZoneId: string;
     discountedPrice?: number | null;
@@ -161,6 +171,31 @@ export type UpdateOrderPayload = {
     quantity?: number;
     notes?: string;
     discountedPrice?: number;
+    customerTotalConfirmOrder?: number;
+    customerTotalCancelOrder?: number;
+};
+
+export type EditOrderItemVariant = {
+    productVariantId: string;
+    productVariantOptionId: string;
+    productVariantOptionExtraPrice?: number;
+};
+
+export type EditOrderItem = {
+    productId: string;
+    productPrice?: number;
+    quantity: number;
+    orderItemVariant: EditOrderItemVariant[];
+};
+
+export type UpdateOrderItemsPayload = {
+    orderItems: EditOrderItem[];
+    orderInfo: {
+        discountedPrice: number;
+        finalPayableAmount: number;
+        paidAmount: number;
+        totalAmount: number;
+    };
 };
 
 // AI Order Generation Types

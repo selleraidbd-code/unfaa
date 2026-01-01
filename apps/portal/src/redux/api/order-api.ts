@@ -1,25 +1,17 @@
 import { api } from "@/redux/api";
-import {
-    PaginatedResponse,
-    QueryParams,
-    METHOD,
-    TagType,
-    ResponseObject,
-} from "@/redux/type";
+import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
 
 import {
+    AIOrderGenerationResult,
     CreateOrder,
     Order,
+    UpdateOrderItemsPayload,
     UpdateOrderPayload,
-    AIOrderGenerationResult,
 } from "@/types/order-type";
 
 const orderApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        createOrderbyAdmin: builder.mutation<
-            void,
-            { assignedTo: string; payload: CreateOrder }
-        >({
+        createOrderbyAdmin: builder.mutation<void, { assignedTo: string; payload: CreateOrder }>({
             query: ({ assignedTo, payload }) => ({
                 url: `/order/admin/${assignedTo}`,
                 method: METHOD.POST,
@@ -42,13 +34,18 @@ const orderApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Order],
         }),
-        updateOrder: builder.mutation<
-            void,
-            { id: string; payload: UpdateOrderPayload }
-        >({
+        updateOrder: builder.mutation<void, { id: string; payload: UpdateOrderPayload }>({
             query: ({ id, payload }) => ({
                 url: `/order/${id}`,
                 method: METHOD.PATCH,
+                body: payload,
+            }),
+            invalidatesTags: [TagType.Order],
+        }),
+        editOrderItems: builder.mutation<void, { id: string; payload: UpdateOrderItemsPayload }>({
+            query: ({ id, payload }) => ({
+                url: `/order/add-new-items/${id}`,
+                method: METHOD.POST,
                 body: payload,
             }),
             invalidatesTags: [TagType.Order],
@@ -60,10 +57,7 @@ const orderApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Order],
         }),
-        aiOrderGeneration: builder.mutation<
-            ResponseObject<AIOrderGenerationResult>,
-            { shopId: string; info: string }
-        >({
+        aiOrderGeneration: builder.mutation<ResponseObject<AIOrderGenerationResult>, { shopId: string; info: string }>({
             query: ({ shopId, info }) => ({
                 url: `/ai-generation/order-generation/${shopId}`,
                 method: METHOD.POST,
@@ -80,6 +74,7 @@ export const {
     useLazyGetOrderQuery,
     useCreateOrderbyAdminMutation,
     useUpdateOrderMutation,
+    useEditOrderItemsMutation,
     useDeleteOrderMutation,
     useAiOrderGenerationMutation,
 } = orderApi;

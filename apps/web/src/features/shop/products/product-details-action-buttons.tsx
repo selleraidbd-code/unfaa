@@ -1,6 +1,12 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { BuyNowDialog } from "@/features/shop/products/buy-now-dialog";
+import { Button } from "@workspace/ui/components/button";
+import { toast } from "@workspace/ui/components/sonner";
+
+import { Product } from "@/types/product-type";
 import {
     cartStorage,
     createSelectedVariants,
@@ -9,26 +15,11 @@ import {
     validateVariantSelection,
     VariantSelection,
 } from "@/lib/cart";
-import { Product } from "@/types/product-type";
-import { Button } from "@workspace/ui/components/button";
-import { toast } from "@workspace/ui/components/sonner";
-import { useCallback, useEffect, useMemo, useState } from "react";
 
-export const ProductDetailsActionButtons = ({
-    product,
-}: {
-    product: Product;
-}) => {
-    const variants = useMemo(
-        () => product?.productVariant || [],
-        [product?.productVariant]
-    );
-    const [variantSelection, setVariantSelection] = useState<VariantSelection>(
-        {}
-    );
-    const [selectedVariants, setSelectedVariants] = useState<SelectedVariant[]>(
-        []
-    );
+export const ProductDetailsActionButtons = ({ product }: { product: Product }) => {
+    const variants = useMemo(() => product?.productVariant || [], [product?.productVariant]);
+    const [variantSelection, setVariantSelection] = useState<VariantSelection>({});
+    const [selectedVariants, setSelectedVariants] = useState<SelectedVariant[]>([]);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [cartQuantity, setCartQuantity] = useState(0);
     const [isInCart, setIsInCart] = useState(false);
@@ -48,17 +39,13 @@ export const ProductDetailsActionButtons = ({
     // Check if current item is in cart
     const checkCartStatus = useCallback(() => {
         const cart = cartStorage.getCart();
-        const currentSelectedVariants = createSelectedVariants(
-            variants,
-            variantSelection
-        );
+        const currentSelectedVariants = createSelectedVariants(variants, variantSelection);
 
         const existingItem = cart.find(
             (item) =>
                 item.productId === product.id &&
                 item.shopId === product.shopId &&
-                JSON.stringify(item.selectedVariants) ===
-                    JSON.stringify(currentSelectedVariants)
+                JSON.stringify(item.selectedVariants) === JSON.stringify(currentSelectedVariants)
         );
 
         if (existingItem) {
@@ -86,9 +73,7 @@ export const ProductDetailsActionButtons = ({
         const validation = validateVariantSelection(variants, variantSelection);
 
         if (!validation.isValid) {
-            toast.error(
-                `Please select: ${validation.missingRequired.join(", ")}`
-            );
+            toast.error(`Please select: ${validation.missingRequired.join(", ")}`);
             return;
         }
 
@@ -124,12 +109,7 @@ export const ProductDetailsActionButtons = ({
         }
 
         const newQuantity = cartQuantity + 1;
-        cartStorage.updateQuantity(
-            product.id,
-            product.shopId,
-            selectedVariants,
-            newQuantity
-        );
+        cartStorage.updateQuantity(product.id, product.shopId, selectedVariants, newQuantity);
         setCartQuantity(newQuantity);
         toast.success("Cart updated successfully!");
     };
@@ -137,22 +117,13 @@ export const ProductDetailsActionButtons = ({
     const handleQuantityDecrease = () => {
         if (cartQuantity <= 1) {
             // Remove item from cart
-            cartStorage.removeItem(
-                product.id,
-                product.shopId,
-                selectedVariants
-            );
+            cartStorage.removeItem(product.id, product.shopId, selectedVariants);
             setIsInCart(false);
             setCartQuantity(0);
             toast.success("Item removed from cart");
         } else {
             const newQuantity = cartQuantity - 1;
-            cartStorage.updateQuantity(
-                product.id,
-                product.shopId,
-                selectedVariants,
-                newQuantity
-            );
+            cartStorage.updateQuantity(product.id, product.shopId, selectedVariants, newQuantity);
             setCartQuantity(newQuantity);
             toast.success("Cart updated successfully!");
         }
@@ -163,39 +134,25 @@ export const ProductDetailsActionButtons = ({
             <div className="space-y-4">
                 {variants.length > 0 &&
                     variants.map((variant) => (
-                        <div
-                            key={variant.id}
-                            className="flex items-center gap-2 flex-wrap"
-                        >
+                        <div key={variant.id} className="flex flex-wrap items-center gap-2">
                             <span className="font-semibold capitalize">
-                                {variant.name} :
-                                {variant.isRequired && (
-                                    <sup className="text-red-500 ml-0.5">*</sup>
-                                )}
+                                {variant.name} :{variant.isRequired && <sup className="ml-0.5 text-red-500">*</sup>}
                             </span>
 
                             <>
                                 {variant.options.map((option) => (
                                     <button
                                         key={option.id}
-                                        onClick={() =>
-                                            handleVariantChange(
-                                                variant.id,
-                                                option.id
-                                            )
-                                        }
-                                        className={`border capitalize text-sm rounded px-2.5 py-1 transition-colors ${
-                                            variantSelection[variant.id] ===
-                                            option.id
-                                                ? "bg-blue-500 text-white border-blue-500"
+                                        onClick={() => handleVariantChange(variant.id, option.id)}
+                                        className={`rounded border px-2.5 py-1 text-sm capitalize transition-colors ${
+                                            variantSelection[variant.id] === option.id
+                                                ? "border-blue-500 bg-blue-500 text-white"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         {option.name}
                                         {option.extraPrice > 0 && (
-                                            <span className="ml-0.5 text-xs">
-                                                (+{option.extraPrice})
-                                            </span>
+                                            <span className="ml-0.5 text-xs">(+{option.extraPrice})</span>
                                         )}
                                     </button>
                                 ))}
@@ -204,32 +161,27 @@ export const ProductDetailsActionButtons = ({
                     ))}
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4 mt-6">
+            <div className="mt-6 grid gap-4 md:grid-cols-2 lg:w-8/12">
                 {!isInCart ? (
-                    <Button
-                        size={"lg"}
-                        onClick={handleAddToCart}
-                        disabled={isAddingToCart}
-                        className="w-full"
-                    >
+                    <Button size={"lg"} onClick={handleAddToCart} disabled={isAddingToCart} className="w-full">
                         {isAddingToCart ? "Adding..." : "Add To Cart"}
                     </Button>
                 ) : (
-                    <div className="flex items-center justify-center gap-3 bg-purple-100 rounded-lg p-3 border border-purple-200">
+                    <div className="flex items-center justify-center gap-3 rounded-lg border border-purple-200 bg-purple-100 p-3">
                         <button
                             onClick={handleQuantityDecrease}
-                            className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500 text-white transition-colors hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-50"
                             disabled={isAddingToCart}
                             title="Decrease quantity"
                         >
                             -
                         </button>
-                        <span className="text-lg font-semibold text-purple-700 min-w-[2rem] text-center">
+                        <span className="min-w-[2rem] text-center text-lg font-semibold text-purple-700">
                             {cartQuantity}
                         </span>
                         <button
                             onClick={handleQuantityIncrease}
-                            className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500 text-white transition-colors hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-50"
                             disabled={isAddingToCart}
                             title="Increase quantity"
                         >

@@ -21,8 +21,9 @@ import { Label } from "@workspace/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@workspace/ui/components/radio-group";
 import { toast } from "@workspace/ui/components/sonner";
 
-import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
-import { Product } from "@/types/product-type";
+import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
+import { Product, ProductVariantOption } from "@/types/product-type";
+import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
 
 interface BuyNowDialogProps {
     product: Product;
@@ -33,6 +34,7 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [deliveryOption, setDeliveryOption] = useState("inside-dhaka");
+    const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariantOption>>({});
     const [customerInfo, setCustomerInfo] = useState({
         name: "",
         address: "",
@@ -45,17 +47,36 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
             const parsedForm = JSON.parse(savedForm);
             setCustomerInfo(parsedForm);
         }
-    }, [open]);
+
+        // Set default variants to the first option of each variant
+        if (product.productVariant && product.productVariant.length > 0) {
+            const defaultVariants: Record<string, ProductVariantOption> = {};
+            product.productVariant.forEach((variant) => {
+                if (variant.options && variant.options.length > 0) {
+                    const firstOption = variant.options[0];
+                    if (firstOption) {
+                        defaultVariants[variant.id] = firstOption;
+                    }
+                }
+            });
+            setSelectedVariants(defaultVariants);
+        }
+    }, [open, product]);
 
     const deliveryOptions = [
         { value: "inside-dhaka", label: "Inside Dhaka", price: 60 },
         { value: "outside-dhaka", label: "Outside Dhaka", price: 120 },
     ];
 
-    const subtotal = product.discountPrice * quantity;
+    // Calculate variant extra prices
+    const variantExtraPrice = Object.values(selectedVariants).reduce(
+        (sum, option) => sum + (option.extraPrice || 0),
+        0
+    );
+
+    const subtotal = (product.discountPrice + variantExtraPrice) * quantity;
     const deliveryCharge = deliveryOptions.find((opt) => opt.value === deliveryOption)?.price || 0;
-    const vat = 0; // 0% VAT as shown in the image
-    const total = subtotal + deliveryCharge + vat;
+    const total = subtotal + deliveryCharge;
 
     const handleInputChange = (field: string, value: string | number) => {
         setCustomerInfo((prev) => ({ ...prev, [field]: value }));
@@ -63,16 +84,46 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
 
     const url = `${config.serverUrl}/order`;
 
+    const normalizedPhone = normalizePhoneNumber(customerInfo.phone);
+
     const handleConfirmOrder = async () => {
         setIsSubmitting(true);
+
+        // Build order item variants from selected variants
+        const orderItemVariant = Object.entries(selectedVariants).map(([variantId, option]) => ({
+            productVariantId: variantId,
+            productVariantOptionId: option.id,
+        }));
+
+        // Collect tracking data (include phone number in phRaw)
+        const trackingData = collectTrackingData(customerInfo.phone);
+
+        // Determine order source based on tracking data
+        let orderSource = OrderSource.WEBSITE; // Default to website
+
+        if (trackingData) {
+            // Check for Facebook tracking parameters
+            const isFacebook = trackingData.fbclid || trackingData.fbc || trackingData.fbp;
+            // Check for TikTok tracking parameters
+            const isTikTok = trackingData.ttclid || trackingData.ttp;
+
+            if (isFacebook) {
+                orderSource = OrderSource.WEBSITE_FACEBOOK;
+            } else if (isTikTok) {
+                orderSource = OrderSource.WEBSITE_TIKTOK;
+            }
+        }
+
         const payload: CreateOrderPayload = {
             shopId: product.shopId,
             customerName: customerInfo.name,
-            customerPhoneNumber: customerInfo.phone,
+            customerPhoneNumber: normalizedPhone,
             customerAddress: customerInfo.address,
             deliveryZoneId: product?.delivery?.deliveryZones?.[0]?.id || "",
             orderStatus: OrderStatus.PLACED,
-            orderItems: [{ productId: product.id, quantity, orderItemVariant: [] }],
+            orderSource,
+            orderItems: [{ productId: product.id, quantity, orderItemVariant }],
+            trackingData,
         };
 
         const response = await fetch(url, {
@@ -87,8 +138,7 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
             throw new Error("Failed to create order");
         }
 
-        const data = await response.json();
-        console.log("data", data);
+        await response.json();
         toast.success("Order created successfully");
         setIsSubmitting(false);
         setOpen(false);
@@ -145,8 +195,8 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
                             />
 
                             <p className="min-w-[160px] pr-4 text-right text-lg md:min-w-[200px]">
-                                {product.discountPrice} x {quantity} = ৳{" "}
-                                <span className="font-semibold">{subtotal}</span>
+                                {(product.discountPrice + variantExtraPrice).toFixed(2)} x {quantity} = ৳{" "}
+                                <span className="font-semibold">{subtotal.toFixed(2)}</span>
                             </p>
                         </div>
                     </div>
@@ -178,9 +228,63 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
                         />
                     </div>
 
+                    {/* Variant Options */}
+                    {product.productVariant && product.productVariant.length > 0 && (
+                        <div className="space-y-4">
+                            {product.productVariant.map((variant) => (
+                                <div key={variant.id} className="space-y-3">
+                                    <h3 className="text-lg font-medium">{variant.name}</h3>
+                                    <RadioGroup
+                                        value={selectedVariants[variant.id]?.id || ""}
+                                        onValueChange={(optionId) => {
+                                            const selectedOption = variant.options.find((opt) => opt.id === optionId);
+                                            if (selectedOption) {
+                                                setSelectedVariants((prev) => ({
+                                                    ...prev,
+                                                    [variant.id]: selectedOption,
+                                                }));
+                                            }
+                                        }}
+                                        className="flex flex-wrap gap-4"
+                                    >
+                                        {variant.options.map((option) => (
+                                            <div key={option.id} className="flex items-center space-x-2">
+                                                <RadioGroupItem
+                                                    value={option.id}
+                                                    id={`variant-${variant.id}-option-${option.id}`}
+                                                    className="text-purple-600"
+                                                />
+                                                <Label
+                                                    htmlFor={`variant-${variant.id}-option-${option.id}`}
+                                                    className="flex cursor-pointer items-center gap-2"
+                                                >
+                                                    {option.imgUrl && (
+                                                        <img
+                                                            src={option.imgUrl}
+                                                            alt={option.name}
+                                                            className="h-12 w-12 rounded object-cover"
+                                                        />
+                                                    )}
+                                                    <span>
+                                                        {option.name}
+                                                        {option.extraPrice > 0 && (
+                                                            <span className="ml-1 text-sm text-gray-600">
+                                                                (+৳{option.extraPrice.toFixed(2)})
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                                </Label>
+                                            </div>
+                                        ))}
+                                    </RadioGroup>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Delivery Options */}
                     <div className="space-y-3">
-                        <h3 className="text-lg font-medium">Select Delivery Option</h3>
+                        <h3 className="text-lg font-medium">ডেলিভারি চার্জ</h3>
                         <RadioGroup value={deliveryOption} onValueChange={setDeliveryOption} className="flex gap-6">
                             {deliveryOptions.map((option) => (
                                 <div key={option.value} className="flex items-center space-x-2">
@@ -205,10 +309,6 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
                             <div className="flex justify-between">
                                 <span>Sub Total:</span>
                                 <span>৳{subtotal.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>VAT / TAX (0%):</span>
-                                <span>৳{vat.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Delivery charge:</span>

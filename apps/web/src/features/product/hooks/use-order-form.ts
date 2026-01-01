@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { config } from "@/config";
 import { toast } from "@workspace/ui/components/sonner";
 
-import { CreateOrderPayload, OrderStatus } from "@/types/order-type";
+import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { getLink } from "@/lib/get-link";
 import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
@@ -50,6 +50,20 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
         // Set default delivery zone to the first one
         if (product.delivery?.deliveryZones && product.delivery.deliveryZones.length > 0) {
             setSelectedDeliveryZone(product.delivery.deliveryZones[0]?.id || "");
+        }
+
+        // Set default variants to the first option of each variant
+        if (product.productVariant && product.productVariant.length > 0) {
+            const defaultVariants: Record<string, ProductVariantOption> = {};
+            product.productVariant.forEach((variant) => {
+                if (variant.options && variant.options.length > 0) {
+                    const firstOption = variant.options[0];
+                    if (firstOption) {
+                        defaultVariants[variant.id] = firstOption;
+                    }
+                }
+            });
+            setSelectedVariants(defaultVariants);
         }
     }, [product]);
 
@@ -114,6 +128,22 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
             // Collect tracking data (include phone number in phRaw)
             const trackingData = collectTrackingData(formData.phone);
 
+            // Determine order source based on tracking data
+            let orderSource = OrderSource.WEBSITE; // Default to website
+
+            if (trackingData) {
+                // Check for Facebook tracking parameters
+                const isFacebook = trackingData.fbclid || trackingData.fbc || trackingData.fbp;
+                // Check for TikTok tracking parameters
+                const isTikTok = trackingData.ttclid || trackingData.ttp;
+
+                if (isFacebook) {
+                    orderSource = OrderSource.WEBSITE_FACEBOOK;
+                } else if (isTikTok) {
+                    orderSource = OrderSource.WEBSITE_TIKTOK;
+                }
+            }
+
             const payload: CreateOrderPayload = {
                 shopId: product.shopId,
                 customerName: formData.name,
@@ -121,6 +151,7 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
                 customerAddress: formData.address,
                 deliveryZoneId: selectedDeliveryZone || product?.delivery?.deliveryZones?.[0]?.id || "",
                 orderStatus: OrderStatus.PLACED,
+                orderSource,
                 orderItems: [
                     {
                         productId: product.id,

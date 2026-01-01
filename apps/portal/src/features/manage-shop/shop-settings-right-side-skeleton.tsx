@@ -2,7 +2,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export const ShopSettingsRightSideSkeleton = () => {
     return (
-        <div className="w-1/3 space-y-6">
+        <div className="space-y-6 lg:w-1/3">
             {/* Shop QR Section */}
             <div className="card space-y-4">
                 <Skeleton className="h-7 w-32" />

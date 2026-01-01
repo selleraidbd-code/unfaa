@@ -348,15 +348,21 @@ const AddProduct = () => {
                                     placeholder="Enter Your video link"
                                 />
 
-                                <CustomFormTextarea
-                                    label="Short Description (SEO & Data Feed)"
-                                    name="description"
-                                    rows={5}
-                                    control={form.control}
-                                    placeholder="Enter Your description"
-                                    required
-                                    className="col-span-2"
-                                />
+                                <div className="col-span-2 space-y-2.5">
+                                    <Label className="title">Short Description (SEO & Data Feed)</Label>
+                                    <Editor
+                                        content={form.watch("description")}
+                                        onChange={(content) => {
+                                            form.setValue("description", content);
+                                            // Use debounced auto-save for editor
+                                            debouncedAutoSave(form.getValues());
+                                        }}
+                                    />
+
+                                    {form.formState.errors.description && (
+                                        <p className="text-red-500">{form.formState.errors.description.message}</p>
+                                    )}
+                                </div>
                                 <div className="col-span-2 space-y-2.5">
                                     <Label className="title">Product Description</Label>
                                     <Editor

@@ -40,15 +40,7 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ order: string }>
         );
     }
 
-    const total = orderDetails?.orderItems.reduce(
-        (acc, item) =>
-            acc +
-            (item?.productPrice ||
-                item?.productVariant?.options.reduce((acc, option) => acc + option.extraPrice, 0) ||
-                0) *
-                item.quantity,
-        0
-    );
+    const total = orderDetails?.discountedPrice || orderDetails?.totalAmount;
 
     // Format products for display
     const productNames = orderDetails?.orderItems.map((item) => item?.productName).join(", ");

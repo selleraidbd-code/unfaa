@@ -1,18 +1,19 @@
 "use client";
 
-import { signUpFormSchema } from "@/features/auth/auth-schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import Link from "next/link";
 
 import { registerAction } from "@/actions/auth-actions";
-import { CustomButton } from "@/components/ui/custom-button";
+import { signUpFormSchema } from "@/features/auth/auth-schemas";
 import { useAuthSuccess } from "@/features/auth/hooks/use-auth-utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormError } from "@workspace/ui/components/custom/custom-form-error";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { Form } from "@workspace/ui/components/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { CustomButton } from "@/components/ui/custom-button";
 
 const SignUpForm = () => {
     const form = useForm<z.infer<typeof signUpFormSchema>>({
@@ -21,7 +22,6 @@ const SignUpForm = () => {
             name: "",
             email: "",
             password: "",
-            confirmPassword: "",
         },
     });
 
@@ -32,16 +32,7 @@ const SignUpForm = () => {
 
     const onSubmit = (data: z.infer<typeof signUpFormSchema>) => {
         startTransition(async () => {
-            if (data.password !== data.confirmPassword) {
-                setError("Password and Confirm Password do not match");
-                return;
-            }
-
-            const response = await registerAction(
-                data.name,
-                data.email,
-                data.password
-            );
+            const response = await registerAction(data.name, data.email, data.password);
 
             if (response.status === "success") {
                 onSuccess({
@@ -88,22 +79,18 @@ const SignUpForm = () => {
                             required
                         />
 
-                        <CustomFormInput
+                        {/* <CustomFormInput
                             name="confirmPassword"
                             label="Confirm Password"
                             placeholder="********"
                             type="password"
                             control={form.control}
                             required
-                        />
+                        /> */}
 
                         <CustomFormError message={error || undefined} />
 
-                        <CustomButton
-                            type="submit"
-                            className="w-full "
-                            isLoading={isPending}
-                        >
+                        <CustomButton type="submit" className="w-full" isLoading={isPending}>
                             Sign Up
                         </CustomButton>
                     </div>
@@ -112,7 +99,7 @@ const SignUpForm = () => {
                         Already have an account?{" "}
                         <Link
                             href="/auth/sign-in"
-                            className="pl-1 underline text-primary/80 underline-offset-4 hover:text-primary"
+                            className="text-primary/80 hover:text-primary pl-1 underline underline-offset-4"
                         >
                             Sign In
                         </Link>

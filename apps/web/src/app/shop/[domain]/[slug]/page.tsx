@@ -1,12 +1,14 @@
-import { getLandingPages } from "@/actions/landing-page-actions";
 import { config } from "@/config";
-import { allComponents } from "@workspace/ui/landing/index";
-import { Section } from "@workspace/ui/landing/types";
+import { AdvanceLandingPageView } from "@/features/shop/landing-page/AdvanceLandingPageView";
+import { EasyLandingPageFAQView } from "@/features/shop/landing-page/EasyLandingPageFAQView";
+import { LandingNotFound } from "@/features/shop/landing-page/landing-not-found";
+import { ResponseObject } from "@/types";
+import { EPageType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
 
 type Props = {
-    params: Promise<{ slug: string }>;
+    params: Promise<{ slug: string; domain: string }>;
 };
 
 // Function to fetch all available slugs for static generation
@@ -35,32 +37,31 @@ async function getShopLayoutDetails(slug: string) {
             throw new Error("Failed to fetch shop layout details");
         }
 
-        return response.json();
+        return response.json() as Promise<ResponseObject<LandingPage>>;
     } catch (error) {
         console.error("Error fetching shop layout details:", error);
         return null;
     }
 }
 
-// Changed to accept params directly without awaiting
 const PreviewPage = async ({ params }: Props) => {
-    const { slug } = await params;
+    const { slug, domain } = await params;
     const shopLayoutData = await getShopLayoutDetails(slug);
+    console.log("shopLayoutData", shopLayoutData);
 
     if (!shopLayoutData) {
-        return <div>Error loading preview data</div>;
+        return <LandingNotFound slug={slug} />;
     }
 
-    return (
-        <section>
-            {shopLayoutData.data.section.map((section: Section, index: number) => {
-                const findComponent = allComponents.find((single) => single.name === section.componentName);
-                if (!findComponent) return <div key={index}>Component Not Found</div>;
-                const Component = findComponent.component;
-                return <Component key={index} data={section} />;
-            })}
-        </section>
-    );
+    if (shopLayoutData.data.pageType === EPageType.ADVANCED) {
+        return <AdvanceLandingPageView sections={shopLayoutData.data.section || []} />;
+    }
+
+    if (shopLayoutData.data.pageType === EPageType.EASY_WITH_FAQ) {
+        return <EasyLandingPageFAQView landingPage={shopLayoutData.data} domain={domain} />;
+    }
+
+    return <LandingNotFound slug={slug} />;
 };
 
 export default PreviewPage;

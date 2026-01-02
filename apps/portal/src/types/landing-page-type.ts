@@ -1,4 +1,6 @@
-import { Section } from "@workspace/ui/landing/types";
+import { EComponentType, EPageType, Section } from "@workspace/ui/landing/types";
+
+import { ShopSectionType } from "@/types/shop-type";
 
 export enum LANDING_PAGE {
     PRODUCT = "PRODUCT",
@@ -67,6 +69,7 @@ export type LandingPage = {
     keyword: string;
     createdAt: string;
     updatedAt: string;
+    pageType: EPageType;
 };
 
 export type LandingPageDemo = {
@@ -80,4 +83,43 @@ export type LandingPageDemo = {
     updatedAt: string;
     metaData: null;
     section: Section[];
+};
+
+export type CreateSectionPayload = {
+    index: number;
+    componentName: string;
+    title?: string;
+    subTitle?: string;
+    imgURL?: string;
+    bgURL?: string;
+    description?: string;
+    customizeDescription?: string;
+    buttonText?: string;
+    buttonUrl?: string;
+    jsonData?: Record<string, unknown> | Record<string, unknown>[];
+    sectionType: EComponentType;
+    sectionList?: CreateSectionListPayload[];
+};
+
+export type CreateLandingPagePayload = {
+    shopId: string;
+    productId: string;
+    name: string;
+    keyword?: string;
+    section: CreateSectionPayload[];
+    featureProductIds?: string[];
+    pageType: EPageType;
+};
+
+export type CreateSectionListPayload = {
+    title?: string;
+    subTitle?: string;
+    imgURL?: string;
+    bgURL?: string;
+    icon?: any;
+    description?: string;
+    customizeDescription?: string;
+    buttonText?: string;
+    buttonUrl?: string;
+    booleanValue?: boolean;
 };

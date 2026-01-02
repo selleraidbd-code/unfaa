@@ -1,28 +1,25 @@
 "use client";
 
-import {
-    setEditing,
-    setLandingPageData,
-} from "@/redux/slices/landing-page-slice";
-import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
-import { toast } from "@workspace/ui/components/sonner";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-import { useCreateLandingPageWithSectionMutation } from "@/redux/api/landing-page-api";
+import { AddSectionComponent } from "@/features/landing-builder/components/add-section-component";
+import { ShowSelectedSection } from "@/features/landing-builder/components/show-selected-section";
+import { useCreateLandingPageMutation } from "@/redux/api/landing-page-api";
 import { useGetShopCategoriesQuery } from "@/redux/api/shop-api";
-import { SiteType } from "@/types/landing-page-type";
+import { setEditing, setLandingPageData, setLandingPageSection } from "@/redux/slices/landing-page-slice";
+import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea";
+import { toast } from "@workspace/ui/components/sonner";
 import { Switch } from "@workspace/ui/components/switch";
-import { Section } from "@workspace/ui/landing/types";
+import { Component, EPageType, Section } from "@workspace/ui/landing/types";
 import { useTheme } from "next-themes";
+
+import { CreateLandingPagePayload, CreateSectionPayload, SiteType } from "@/types/landing-page-type";
 // import MyForm from "@repo/ui/components/test/MyForm";
 import { CustomButton } from "@/components/ui/custom-button";
-import { AddSectionComponent } from "@/features/landing-builder/components/add-section-component";
-import { ShowSelectedSection } from "@/features/landing-builder/components/show-selected-section";
-import { setLandingPageSection } from "@/redux/slices/landing-page-slice";
-import { Component } from "@workspace/ui/landing/types";
-import { useEffect } from "react";
 
 export const LandingPageCreator = ({
     basicInfo,
@@ -33,14 +30,14 @@ export const LandingPageCreator = ({
     info: { componentData: Section; componentInfo: Component }[];
     productId: string;
 }) => {
+    const router = useRouter();
     const dispatch = useAppDispatch();
-    const { theme } = useTheme();
+    const user = useAppSelector((state) => state.auth.user);
+    const shopId = user?.shop.id;
 
     useEffect(() => {
         dispatch(setLandingPageSection(info));
-        dispatch(
-            setLandingPageData({ fieldName: "name", value: basicInfo.name })
-        );
+        dispatch(setLandingPageData({ fieldName: "name", value: basicInfo.name }));
         dispatch(
             setLandingPageData({
                 fieldName: "keyword",
@@ -49,35 +46,24 @@ export const LandingPageCreator = ({
         );
     }, [info]);
 
-    const portfolioName = useAppSelector(
-        (state) => state.landingPage.landingPageData.name
-    );
-    const portfolioKeyword = useAppSelector(
-        (state) => state.landingPage.landingPageData.keyword
-    );
+    const portfolioName = useAppSelector((state) => state.landingPage.landingPageData.name);
+    const portfolioKeyword = useAppSelector((state) => state.landingPage.landingPageData.keyword);
 
-    const landingPageSections = useAppSelector(
-        (state) => state.landingPage.landingPageSections
-    );
+    const landingPageSections = useAppSelector((state) => state.landingPage.landingPageSections);
     const isEditing = useAppSelector((state) => state.landingPage.isEditing);
 
-    const [createLandingPageWithSection, { isLoading }] =
-        useCreateLandingPageWithSectionMutation();
-
-    const { data: categoryData } = useGetShopCategoriesQuery({
-        limit: 200,
-    });
+    const [createLandingPage, { isLoading }] = useCreateLandingPageMutation();
 
     const handleSave = async () => {
         if (isLoading) {
             toast.error("Please wait for saving");
             return;
         }
-        if (!portfolioName || !portfolioKeyword) {
+        if (!portfolioName || !portfolioKeyword || !shopId) {
             toast.error("Please fill Name and Keyword");
             return;
         }
-        const section = landingPageSections.map((single, i) => ({
+        const section: CreateSectionPayload[] = landingPageSections.map((single, i) => ({
             ...single.componentData,
             componentName: single.componentInfo.name,
             sectionType: single.componentInfo.type,
@@ -85,24 +71,21 @@ export const LandingPageCreator = ({
             refaranceComponentId: single.componentInfo.id,
         }));
 
-        const data = {
+        const data: CreateLandingPagePayload = {
             section,
-            theme: `${theme}-${theme}`,
-            siteType: SiteType.PORTFOLIO,
+            shopId,
+            productId,
             name: portfolioName,
             keyword: portfolioKeyword,
-            productId,
+            pageType: EPageType.TEMPLATE,
         };
 
         console.log("save", data);
-        await createLandingPageWithSection(data)
+        await createLandingPage(data)
             .unwrap()
             .then((res) => {
-                if (res.data) {
-                    // dispatch(clearLandingPage());
-                    toast.success("Product created successfully");
-                    // router.push(`/products`);
-                }
+                toast.success("Landing page created successfully");
+                router.push(`/landing-page`);
             })
             .catch((err) => {
                 toast.error(err?.data?.message || "Something went wrong");

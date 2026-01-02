@@ -1,6 +1,6 @@
 "use client";
 
-import { Truck } from "lucide-react";
+import { cn } from "@workspace/ui/lib/utils";
 
 import { DeliveryZone } from "@/types/product-type";
 
@@ -11,15 +11,13 @@ type Props = {
 };
 
 export const DeliveryZoneSelector = ({ zones, selectedZoneId, onZoneChange }: Props) => {
+    if (zones.length === 0) return null;
+
     return (
-        <div className="mb-6">
-            <h3 className="mb-3 flex items-center gap-2 text-xl font-bold text-green-600">
-                <Truck className="h-6 w-6" />
-                ডেলিভারি তথ্য
-            </h3>
-            <div className="space-y-3">
+        <div className="mb-5">
+            <div className="flex flex-row gap-3">
                 {zones.map((zone) => (
-                    <div key={zone.id}>
+                    <div key={zone.id} className="flex-1">
                         <input
                             type="radio"
                             id={`delivery-zone-${zone.id}`}
@@ -31,12 +29,20 @@ export const DeliveryZoneSelector = ({ zones, selectedZoneId, onZoneChange }: Pr
                         />
                         <label
                             htmlFor={`delivery-zone-${zone.id}`}
-                            className={`flex cursor-pointer items-center justify-between rounded-xl border-2 bg-green-50 p-4 transition-all ${
-                                selectedZoneId === zone.id ? "border-green-600 bg-green-100" : "border-green-50"
-                            } hover:border-green-600`}
+                            className={cn(
+                                "flex cursor-pointer flex-col items-center justify-center rounded-xl border-[3px] bg-[#eafbea] p-4 transition-all",
+                                selectedZoneId === zone.id ? "border-[#0fa54c]" : "border-[#eafbea]",
+                                "hover:border-[#0fa54c]"
+                            )}
                         >
-                            <div className="font-bold text-gray-800 capitalize">{zone.name}</div>
-                            <div className="text-lg font-bold text-green-600">৳{zone.fee}</div>
+                            <div className="flex flex-col items-center">
+                                <h4 className="mb-2 text-center text-base font-bold text-[#0fa54c] md:text-lg">
+                                    {zone.name}
+                                </h4>
+                                <p className="text-center text-base font-bold text-gray-800 md:text-lg">
+                                    {zone.fee === 0 ? "০" : zone.fee} টাকা
+                                </p>
+                            </div>
                         </label>
                     </div>
                 ))}

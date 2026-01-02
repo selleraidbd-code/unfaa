@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { config } from "@/config";
 import { toast } from "@workspace/ui/components/sonner";
 
+import { Package, WithProductPackage } from "@/types/landing-type";
 import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { getLink } from "@/lib/get-link";
 import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
+import { buildTikTokPackageContents, buildTikTokProductContents, trackTikTokEvent } from "@/hooks/use-tiktok-tracking";
 
 type FormData = {
     name: string;
@@ -23,7 +25,7 @@ type FormErrors = {
     phone?: string;
 };
 
-export const useOrderForm = (product: Product, shopSlug: string) => {
+export const useOrderForm = (product: Product | WithProductPackage, shopSlug: string) => {
     const router = useRouter();
     const [formData, setFormData] = useState<FormData>({
         name: "",
@@ -34,6 +36,10 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedDeliveryZone, setSelectedDeliveryZone] = useState<string>("");
     const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariantOption>>({});
+    const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+
+    // Check if product has packages
+    const packages = "package" in product ? product.package : [];
 
     // Load saved form data from localStorage on mount
     useEffect(() => {
@@ -116,12 +122,6 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
         setIsSubmitting(true);
 
         try {
-            // Build order item variants
-            const orderItemVariant = Object.entries(selectedVariants).map(([variantId, option]) => ({
-                productVariantId: variantId,
-                productVariantOptionId: option.id,
-            }));
-
             // Normalize phone number (remove country code if present)
             const normalizedPhone = normalizePhoneNumber(formData.phone);
 
@@ -130,18 +130,53 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
 
             // Determine order source based on tracking data
             let orderSource = OrderSource.WEBSITE; // Default to website
+            let isTikTok = false;
 
             if (trackingData) {
                 // Check for Facebook tracking parameters
                 const isFacebook = trackingData.fbclid || trackingData.fbc || trackingData.fbp;
                 // Check for TikTok tracking parameters
-                const isTikTok = trackingData.ttclid || trackingData.ttp;
+                isTikTok = !!(trackingData.ttclid || trackingData.ttp);
 
                 if (isFacebook) {
                     orderSource = OrderSource.WEBSITE_FACEBOOK;
                 } else if (isTikTok) {
                     orderSource = OrderSource.WEBSITE_TIKTOK;
                 }
+            }
+
+            // Build order items based on whether package is selected
+            let orderItems: CreateOrderPayload["orderItems"];
+
+            if (selectedPackage) {
+                // If package is selected, create order items for all products in the package
+                orderItems = selectedPackage.packageProducts.map((packageProduct) => {
+                    // Map variants directly from package data
+                    const orderItemVariant = packageProduct.packageProductVariants.map((variant) => ({
+                        productVariantId: variant.productVariantId || "",
+                        productVariantOptionId: variant.productVariantOptionId,
+                    }));
+
+                    return {
+                        productId: packageProduct.productId,
+                        quantity: packageProduct.quantity,
+                        orderItemVariant,
+                    };
+                });
+            } else {
+                // Normal product order
+                const orderItemVariant = Object.entries(selectedVariants).map(([variantId, option]) => ({
+                    productVariantId: variantId,
+                    productVariantOptionId: option.id,
+                }));
+
+                orderItems = [
+                    {
+                        productId: product.id,
+                        quantity: 1,
+                        orderItemVariant,
+                    },
+                ];
             }
 
             const payload: CreateOrderPayload = {
@@ -152,13 +187,7 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
                 deliveryZoneId: selectedDeliveryZone || product?.delivery?.deliveryZones?.[0]?.id || "",
                 orderStatus: OrderStatus.PLACED,
                 orderSource,
-                orderItems: [
-                    {
-                        productId: product.id,
-                        quantity: 1,
-                        orderItemVariant,
-                    },
-                ],
+                orderItems,
                 trackingData,
             };
 
@@ -191,6 +220,26 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
                 })
             );
 
+            // Track TikTok Purchase event if TikTok tracking information is present
+            if (isTikTok) {
+                // Build contents array for TikTok Purchase event
+                const contents = selectedPackage
+                    ? buildTikTokPackageContents(selectedPackage, product)
+                    : buildTikTokProductContents(product, selectedVariants, 1);
+
+                // Track TikTok CompletePayment event
+                trackTikTokEvent(
+                    "CompletePayment",
+                    {
+                        contents,
+                        value: totalAmount,
+                        currency: "BDT",
+                        order_id: data?.data?.orderSerialNumber || data?.data?.id,
+                    },
+                    trackingData
+                );
+            }
+
             toast.success("অর্ডার সফলভাবে সম্পন্ন হয়েছে! ✅");
 
             // Redirect to success page
@@ -208,15 +257,56 @@ export const useOrderForm = (product: Product, shopSlug: string) => {
         }
     };
 
+    // Calculate total amount
+    const calculateTotal = (): number => {
+        let total: number;
+
+        if (selectedPackage) {
+            // Use package price
+            total = selectedPackage.codAmount;
+        } else {
+            // Use product price
+            total = product.discountPrice;
+
+            // Add variant extra prices
+            Object.values(selectedVariants).forEach((option) => {
+                total += option.extraPrice;
+            });
+        }
+
+        // Add delivery zone fee
+        const selectedZone = product.delivery?.deliveryZones?.find((zone) => zone.id === selectedDeliveryZone);
+        if (selectedZone) {
+            total += selectedZone.fee;
+        }
+
+        return total;
+    };
+
+    const totalAmount = calculateTotal();
+
+    const handlePackageSelect = (packageId: string | null) => {
+        if (packageId) {
+            const pkg = packages.find((p) => p.id === packageId);
+            setSelectedPackage(pkg || null);
+        } else {
+            setSelectedPackage(null);
+        }
+    };
+
     return {
         formData,
         errors,
         isSubmitting,
         selectedDeliveryZone,
         selectedVariants,
+        selectedPackage,
+        packages,
+        totalAmount,
         handleInputChange,
         handleVariantChange,
         setSelectedDeliveryZone,
+        handlePackageSelect,
         handleSubmit,
     };
 };

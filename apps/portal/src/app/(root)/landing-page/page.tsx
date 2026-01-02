@@ -2,14 +2,11 @@
 
 import { useState } from "react";
 
-import { config } from "@/config";
+import { LandingPageCard } from "@/features/landing-builder/components/landing-page-card";
 import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
 import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { formatDateWithTime } from "@workspace/ui/lib/formateDate";
-import { Calendar, Edit, ExternalLink, Globe } from "lucide-react";
 
 import { CustomButton } from "@/components/ui/custom-button";
 import { DataStateHandler } from "@/components/shared/data-state-handler";
@@ -21,10 +18,6 @@ const Page = () => {
     const { data, isLoading, isError } = useGetLandingPagesQuery({
         shopId: user?.shop.id,
     });
-
-    const getLandingPageUrl = (pageSlug: string) => {
-        return `${config.nodeEnv === "development" ? "http" : "https"}://${user?.shop?.slug}.${config.rootDomain}/${pageSlug}`;
-    };
 
     return (
         <>
@@ -50,42 +43,7 @@ const Page = () => {
                 >
                     {(landingPages) =>
                         landingPages.map((landingPage) => (
-                            <Card key={landingPage.id} className="transition-shadow duration-200 hover:shadow-lg">
-                                <CardHeader>
-                                    <CardTitle className="sub-title line-clamp-2">{landingPage.name}</CardTitle>
-
-                                    <CardDescription className="flex items-center gap-1 text-sm">
-                                        <Globe className="size-3" />/{landingPage.slug}
-                                    </CardDescription>
-                                </CardHeader>
-
-                                <CardContent className="pt-0">
-                                    <div className="text-muted-foreground flex items-center gap-1 text-sm">
-                                        <Calendar className="size-3" />
-                                        Created : {formatDateWithTime(landingPage.createdAt)}
-                                    </div>
-                                </CardContent>
-
-                                <CardFooter className="grid grid-cols-2 gap-4">
-                                    <CustomButton
-                                        variant="outline"
-                                        href={`/landing-page/builder?productId=${landingPage.productId}`}
-                                        className="w-full"
-                                    >
-                                        <Edit className="size-4" />
-                                        Edit Page
-                                    </CustomButton>
-
-                                    <CustomButton
-                                        target="_blank"
-                                        href={getLandingPageUrl(landingPage.slug)}
-                                        className="w-full"
-                                    >
-                                        <ExternalLink className="size-4" />
-                                        View Page
-                                    </CustomButton>
-                                </CardFooter>
-                            </Card>
+                            <LandingPageCard key={landingPage.id} landingPage={landingPage} />
                         ))
                     }
                 </DataStateHandler>

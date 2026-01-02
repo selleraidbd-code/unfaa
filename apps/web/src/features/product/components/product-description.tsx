@@ -1,30 +1,50 @@
-"use client";
-
 import { memo } from "react";
+import Image from "next/image";
 
-import { Product } from "@/types/product-type";
 import { HtmlRenderer } from "@/components/shared/html-renderer";
 
 type Props = {
-    product: Product;
+    description: string;
     imageTwo?: string;
     imageThree?: string;
+    fullDescription: string;
 };
 
-export const ProductDescription = memo(function ProductDescription({ product, imageTwo, imageThree }: Props) {
+export const ProductDescription = memo(function ProductDescription({
+    description,
+    imageTwo,
+    imageThree,
+    fullDescription,
+}: Props) {
     return (
         <>
-            <div className="mb-4 rounded-xl border-l-6 border-blue-500 bg-blue-50 p-5">
+            <div className="mb-4 rounded-xl border-l-4 border-blue-500 bg-blue-50 p-5 lg:border-l-6">
                 <h3 className="mb-3 text-xl font-bold text-blue-600">সংক্ষিপ্ত বিবরণ</h3>
-                <HtmlRenderer html={product.description} />
+                <HtmlRenderer html={description} />
             </div>
-            {imageTwo && <img src={imageTwo} alt="Product" className="mb-4 w-full rounded-xl shadow-md" />}
+            {imageTwo && (
+                <Image
+                    src={imageTwo}
+                    alt="Product"
+                    className="mb-4 w-full rounded-xl shadow-md"
+                    width={1000}
+                    height={1000}
+                />
+            )}
 
-            <div className="mb-4 rounded-xl border-l-6 border-gray-500 bg-gray-100 p-5">
+            <div className="mb-4 rounded-xl border-l-4 border-gray-500 bg-gray-100 p-5 lg:border-l-6">
                 <h3 className="mb-3 text-xl font-bold text-gray-700">বিস্তারিত বিবরণ</h3>
-                <HtmlRenderer html={product.fullDescription} />
+                <HtmlRenderer html={fullDescription} />
             </div>
-            {imageThree && <img src={imageThree} alt="Product" className="mb-4 w-full rounded-xl shadow-md" />}
+            {imageThree && (
+                <Image
+                    src={imageThree}
+                    alt="Product"
+                    className="mb-4 w-full rounded-xl shadow-md"
+                    width={1000}
+                    height={1000}
+                />
+            )}
         </>
     );
 });

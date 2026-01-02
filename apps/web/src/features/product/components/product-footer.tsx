@@ -1,17 +1,14 @@
-"use client";
-
 import { memo } from "react";
 import Link from "next/link";
 
-import { Product } from "@/types/product-type";
 import { getLink } from "@/lib/get-link";
 
 type Props = {
-    product: Product;
+    banglaName: string;
     shopSlug: string;
 };
 
-export const ProductFooter = memo(function ProductFooter({ product, shopSlug }: Props) {
+export const ProductFooter = memo(function ProductFooter({ banglaName, shopSlug }: Props) {
     return (
         <footer className="mt-8 border-t border-gray-200 pt-6 text-center text-gray-600">
             <p className="mb-2">
@@ -24,7 +21,7 @@ export const ProductFooter = memo(function ProductFooter({ product, shopSlug }: 
                 </Link>
             </p>
             <p>
-                © {new Date().getFullYear()} {product.banglaName}
+                © {new Date().getFullYear()} {banglaName}
             </p>
         </footer>
     );

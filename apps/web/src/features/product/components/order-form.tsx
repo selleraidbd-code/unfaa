@@ -12,11 +12,12 @@ type Props = {
         phone?: string;
     };
     isSubmitting: boolean;
+    totalAmount: number;
     onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;
 };
 
-export const OrderForm = ({ formData, errors, isSubmitting, onInputChange, onSubmit }: Props) => {
+export const OrderForm = ({ formData, errors, isSubmitting, totalAmount, onInputChange, onSubmit }: Props) => {
     return (
         <div className="mb-6 space-y-4">
             <div>
@@ -40,9 +41,7 @@ export const OrderForm = ({ formData, errors, isSubmitting, onInputChange, onSub
                     placeholder="সম্পূর্ণ ঠিকানা (জেলা, থানা ও গ্রামের নাম)"
                     className="w-full rounded-xl border-2 border-gray-300 px-4 py-4 text-lg transition-colors focus:border-green-600 focus:outline-none"
                 />
-                {errors.address && (
-                    <p className="mt-2 text-sm font-semibold text-red-600">{errors.address}</p>
-                )}
+                {errors.address && <p className="mt-2 text-sm font-semibold text-red-600">{errors.address}</p>}
             </div>
 
             <div>
@@ -57,16 +56,12 @@ export const OrderForm = ({ formData, errors, isSubmitting, onInputChange, onSub
                 {errors.phone && <p className="mt-2 text-sm font-semibold text-red-600">{errors.phone}</p>}
             </div>
 
-            <div className="rounded-lg border-l-4 border-yellow-500 bg-yellow-50 p-4 font-bold">
-                💵 ক্যাশ অন ডেলিভারি: প্রোডাক্ট হাতে পেয়ে টাকা পরিশোধ করবেন।
-            </div>
-
             <button
                 onClick={onSubmit}
                 disabled={isSubmitting}
                 className="w-full rounded-xl bg-green-600 py-5 text-xl font-bold text-white shadow-lg transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
             >
-                {isSubmitting ? "অর্ডার করা হচ্ছে..." : "এখনই অর্ডার করুন"}
+                {isSubmitting ? "অর্ডার করা হচ্ছে..." : `অর্ডার করুন (${totalAmount?.toLocaleString()} টাকা)`}
             </button>
         </div>
     );

@@ -21,7 +21,7 @@ export const ProductSelectionCard = ({
     return (
         <div
             className={cn(
-                "relative h-fit w-[156px] space-y-2 rounded-md border-2 p-2 sm:w-40 sm:p-4 lg:w-44",
+                "hover:border-primary relative h-fit w-[156px] cursor-pointer space-y-2 rounded-md border-2 p-2 sm:w-40 sm:p-4 lg:w-44",
                 isSelected && "border-primary"
             )}
             onClick={() => onSelect?.(product.id)}

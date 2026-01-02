@@ -1,6 +1,7 @@
 "use client";
 
 import { memo } from "react";
+import Image from "next/image";
 
 import { Package } from "lucide-react";
 
@@ -19,7 +20,13 @@ export const ProductImageGallery = memo(function ProductImageGallery({
         <div className="relative mb-4 aspect-square overflow-hidden rounded-xl bg-gray-100">
             {photoURL ? (
                 <>
-                    <img src={photoURL} alt={productName} className="h-full w-full object-contain" />
+                    <Image
+                        src={photoURL}
+                        alt={productName}
+                        className="h-full w-full object-contain"
+                        width={1000}
+                        height={1000}
+                    />
                     {discountPercent !== undefined && discountPercent > 0 && (
                         <div className="absolute top-4 right-4 rounded-full bg-red-600 px-3 py-2 font-bold text-white shadow-lg">
                             {discountPercent}% ছাড়

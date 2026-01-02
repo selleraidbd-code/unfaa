@@ -3,9 +3,7 @@ import { UrlObject } from "url";
 
 export interface ComponentProps {
     data?: Section;
-    Link?: React.ComponentType<
-        React.ComponentProps<"a"> & { href: string | UrlObject }
-    >;
+    Link?: React.ComponentType<React.ComponentProps<"a"> & { href: string | UrlObject }>;
     Image?: React.ComponentType<React.ImgHTMLAttributes<HTMLImageElement>>;
 }
 
@@ -107,4 +105,10 @@ export interface ComponentData {
     description: string;
     fieldLabel?: string | unknown;
     defaultValue?: Section;
+}
+
+export enum EPageType {
+    EASY_WITH_FAQ = "EASY_WITH_FAQ",
+    ADVANCED = "ADVANCED",
+    TEMPLATE = "TEMPLATE",
 }

@@ -1,26 +1,32 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 
+import { FeaturedProducts } from "@/features/product/components/featured-products";
+import { OrderSection } from "@/features/product/components/order-section";
+import { ProductDescription } from "@/features/product/components/product-description";
+import { ProductFAQ } from "@/features/product/components/product-faq";
+import { ProductFooter } from "@/features/product/components/product-footer";
+import { ProductImageGallery } from "@/features/product/components/product-image-gallery";
+import { ProductPricing } from "@/features/product/components/product-pricing";
+import { ProductVideo } from "@/features/product/components/product-video";
+import { ProductWarranty } from "@/features/product/components/product-warranty";
+import { useOrderForm } from "@/features/product/hooks/use-order-form";
+import { Section } from "@workspace/ui/landing/types";
+
+import { FeatureProduct } from "@/types/landing-type";
 import { Product } from "@/types/product-type";
-
-import { CashOnDeliveryBanner } from "./components/cash-on-delivery-banner";
-import { OrderSection } from "./components/order-section";
-import { ProductDescription } from "./components/product-description";
-import { ProductFooter } from "./components/product-footer";
-import { ProductHeader } from "./components/product-header";
-import { ProductImageGallery } from "./components/product-image-gallery";
-import { ProductPricing } from "./components/product-pricing";
-import { ProductVideo } from "./components/product-video";
-import { ProductWarranty } from "./components/product-warranty";
-import { useOrderForm } from "./hooks/use-order-form";
 
 type Props = {
     product: Product;
+    featureProducts: FeatureProduct[];
+    title: string;
     shopSlug: string;
+    section: Section | undefined;
 };
 
-export const ProductPageDetails = ({ product, shopSlug }: Props) => {
+export const ProductPageDetails = ({ product, featureProducts, title, shopSlug, section }: Props) => {
     const discountPercent = useMemo(
         () =>
             product.discountPrice < product.price
@@ -35,9 +41,13 @@ export const ProductPageDetails = ({ product, shopSlug }: Props) => {
         isSubmitting,
         selectedDeliveryZone,
         selectedVariants,
+        selectedPackage,
+        packages,
+        totalAmount,
         handleInputChange,
         handleVariantChange,
         setSelectedDeliveryZone,
+        handlePackageSelect,
         handleSubmit,
     } = useOrderForm(product, shopSlug);
 
@@ -48,43 +58,80 @@ export const ProductPageDetails = ({ product, shopSlug }: Props) => {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-4" style={{ fontFamily: "'Noto Sans Bengali', sans-serif" }}>
-            <ProductHeader product={product} />
+            <div className="mx-auto max-w-2xl space-y-4 rounded-xl bg-white px-4 py-6 shadow-lg lg:space-y-6">
+                <h1 className="px-4 text-center text-3xl leading-snug font-bold text-red-600">
+                    {title || product.banglaName}
+                </h1>
 
-            <div className="mx-auto my-6 max-w-3xl rounded-xl bg-white px-4 py-6 shadow-lg">
                 <ProductImageGallery
                     photoURL={product.photoURL}
                     productName={product.name}
                     discountPercent={discountPercent}
                 />
 
-                <ProductPricing product={product} />
+                <ProductPricing price={product.price} discountPrice={product.discountPrice} />
 
-                {imageOne && <img src={imageOne} alt="Product" className="mb-4 w-full rounded-xl shadow-md" />}
+                {imageOne && (
+                    <Image
+                        src={imageOne}
+                        alt="Product"
+                        className="w-full rounded-xl shadow-md"
+                        width={1000}
+                        height={1000}
+                    />
+                )}
 
-                <ProductDescription product={product} imageTwo={imageTwo} imageThree={imageThree} />
+                <ProductDescription
+                    description={product.description}
+                    imageTwo={imageTwo}
+                    imageThree={imageThree}
+                    fullDescription={product.fullDescription}
+                />
 
                 {product.warranty && <ProductWarranty warranty={product.warranty} />}
 
-                <CashOnDeliveryBanner />
+                <div className="rounded-xl bg-gradient-to-r from-red-600 to-red-400 p-2 text-center font-bold text-white md:p-6">
+                    <div className="text-lg leading-relaxed">
+                        🚚 আপনি রাইডারের সামনে প্রোডাক্ট চেক করে তারপরে রাইডারকে টাকা দিবেন।
+                        <br />
+                        💰 অগ্রীম এক টাকাও দেয়া লাগবে না!
+                    </div>
+                </div>
 
                 {product.videoLink && <ProductVideo videoLink={product.videoLink} />}
 
-                {imageFour && <img src={imageFour} alt="Product" className="mb-4 w-full rounded-xl shadow-md" />}
+                {imageFour && (
+                    <Image
+                        src={imageFour}
+                        alt="Product"
+                        className="mb-4 w-full rounded-xl shadow-md"
+                        width={1000}
+                        height={1000}
+                    />
+                )}
+
+                {section && <ProductFAQ section={section} />}
 
                 <OrderSection
                     product={product}
+                    packages={packages}
                     formData={formData}
                     errors={errors}
                     isSubmitting={isSubmitting}
                     selectedDeliveryZone={selectedDeliveryZone}
                     selectedVariants={selectedVariants}
+                    selectedPackage={selectedPackage}
+                    totalAmount={totalAmount}
                     handleInputChange={handleInputChange}
                     handleVariantChange={handleVariantChange}
                     setSelectedDeliveryZone={setSelectedDeliveryZone}
+                    handlePackageSelect={handlePackageSelect}
                     handleSubmit={handleSubmit}
                 />
 
-                <ProductFooter product={product} shopSlug={shopSlug} />
+                <FeaturedProducts featureProducts={featureProducts} shopSlug={shopSlug} />
+
+                <ProductFooter banglaName={product.banglaName} shopSlug={shopSlug} />
             </div>
         </div>
     );

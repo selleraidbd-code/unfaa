@@ -1,25 +1,11 @@
 import { api } from "@/redux/api";
-import {
-    METHOD,
-    PaginatedResponse,
-    QueryParams,
-    ResponseObject,
-    TagType,
-} from "@/redux/type";
+import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
 
-import { LandingPage, LandingPageDemo } from "@/types/landing-page-type";
+import { CreateLandingPagePayload, LandingPage, LandingPageDemo } from "@/types/landing-page-type";
 
 const landingPageApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        createLandingPage: builder.mutation({
-            query: (payload) => ({
-                url: `/landingPageLayout`,
-                method: METHOD.POST,
-                body: payload,
-            }),
-            invalidatesTags: [TagType.LandingPage],
-        }),
-        createLandingPageWithSection: builder.mutation({
+        createLandingPage: builder.mutation<void, CreateLandingPagePayload>({
             query: (payload) => ({
                 url: `/landingPageLayout/build-landing-layout-with-section`,
                 method: METHOD.POST,
@@ -27,7 +13,7 @@ const landingPageApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.LandingPage],
         }),
-        createLandingPageDemoWithSection: builder.mutation({
+        createLandingPageDemoWithSection: builder.mutation<void, CreateLandingPagePayload>({
             query: (payload) => ({
                 url: `/landingPageLayout/build-landing-layout-demo-with-section`,
                 method: METHOD.POST,
@@ -50,10 +36,7 @@ const landingPageApi = api.injectEndpoints({
                 body: payload.sections,
             }),
         }),
-        getLandingPages: builder.query<
-            PaginatedResponse<LandingPage>,
-            QueryParams
-        >({
+        getLandingPages: builder.query<PaginatedResponse<LandingPage>, QueryParams>({
             query: (queryParams) => ({
                 url: `/landingPageLayout`,
                 method: METHOD.GET,
@@ -61,20 +44,14 @@ const landingPageApi = api.injectEndpoints({
             }),
             providesTags: [TagType.LandingPage],
         }),
-        getLandingPage: builder.query<
-            ResponseObject<LandingPage>,
-            { slug: string }
-        >({
+        getLandingPage: builder.query<ResponseObject<LandingPage>, { slug: string }>({
             query: ({ slug }) => ({
                 url: `/landingPageLayout/${slug}`,
                 method: METHOD.GET,
             }),
             providesTags: [TagType.LandingPage],
         }),
-        getLandingPageWithProductId: builder.query<
-            ResponseObject<LandingPageDemo>,
-            { productId: string }
-        >({
+        getLandingPageWithProductId: builder.query<ResponseObject<LandingPageDemo>, { productId: string }>({
             query: ({ productId }) => ({
                 url: `/landingPageLayout/${productId}`,
                 method: METHOD.GET,
@@ -101,7 +78,6 @@ const landingPageApi = api.injectEndpoints({
 
 export const {
     useCreateLandingPageMutation,
-    useCreateLandingPageWithSectionMutation,
     useCreateLandingPageDemoWithSectionMutation,
     useAddSectionToLandingPageMutation,
     useAddFooterOrNavbarSectionToLandingPageMutation,

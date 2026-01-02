@@ -2,52 +2,40 @@
 
 import { useRouter } from "next/navigation";
 
-import { AddSectionComponent } from "@/features/landing-builder/components/add-section-component";
-import {
-    clearLandingPage,
-    setEditing,
-    setLandingPageData,
-} from "@/redux/slices/landing-page-slice";
-import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
-import { toast } from "@workspace/ui/components/sonner";
-
-import { FileUpload } from "@/components/file-upload";
-import { CustomButton } from "@/components/ui/custom-button";
 import { shopTypes } from "@/data/shop-data";
+import { AddSectionComponent } from "@/features/landing-builder/components/add-section-component";
 import { ShowSelectedSection } from "@/features/landing-builder/components/show-selected-section";
 import { useCreateLandingPageDemoWithSectionMutation } from "@/redux/api/landing-page-api";
-import { SiteType } from "@/types/landing-page-type";
+import { clearLandingPage, setEditing, setLandingPageData } from "@/redux/slices/landing-page-slice";
+import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import { CustomSelect } from "@workspace/ui/components/custom/custom-select";
 import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea";
+import { toast } from "@workspace/ui/components/sonner";
 import { Switch } from "@workspace/ui/components/switch";
+import { EPageType } from "@workspace/ui/landing/types";
 import { useTheme } from "next-themes";
+
+import { CreateLandingPagePayload, SiteType } from "@/types/landing-page-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { FileUpload } from "@/components/file-upload";
 
 const CreateTemplate = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const { theme } = useTheme();
-    const portfolioName = useAppSelector(
-        (state) => state.landingPage.landingPageData.name
-    );
-    const portfolioKeyword = useAppSelector(
-        (state) => state.landingPage.landingPageData.keyword
-    );
-    const portfolioImage = useAppSelector(
-        (state) => state.landingPage.landingPageData.imgUrl
-    );
-    const shopCategory = useAppSelector(
-        (state) => state.landingPage.landingPageData.category
-    );
 
-    const landingPageSections = useAppSelector(
-        (state) => state.landingPage.landingPageSections
-    );
+    const user = useAppSelector((state) => state.auth.user);
+    const shopId = user?.shop.id;
+    const portfolioName = useAppSelector((state) => state.landingPage.landingPageData.name);
+    const portfolioKeyword = useAppSelector((state) => state.landingPage.landingPageData.keyword);
+    const portfolioImage = useAppSelector((state) => state.landingPage.landingPageData.imgUrl);
+    const shopCategory = useAppSelector((state) => state.landingPage.landingPageData.category);
+
+    const landingPageSections = useAppSelector((state) => state.landingPage.landingPageSections);
     const isEditing = useAppSelector((state) => state.landingPage.isEditing);
 
-    const [createLandingPageDemoWithSection, { isLoading }] =
-        useCreateLandingPageDemoWithSectionMutation();
+    const [createLandingPageDemoWithSection, { isLoading }] = useCreateLandingPageDemoWithSectionMutation();
 
     const handleSave = async () => {
         if (isLoading) {
@@ -66,24 +54,21 @@ const CreateTemplate = () => {
             index: i,
         }));
 
-        const data = {
+        const data: CreateLandingPagePayload = {
             section,
-            theme: `${theme}`,
-            siteType: SiteType.TEMPLATE,
+            shopId: shopId || "",
+            productId: "",
             name: portfolioName,
             keyword: portfolioKeyword,
-            imgURL: portfolioImage,
-            landingPageLayoutType: shopCategory,
+            pageType: EPageType.TEMPLATE,
         };
 
         await createLandingPageDemoWithSection(data)
             .unwrap()
             .then((res) => {
-                if (res.data) {
-                    dispatch(clearLandingPage());
-                    toast.success("Template created successfully");
-                    router.push(`/templates`);
-                }
+                dispatch(clearLandingPage());
+                toast.success("Template created successfully");
+                router.push(`/templates`);
             })
             .catch((err) => {
                 toast.error(err?.data?.message || "Something went wrong");

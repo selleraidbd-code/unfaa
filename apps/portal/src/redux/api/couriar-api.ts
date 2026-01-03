@@ -1,16 +1,7 @@
 import { api } from "@/redux/api";
-import {
-    METHOD,
-    PaginatedResponse,
-    QueryParams,
-    ResponseObject,
-    TagType,
-} from "@/redux/type";
-import {
-    CourierSetup,
-    CreateCourierSetup,
-    RiderNote,
-} from "@/types/courier-type";
+import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
+
+import { CourierSetup, CreateCourierSetup, RiderNote } from "@/types/courier-type";
 
 const courierApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -22,34 +13,33 @@ const courierApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Courier],
         }),
-        courierEntry: builder.mutation<void, { ids: string[]; shopId: string }>(
-            {
-                query: (payload) => ({
-                    url: `/order/courior-entry/${payload.shopId}`,
-                    method: METHOD.POST,
-                    body: { ids: payload.ids },
-                }),
-            }
-        ),
-        getCourierSetup: builder.query<
-            ResponseObject<CourierSetup>,
-            { shopId: string }
-        >({
+        courierEntry: builder.mutation<void, { ids: string[]; shopId: string }>({
+            query: (payload) => ({
+                url: `/order/courior-entry/${payload.shopId}`,
+                method: METHOD.POST,
+                body: { ids: payload.ids },
+            }),
+        }),
+        getCourierSetup: builder.query<ResponseObject<CourierSetup>, { shopId: string }>({
             query: ({ shopId }) => ({
                 url: `/shop-courier-setup/${shopId}`,
                 method: METHOD.GET,
             }),
             providesTags: [TagType.Courier],
         }),
-        getSteadfastRiderNote: builder.query<
-            PaginatedResponse<RiderNote>,
-            QueryParams
-        >({
+        getSteadfastRiderNote: builder.query<PaginatedResponse<RiderNote>, QueryParams>({
             query: (params) => ({
                 url: `/stead-fast-courier-webhook-response`,
                 method: METHOD.GET,
                 params,
             }),
+        }),
+        reCheckCourierStatus: builder.mutation<void, { shopId: string }>({
+            query: ({ shopId }) => ({
+                url: `/order/re-check-courior-status/${shopId}`,
+                method: METHOD.PATCH,
+            }),
+            invalidatesTags: [TagType.Order],
         }),
     }),
 });
@@ -59,4 +49,5 @@ export const {
     useCourierEntryMutation,
     useGetCourierSetupQuery,
     useGetSteadfastRiderNoteQuery,
+    useReCheckCourierStatusMutation,
 } = courierApi;

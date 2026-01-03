@@ -10,6 +10,8 @@ import { cn } from "@workspace/ui/lib/utils";
 import { Calendar, FileText, MapPin, Package, Phone, User } from "lucide-react";
 
 import { CourierStatus, OrderStatus } from "@/types/order-type";
+import { useUpdateCourierStatus } from "@/hooks/useUpdateCourierStatus";
+import { CustomButton } from "@/components/ui/custom-button";
 import { CustomPagination, PaginationMeta } from "@/components/ui/custom-pagination";
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 
@@ -31,10 +33,28 @@ export const PendingParcel = () => {
         limit: Number(limit),
     });
 
+    const { isButtonEnabled, isUpdating, timeRemaining, updateAllStatuses } = useUpdateCourierStatus({
+        shopId: shop?.id,
+    });
+
     const paginationMeta: PaginationMeta = {
         page: Number(page),
         limit: Number(limit),
         total: pendingData?.meta?.total || 0,
+    };
+
+    const formatTimeRemaining = (seconds: number | null): string => {
+        if (seconds === null) return "";
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        if (hours > 0) {
+            return `${hours}h ${minutes}m ${secs}s`;
+        }
+        if (minutes > 0) {
+            return `${minutes}m ${secs}s`;
+        }
+        return `${secs}s`;
     };
 
     const getStatusColor = (status: OrderStatus) => {
@@ -79,8 +99,25 @@ export const PendingParcel = () => {
         >
             {(pendingData) => (
                 <>
-                    <div className="mb-4 text-sm text-gray-600">
-                        Total Pending Parcels: {pendingData?.meta?.total || 0}
+                    <div className="mb-4 flex items-center justify-between">
+                        <h2 className="text-sm text-gray-600">
+                            Total Pending Parcels: {pendingData?.meta?.total || 0}
+                        </h2>
+
+                        <div className="flex items-center gap-2">
+                            {!isButtonEnabled && timeRemaining !== null && (
+                                <span className="text-xs text-gray-500">
+                                    Available in: {formatTimeRemaining(timeRemaining)}
+                                </span>
+                            )}
+                            <CustomButton
+                                onClick={updateAllStatuses}
+                                disabled={!isButtonEnabled || isUpdating}
+                                isLoading={isUpdating}
+                            >
+                                Update Status
+                            </CustomButton>
+                        </div>
                     </div>
                     <div className="mb-2 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {pendingData?.data?.map((order) => (

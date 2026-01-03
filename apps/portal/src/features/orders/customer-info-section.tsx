@@ -1,12 +1,15 @@
 import { useState } from "react";
+import Link from "next/link";
 
 import { useUpdateOrderMutation } from "@/redux/api/order-api";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
+import { CustomTextCopy } from "@workspace/ui/components/custom/custom-text-copy";
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "@workspace/ui/components/sonner";
-import { Edit2, Phone, X } from "lucide-react";
+import { Edit2, MapPin, Phone, Truck, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { Order } from "@/types/order-type";
@@ -147,16 +150,19 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
         <div className="space-y-2 rounded-sm border p-3 md:space-y-4 md:rounded-lg md:p-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-base">Customer Information</h3>
-                <CustomButton
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditing(true)}
-                    isLoading={isUpdating}
-                >
-                    <Edit2 />
-                    Edit
-                </CustomButton>
+                <div className="flex items-center gap-1">
+                    <Badge>{order?.orderSource}</Badge>
+                    <CustomButton
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditing(true)}
+                        isLoading={isUpdating}
+                    >
+                        <Edit2 />
+                        Edit
+                    </CustomButton>
+                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
@@ -173,12 +179,16 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
                     <p className="font-medium">৳ {order?.discountedPrice ?? order?.totalAmount ?? 0}</p>
                 </div>
 
-                <div className="flex items-end gap-4 max-md:col-span-2">
+                <div className="flex items-end gap-1.5 max-md:col-span-2">
                     <div className="flex gap-1 max-md:items-center md:flex-col">
                         <p className="text-muted-foreground flex-shrink-0 text-sm">
                             Phone <span className="max-md:hidden">Number</span> <span className="md:hidden">:</span>
                         </p>
-                        <p className="font-medium max-sm:text-sm">{order?.customerPhoneNumber || "N/A"}</p>
+                        <CustomTextCopy
+                            text={order?.customerPhoneNumber || "N/A"}
+                            copy={true}
+                            textClassName=" max-sm:text-sm"
+                        />
                     </div>
                     <button
                         className="bg-primary text-primary-foreground flex items-center gap-1 rounded-sm px-4 py-1 text-xs sm:px-2 sm:text-sm"
@@ -187,6 +197,16 @@ export const CustomerInfoSection = ({ order, onUpdate }: CustomerInfoSectionProp
                         <Phone className="size-4 max-sm:hidden" />
                         Call
                     </button>
+
+                    {order?.consignmentId && (
+                        <Link
+                            className="bg-primary text-primary-foreground center h-7 w-8 gap-1 rounded-sm text-xs sm:text-sm"
+                            href={`https://steadfast.com.bd/user/consignment/${order?.consignmentId}`}
+                            target="_blank"
+                        >
+                            <Truck className="size-4" />
+                        </Link>
+                    )}
                 </div>
             </div>
 

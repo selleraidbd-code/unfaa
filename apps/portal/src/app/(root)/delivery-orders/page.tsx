@@ -41,15 +41,15 @@ const Page = () => {
                     </CustomTabsTrigger>
                 </CustomTabsList>
 
-                <CustomTabsContent value="ready-for-dispatch">
+                <CustomTabsContent value="ready-for-dispatch" className="mt-4">
                     <ReadyToDispatch />
                 </CustomTabsContent>
 
-                <CustomTabsContent value="pending-parcel" className="mt-6">
+                <CustomTabsContent value="pending-parcel" className="mt-4">
                     <PendingParcel />
                 </CustomTabsContent>
 
-                <CustomTabsContent value="rider-note" className="mt-6">
+                <CustomTabsContent value="rider-note" className="mt-4">
                     <RiderNote />
                 </CustomTabsContent>
             </CustomTabs>

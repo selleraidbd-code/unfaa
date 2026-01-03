@@ -61,11 +61,13 @@ export const PackageSection = ({ shopId, productId }: PackageSectionProps) => {
     };
 
     return (
-        <div className="bg-card space-y-6 rounded-lg border p-6">
+        <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="mb-2 text-lg font-semibold">Packages</h2>
-                    <p className="text-muted-foreground text-sm">Create and manage product packages for your shop</p>
+                    <p className="text-muted-foreground text-sm max-sm:hidden">
+                        Create and manage product packages for your shop
+                    </p>
                 </div>
                 <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />

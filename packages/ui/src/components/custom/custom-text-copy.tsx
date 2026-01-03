@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+
 import { cn } from "@workspace/ui/lib/utils";
+import { Check, Copy } from "lucide-react";
 
 /**
  * CustomTextCopy Component
@@ -42,8 +43,11 @@ export const CustomTextCopy = ({
 }: CustomTextCopyProps) => {
     const [copied, setCopied] = useState(false);
 
-    const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
+    const handleCopy = async (e?: React.MouseEvent) => {
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
         try {
             await navigator.clipboard.writeText(text);
             setCopied(true);
@@ -61,8 +65,10 @@ export const CustomTextCopy = ({
         <div className={cn("flex items-center gap-2", className)}>
             {prefixText && prefixText}
             <span
+                onClick={!href ? handleCopy : undefined}
                 className={cn(
-                    "flex-1 text-primary line-clamp-1 font-medium text-base",
+                    "line-clamp-1 flex-1 text-base font-medium",
+                    href ? "text-blue-500" : "cursor-pointer hover:text-blue-500",
                     textClassName
                 )}
             >
@@ -77,16 +83,13 @@ export const CustomTextCopy = ({
             {copy && (
                 <button
                     onClick={handleCopy}
-                    className={cn(
-                        " cursor-pointer hover:text-primary",
-                        buttonClassName
-                    )}
+                    className={cn("hover:text-primary cursor-pointer", buttonClassName)}
                     title={copied ? "Copied!" : "Copy to clipboard"}
                 >
                     {copied ? (
-                        <Check className="w-4 h-4 text-green-600" />
+                        <Check className="h-4 w-4 text-green-600" />
                     ) : (
-                        <Copy className="w-4 h-4 text-muted-foreground" />
+                        <Copy className="text-muted-foreground h-4 w-4" />
                     )}
                 </button>
             )}

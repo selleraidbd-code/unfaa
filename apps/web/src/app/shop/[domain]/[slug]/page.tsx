@@ -1,3 +1,4 @@
+import { getLandingPages } from "@/actions/landing-page-actions";
 import { config } from "@/config";
 import { AdvanceLandingPageView } from "@/features/shop/landing-page/AdvanceLandingPageView";
 import { EasyLandingPageFAQView } from "@/features/shop/landing-page/EasyLandingPageFAQView";
@@ -12,20 +13,20 @@ type Props = {
 };
 
 // Function to fetch all available slugs for static generation
-// export async function generateStaticParams() {
-//     try {
-//         const response = await getLandingPages();
-//         if (!response?.data) {
-//             return [];
-//         }
-//         return response.data.map((layout: LandingPage) => ({
-//             slug: layout.slug,
-//         }));
-//     } catch (error) {
-//         console.error("Error fetching landing page layouts:", error);
-//         return [];
-//     }
-// }
+export async function generateStaticParams() {
+    try {
+        const response = await getLandingPages();
+        if (!response?.data) {
+            return [];
+        }
+        return response.data.map((layout: LandingPage) => ({
+            slug: layout.slug,
+        }));
+    } catch (error) {
+        console.error("Error fetching landing page layouts:", error);
+        return [];
+    }
+}
 
 async function getShopLayoutDetails(slug: string) {
     try {

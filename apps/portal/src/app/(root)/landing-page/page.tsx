@@ -21,11 +21,13 @@ const Page = () => {
 
     return (
         <>
-            <div className="space-y-6">
+            <div className="space-y-4 lg:space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-semibold tracking-tight">Landing Pages</h2>
-                        <p className="text-muted-foreground">Here&apos;s a list of your Landing Pages!</p>
+                        <h2 className="title lg:text-2xl">Landing Pages</h2>
+                        <p className="text-muted-foreground text-sm max-sm:hidden">
+                            Here&apos;s a list of your Landing Pages!
+                        </p>
                     </div>
 
                     <CustomButton onClick={() => setProductSelectModalOpen(true)}>Add Landing Page</CustomButton>

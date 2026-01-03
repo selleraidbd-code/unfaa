@@ -182,9 +182,9 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
     };
 
     return (
-        <div className="mx-auto max-w-3xl space-y-6 p-6">
-            <div className="flex items-center gap-3">
-                <div className="bg-primary/10 rounded-full p-2">
+        <div className="mx-auto max-w-3xl space-y-4 lg:space-y-6 lg:p-6">
+            <div className="flex items-center gap-2 lg:gap-3">
+                <div className="bg-primary/10 rounded-full p-1 lg:p-2">
                     <Button
                         type="button"
                         variant="ghost"
@@ -196,12 +196,14 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
                     </Button>
                 </div>
                 <div>
-                    <h1 className="title text-2xl">Easy Landing Page Builder</h1>
-                    <p className="text-muted-foreground text-sm">Create your landing page in just a few simple steps</p>
+                    <h1 className="title lg:text-2xl">Easy Landing Page Builder</h1>
+                    <p className="text-muted-foreground text-sm max-sm:hidden">
+                        Create your landing page in just a few simple steps
+                    </p>
                 </div>
             </div>
 
-            <div className="bg-card space-y-6 rounded-lg border p-6">
+            <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
                 <CustomInput
                     label="Landing Page Title"
                     placeholder="Enter landing page title"
@@ -212,7 +214,7 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
             </div>
 
             {/* FAQ Section */}
-            <div className="bg-card space-y-6 rounded-lg border p-6">
+            <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
                 <div>
                     <h2 className="mb-2 text-lg font-semibold">FAQ Section</h2>
                     <p className="text-muted-foreground text-sm">Add frequently asked questions to your landing page</p>
@@ -280,10 +282,12 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
             {shopId && <PackageSection shopId={shopId} productId={productId} />}
 
             {/* Featured Products Section */}
-            <div className="bg-card space-y-6 rounded-lg border p-6">
+            <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
                 <div>
                     <h2 className="mb-2 text-lg font-semibold">Featured Products</h2>
-                    <p className="text-muted-foreground text-sm">Select products to feature on your landing page</p>
+                    <p className="text-muted-foreground text-sm max-sm:hidden">
+                        Select products to feature on your landing page
+                    </p>
                 </div>
 
                 {selectedProducts.length === 0 ? (

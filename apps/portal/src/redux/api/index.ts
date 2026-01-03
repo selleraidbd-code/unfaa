@@ -1,9 +1,5 @@
 import { config } from "@/config";
-import {
-    logoutThunk,
-    setTokens,
-    setTokensThunk,
-} from "@/redux/slices/auth-slice";
+import { logoutThunk, setTokens, setTokensThunk } from "@/redux/slices/auth-slice";
 import { METHOD, ResponseObject, RootState, tagTypes } from "@/redux/type";
 import {
     BaseQueryFn,
@@ -15,7 +11,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { toast } from "@workspace/ui/components/sonner";
 
-export const API_TIMEOUT = 60_000;
+export const API_TIMEOUT = 120_000; // 2 minutes
 export const API_BASE_URL = config.serverUrl;
 
 export const baseQuery = fetchBaseQuery({
@@ -37,11 +33,11 @@ const baseQueryWithoutAuth = fetchBaseQuery({
     timeout: API_TIMEOUT,
 });
 
-export const baseQueryWithReAuth: BaseQueryFn<
-    string | FetchArgs,
-    unknown,
-    FetchBaseQueryError
-> = async (args, api, extraOptions) => {
+export const baseQueryWithReAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+    args,
+    api,
+    extraOptions
+) => {
     let result = await baseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {

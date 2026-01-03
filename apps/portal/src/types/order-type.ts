@@ -35,6 +35,7 @@ export enum CourierStatus {
 
 export type Order = {
     id: string;
+    orderSource: OrderSource;
     customerName: string;
     customerPhoneNumber: string;
     customerAddress: string;

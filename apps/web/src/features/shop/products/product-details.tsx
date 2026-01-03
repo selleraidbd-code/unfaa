@@ -80,7 +80,7 @@ export const ProductDetails = ({ product, shopSlug }: { product: Product; shopSl
 
                     <Separator className="my-4" />
 
-                    <ProductDetailsActionButtons product={product} />
+                    <ProductDetailsActionButtons product={product} shopSlug={shopSlug} />
                 </div>
             </div>
         </section>

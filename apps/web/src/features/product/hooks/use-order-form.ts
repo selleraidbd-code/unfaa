@@ -10,6 +10,7 @@ import { Package, WithProductPackage } from "@/types/landing-type";
 import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { getLink } from "@/lib/get-link";
+import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
 import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
 import { buildTikTokPackageContents, buildTikTokProductContents, trackTikTokEvent } from "@/hooks/use-tiktok-tracking";
 
@@ -220,6 +221,44 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                 })
             );
 
+            // Track Purchase event
+            const purchaseEventId = `purchase_${data?.data?.id || Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            const orderId = data?.data?.orderSerialNumber || data?.data?.id;
+            const categoryName = product.categories?.[0]?.category?.name || "Uncategorized";
+
+            // Track to backend
+            await trackEventToBackend(
+                "Purchase",
+                {
+                    event_id: purchaseEventId,
+                    external_id: orderId,
+                    content_name: product.name,
+                    content_category: categoryName,
+                    content_ids: [product.id],
+                    content_type: "product",
+                    value: totalAmount,
+                    currency: "BDT",
+                    user_data: {
+                        ...buildUserData(),
+                        phone: normalizedPhone,
+                        first_name: formData.name.split(/\s+/)[0] || "",
+                        last_name: formData.name.split(/\s+/).slice(1).join(" ") || "",
+                    },
+                },
+                shopSlug
+            );
+
+            // Track Facebook Pixel
+            trackFacebookPixel("Purchase", {
+                content_ids: [product.id],
+                content_type: "product",
+                content_name: product.name,
+                content_category: categoryName,
+                value: totalAmount,
+                currency: "BDT",
+                order_id: orderId,
+            });
+
             // Track TikTok Purchase event if TikTok tracking information is present
             if (isTikTok) {
                 // Build contents array for TikTok Purchase event
@@ -238,6 +277,18 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                     },
                     trackingData
                 );
+            } else {
+                // Track TikTok Pixel even if no tracking data
+                trackTikTokPixel("CompletePayment", {
+                    content_id: product.id,
+                    content_ids: [product.id],
+                    content_type: "product",
+                    content_name: product.name,
+                    content_category: categoryName,
+                    value: totalAmount,
+                    currency: "BDT",
+                    order_id: data?.data?.orderSerialNumber || data?.data?.id,
+                });
             }
 
             toast.success("অর্ডার সফলভাবে সম্পন্ন হয়েছে! ✅");

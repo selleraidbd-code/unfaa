@@ -15,8 +15,9 @@ import {
     validateVariantSelection,
     VariantSelection,
 } from "@/lib/cart";
+import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
 
-export const ProductDetailsActionButtons = ({ product }: { product: Product }) => {
+export const ProductDetailsActionButtons = ({ product, shopSlug }: { product: Product; shopSlug: string }) => {
     const variants = useMemo(() => product?.productVariant || [], [product?.productVariant]);
     const [variantSelection, setVariantSelection] = useState<VariantSelection>({});
     const [selectedVariants, setSelectedVariants] = useState<SelectedVariant[]>([]);
@@ -92,6 +93,53 @@ export const ProductDetailsActionButtons = ({ product }: { product: Product }) =
 
             cartStorage.addItem(cartItem);
             checkCartStatus(); // Update cart status
+
+            // Track AddToCart event
+            const eventId = `addtocart_${product.id}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            const itemPrice = product.discountPrice || product.price;
+            const variantExtraPrice = selectedVariants.reduce((sum, variant) => sum + variant.extraPrice, 0);
+            const totalValue = itemPrice + variantExtraPrice;
+
+            // Get category name
+            const categoryName = product.categories?.[0]?.category?.name || "Uncategorized";
+
+            // Track to backend
+            trackEventToBackend(
+                "AddToCart",
+                {
+                    event_id: eventId,
+                    content_name: product.name,
+                    content_category: categoryName,
+                    content_ids: [product.id],
+                    content_type: "product",
+                    value: totalValue,
+                    currency: "BDT",
+                    user_data: buildUserData(),
+                },
+                shopSlug
+            );
+
+            // Track Facebook Pixel
+            trackFacebookPixel("AddToCart", {
+                content_ids: [product.id],
+                content_type: "product",
+                content_name: product.name,
+                content_category: categoryName,
+                value: totalValue,
+                currency: "BDT",
+            });
+
+            // Track TikTok Pixel
+            trackTikTokPixel("AddToCart", {
+                content_id: product.id,
+                content_ids: [product.id],
+                content_type: "product",
+                content_name: product.name,
+                content_category: categoryName,
+                value: totalValue,
+                price: totalValue,
+                currency: "BDT",
+            });
 
             toast.success("Item added to cart successfully!");
         } catch (error) {

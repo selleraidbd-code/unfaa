@@ -48,7 +48,6 @@ async function getShopLayoutDetails(slug: string) {
 const PreviewPage = async ({ params }: Props) => {
     const { slug, domain } = await params;
     const shopLayoutData = await getShopLayoutDetails(slug);
-    console.log("shopLayoutData", shopLayoutData);
 
     if (!shopLayoutData) {
         return <LandingNotFound slug={slug} />;

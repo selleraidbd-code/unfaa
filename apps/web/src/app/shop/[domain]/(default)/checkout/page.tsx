@@ -18,6 +18,7 @@ import { z } from "zod";
 import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { CartItem, cartStorage } from "@/lib/cart";
 import { getLink } from "@/lib/get-link";
+import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
 import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 
@@ -88,6 +89,55 @@ const Page = () => {
         window.addEventListener("cart-updated", updateCart);
         return () => window.removeEventListener("cart-updated", updateCart);
     }, []);
+
+    // Track InitiateCheckout when checkout page loads
+    useEffect(() => {
+        if (cartItems.length === 0) return;
+
+        const trackInitiateCheckout = async () => {
+            const eventId = `initiatecheckout_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            const contentIds = cartItems.map((item) => item.productId);
+            const contentNames = cartItems.map((item) => item.name || "").filter(Boolean);
+            const totalValue = summary.total;
+
+            // Track to backend
+            await trackEventToBackend(
+                "InitiateCheckout",
+                {
+                    event_id: eventId,
+                    content_name: contentNames.join(", ") || "Cart Items",
+                    content_category: "checkout",
+                    content_ids: contentIds,
+                    content_type: "product",
+                    value: totalValue,
+                    currency: "BDT",
+                    user_data: buildUserData(),
+                },
+                shop.slug
+            );
+
+            // Track Facebook Pixel
+            trackFacebookPixel("InitiateCheckout", {
+                content_ids: contentIds,
+                content_type: "product",
+                value: totalValue,
+                currency: "BDT",
+                num_items: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+            });
+
+            // Track TikTok Pixel
+            trackTikTokPixel("InitiateCheckout", {
+                content_ids: contentIds,
+                content_type: "product",
+                value: totalValue,
+                currency: "BDT",
+            });
+        };
+
+        // Track after a short delay to ensure page is loaded
+        const timer = setTimeout(trackInitiateCheckout, 500);
+        return () => clearTimeout(timer);
+    }, [cartItems.length, summary.total, shop.slug]);
 
     useEffect(() => {
         const savedForm = localStorage.getItem("checkout_form");
@@ -181,6 +231,54 @@ const Page = () => {
 
             const data = await response.json();
             console.log("Order created:", data);
+
+            // Track Purchase event
+            const purchaseEventId = `purchase_${data?.data?.id || Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            const contentIds = cartItems.map((item) => item.productId);
+            const contentNames = cartItems.map((item) => item.name || "").filter(Boolean);
+            const totalValue = summary.total;
+            const orderId = data?.data?.orderSerialNumber || data?.data?.id;
+
+            // Track to backend
+            await trackEventToBackend(
+                "Purchase",
+                {
+                    event_id: purchaseEventId,
+                    external_id: orderId,
+                    content_name: contentNames.join(", ") || "Order",
+                    content_category: "purchase",
+                    content_ids: contentIds,
+                    content_type: "product",
+                    value: totalValue,
+                    currency: "BDT",
+                    user_data: {
+                        ...buildUserData(),
+                        phone: normalizedPhone,
+                        first_name: values.name.split(/\s+/)[0] || "",
+                        last_name: values.name.split(/\s+/).slice(1).join(" ") || "",
+                    },
+                },
+                shop.slug
+            );
+
+            // Track Facebook Pixel
+            trackFacebookPixel("Purchase", {
+                content_ids: contentIds,
+                content_type: "product",
+                value: totalValue,
+                currency: "BDT",
+                num_items: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+                order_id: orderId,
+            });
+
+            // Track TikTok Pixel
+            trackTikTokPixel("CompletePayment", {
+                content_ids: contentIds,
+                content_type: "product",
+                value: totalValue,
+                currency: "BDT",
+                order_id: orderId,
+            });
 
             // Clear cart and save form data
             cartStorage.clearCart();

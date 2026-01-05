@@ -7,6 +7,7 @@ import { orderStatusOptions, orderStatusOptionsMobile } from "@/features/orders/
 import { OrderDetailsWrapper } from "@/features/orders/order-details-wrapper";
 import { OrderMobileList } from "@/features/orders/order-mobile-list";
 import { OrderTable } from "@/features/orders/order-table";
+import { PackageGroupingDialog } from "@/features/orders/package-grouping-dialog";
 import { useCourierEntryMutation } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
@@ -39,6 +40,7 @@ const OrdersPage = () => {
     const [selectedRows, setSelectedRows] = useState<Order[]>([]);
     const [activeTab, setActiveTab] = useState<string>(status);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
 
     const { data, isLoading, isError } = useGetOrdersQuery({
         shopId: user?.shop?.id,
@@ -178,14 +180,19 @@ const OrdersPage = () => {
                             )}
                         </div>
 
-                        <CustomButton
-                            onClick={handleCourierEntry}
-                            disabled={selectedRows.length === 0 || isCourierEntryLoading}
-                        >
-                            <Truck />
-                            Send
-                            <span className="max-sm:hidden">to Courier</span>
-                        </CustomButton>
+                        <div className="flex items-center gap-2">
+                            <CustomButton variant="outline" onClick={() => setIsPackageDialogOpen(true)}>
+                                Package
+                            </CustomButton>
+                            <CustomButton
+                                onClick={handleCourierEntry}
+                                disabled={selectedRows.length === 0 || isCourierEntryLoading}
+                            >
+                                <Truck />
+                                Send
+                                <span className="max-sm:hidden">to Courier</span>
+                            </CustomButton>
+                        </div>
                     </div>
                 ) : (
                     <CustomSearch onSearch={handleSearch} placeholder="Search orders" />
@@ -228,6 +235,12 @@ const OrdersPage = () => {
                     order={selectedOrder}
                 />
             )}
+
+            <PackageGroupingDialog
+                isOpen={isPackageDialogOpen}
+                onClose={() => setIsPackageDialogOpen(false)}
+                orders={data?.data || []}
+            />
         </>
     );
 };

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { DispatchOrderCard } from "@/features/orders/dispatch-order-card";
+import { PackageGroupingDialog } from "@/features/orders/package-grouping-dialog";
 import { useGetCourierSetupQuery } from "@/redux/api/couriar-api";
 import { useGetOrdersQuery } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
@@ -26,6 +27,7 @@ export const ReadyToDispatch = () => {
 
     const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
     const [isExporting, setIsExporting] = useState(false);
+    const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
 
     // Cache generated blobs so repeated exports don't rebuild identical PDFs.
     // Cache promises so duplicate exports reuse the same work and resolve once.
@@ -231,17 +233,22 @@ export const ReadyToDispatch = () => {
                                 )}
                             </div>
 
-                            <CustomButton
-                                onClick={() => handleBulkPDFExport(selectedOrdersList)}
-                                disabled={selectedOrders.size === 0 || isExporting}
-                                isLoading={isExporting}
-                            >
-                                {isExporting
-                                    ? "Exporting..."
-                                    : selectedOrders.size > 0
-                                      ? `Export PDF${selectedOrders.size > 1 ? "s" : ""}`
-                                      : "Export PDF"}
-                            </CustomButton>
+                            <div className="flex items-center gap-2">
+                                <CustomButton variant="outline" onClick={() => setIsPackageDialogOpen(true)}>
+                                    Package
+                                </CustomButton>
+                                <CustomButton
+                                    onClick={() => handleBulkPDFExport(selectedOrdersList)}
+                                    disabled={selectedOrders.size === 0 || isExporting}
+                                    isLoading={isExporting}
+                                >
+                                    {isExporting
+                                        ? "Exporting..."
+                                        : selectedOrders.size > 0
+                                          ? `Export PDF${selectedOrders.size > 1 ? "s" : ""}`
+                                          : "Export PDF"}
+                                </CustomButton>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
@@ -267,6 +274,12 @@ export const ReadyToDispatch = () => {
                                 onLimitChange={handleLimitChange}
                             />
                         </div>
+
+                        <PackageGroupingDialog
+                            isOpen={isPackageDialogOpen}
+                            onClose={() => setIsPackageDialogOpen(false)}
+                            orders={orders}
+                        />
                     </>
                 );
             }}

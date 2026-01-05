@@ -8,6 +8,7 @@ import { CheckCircle } from "lucide-react";
 
 import { FraudCheckerData } from "@/types/customer-type";
 import { CreateOrder, OrderDetailsType, OrderItem, OrderSource, OrderStatus } from "@/types/order-type";
+import { formatPhoneNumber } from "@/lib/format-number-utils";
 
 interface Props {
     onReset: () => void;
@@ -71,8 +72,7 @@ export const PlaceOrder = ({
         const customerTotalConfirmOrder = fraudState?.total_delivered ?? 0;
         const customerTotalCancelOrder = fraudState?.total_cancel ?? 0;
 
-        // Remove country code from phone number if present
-        const phoneNumber = customerInfo.customerPhone.replace(/^\+88/, "");
+        const phoneNumber = formatPhoneNumber(customerInfo.customerPhone);
 
         // Build payload akin to make-order page
         const payload: CreateOrder = {

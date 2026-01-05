@@ -19,6 +19,7 @@ const courierApi = api.injectEndpoints({
                 method: METHOD.POST,
                 body: { ids: payload.ids },
             }),
+            invalidatesTags: [TagType.Order],
         }),
         getCourierSetup: builder.query<ResponseObject<CourierSetup>, { shopId: string }>({
             query: ({ shopId }) => ({

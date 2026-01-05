@@ -15,6 +15,7 @@ import { toast } from "@workspace/ui/components/sonner";
 
 import { FraudCheckerData } from "@/types/customer-type";
 import { AIOrderGenerationProductInfo, OrderDetailsType, OrderSource, OrderStatus } from "@/types/order-type";
+import { formatPhoneNumber } from "@/lib/format-number-utils";
 
 export type OrderDetails = {
     orderNotes: string;
@@ -67,7 +68,7 @@ const Page = () => {
 
         setIsCheckingFraud(true);
         setFraudError(null);
-        const sanitizedPhone = phoneNumber.replace(/\D/g, "");
+        const sanitizedPhone = formatPhoneNumber(phoneNumber);
         await getFraudCheckerData({ phoneNumber: sanitizedPhone })
             .unwrap()
             .then((res) => {

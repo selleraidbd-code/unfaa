@@ -1,3 +1,6 @@
+// Import and re-export formatPhoneNumber from phone-number-utils for backward compatibility
+import { formatPhoneNumber } from "./format-number-utils";
+
 /**
  * Utility functions for collecting tracking data from various sources
  */
@@ -57,33 +60,6 @@ function getUrlParamFromString(url: string, name: string): string | undefined {
 }
 
 /**
- * Normalize phone number by removing country code (+880) if present
- * Ensures the number starts with 0 after removing country code
- * @param phoneNumber - Phone number to normalize
- * @returns Normalized phone number without country code, starting with 0
- */
-export function normalizePhoneNumber(phoneNumber: string): string {
-    if (!phoneNumber) return phoneNumber;
-
-    // Remove spaces and dashes
-    let normalized = phoneNumber.replace(/[\s-]/g, "");
-
-    // Remove +880 or 880 country code if present
-    if (normalized.startsWith("+880")) {
-        normalized = normalized.substring(4); // Remove "+880"
-    } else if (normalized.startsWith("880")) {
-        normalized = normalized.substring(3); // Remove "880"
-    }
-
-    // Ensure the number starts with 0 (Bangladesh mobile number format)
-    if (normalized && !normalized.startsWith("0")) {
-        normalized = "0" + normalized;
-    }
-
-    return normalized;
-}
-
-/**
  * Collect all tracking data from cookies, URL parameters, and other sources
  * @param phoneNumber - Optional phone number to include in phRaw field
  */
@@ -94,7 +70,7 @@ export function collectTrackingData(phoneNumber?: string): TrackingData | null {
 
     // Include phone number if provided (normalized without country code)
     if (phoneNumber && phoneNumber.trim()) {
-        trackingData.phRaw = normalizePhoneNumber(phoneNumber.trim());
+        trackingData.phRaw = formatPhoneNumber(phoneNumber.trim());
     }
 
     // Get Facebook Pixel data from cookies

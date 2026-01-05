@@ -9,9 +9,10 @@ import { toast } from "@workspace/ui/components/sonner";
 import { Package, WithProductPackage } from "@/types/landing-type";
 import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
+import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { getLink } from "@/lib/get-link";
 import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
-import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
+import { collectTrackingData } from "@/lib/tracking-utils";
 import { buildTikTokPackageContents, buildTikTokProductContents, trackTikTokEvent } from "@/hooks/use-tiktok-tracking";
 
 type FormData = {
@@ -93,10 +94,6 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
         if (!formData.name.trim()) newErrors.name = "নাম লিখুন";
         if (!formData.address.trim()) newErrors.address = "ঠিকানা লিখুন";
 
-        const clean = formData.phone.replace(/[\s-]/g, "");
-        const isValidPhone = /^\+8801[3-9][0-9]{8}$/.test(clean) || /^01[3-9][0-9]{8}$/.test(clean);
-        if (!isValidPhone) newErrors.phone = "সঠিক ফোন নাম্বার লিখুন";
-
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return false;
@@ -120,11 +117,15 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             return;
         }
 
+        const normalizedPhone = formatPhoneNumber(formData.phone);
+
+        console.log("normalizedPhone", normalizedPhone);
+
         setIsSubmitting(true);
 
         try {
             // Normalize phone number (remove country code if present)
-            const normalizedPhone = normalizePhoneNumber(formData.phone);
+            const normalizedPhone = formatPhoneNumber(formData.phone);
 
             // Collect tracking data (include phone number in phRaw)
             const trackingData = collectTrackingData(formData.phone);

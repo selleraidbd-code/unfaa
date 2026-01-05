@@ -17,9 +17,10 @@ import { z } from "zod";
 
 import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { CartItem, cartStorage } from "@/lib/cart";
+import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { getLink } from "@/lib/get-link";
 import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
-import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
+import { collectTrackingData } from "@/lib/tracking-utils";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 
 const formSchema = z.object({
@@ -179,8 +180,7 @@ const Page = () => {
                 })),
             }));
 
-            // Normalize phone number (remove country code if present)
-            const normalizedPhone = normalizePhoneNumber(values.phone);
+            const formattedPhone = formatPhoneNumber(values.phone);
 
             // Collect tracking data (include phone number in phRaw)
             const trackingData = collectTrackingData(values.phone);
@@ -205,7 +205,7 @@ const Page = () => {
                 shopId: shop.id,
                 orderItems,
                 customerName: values.name,
-                customerPhoneNumber: normalizedPhone,
+                customerPhoneNumber: formattedPhone,
                 customerAddress: values.address,
                 deliveryZoneId: values.deliveryZoneId,
                 orderStatus: OrderStatus.PLACED,
@@ -253,7 +253,7 @@ const Page = () => {
                     currency: "BDT",
                     user_data: {
                         ...buildUserData(),
-                        phone: normalizedPhone,
+                        phone: formattedPhone,
                         first_name: values.name.split(/\s+/)[0] || "",
                         last_name: values.name.split(/\s+/).slice(1).join(" ") || "",
                     },

@@ -23,7 +23,8 @@ import { toast } from "@workspace/ui/components/sonner";
 
 import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
-import { collectTrackingData, normalizePhoneNumber } from "@/lib/tracking-utils";
+import { formatPhoneNumber } from "@/lib/format-number-utils";
+import { collectTrackingData } from "@/lib/tracking-utils";
 
 interface BuyNowDialogProps {
     product: Product;
@@ -84,7 +85,7 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
 
     const url = `${config.serverUrl}/order`;
 
-    const normalizedPhone = normalizePhoneNumber(customerInfo.phone);
+    const formattedPhone = formatPhoneNumber(customerInfo.phone);
 
     const handleConfirmOrder = async () => {
         setIsSubmitting(true);
@@ -117,7 +118,7 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
         const payload: CreateOrderPayload = {
             shopId: product.shopId,
             customerName: customerInfo.name,
-            customerPhoneNumber: normalizedPhone,
+            customerPhoneNumber: formattedPhone,
             customerAddress: customerInfo.address,
             deliveryZoneId: product?.delivery?.deliveryZones?.[0]?.id || "",
             orderStatus: OrderStatus.PLACED,

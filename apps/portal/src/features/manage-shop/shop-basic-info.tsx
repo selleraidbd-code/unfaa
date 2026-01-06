@@ -24,7 +24,7 @@ import { CustomFormImage } from "@/components/ui/custom-form-image";
 const shopInfoSchema = z.object({
     name: z.string().min(1),
     description: z.string().min(1),
-    shopEmail: z.string().email().optional(),
+    shopEmail: z.string().optional(),
     whatsappNumber: z.string(),
     // address: z.string().min(1),
     // topBarMessage: z.string().min(1),

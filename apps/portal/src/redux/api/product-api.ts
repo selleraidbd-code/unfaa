@@ -1,18 +1,7 @@
 import { api } from "@/redux/api";
-import {
-    METHOD,
-    PaginatedResponse,
-    QueryParams,
-    ResponseObject,
-    TagType,
-} from "@/redux/type";
+import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
 
-import {
-    Product,
-    ProductCeratePayload,
-    ProductVariantBulkPayload,
-    ProductVariantUpdate,
-} from "@/types/product-type";
+import { Product, ProductCeratePayload, ProductVariantBulkPayload, ProductVariantUpdate } from "@/types/product-type";
 
 const productApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -24,10 +13,7 @@ const productApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Product],
         }),
-        createProductVariantBulk: builder.mutation<
-            void,
-            { id: string; payload: ProductVariantBulkPayload[] }
-        >({
+        createProductVariantBulk: builder.mutation<void, { id: string; payload: ProductVariantBulkPayload[] }>({
             query: ({ id, payload }) => ({
                 url: `/product-variant/${id}`,
                 method: METHOD.POST,
@@ -43,16 +29,6 @@ const productApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Product],
         }),
-        getProduct: builder.query<
-            ResponseObject<Product>,
-            { shopName: string; slug: string }
-        >({
-            query: ({ shopName, slug }) => ({
-                url: `/product/${shopName}/${slug}`,
-                method: METHOD.GET,
-            }),
-            providesTags: [TagType.Product],
-        }),
         getProductById: builder.query<ResponseObject<Product>, { id: string }>({
             query: ({ id }) => ({
                 url: `/product/${id}`,
@@ -60,10 +36,7 @@ const productApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Product],
         }),
-        updateProduct: builder.mutation<
-            void,
-            { id: string; payload: Partial<ProductCeratePayload> }
-        >({
+        updateProduct: builder.mutation<void, { id: string; payload: Partial<ProductCeratePayload> }>({
             query: ({ id, payload }) => ({
                 url: `/product/${id}`,
                 method: METHOD.PATCH,
@@ -71,10 +44,7 @@ const productApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Product],
         }),
-        updateProductVariant: builder.mutation<
-            void,
-            { id: string; payload: ProductVariantUpdate }
-        >({
+        updateProductVariant: builder.mutation<void, { id: string; payload: ProductVariantUpdate }>({
             query: ({ id, payload }) => ({
                 url: `/product-variant/${id}`,
                 method: METHOD.PATCH,

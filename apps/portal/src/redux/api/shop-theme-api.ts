@@ -60,7 +60,7 @@ const shopApi = api.injectEndpoints({
             { sectionId: string; payload: Partial<UpdateShopSectionCorePayload> }
         >({
             query: (data) => ({
-                url: `/shop-section/${data.sectionId}`,
+                url: `/shop-section/${data.sectionId}?fullUpdate=true`,
                 method: METHOD.PATCH,
                 body: data.payload,
             }),

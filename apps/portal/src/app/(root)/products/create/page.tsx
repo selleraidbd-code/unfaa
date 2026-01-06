@@ -340,10 +340,10 @@ const AddProduct = () => {
                                     placeholder="Select delivery charge"
                                 />
 
-                                <CustomFormInput
+                                <CustomFormTextarea
                                     label="Video Link"
                                     name="videoLink"
-                                    type="text"
+                                    rows={2}
                                     control={form.control}
                                     placeholder="Enter Your video link"
                                 />

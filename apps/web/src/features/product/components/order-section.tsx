@@ -6,7 +6,6 @@ import { Package } from "@/types/landing-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
 
 import { DeliveryZoneSelector } from "./delivery-zone-selector";
-import { OrderForm } from "./order-form";
 import { PackageSelector } from "./package-selector";
 import { ProductVariants } from "./product-variants";
 
@@ -52,8 +51,10 @@ export const OrderSection = memo(function OrderSection({
     handleSubmit,
 }: OrderSectionProps) {
     return (
-        <>
-            <h2 className="mb-6 text-center text-3xl font-bold text-red-600">অর্ডার করুন 🛒</h2>
+        <div className="mt-[30px] rounded-2xl border-2 border-[#eafbea] bg-[#dbeafe] px-4 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+            <div className="mb-[18px] rounded-xl border border-[#dbe7ff] bg-gradient-to-r from-[#e8f0ff] to-[#f3f7ff] px-[18px] py-4 text-left text-[22px] font-bold text-red-500">
+                অর্ডার করুন
+            </div>
 
             {packages.length > 0 && (
                 <PackageSelector
@@ -71,20 +72,68 @@ export const OrderSection = memo(function OrderSection({
                 />
             )}
 
+            <div>
+                <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="নাম"
+                    className="mb-3.5 w-full rounded-[10px] border border-[#ccc] bg-white px-3.5 py-4 text-lg transition-colors outline-none focus:border-[#0fa54c]"
+                />
+                {errors.name && (
+                    <div className="mt-2.5 mb-4 rounded-md border-l-[5px] border-l-red-500 bg-[#ffdddd] p-2.5 text-[#b30000]">
+                        {errors.name}
+                    </div>
+                )}
+            </div>
+
+            <div>
+                <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="ঠিকানা (জেলা, থানা ও গ্রামের নাম)"
+                    className="mb-3.5 w-full rounded-[10px] border border-[#ccc] bg-white px-3.5 py-4 text-lg transition-colors outline-none focus:border-[#0fa54c]"
+                />
+                {errors.address && (
+                    <div className="mt-2.5 mb-4 rounded-md border-l-[5px] border-l-red-500 bg-[#ffdddd] p-2.5 text-[#b30000]">
+                        {errors.address}
+                    </div>
+                )}
+            </div>
+
+            <div>
+                <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="সচল মোবাইল নাম্বার"
+                    className="mb-3.5 w-full rounded-[10px] border border-[#ccc] bg-white px-3.5 py-4 text-lg transition-colors outline-none focus:border-[#0fa54c]"
+                />
+                {errors.phone && (
+                    <div className="mt-2.5 mb-4 rounded-md border-l-[5px] border-l-red-500 bg-[#ffdddd] p-2.5 text-[#b30000]">
+                        {errors.phone}
+                    </div>
+                )}
+            </div>
+
             <DeliveryZoneSelector
                 zones={product.delivery.deliveryZones}
                 selectedZoneId={selectedDeliveryZone}
                 onZoneChange={setSelectedDeliveryZone}
             />
 
-            <OrderForm
-                formData={formData}
-                errors={errors}
-                isSubmitting={isSubmitting}
-                totalAmount={totalAmount}
-                onInputChange={handleInputChange}
-                onSubmit={handleSubmit}
-            />
-        </>
+            <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="mt-2.5 w-full cursor-pointer rounded-xl border-none bg-[#0fa54c] px-4 py-4 text-[22px] font-bold text-white transition-all duration-200 hover:bg-[#0d8c3f] disabled:cursor-not-allowed disabled:bg-[#999]"
+            >
+                {isSubmitting ? "অর্ডার করা হচ্ছে..." : `অর্ডার করুন (${totalAmount?.toLocaleString()} টাকা)`}
+            </button>
+        </div>
     );
 });

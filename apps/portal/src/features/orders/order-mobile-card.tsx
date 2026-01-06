@@ -98,12 +98,12 @@ export const OrderMobileCard = ({
         >
             {/* Selection Checkbox */}
             {enableSelection && (
-                <div className="absolute top-3 right-3 z-10" data-action-button onClick={handleCheckboxClick}>
+                <div className="absolute top-9 right-3 z-10" data-action-button onClick={handleCheckboxClick}>
                     <Checkbox
                         checked={isSelected}
                         onCheckedChange={() => onToggleSelection(order.id)}
                         aria-label={isSelected ? "Deselect order" : "Select order"}
-                        className="size-4"
+                        className="size-4 bg-white"
                     />
                 </div>
             )}

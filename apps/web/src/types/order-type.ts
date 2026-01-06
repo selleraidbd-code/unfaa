@@ -61,6 +61,7 @@ export type CreateOrderPayload = {
         }[];
     }[];
     trackingData?: TrackingData | null;
+    discountedPrice?: number | null;
 };
 
 export type OrderResponse = {

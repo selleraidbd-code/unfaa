@@ -7,6 +7,7 @@ import { AddNewVariants } from "@/features/products/add-new-variants";
 import { updateProductSchema } from "@/features/products/product-schema";
 import { useGetBrandsQuery } from "@/redux/api/brand-api";
 import { useGetCategoriesQuery } from "@/redux/api/category-api";
+import { useGetDeliveriesQuery } from "@/redux/api/delivery-api";
 import {
     useDeleteProductVariantMutation,
     useGetProductByIdQuery,
@@ -91,6 +92,7 @@ const EditProduct = () => {
                   sku: product.data.sku || "",
                   unitName: product.data.unitName || "",
                   warranty: product.data.warranty || "",
+                  deliveryId: product.data.deliveryId || "",
               }
             : undefined,
     });
@@ -105,10 +107,21 @@ const EditProduct = () => {
         limit: 100,
     });
 
+    const { data: deliveries } = useGetDeliveriesQuery({
+        shopId,
+        limit: 100,
+    });
+
     const brandOptions = brands?.data.map((brand) => ({
         value: brand.id,
         label: brand.name,
     }));
+
+    const deliveryOptions =
+        deliveries?.data?.map((delivery) => ({
+            value: delivery.id,
+            label: delivery.name,
+        })) || [];
 
     const categories = data?.data.map((category) => ({
         value: category.id,
@@ -150,6 +163,7 @@ const EditProduct = () => {
             sku: product.data.sku || "",
             unitName: product.data.unitName || "",
             warranty: product.data.warranty || "",
+            deliveryId: product.data.deliveryId || "",
         };
     };
 
@@ -380,17 +394,26 @@ const EditProduct = () => {
                     <CustomCollapsible
                         title="Product Details"
                         content={
-                            <div className="grid grid-cols-2 gap-x-6 gap-y-4 pt-2">
-                                <CustomFormTextarea
-                                    label="Video Link"
-                                    name="videoLink"
-                                    rows={5}
-                                    control={form.control}
-                                    placeholder="Enter Your video link"
-                                    className="col-span-2"
-                                />
+                            <div className="space-y-4 pt-2">
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                                    <CustomFormSearchSelect
+                                        label="Delivery Charge"
+                                        name="deliveryId"
+                                        control={form.control}
+                                        options={deliveryOptions}
+                                        placeholder="Select delivery charge"
+                                    />
 
-                                <div className="col-span-2 space-y-2.5">
+                                    <CustomFormTextarea
+                                        label="Video Link"
+                                        name="videoLink"
+                                        rows={2}
+                                        control={form.control}
+                                        placeholder="Enter Your video link"
+                                    />
+                                </div>
+
+                                <div className="space-y-2.5">
                                     <Label className="title">Short Description (SEO & Data Feed)</Label>
                                     <Editor
                                         content={form.watch("description") || product?.data?.description}
@@ -399,7 +422,7 @@ const EditProduct = () => {
                                         }}
                                     />
                                 </div>
-                                <div className="col-span-2 space-y-2.5">
+                                <div className="space-y-2.5">
                                     <Label className="title">Product Description</Label>
                                     <Editor
                                         content={form.watch("fullDescription") || product?.data?.fullDescription}
@@ -416,7 +439,6 @@ const EditProduct = () => {
                                     control={form.control}
                                     placeholder="Enter Your keywords"
                                     required
-                                    className="col-span-2"
                                 />
                             </div>
                         }

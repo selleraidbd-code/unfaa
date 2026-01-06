@@ -57,6 +57,14 @@ const orderApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Order],
         }),
+        bulkDeleteOrders: builder.mutation<void, { ids: string[] }>({
+            query: ({ ids }) => ({
+                url: `/order/bulk/delete`,
+                method: METHOD.DELETE,
+                body: { ids },
+            }),
+            invalidatesTags: [TagType.Order],
+        }),
         aiOrderGeneration: builder.mutation<ResponseObject<AIOrderGenerationResult>, { shopId: string; info: string }>({
             query: ({ shopId, info }) => ({
                 url: `/ai-generation/order-generation/${shopId}`,
@@ -76,5 +84,6 @@ export const {
     useUpdateOrderMutation,
     useEditOrderItemsMutation,
     useDeleteOrderMutation,
+    useBulkDeleteOrdersMutation,
     useAiOrderGenerationMutation,
 } = orderApi;

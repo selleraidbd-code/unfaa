@@ -8,17 +8,19 @@ import { OrderDetailsWrapper } from "@/features/orders/order-details-wrapper";
 import { OrderMobileList } from "@/features/orders/order-mobile-list";
 import { OrderTable } from "@/features/orders/order-table";
 import { PackageGroupingDialog } from "@/features/orders/package-grouping-dialog";
+import { AlertType } from "@/providers/AlertProvider";
 import { useCourierEntryMutation } from "@/redux/api/couriar-api";
-import { useGetOrdersQuery } from "@/redux/api/order-api";
+import { useBulkDeleteOrdersMutation, useGetOrdersQuery } from "@/redux/api/order-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { PaginationState } from "@tanstack/react-table";
 import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import { CustomTabs, CustomTabsList, CustomTabsTrigger } from "@workspace/ui/components/custom/custom-tabs";
 import { toast } from "@workspace/ui/components/sonner";
 import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
-import { Bot, CheckSquare, DownloadCloud, Plus, Square, Truck } from "lucide-react";
+import { Bot, CheckSquare, DownloadCloud, Plus, Square, Trash2, Truck } from "lucide-react";
 
 import { Order, OrderStatus } from "@/types/order-type";
+import { useAlert } from "@/hooks/useAlert";
 import { CustomButton } from "@/components/ui/custom-button";
 import { Meta } from "@/components/table/data-table";
 
@@ -51,6 +53,8 @@ const OrdersPage = () => {
     });
 
     const [courierEntry, { isLoading: isCourierEntryLoading }] = useCourierEntryMutation();
+    const [bulkDeleteOrders, { isLoading: isBulkDeleteLoading }] = useBulkDeleteOrdersMutation();
+    const { fire } = useAlert();
 
     const handleSearch = (value: string) => {
         setFilterParams({ ...filterParams, searchTerm: value });
@@ -103,6 +107,34 @@ const OrdersPage = () => {
                 toast.error(error.data?.message || "Failed to send orders to courier");
                 setSelectedRows([]);
             });
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedRows.length === 0) return;
+
+        const orderIds = selectedRows.map((o) => o.id);
+
+        fire({
+            title: "Delete Orders",
+            description: `Are you sure you want to delete ${selectedRows.length} order(s)? This action cannot be undone.`,
+            type: AlertType.ERROR,
+            confirmButtonOptions: {
+                variant: "destructive",
+                text: "Delete",
+            },
+            onConfirm: async () => {
+                await bulkDeleteOrders({ ids: orderIds })
+                    .unwrap()
+                    .then(() => {
+                        toast.success("Orders deleted successfully");
+                        setSelectedRows([]);
+                    })
+                    .catch((error) => {
+                        toast.error(error.data?.message || "Failed to delete orders");
+                        setSelectedRows([]);
+                    });
+            },
+        });
     };
 
     const meta: Meta = {
@@ -194,6 +226,46 @@ const OrdersPage = () => {
                             </CustomButton>
                         </div>
                     </div>
+                ) : activeTab === OrderStatus.PLACED ? (
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Total: {data?.meta?.total || 0}</p>
+                            {(data?.data || []).length > 0 && (
+                                <button
+                                    onClick={toggleSelectAll}
+                                    className="text-primary hover:text-primary/80 flex items-center gap-2 text-sm font-medium transition-colors"
+                                >
+                                    {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                                    <span>
+                                        {allSelected ? (
+                                            <>
+                                                Deselect <span className="max-sm:hidden">All</span>
+                                            </>
+                                        ) : (
+                                            "Select All"
+                                        )}
+                                    </span>
+                                </button>
+                            )}
+                            {selectedRows.length > 0 && (
+                                <p className="text-primary text-sm font-medium">
+                                    {selectedRows.length} <span className="max-sm:hidden">selected</span>
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <CustomButton
+                                onClick={handleBulkDelete}
+                                disabled={selectedRows.length === 0 || isBulkDeleteLoading}
+                                variant="destructive"
+                            >
+                                <Trash2 />
+                                Delete
+                                <span className="max-sm:hidden">Selected</span>
+                            </CustomButton>
+                        </div>
+                    </div>
                 ) : (
                     <CustomSearch onSearch={handleSearch} placeholder="Search orders" />
                 )}
@@ -208,7 +280,7 @@ const OrdersPage = () => {
                         onPaginationChange={handlePaginationChange}
                         onRowClick={handleRowClick}
                         onSelectionChange={setSelectedRows}
-                        enableSelection={activeTab === OrderStatus.CONFIRMED}
+                        enableSelection={activeTab === OrderStatus.CONFIRMED || activeTab === OrderStatus.PLACED}
                     />
                 </div>
 
@@ -220,7 +292,7 @@ const OrdersPage = () => {
                         isError={isError}
                         meta={meta}
                         selectedRows={selectedRows}
-                        enableSelection={activeTab === OrderStatus.CONFIRMED}
+                        enableSelection={activeTab === OrderStatus.CONFIRMED || activeTab === OrderStatus.PLACED}
                         onPaginationChange={handlePaginationChange}
                         onRowClick={handleRowClick}
                         onSelectionChange={setSelectedRows}

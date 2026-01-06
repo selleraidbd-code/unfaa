@@ -73,6 +73,11 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             });
             setSelectedVariants(defaultVariants);
         }
+
+        // Set default package to the first one if packages exist
+        if (packages && packages.length > 0 && packages[0]) {
+            setSelectedPackage(packages[0]);
+        }
     }, [product]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,6 +189,15 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                 ];
             }
 
+            // Calculate delivery charge
+            const selectedZone = product.delivery?.deliveryZones?.find(
+                (zone) => zone.id === (selectedDeliveryZone || product?.delivery?.deliveryZones?.[0]?.id)
+            );
+            const deliveryCharge = selectedZone?.fee || 0;
+
+            // Calculate discountedPrice: if package selected, use codAmount + delivery charge, otherwise null
+            const discountedPrice = selectedPackage ? selectedPackage.codAmount + deliveryCharge : null;
+
             const payload: CreateOrderPayload = {
                 shopId: product.shopId,
                 customerName: formData.name,
@@ -194,6 +208,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                 orderSource,
                 orderItems,
                 trackingData,
+                discountedPrice,
             };
 
             const url = `${config.serverUrl}/order`;
@@ -259,28 +274,31 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                     ? buildTikTokPackageContents(selectedPackage, product)
                     : buildTikTokProductContents(product, selectedVariants, 1);
 
-                // Track TikTok CompletePayment event
+                // Track TikTok Purchase event
                 trackTikTokEvent(
-                    "CompletePayment",
+                    "Purchase",
                     {
+                        event_id: purchaseEventId,
                         contents,
                         value: totalAmount,
                         currency: "BDT",
-                        order_id: data?.data?.orderSerialNumber || data?.data?.id,
+                        order_id: orderId,
                     },
                     trackingData
                 );
             } else {
-                // Track TikTok Pixel even if no tracking data
-                trackTikTokPixel("CompletePayment", {
-                    content_id: product.id,
-                    content_ids: [product.id],
-                    content_type: "product",
-                    content_name: product.name,
-                    content_category: categoryName,
+                // Build contents array for TikTok Purchase event (even without tracking data)
+                const contents = selectedPackage
+                    ? buildTikTokPackageContents(selectedPackage, product)
+                    : buildTikTokProductContents(product, selectedVariants, 1);
+
+                // Track TikTok Purchase event even if no tracking data
+                trackTikTokPixel("Purchase", {
+                    event_id: purchaseEventId,
+                    contents,
                     value: totalAmount,
                     currency: "BDT",
-                    order_id: data?.data?.orderSerialNumber || data?.data?.id,
+                    order_id: orderId,
                 });
             }
 

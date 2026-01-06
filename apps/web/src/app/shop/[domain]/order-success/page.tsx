@@ -6,6 +6,7 @@ import { formatDate } from "@workspace/ui/lib/formateDate";
 import { CheckCircle2, Package } from "lucide-react";
 
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
+import { AutoRedirect } from "@/components/shared/auto-redirect";
 
 export const metadata: Metadata = {
     title: "Thank you - Order Success",
@@ -148,6 +149,8 @@ const Page = async ({
                     </div>
                 </div>
             </div>
+
+            <AutoRedirect href={`/shop/${domain}`} delay={5000} />
         </div>
     );
 };

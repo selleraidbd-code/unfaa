@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
 
@@ -24,7 +24,6 @@ export function ProductViewTracker({
     shopSlug,
 }: ProductViewTrackerProps) {
     const [tracked, setTracked] = useState(false);
-    const scrollMilestonesRef = useRef<Set<number>>(new Set());
 
     useEffect(() => {
         // Prevent duplicate tracking
@@ -148,88 +147,6 @@ export function ProductViewTracker({
             clearTimeout(maxTimeout);
         };
     }, [productId, productName, productSlug, price, discountPrice, category, shopSlug, tracked]);
-
-    // Scroll tracking effect
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-
-        let scrollTimeout: NodeJS.Timeout;
-        const scrollMilestonesToTrack = [25, 50, 75, 100];
-
-        const handleScroll = () => {
-            // Throttle scroll events
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-                const documentHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-                const scrollBottom = scrollTop + windowHeight;
-                const scrollPercentage = Math.round((scrollBottom / documentHeight) * 100);
-
-                // Check which milestones have been reached
-                scrollMilestonesToTrack.forEach((milestone) => {
-                    if (scrollPercentage >= milestone && !scrollMilestonesRef.current.has(milestone)) {
-                        // Mark this milestone as tracked
-                        scrollMilestonesRef.current.add(milestone);
-
-                        // Track scroll event
-                        const scrollEventId = `scroll_${productId}_${milestone}%_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-
-                        // Track to backend as Lead event (scroll depth indicates engagement)
-                        trackEventToBackend(
-                            "Lead",
-                            {
-                                event_id: scrollEventId,
-                                content_name: `${productName} - ${milestone}% Scroll`,
-                                content_category: category || "Uncategorized",
-                                content_ids: [productId],
-                                content_type: "product",
-                                value: discountPrice,
-                                currency: "BDT",
-                                user_data: buildUserData(),
-                            },
-                            shopSlug
-                        );
-
-                        // Track Facebook Pixel (custom event for scroll depth)
-                        trackFacebookPixel("Lead", {
-                            content_ids: [productId],
-                            content_type: "product",
-                            content_name: productName,
-                            content_category: category || "Uncategorized",
-                            value: discountPrice,
-                            currency: "BDT",
-                            scroll_depth: milestone,
-                        });
-
-                        // Track TikTok Pixel
-                        trackTikTokPixel("CompleteRegistration", {
-                            content_id: productId,
-                            content_ids: [productId],
-                            content_type: "product",
-                            content_name: productName,
-                            content_category: category || "Uncategorized",
-                            value: discountPrice,
-                            currency: "BDT",
-                            scroll_depth: milestone,
-                        });
-
-                        console.log(`✅ Scroll ${milestone}% tracked for product: ${productName}`);
-                    }
-                });
-            }, 100); // Throttle to 100ms
-        };
-
-        window.addEventListener("scroll", handleScroll, { passive: true });
-
-        // Check initial scroll position
-        handleScroll();
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            clearTimeout(scrollTimeout);
-        };
-    }, [productId, productName, productSlug, price, discountPrice, category, shopSlug]);
 
     return null;
 }

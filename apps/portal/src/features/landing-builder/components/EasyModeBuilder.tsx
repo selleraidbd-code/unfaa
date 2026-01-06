@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import { ContactData, ContactSection } from "@/features/landing-builder/components/contact-section";
+import { FAQData, FAQSection } from "@/features/landing-builder/components/faq-section";
 import { FeaturedProductsSelectionDialog } from "@/features/landing-builder/components/featured-products-selection-dialog";
 import { PackageSection } from "@/features/landing-builder/components/package-section";
 import { useCreateLandingPageMutation } from "@/redux/api/landing-page-api";
@@ -11,10 +13,9 @@ import { useGetProductsQuery } from "@/redux/api/product-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
 import { CustomInput } from "@workspace/ui/components/custom/custom-input";
-import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea";
 import { toast } from "@workspace/ui/components/sonner";
 import { EComponentType, EPageType } from "@workspace/ui/landing/types";
-import { ArrowLeft, Package, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { ArrowLeft, Package, Plus, X } from "lucide-react";
 
 import {
     CreateLandingPagePayload,
@@ -22,6 +23,7 @@ import {
     CreateSectionPayload,
     LandingPageDemo,
 } from "@/types/landing-page-type";
+import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { CustomButton } from "@/components/ui/custom-button";
 
 type EasyModeBuilderProps = {
@@ -29,20 +31,20 @@ type EasyModeBuilderProps = {
     landingPage?: LandingPageDemo;
 };
 
-type FAQItem = {
-    id: string;
-    question: string;
-    answer: string;
-};
-
 export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps) => {
     const router = useRouter();
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id;
     const [name, setName] = useState("");
-    const [faqTitle, setFaqTitle] = useState("");
-    const [faqSubTitle, setFaqSubTitle] = useState("");
-    const [faqItems, setFaqItems] = useState<FAQItem[]>([{ id: Date.now().toString(), question: "", answer: "" }]);
+    const [contactData, setContactData] = useState<ContactData>({
+        whatsappNumber: "",
+        facebookPageId: "",
+    });
+    const [faqData, setFaqData] = useState<FAQData>({
+        title: "",
+        subTitle: "",
+        items: [{ id: Date.now().toString(), question: "", answer: "" }],
+    });
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
@@ -62,26 +64,15 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
             // Set landing page name
             setName(landingPage.name || "");
 
-            // Extract FAQ section if it exists
-            const faqSection = landingPage.section?.find((section) => section.sectionType === EComponentType.FAQ);
+            // Extract Contact section if it exists
+            const contactSection = landingPage.section?.find((section) => section.sectionType === EComponentType.CTA);
 
-            if (faqSection) {
-                setFaqTitle(faqSection.title || "");
-                setFaqSubTitle(faqSection.subTitle || "");
-
-                // Convert sectionList to FAQItems
-                if (faqSection.sectionList && faqSection.sectionList.length > 0) {
-                    const faqItemsData = faqSection.sectionList.map((item, index) => ({
-                        id: item.id || Date.now().toString() + index,
-                        question: item.title || "",
-                        answer: item.description || "",
-                    }));
-                    setFaqItems(
-                        faqItemsData.length > 0
-                            ? faqItemsData
-                            : [{ id: Date.now().toString(), question: "", answer: "" }]
-                    );
-                }
+            if (contactSection) {
+                // WhatsApp number is stored in title, Facebook page ID in subTitle
+                setContactData({
+                    whatsappNumber: contactSection.title || "",
+                    facebookPageId: contactSection.subTitle || "",
+                });
             }
 
             // Extract feature product IDs if available
@@ -95,20 +86,6 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
             }
         }
     }, [landingPage]);
-
-    const handleAddFAQItem = () => {
-        setFaqItems([...faqItems, { id: Date.now().toString(), question: "", answer: "" }]);
-    };
-
-    const handleRemoveFAQItem = (id: string) => {
-        if (faqItems.length > 1) {
-            setFaqItems(faqItems.filter((item) => item.id !== id));
-        }
-    };
-
-    const handleUpdateFAQItem = (id: string, field: "question" | "answer", value: string) => {
-        setFaqItems(faqItems.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
-    };
 
     const handleRemoveProduct = (productId: string) => {
         setSelectedProductIds(selectedProductIds.filter((id) => id !== productId));
@@ -129,31 +106,49 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
             return;
         }
 
-        // Build FAQ section if user has entered FAQ data
+        // Build sections array
         const sections: CreateSectionPayload[] = [];
+        let sectionIndex = 0;
+
+        // Check if Contact section has any data
+        const hasContactData = contactData.whatsappNumber.trim() || contactData.facebookPageId.trim();
+
+        if (hasContactData) {
+            const whatsappNumber = formatPhoneNumber(contactData.whatsappNumber);
+
+            const contactSection: CreateSectionPayload = {
+                index: sectionIndex++,
+                componentName: "Contact",
+                sectionType: EComponentType.CTA,
+                title: whatsappNumber || undefined,
+                subTitle: contactData.facebookPageId.trim() || undefined,
+            };
+
+            sections.push(contactSection);
+        }
 
         // Check if FAQ section has any data
         const hasFaqData =
-            faqTitle.trim() ||
-            faqSubTitle.trim() ||
-            faqItems.some((item) => item.question.trim() || item.answer.trim());
+            faqData.title.trim() ||
+            faqData.subTitle.trim() ||
+            faqData.items.some((item) => item.question.trim() || item.answer.trim());
 
         if (hasFaqData) {
             // Filter out empty FAQ items
-            const validFaqItems = faqItems.filter((item) => item.question.trim() && item.answer.trim());
+            const validFaqItems = faqData.items.filter((item) => item.question.trim() && item.answer.trim());
 
             if (validFaqItems.length > 0) {
-                const faqSectionList: CreateSectionListPayload[] = validFaqItems.map((item, index) => ({
+                const faqSectionList: CreateSectionListPayload[] = validFaqItems.map((item) => ({
                     title: item.question,
                     description: item.answer,
                 }));
 
                 const faqSection: CreateSectionPayload = {
-                    index: 0,
+                    index: sectionIndex++,
                     componentName: "FAQ",
                     sectionType: EComponentType.FAQ,
-                    title: faqTitle.trim() || undefined,
-                    subTitle: faqSubTitle.trim() || undefined,
+                    title: faqData.title.trim() || undefined,
+                    subTitle: faqData.subTitle.trim() || undefined,
                     sectionList: faqSectionList,
                 };
 
@@ -213,70 +208,20 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
                 />
             </div>
 
+            {/* Contact Section */}
+            <ContactSection
+                whatsappNumber={contactData.whatsappNumber}
+                facebookPageId={contactData.facebookPageId}
+                onWhatsappNumberChange={(value) =>
+                    setContactData((prev: ContactData) => ({ ...prev, whatsappNumber: value }))
+                }
+                onFacebookPageIdChange={(value) =>
+                    setContactData((prev: ContactData) => ({ ...prev, facebookPageId: value }))
+                }
+            />
+
             {/* FAQ Section */}
-            <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
-                <div>
-                    <h2 className="mb-2 text-lg font-semibold">FAQ Section</h2>
-                    <p className="text-muted-foreground text-sm">Add frequently asked questions to your landing page</p>
-                </div>
-
-                <div className="space-y-4">
-                    <CustomInput
-                        label="FAQ Section Title"
-                        placeholder="e.g., Frequently Asked Questions"
-                        value={faqTitle}
-                        onChange={(value) => setFaqTitle(String(value))}
-                    />
-                    <CustomInput
-                        label="FAQ Section Subtitle"
-                        placeholder="e.g., Find answers to common questions"
-                        value={faqSubTitle}
-                        onChange={(value) => setFaqSubTitle(String(value))}
-                    />
-                </div>
-
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-medium">Questions & Answers</h3>
-                        <Button type="button" variant="outline" size="sm" onClick={handleAddFAQItem} className="gap-2">
-                            <Plus className="h-4 w-4" />
-                            Add Question
-                        </Button>
-                    </div>
-
-                    {faqItems.map((item, index) => (
-                        <div key={item.id} className="space-y-3 rounded-lg border p-4">
-                            <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground text-sm font-medium">Question {index + 1}</span>
-                                {faqItems.length > 1 && (
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleRemoveFAQItem(item.id)}
-                                        className="text-destructive hover:text-destructive h-8 w-8 p-0"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                )}
-                            </div>
-                            <CustomInput
-                                label="Question"
-                                placeholder="Enter your question"
-                                value={item.question}
-                                onChange={(value) => handleUpdateFAQItem(item.id, "question", String(value))}
-                            />
-                            <CustomTextarea
-                                label="Answer"
-                                placeholder="Enter the answer"
-                                value={item.answer}
-                                onChange={(value) => handleUpdateFAQItem(item.id, "answer", value)}
-                                rows={3}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <FAQSection landingPage={landingPage} onDataChange={setFaqData} />
 
             {/* Package Section */}
             {shopId && <PackageSection shopId={shopId} productId={productId} />}

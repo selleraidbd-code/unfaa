@@ -1,4 +1,5 @@
 import { ProductPageDetails } from "@/features/product/product-page-details";
+import { EComponentType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
 import { ProductViewTracker } from "@/components/product-view-tracker";
@@ -13,7 +14,14 @@ export const EasyLandingPageFAQView = ({ landingPage, domain }: Props) => {
     const featureProducts = landingPage.featureProducts;
     const shopSlug = domain;
     const sections = landingPage.section;
-    const section = sections && sections.length > 0 ? sections[0] : undefined;
+
+    // Find FAQ section (first section or FAQ type)
+    const faqSection =
+        sections?.find((s) => s.sectionType === EComponentType.FAQ) ||
+        (sections && sections.length > 0 ? sections[0] : undefined);
+
+    // Find Contact section
+    const contactSection = sections?.find((s) => s.sectionType === EComponentType.CTA);
 
     return (
         <>
@@ -31,7 +39,8 @@ export const EasyLandingPageFAQView = ({ landingPage, domain }: Props) => {
                 featureProducts={featureProducts}
                 title={landingPage.name}
                 shopSlug={shopSlug}
-                section={section}
+                section={faqSection}
+                contactSection={contactSection}
             />
         </>
     );

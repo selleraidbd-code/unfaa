@@ -125,17 +125,6 @@ export function ProductTableView({
             },
         },
         {
-            accessorKey: "",
-            header: "Make Page",
-            cell: ({ row }) => {
-                return (
-                    <CustomButton size="sm" href={`/landing-page/add?productId=${row.original.id}`}>
-                        Make Page
-                    </CustomButton>
-                );
-            },
-        },
-        {
             id: "actions",
             cell: ({ row }) => (
                 <DataTableRowActions

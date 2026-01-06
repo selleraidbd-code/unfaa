@@ -11,7 +11,7 @@ import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { getLink } from "@/lib/get-link";
-import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
+import { buildUserData, trackEventToBackend, trackTikTokPixel } from "@/lib/tracking-events";
 import { collectTrackingData } from "@/lib/tracking-utils";
 import { buildTikTokPackageContents, buildTikTokProductContents, trackTikTokEvent } from "@/hooks/use-tiktok-tracking";
 
@@ -117,15 +117,18 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             return;
         }
 
-        const normalizedPhone = formatPhoneNumber(formData.phone);
-
-        console.log("normalizedPhone", normalizedPhone);
-
         setIsSubmitting(true);
 
         try {
             // Normalize phone number (remove country code if present)
             const normalizedPhone = formatPhoneNumber(formData.phone);
+
+            // Validate phone number: must be 11 digits and start with 01
+            if (!normalizedPhone || normalizedPhone.length !== 11 || !normalizedPhone.startsWith("01")) {
+                setErrors((prev) => ({ ...prev, phone: "সঠিক মোবাইল নাম্বার লিখুন (০১XXXXXXXXX)" }));
+                setIsSubmitting(false);
+                return;
+            }
 
             // Collect tracking data (include phone number in phRaw)
             const trackingData = collectTrackingData(formData.phone);
@@ -206,11 +209,11 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 toast.error(errorData.message || "অর্ডার তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+                setIsSubmitting(false);
                 return;
             }
 
             const data = await response.json();
-            console.log("Order created:", data);
 
             // Save form data to localStorage for next time
             localStorage.setItem(
@@ -249,17 +252,6 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                 shopSlug
             );
 
-            // Track Facebook Pixel
-            trackFacebookPixel("Purchase", {
-                content_ids: [product.id],
-                content_type: "product",
-                content_name: product.name,
-                content_category: categoryName,
-                value: totalAmount,
-                currency: "BDT",
-                order_id: orderId,
-            });
-
             // Track TikTok Purchase event if TikTok tracking information is present
             if (isTikTok) {
                 // Build contents array for TikTok Purchase event
@@ -295,7 +287,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             toast.success("অর্ডার সফলভাবে সম্পন্ন হয়েছে! ✅");
 
             // Redirect to success page
-            router.push(
+            router.replace(
                 getLink({
                     shopSlug: shopSlug,
                     path: `/order-success?order=${data?.data?.orderSerialNumber}`,
@@ -304,7 +296,6 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
         } catch (error) {
             console.error("Error creating order:", error);
             toast.error("অর্ডার তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
-        } finally {
             setIsSubmitting(false);
         }
     };

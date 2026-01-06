@@ -7,7 +7,7 @@ import { ShopNotFound } from "@/components/shop-not-found";
 import { TrackingPixels } from "@/components/tracking-pixels";
 
 // Enable ISR with 1 hour revalidation
-export const revalidate = 600; // 10 minutes in seconds
+export const revalidate = 300; //  5 minutes in seconds
 
 // Generate static params for all shops at build time
 export async function generateStaticParams() {

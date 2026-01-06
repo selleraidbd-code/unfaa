@@ -1,10 +1,10 @@
 import { Metadata } from "next";
+import Link from "next/link";
 
 import { getOrderBySerialNumber } from "@/actions/order-actions";
 import { formatDate } from "@workspace/ui/lib/formateDate";
 import { CheckCircle2, Package } from "lucide-react";
 
-import { CustomButton } from "@/components/ui/custom-button";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 
 export const metadata: Metadata = {
@@ -12,7 +12,14 @@ export const metadata: Metadata = {
     description: "Our representative will contact you very soon",
 };
 
-const Page = async ({ searchParams }: { searchParams: Promise<{ order: string }> }) => {
+const Page = async ({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ domain: string }>;
+    searchParams: Promise<{ order: string }>;
+}) => {
+    const { domain } = await params;
     const { order } = await searchParams;
 
     if (!order) {
@@ -128,6 +135,16 @@ const Page = async ({ searchParams }: { searchParams: Promise<{ order: string }>
                                 <span className="text-black">৩-৭ কার্যদিবস</span>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Buy More Button */}
+                    <div className="flex justify-center">
+                        <Link
+                            href={`/shop/${domain}`}
+                            className="rounded-lg bg-green-600 px-8 py-3 font-semibold text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+                        >
+                            আরো কিনুন
+                        </Link>
                     </div>
                 </div>
             </div>

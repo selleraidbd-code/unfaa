@@ -3,9 +3,9 @@
 import { useMemo } from "react";
 import Image from "next/image";
 
+import { ContactButtons } from "@/features/product/components/contact-buttons";
 import { FeaturedProducts } from "@/features/product/components/featured-products";
 import { OrderSection } from "@/features/product/components/order-section";
-import { ProductDescription } from "@/features/product/components/product-description";
 import { ProductFAQ } from "@/features/product/components/product-faq";
 import { ProductFooter } from "@/features/product/components/product-footer";
 import { ProductImageGallery } from "@/features/product/components/product-image-gallery";
@@ -17,6 +17,7 @@ import { Section } from "@workspace/ui/landing/types";
 
 import { FeatureProduct } from "@/types/landing-type";
 import { Product } from "@/types/product-type";
+import { HtmlRenderer } from "@/components/shared/html-renderer";
 
 type Props = {
     product: Product;
@@ -24,9 +25,10 @@ type Props = {
     title: string;
     shopSlug: string;
     section: Section | undefined;
+    contactSection?: Section;
 };
 
-export const ProductPageDetails = ({ product, featureProducts, title, shopSlug, section }: Props) => {
+export const ProductPageDetails = ({ product, featureProducts, title, shopSlug, section, contactSection }: Props) => {
     const discountPercent = useMemo(
         () =>
             product.discountPrice < product.price
@@ -51,10 +53,8 @@ export const ProductPageDetails = ({ product, featureProducts, title, shopSlug, 
         handleSubmit,
     } = useOrderForm(product, shopSlug);
 
-    const imageOne = product.images?.[0];
-    const imageTwo = product.images?.[1];
-    const imageThree = product.images?.[2];
-    const imageFour = product.images?.[3];
+    const firstImage = product.images?.[0];
+    const secondImage = product.images?.[1];
 
     return (
         <div className="min-h-screen bg-gray-50 pb-4" style={{ fontFamily: "'Noto Sans Bengali', sans-serif" }}>
@@ -71,22 +71,39 @@ export const ProductPageDetails = ({ product, featureProducts, title, shopSlug, 
 
                 <ProductPricing price={product.price} discountPrice={product.discountPrice} />
 
-                {imageOne && (
+                <div className="mb-4 rounded-xl border-l-4 border-blue-500 bg-blue-50 p-5 lg:border-l-6">
+                    <h3 className="mb-3 text-xl font-bold text-blue-600">সংক্ষিপ্ত বিবরণ</h3>
+                    <HtmlRenderer html={product.description} />
+                </div>
+
+                {firstImage && (
                     <Image
-                        src={imageOne}
+                        src={firstImage}
                         alt="Product"
-                        className="w-full rounded-xl shadow-md"
+                        className="mb-4 w-full rounded-xl shadow-md"
                         width={1000}
                         height={1000}
                     />
                 )}
 
-                <ProductDescription
-                    description={product.description}
-                    imageTwo={imageTwo}
-                    imageThree={imageThree}
-                    fullDescription={product.fullDescription}
-                />
+                {/* Contact section */}
+                {contactSection && (
+                    <ContactButtons whatsappNumber={contactSection.title} facebookPageId={contactSection.subTitle} />
+                )}
+
+                <div className="mb-4 rounded-xl border-l-4 border-gray-500 bg-gray-100 p-5 lg:border-l-6">
+                    <h3 className="mb-3 text-xl font-bold text-gray-700">বিস্তারিত বিবরণ</h3>
+                    <HtmlRenderer html={product.fullDescription} />
+                </div>
+                {secondImage && (
+                    <Image
+                        src={secondImage}
+                        alt="Product"
+                        className="mb-4 w-full rounded-xl shadow-md"
+                        width={1000}
+                        height={1000}
+                    />
+                )}
 
                 {product.warranty && <ProductWarranty warranty={product.warranty} />}
 
@@ -99,16 +116,6 @@ export const ProductPageDetails = ({ product, featureProducts, title, shopSlug, 
                 </div>
 
                 {product.videoLink && <ProductVideo videoLink={product.videoLink} />}
-
-                {imageFour && (
-                    <Image
-                        src={imageFour}
-                        alt="Product"
-                        className="mb-4 w-full rounded-xl shadow-md"
-                        width={1000}
-                        height={1000}
-                    />
-                )}
 
                 {section && <ProductFAQ section={section} />}
 

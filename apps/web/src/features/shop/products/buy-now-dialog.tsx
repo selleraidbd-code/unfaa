@@ -25,12 +25,15 @@ import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { collectTrackingData } from "@/lib/tracking-utils";
+import { useCheckoutManagement } from "@/hooks/use-checkout-management";
 
 interface BuyNowDialogProps {
     product: Product;
 }
 
 export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
+    const { checkOrderLimit, incrementOrderCount, getLimitErrorMessage, getCheckoutFormData, saveCheckoutFormData } =
+        useCheckoutManagement();
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quantity, setQuantity] = useState(1);
@@ -43,10 +46,9 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
     });
 
     useEffect(() => {
-        const savedForm = localStorage.getItem("checkout_form");
+        const savedForm = getCheckoutFormData();
         if (savedForm) {
-            const parsedForm = JSON.parse(savedForm);
-            setCustomerInfo(parsedForm);
+            setCustomerInfo(savedForm);
         }
 
         // Set default variants to the first option of each variant
@@ -62,7 +64,7 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
             });
             setSelectedVariants(defaultVariants);
         }
-    }, [open, product]);
+    }, [open, product, getCheckoutFormData]);
 
     const deliveryOptions = [
         { value: "inside-dhaka", label: "Inside Dhaka", price: 60 },
@@ -85,10 +87,24 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
 
     const url = `${config.serverUrl}/order`;
 
-    const formattedPhone = formatPhoneNumber(customerInfo.phone);
-
     const handleConfirmOrder = async () => {
         setIsSubmitting(true);
+
+        // Validate phone number format first
+        const formattedPhone = formatPhoneNumber(customerInfo.phone);
+        if (!formattedPhone || formattedPhone.length !== 11 || !formattedPhone.startsWith("01")) {
+            toast.error("সঠিক মোবাইল নাম্বার লিখুন (০১XXXXXXXXX)");
+            setIsSubmitting(false);
+            return;
+        }
+
+        // Check order limit before proceeding
+        const limitCheck = checkOrderLimit(customerInfo.phone);
+        if (limitCheck.isLimitReached) {
+            toast.error(getLimitErrorMessage());
+            setIsSubmitting(false);
+            return;
+        }
 
         // Build order item variants from selected variants
         const orderItemVariant = Object.entries(selectedVariants).map(([variantId, option]) => ({
@@ -136,10 +152,24 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to create order");
+            const errorData = await response.json().catch(() => ({}));
+            toast.error(errorData.message || "Failed to create order");
+            setIsSubmitting(false);
+            return;
         }
 
         await response.json();
+
+        // Increment order count after successful order
+        incrementOrderCount(customerInfo.phone);
+
+        // Save form data to localStorage for next time
+        saveCheckoutFormData({
+            name: customerInfo.name,
+            phone: customerInfo.phone,
+            address: customerInfo.address,
+        });
+
         toast.success("Order created successfully");
         setIsSubmitting(false);
         setOpen(false);

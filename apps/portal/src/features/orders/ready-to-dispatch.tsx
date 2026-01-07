@@ -43,8 +43,6 @@ export const ReadyToDispatch = () => {
         limit: Number(limit),
     });
 
-    console.log(data?.data);
-
     const paginationMeta: PaginationMeta = {
         page: Number(page),
         limit: Number(limit),

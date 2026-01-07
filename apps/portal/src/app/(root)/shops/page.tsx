@@ -38,11 +38,11 @@ const ShopsPage = () => {
     };
 
     const handlePaginationChange = (state: PaginationState) => {
-        console.log(state);
+        console.warn(state);
     };
 
     const handleBulkDelete = () => {
-        console.log("Bulk delete");
+        console.warn("Bulk delete");
     };
 
     const handleDelete = async (id: string) => {

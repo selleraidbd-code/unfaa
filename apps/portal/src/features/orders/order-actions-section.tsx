@@ -7,7 +7,6 @@ import { toast } from "@workspace/ui/components/sonner";
 import { cn } from "@workspace/ui/lib/utils";
 import { Loader2, RefreshCw, Trash2 } from "lucide-react";
 
-import { FraudCheckerData } from "@/types/customer-type";
 import { useAlert } from "@/hooks/useAlert";
 
 interface OrderActionsSectionProps {
@@ -58,7 +57,7 @@ export const OrderActionsSection = ({
                     });
             })
             .catch((error) => {
-                console.log(error);
+                console.warn(error);
             });
     };
 

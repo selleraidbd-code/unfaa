@@ -21,7 +21,7 @@ export function PageViewTracker({ pageName, pageData }: PageViewTrackerProps) {
 
         // Optional: Log for debugging
         if (process.env.NODE_ENV === "development") {
-            console.log("Page view tracked:", { pageName, pageData });
+            console.warn("Page view tracked:", { pageName, pageData });
         }
     }, [pageName, pageData]);
 

@@ -1,29 +1,29 @@
 "use client";
 
+import { useState, useTransition } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-
-import { useReSendVerificationSignupOTPMutation } from "@/redux/api/auth-api";
-import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
-import { ErrorResponse } from "@/redux/type";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { REGEXP_ONLY_DIGITS } from "@workspace/ui/components/input-otp";
-import { toast } from "@workspace/ui/components/sonner";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { verifyEmailAction } from "@/actions/auth-actions";
 import logo from "@/assets/images/logo.png";
-import { CustomButton } from "@/components/ui/custom-button";
 import { useAuthSuccess } from "@/features/auth/hooks/use-auth-utils";
-import useTimeCounter from "@/hooks/useTimeCounter";
+import { useReSendVerificationSignupOTPMutation } from "@/redux/api/auth-api";
 import { logoutThunkWithoutReload } from "@/redux/slices/auth-slice";
+import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
+import { ErrorResponse } from "@/redux/type";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CardDescription, CardTitle } from "@workspace/ui/components/card";
 import CustomOTPFormInput from "@workspace/ui/components/custom/custom-OTP-form-input";
 import { Form } from "@workspace/ui/components/form";
+import { REGEXP_ONLY_DIGITS } from "@workspace/ui/components/input-otp";
 import { Separator } from "@workspace/ui/components/separator";
+import { toast } from "@workspace/ui/components/sonner";
 import { Mail } from "lucide-react";
-import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import useTimeCounter from "@/hooks/useTimeCounter";
+import { CustomButton } from "@/components/ui/custom-button";
 
 const FormSchema = z.object({
     otp: z.string().min(4, {
@@ -41,8 +41,7 @@ const OTPVerifyForm = () => {
     const [error, setError] = useState<string | null>(null);
     const [resendSuccess, setResendSuccess] = useState(false);
     const [isPending, startTransition] = useTransition();
-    const [reSendVerificationSignupOTP, { isLoading: isResendLoading }] =
-        useReSendVerificationSignupOTPMutation();
+    const [reSendVerificationSignupOTP, { isLoading: isResendLoading }] = useReSendVerificationSignupOTPMutation();
     const onSuccess = useAuthSuccess();
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -74,9 +73,7 @@ const OTPVerifyForm = () => {
                     form.reset();
                     toast.error("The verification code has been resent.");
                 } else {
-                    setError(
-                        response.error || "Invalid OTP. Please try again."
-                    );
+                    setError(response.error || "Invalid OTP. Please try again.");
                 }
             }
         });
@@ -109,47 +106,36 @@ const OTPVerifyForm = () => {
     const handleBackToSignIn = () => {
         dispatch(logoutThunkWithoutReload());
         setTimeout(() => {
-            console.log("Back to sign in");
             router.replace("/auth/sign-in");
         }, 100);
     };
 
     return (
         <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="w-sm overflow-hidden"
-            >
-                <div className="text-center mb-6">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="w-sm overflow-hidden">
+                <div className="mb-6 text-center">
                     <Image
                         src={logo}
                         alt="Logo"
                         width={40}
                         height={40}
-                        className="mx-auto   flex items-center justify-center mb-1"
+                        className="mx-auto mb-1 flex items-center justify-center"
                     />
 
-                    <CardTitle className="text-2xl italic font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <CardTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-2xl font-bold text-transparent italic">
                         Verification <span className="">Code</span>
                     </CardTitle>
-                    <CardDescription className="text-gray-600 text-base">
+                    <CardDescription className="text-base text-gray-600">
                         {email && (
                             <>
-                                We&apos;ve sent a verification code to{" "}
-                                <span className="font-semibold">{email}</span>
+                                We&apos;ve sent a verification code to <span className="font-semibold">{email}</span>
                             </>
                         )}
-                        {!email &&
-                            "We have sent a verification code to your email address"}
+                        {!email && "We have sent a verification code to your email address"}
                     </CardDescription>
                 </div>
 
-                <CustomOTPFormInput
-                    pattern={REGEXP_ONLY_DIGITS}
-                    control={form.control}
-                    name="otp"
-                    placeholder="*"
-                />
+                <CustomOTPFormInput pattern={REGEXP_ONLY_DIGITS} control={form.control} name="otp" placeholder="*" />
 
                 {error && (
                     <div className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400">
@@ -162,26 +148,19 @@ const OTPVerifyForm = () => {
                         <div className="flex items-center gap-2">
                             <Mail className="h-4 w-4 shrink-0" />
                             <span>
-                                Verification email resent successfully to{" "}
-                                <strong>{email}</strong>. Please check your
+                                Verification email resent successfully to <strong>{email}</strong>. Please check your
                                 inbox.
                             </span>
                         </div>
                     </div>
                 )}
 
-                <CustomButton
-                    isLoading={isPending}
-                    className="mt-6 w-full"
-                    type="submit"
-                >
+                <CustomButton isLoading={isPending} className="mt-6 w-full" type="submit">
                     Verify Email
                 </CustomButton>
 
                 <div className="mt-4 text-center text-sm">
-                    <span className="text-muted-foreground">
-                        Didn&apos;t receive the code?{" "}
-                    </span>
+                    <span className="text-muted-foreground">Didn&apos;t receive the code? </span>
                     <button
                         type="button"
                         onClick={handleResendOpt}
@@ -190,11 +169,7 @@ const OTPVerifyForm = () => {
                     >
                         {isResendLoading ? "Sending..." : "Resend"}
                     </button>
-                    {!isEnd && (
-                        <span className="text-muted-foreground ml-1">
-                            (after {countingTime}s)
-                        </span>
-                    )}
+                    {!isEnd && <span className="text-muted-foreground ml-1">(after {countingTime}s)</span>}
                 </div>
 
                 <div className="my-2 flex items-center justify-center text-center text-sm">

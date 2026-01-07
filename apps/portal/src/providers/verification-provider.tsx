@@ -1,15 +1,12 @@
 "use client";
 
-import { useAppSelector } from "@/redux/store/hook";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+
+import { useAppSelector } from "@/redux/store/hook";
 import { toast } from "@workspace/ui/components/sonner";
 
-export const VerificationProvider = ({
-    children,
-}: {
-    children: React.ReactNode;
-}) => {
+export const VerificationProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const user = useAppSelector((state) => state.auth.user);
     const isShowToast = useRef(false);
@@ -17,8 +14,6 @@ export const VerificationProvider = ({
     useEffect(() => {
         if (isShowToast.current) return;
         if (user === undefined) return;
-
-        console.log("user", user);
 
         if (user?.id) {
             if (!user.isVerified) {

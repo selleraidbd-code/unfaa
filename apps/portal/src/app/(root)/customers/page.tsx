@@ -1,20 +1,19 @@
 "use client";
 
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+
 import { CustomerCardList } from "@/features/customers/customer-card-list";
 import { CustomerTableView } from "@/features/customers/customer-table-view";
 import { UpdateCustomerDialog } from "@/features/customers/update-customer-dialog";
-import { useAlert } from "@/hooks/useAlert";
-import {
-    useDeleteCustomerMutation,
-    useGetCustomersQuery,
-} from "@/redux/api/customer-api";
+import { useDeleteCustomerMutation, useGetCustomersQuery } from "@/redux/api/customer-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { Customer } from "@/types/customer-type";
 import { PaginationState } from "@tanstack/react-table";
 import { toast } from "@workspace/ui/components/sonner";
 import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+
+import { Customer } from "@/types/customer-type";
+import { useAlert } from "@/hooks/useAlert";
 
 const CustomersPage = () => {
     const searchParams = useSearchParams();
@@ -41,14 +40,13 @@ const CustomersPage = () => {
     };
 
     const handlePaginationChange = (state: PaginationState) => {
-        console.log(state);
+        console.warn(state);
     };
 
     const handleDelete = async (id: string) => {
         fire({
             title: "Delete Customer",
-            description:
-                "Are you sure you want to delete this customer? This action cannot be undone.",
+            description: "Are you sure you want to delete this customer? This action cannot be undone.",
             onConfirm: async () => {
                 await deleteCustomer({ id })
                     .unwrap()
@@ -56,9 +54,7 @@ const CustomersPage = () => {
                         toast.success("🎉 Customer deleted successfully");
                     })
                     .catch((error) => {
-                        toast.error(
-                            error.data.message || "Something went wrong"
-                        );
+                        toast.error(error.data.message || "Something went wrong");
                     });
             },
         });
@@ -99,11 +95,7 @@ const CustomersPage = () => {
             )}
 
             {customer && (
-                <UpdateCustomerDialog
-                    open={!!customer}
-                    setOpen={() => setCustomer(null)}
-                    customer={customer}
-                />
+                <UpdateCustomerDialog open={!!customer} setOpen={() => setCustomer(null)} customer={customer} />
             )}
         </>
     );

@@ -1,19 +1,9 @@
 "use client";
 
-import { Control, FieldValues, Path } from "react-hook-form";
-
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@workspace/ui/components/form";
+import { RadioGroup, RadioGroupItem } from "@workspace/ui/components/radio-group";
 import { cn } from "@workspace/ui/lib/utils";
-import {
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@workspace/ui/components/form";
-import {
-    RadioGroup,
-    RadioGroupItem,
-} from "@workspace/ui/components/radio-group";
+import { Control, FieldValues, Path } from "react-hook-form";
 
 type TCustomFormInput<T extends FieldValues> = {
     name: Path<T>;
@@ -26,7 +16,7 @@ type TCustomFormInput<T extends FieldValues> = {
     layout?: "horizontal" | "vertical";
 };
 
-const CustomRadioGroup = <T extends FieldValues>({
+export const CustomRadioGroup = <T extends FieldValues>({
     name,
     label,
     control,
@@ -43,23 +33,15 @@ const CustomRadioGroup = <T extends FieldValues>({
                     <FormControl>
                         <RadioGroup
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className={cn(
-                                "flex flex-col gap-1",
-                                layout === "horizontal" && "flex-row gap-4"
-                            )}
+                            value={field.value || ""}
+                            className={cn("flex flex-col gap-1", layout === "horizontal" && "flex-row gap-4")}
                         >
                             {options.map((option) => (
-                                <FormItem
-                                    key={option.value}
-                                    className="flex items-center space-x-2 space-y-0"
-                                >
+                                <FormItem key={option.value} className="flex items-center space-y-0 space-x-2">
                                     <FormControl>
                                         <RadioGroupItem value={option.value} />
                                     </FormControl>
-                                    <FormLabel className="cursor-pointer font-normal">
-                                        {option.label}
-                                    </FormLabel>
+                                    <FormLabel className="cursor-pointer font-normal">{option.label}</FormLabel>
                                 </FormItem>
                             ))}
                         </RadioGroup>
@@ -70,5 +52,3 @@ const CustomRadioGroup = <T extends FieldValues>({
         />
     );
 };
-
-export default CustomRadioGroup;

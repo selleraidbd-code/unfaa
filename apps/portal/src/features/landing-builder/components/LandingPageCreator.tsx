@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { AddSectionComponent } from "@/features/landing-builder/components/add-section-component";
 import { ShowSelectedSection } from "@/features/landing-builder/components/show-selected-section";
 import { useCreateLandingPageMutation } from "@/redux/api/landing-page-api";
-import { useGetShopCategoriesQuery } from "@/redux/api/shop-api";
 import { setEditing, setLandingPageData, setLandingPageSection } from "@/redux/slices/landing-page-slice";
 import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
@@ -15,9 +14,8 @@ import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea"
 import { toast } from "@workspace/ui/components/sonner";
 import { Switch } from "@workspace/ui/components/switch";
 import { Component, EPageType, Section } from "@workspace/ui/landing/types";
-import { useTheme } from "next-themes";
 
-import { CreateLandingPagePayload, CreateSectionPayload, SiteType } from "@/types/landing-page-type";
+import { CreateLandingPagePayload, CreateSectionPayload } from "@/types/landing-page-type";
 // import MyForm from "@repo/ui/components/test/MyForm";
 import { CustomButton } from "@/components/ui/custom-button";
 
@@ -80,7 +78,6 @@ export const LandingPageCreator = ({
             pageType: EPageType.TEMPLATE,
         };
 
-        console.log("save", data);
         await createLandingPage(data)
             .unwrap()
             .then((res) => {
@@ -103,7 +100,6 @@ export const LandingPageCreator = ({
                         <Switch
                             checked={isEditing}
                             onCheckedChange={(value) => {
-                                console.log({ value });
                                 dispatch(setEditing(Boolean(value)));
                             }}
                         ></Switch>

@@ -6,7 +6,6 @@ const getDeliveryZones = async (shopId: string) => {
         body: JSON.stringify({ shopId }),
     });
 
-    console.log("delivery response", response);
     return response;
 };
 

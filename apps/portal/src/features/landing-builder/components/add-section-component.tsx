@@ -1,14 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import Image from "next/image";
 
 import { useGetComponentsQuery } from "@/redux/api/component-api";
 import { addNewSection } from "@/redux/slices/landing-page-slice";
 import { useAppDispatch } from "@/redux/store/hook";
-import { allComponents } from "@workspace/ui/landing/index";
-import { ArrowLeft, Plus } from "lucide-react";
-
 import { Button } from "@workspace/ui/components/button";
 import {
     Dialog,
@@ -21,21 +18,18 @@ import {
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { allComponentsTypeOptions } from "@workspace/ui/landing/data";
+import { allComponents } from "@workspace/ui/landing/index";
 import type { Component } from "@workspace/ui/landing/types";
 import { EComponentType, Section } from "@workspace/ui/landing/types";
+import { ArrowLeft, Plus } from "lucide-react";
+
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 
-export const AddSectionComponent = ({
-    type,
-}: {
-    type?: "navbar" | "footer";
-}) => {
+export const AddSectionComponent = ({ type }: { type?: "navbar" | "footer" }) => {
     const dispatch = useAppDispatch();
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedComponentType, setSelectedComponentType] = useState<
-        EComponentType | undefined
-    >(undefined);
+    const [selectedComponentType, setSelectedComponentType] = useState<EComponentType | undefined>(undefined);
     const [step, setStep] = useState(0);
 
     const { data, isLoading, isFetching, isError } = useGetComponentsQuery(
@@ -44,10 +38,7 @@ export const AddSectionComponent = ({
     );
 
     const handleAddSection = (single: Component) => {
-        const compo = allComponents.find(
-            (singleCompo) => singleCompo.name === single.name
-        );
-        console.log("compo :>> ", allComponents);
+        const compo = allComponents.find((singleCompo) => singleCompo.name === single.name);
 
         if (!compo) return;
 
@@ -73,9 +64,7 @@ export const AddSectionComponent = ({
                         height: "250px",
                     }}
                     onClick={() => {
-                        setSelectedComponentType(
-                            section.type as EComponentType
-                        );
+                        setSelectedComponentType(section.type as EComponentType);
                         setStep(1);
                     }}
                 >
@@ -107,10 +96,7 @@ export const AddSectionComponent = ({
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     {componentsData.map((single) => (
                         <div key={single.id}>
-                            <button
-                                onClick={() => handleAddSection(single)}
-                                className="h-full w-full"
-                            >
+                            <button onClick={() => handleAddSection(single)} className="h-full w-full">
                                 <Image
                                     src={single.imgURL}
                                     height={200}
@@ -133,11 +119,7 @@ export const AddSectionComponent = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button
-                    variant="accent"
-                    className="w-fit mx-auto capitalize"
-                    size="lg"
-                >
+                <Button variant="accent" className="mx-auto w-fit capitalize" size="lg">
                     <Plus />
                     {`Add ${type || "Section"}`}
                 </Button>
@@ -146,19 +128,14 @@ export const AddSectionComponent = ({
             <DialogContent className="lg:max-w-7xl">
                 <DialogHeader>
                     <DialogTitle>{titles[step]}</DialogTitle>
-                    <DialogDescription className="sr-only">
-                        {`Add ${type || "Section"}`}
-                    </DialogDescription>
+                    <DialogDescription className="sr-only">{`Add ${type || "Section"}`}</DialogDescription>
                 </DialogHeader>
 
                 <DialogContainer>{allStep[step]}</DialogContainer>
 
                 <DialogFooter className="flex justify-end">
                     {step >= 1 ? (
-                        <Button
-                            variant="accent"
-                            onClick={() => setStep((pre) => pre - 1)}
-                        >
+                        <Button variant="accent" onClick={() => setStep((pre) => pre - 1)}>
                             <ArrowLeft /> Back
                         </Button>
                     ) : null}

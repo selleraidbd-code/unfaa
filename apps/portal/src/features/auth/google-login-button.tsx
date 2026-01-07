@@ -3,20 +3,16 @@
 import { loginWithGoogleAction } from "@/actions/auth-actions";
 import { useAuthSuccess } from "@/features/auth/hooks/use-auth-utils";
 import { useGoogleLogin } from "@react-oauth/google";
-import { toast } from "@workspace/ui/components/sonner";
-
-import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
+import { toast } from "@workspace/ui/components/sonner";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface GoogleLoginButtonProps {
     className?: string;
     size?: number;
 }
 
-export const GoogleLoginButton = ({
-    className,
-    size = 24,
-}: GoogleLoginButtonProps) => {
+export const GoogleLoginButton = ({ className, size = 24 }: GoogleLoginButtonProps) => {
     const onSuccess = useAuthSuccess();
 
     const googleLogin = useGoogleLogin({
@@ -24,8 +20,6 @@ export const GoogleLoginButton = ({
             const result = await loginWithGoogleAction({
                 access_token: response.access_token,
             });
-
-            console.log("result", result);
 
             if (result.status === "success") {
                 onSuccess(result.data);
@@ -41,12 +35,7 @@ export const GoogleLoginButton = ({
     });
 
     return (
-        <Button
-            variant="secondary"
-            type="button"
-            className={cn("w-full", className)}
-            onClick={() => googleLogin()}
-        >
+        <Button variant="secondary" type="button" className={cn("w-full", className)} onClick={() => googleLogin()}>
             <GoogleIcon size={size} />
             Continue with Google
         </Button>
@@ -55,13 +44,7 @@ export const GoogleLoginButton = ({
 
 const GoogleIcon = ({ size = 24 }: { size?: number }) => {
     return (
-        <svg
-            width={size}
-            height={size}
-            viewBox="0 0 48 48"
-            xmlns="http://www.w3.org/2000/svg"
-            className="mr-2"
-        >
+        <svg width={size} height={size} viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" className="mr-2">
             <path
                 fill="#FFC107"
                 d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"

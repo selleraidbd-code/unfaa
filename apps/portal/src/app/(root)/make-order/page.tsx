@@ -83,7 +83,7 @@ const Page = () => {
                 }
             })
             .catch((error) => {
-                console.log(error);
+                console.warn(error);
                 setFraudError(
                     error.data?.message || error.message || "Failed to check customer verification. Please try again."
                 );

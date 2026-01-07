@@ -1,8 +1,7 @@
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { useState } from "react";
+
 import { useCreateCategoryMutation } from "@/redux/api/category-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { CreateCategory } from "@/types/category-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
@@ -19,9 +18,12 @@ import {
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { CreateCategory } from "@/types/category-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
 
 const categoryFormSchema = z.object({
     name: z.string().min(3, {
@@ -74,7 +76,6 @@ export const CreateCategoryDialog = () => {
                 toast.success("Category created successfully");
             })
             .catch((error) => {
-                console.log(error);
                 toast.error(error.data.message);
             });
     };
@@ -83,17 +84,13 @@ export const CreateCategoryDialog = () => {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <CustomButton>
-                    <Plus className="w-4 h-4" /> Create Category
+                    <Plus className="h-4 w-4" /> Create Category
                 </CustomButton>
             </DialogTrigger>
             <DialogContent className="lg:max-w-3xl">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Create Category
-                    </DialogTitle>
-                    <DialogDescription>
-                        Create a new category for your shop.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Create Category</DialogTitle>
+                    <DialogDescription>Create a new category for your shop.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -114,17 +111,9 @@ export const CreateCategoryDialog = () => {
                                 control={form.control}
                             />
 
-                            <CustomFormImage
-                                label="Thumbnail Image"
-                                name="thumbnailImg"
-                                control={form.control}
-                            />
+                            <CustomFormImage label="Thumbnail Image" name="thumbnailImg" control={form.control} />
 
-                            <CustomFormImage
-                                label="Cover Image"
-                                name="coverImg"
-                                control={form.control}
-                            />
+                            <CustomFormImage label="Cover Image" name="coverImg" control={form.control} />
 
                             <CustomFormTextarea
                                 label="Keywords"

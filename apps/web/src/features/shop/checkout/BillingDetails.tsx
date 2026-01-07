@@ -1,9 +1,9 @@
 import { useShop } from "@/contexts/shop-context";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
-import { CustomFormSelect } from "@workspace/ui/components/custom/custom-form-select";
+import { CustomRadioGroup } from "@workspace/ui/components/custom/custom-radio-group";
 import { useFormContext } from "react-hook-form";
 
-const BillingDetails = () => {
+export const BillingDetails = () => {
     const { shop } = useShop();
 
     const deliveryZones =
@@ -38,16 +38,13 @@ const BillingDetails = () => {
                 type="text"
                 required
             />
-            <CustomFormSelect
+            <CustomRadioGroup
                 name="deliveryZoneId"
                 control={control}
                 label="ডেলিভারি জোন নির্বাচন করুন"
-                placeholder="ডেলিভারি জোন বেছে নিন"
                 options={deliveryZones}
-                required
+                layout="vertical"
             />
         </div>
     );
 };
-
-export default BillingDetails;

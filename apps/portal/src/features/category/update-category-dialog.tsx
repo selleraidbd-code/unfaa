@@ -1,7 +1,4 @@
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomFormImage } from "@/components/ui/custom-form-image";
 import { useUpdateCategoryMutation } from "@/redux/api/category-api";
-import { Category } from "@/types/category-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
@@ -15,9 +12,13 @@ import {
     DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
-import { useForm } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { Category } from "@/types/category-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
 
 const categoryFormSchema = z.object({
     name: z.string().min(3, {
@@ -36,10 +37,7 @@ interface UpdateCategoryDialogProps {
     onClose: () => void;
 }
 
-export const UpdateCategoryDialog = ({
-    category,
-    onClose,
-}: UpdateCategoryDialogProps) => {
+export const UpdateCategoryDialog = ({ category, onClose }: UpdateCategoryDialogProps) => {
     const form = useForm<CategoryFormValues>({
         resolver: zodResolver(categoryFormSchema),
         defaultValues: {
@@ -61,7 +59,6 @@ export const UpdateCategoryDialog = ({
                 onClose();
             })
             .catch((error) => {
-                console.log(error);
                 toast.error(error.data?.message || "Failed to update category");
             });
     };
@@ -70,12 +67,8 @@ export const UpdateCategoryDialog = ({
         <Dialog open={true} onOpenChange={onClose}>
             <DialogContent className="lg:max-w-3xl">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Update Category
-                    </DialogTitle>
-                    <DialogDescription>
-                        Update the category information.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Update Category</DialogTitle>
+                    <DialogDescription>Update the category information.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -96,17 +89,9 @@ export const UpdateCategoryDialog = ({
                                 control={form.control}
                             />
 
-                            <CustomFormImage
-                                label="Thumbnail Image"
-                                name="thumbnailImg"
-                                control={form.control}
-                            />
+                            <CustomFormImage label="Thumbnail Image" name="thumbnailImg" control={form.control} />
 
-                            <CustomFormImage
-                                label="Cover Image"
-                                name="coverImg"
-                                control={form.control}
-                            />
+                            <CustomFormImage label="Cover Image" name="coverImg" control={form.control} />
 
                             <CustomFormTextarea
                                 label="Keywords"
@@ -118,11 +103,7 @@ export const UpdateCategoryDialog = ({
 
                         <div className="flex justify-end gap-4">
                             <DialogClose asChild>
-                                <CustomButton
-                                    type="button"
-                                    variant="outline"
-                                    onClick={onClose}
-                                >
+                                <CustomButton type="button" variant="outline" onClick={onClose}>
                                     Cancel
                                 </CustomButton>
                             </DialogClose>

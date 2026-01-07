@@ -36,7 +36,7 @@ const UsersPage = () => {
     };
 
     const handleBulkDelete = () => {
-        console.log("Bulk delete");
+        console.warn("Bulk delete");
     };
 
     const handleDelete = async (id: string) => {

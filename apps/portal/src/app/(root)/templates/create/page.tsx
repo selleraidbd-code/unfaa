@@ -15,9 +15,8 @@ import { CustomTextarea } from "@workspace/ui/components/custom/custom-textarea"
 import { toast } from "@workspace/ui/components/sonner";
 import { Switch } from "@workspace/ui/components/switch";
 import { EPageType } from "@workspace/ui/landing/types";
-import { useTheme } from "next-themes";
 
-import { CreateLandingPagePayload, SiteType } from "@/types/landing-page-type";
+import { CreateLandingPagePayload } from "@/types/landing-page-type";
 import { CustomButton } from "@/components/ui/custom-button";
 import { FileUpload } from "@/components/file-upload";
 
@@ -80,8 +79,6 @@ const CreateTemplate = () => {
         label: category.label,
     }));
 
-    console.log(categoryOptions);
-
     return (
         <div className="grid gap-6">
             <div className="flex items-center gap-4">
@@ -93,7 +90,6 @@ const CreateTemplate = () => {
                         <Switch
                             checked={isEditing}
                             onCheckedChange={(value) => {
-                                console.log({ value });
                                 dispatch(setEditing(Boolean(value)));
                             }}
                         ></Switch>
@@ -154,7 +150,6 @@ const CreateTemplate = () => {
                     className="col-span-2"
                     limit={1}
                     onFilesSelected={(value) => {
-                        console.log(value);
                         dispatch(
                             setLandingPageData({
                                 fieldName: "imgUrl",

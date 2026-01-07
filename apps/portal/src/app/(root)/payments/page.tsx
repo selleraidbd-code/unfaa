@@ -1,22 +1,19 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
+import { useDeletePaymentMutation, useGetPaymentsQuery } from "@/redux/api/payments-api";
 import { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@workspace/ui/components/checkbox";
 import { toast } from "@workspace/ui/components/sonner";
+import { formatDate } from "@workspace/ui/lib/formateDate";
 import { Trash } from "lucide-react";
 
+import { Payment } from "@/types/payments-type";
 import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
-import {
-    useDeletePaymentMutation,
-    useGetPaymentsQuery,
-} from "@/redux/api/payments-api";
-import { Payment } from "@/types/payments-type";
-import { Checkbox } from "@workspace/ui/components/checkbox";
-import { formatDate } from "@workspace/ui/lib/formateDate";
 
 const Payments = () => {
     const searchParams = useSearchParams();
@@ -37,18 +34,16 @@ const Payments = () => {
     };
 
     const handleBulkDelete = () => {
-        console.log("Bulk delete");
+        console.warn("Bulk delete");
     };
 
     const handleDelete = (data: Payment) => {
         deletePayment({ id: data.id })
             .unwrap()
-            .then((res) => {
-                console.log(res);
+            .then(() => {
                 toast.success("Payment deleted successfully");
             })
-            .catch((err) => {
-                console.log(err);
+            .catch(() => {
                 toast.error("Payment deletion failed");
             });
     };
@@ -58,13 +53,8 @@ const Payments = () => {
             id: "select",
             header: ({ table }) => (
                 <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
-                    }
+                    checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
                     className="translate-y-[2px]"
                 />
@@ -82,55 +72,30 @@ const Payments = () => {
         },
         {
             accessorKey: "name",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Name" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
             cell: ({ row }) => {
-                return (
-                    <span className="truncate font-medium">
-                        {row.getValue("name")}
-                    </span>
-                );
+                return <span className="truncate font-medium">{row.getValue("name")}</span>;
             },
         },
         {
             accessorKey: "paymentMethod",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Payment Method" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Payment Method" />,
             cell: ({ row }) => {
-                return (
-                    <span className="truncate font-medium">
-                        {row.original.paymentMethod}
-                    </span>
-                );
+                return <span className="truncate font-medium">{row.original.paymentMethod}</span>;
             },
         },
         {
             accessorKey: "createdAt",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Created At" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
             cell: ({ row }) => {
-                return (
-                    <span className="truncate font-medium">
-                        {formatDate(row.getValue("createdAt"))}
-                    </span>
-                );
+                return <span className="truncate font-medium">{formatDate(row.getValue("createdAt"))}</span>;
             },
         },
         {
             id: "actions",
-            cell: ({ row }) => (
-                <DataTableRowActions
-                    row={row}
-                    actions={[{ label: "Delete", onClick: handleDelete }]}
-                />
-            ),
+            cell: ({ row }) => <DataTableRowActions row={row} actions={[{ label: "Delete", onClick: handleDelete }]} />,
         },
     ];
-
-    console.log(data);
 
     const meta: Meta = {
         total: data?.meta?.total || 0,

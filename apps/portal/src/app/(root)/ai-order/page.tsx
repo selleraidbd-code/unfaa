@@ -64,7 +64,7 @@ const Page = () => {
                 }
             })
             .catch((error) => {
-                console.log(error);
+                console.warn(error);
                 setFraudError(
                     error.data?.message || error.message || "Failed to check customer verification. Please try again."
                 );
@@ -111,7 +111,7 @@ const Page = () => {
                 }
             })
             .catch((error) => {
-                console.log(error);
+                console.warn(error);
                 toast.error(error.data?.message || "Failed to generate order");
                 setIsProcessing(false);
             });

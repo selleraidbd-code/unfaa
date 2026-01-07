@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSearchSelect } from "@workspace/ui/components/custom/custom-form-search-select";
-import CustomRadioGroup from "@workspace/ui/components/custom/custom-radio-group";
+import { CustomRadioGroup } from "@workspace/ui/components/custom/custom-radio-group";
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "@workspace/ui/components/sonner";
 import { EComponentType } from "@workspace/ui/landing/types";

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { config } from "@/config";
 import { useShop } from "@/contexts/shop-context";
-import BillingDetails from "@/features/shop/checkout/BillingDetails";
+import { BillingDetails } from "@/features/shop/checkout/BillingDetails";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { Form } from "@workspace/ui/components/form";
@@ -38,18 +38,7 @@ const formSchema = z.object({
         .string({
             required_error: "ফোন নম্বর লিখুন",
         })
-        .min(10, { message: "ফোন নম্বর কমপক্ষে 10 ডিজিট হতে হবে" })
-        .refine(
-            (value) => {
-                const cleanNumber = value.replace(/[\s-]/g, "");
-
-                const bdNumberRegex = /^(?:\+88|88)?01[3-9]\d{8}$/;
-                return bdNumberRegex.test(cleanNumber);
-            },
-            {
-                message: "সঠিক বাংলাদেশী ফোন নম্বর দিন",
-            }
-        ),
+        .min(10, { message: "ফোন নম্বর কমপক্ষে 10 ডিজিট হতে হবে" }),
     deliveryZoneId: z
         .string({
             required_error: "ডেলিভারি জোন নির্বাচন করুন",
@@ -75,7 +64,7 @@ const Page = () => {
             name: "",
             address: "",
             phone: "",
-            deliveryZoneId: "",
+            deliveryZoneId: shop?.delivery[0]?.deliveryZones?.[0]?.id || "",
         },
     });
 
@@ -152,6 +141,30 @@ const Page = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Set default delivery zone when shop data is available
+    useEffect(() => {
+        if (!shop?.delivery?.[0]?.deliveryZones?.length) return;
+
+        const firstDeliveryZoneId = shop.delivery[0].deliveryZones[0]?.id;
+        if (!firstDeliveryZoneId) return;
+
+        const savedForm = localStorage.getItem("checkout_form");
+        const currentDeliveryZoneId = form.getValues("deliveryZoneId");
+
+        // Only set default if no value is set and no saved form exists
+        if ((!currentDeliveryZoneId || currentDeliveryZoneId === "") && !savedForm) {
+            // Use setTimeout to ensure this runs after the form is fully initialized
+            setTimeout(() => {
+                form.setValue("deliveryZoneId", firstDeliveryZoneId, {
+                    shouldValidate: false,
+                    shouldDirty: false,
+                    shouldTouch: false,
+                });
+            }, 0);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [shop?.id, shop?.delivery?.[0]?.deliveryZones?.length]);
 
     if (cartItems.length === 0) {
         return (
@@ -230,7 +243,6 @@ const Page = () => {
             }
 
             const data = await response.json();
-            console.log("Order created:", data);
 
             // Track Purchase event
             const purchaseEventId = `purchase_${data?.data?.id || Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -304,7 +316,7 @@ const Page = () => {
     };
 
     const formErrors = form.formState.errors;
-    console.log("formErrors", formErrors);
+    console.warn("formErrors", formErrors);
 
     return (
         <Form {...form}>

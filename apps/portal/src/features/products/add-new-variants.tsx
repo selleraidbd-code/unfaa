@@ -1,7 +1,7 @@
-import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { useState } from "react";
+
 import { productVariantSchema } from "@/features/products/product-schema";
 import { useCreateProductVariantBulkMutation } from "@/redux/api/product-api";
-import { ProductVariantBulkPayload } from "@/types/product-type";
 import { Button } from "@workspace/ui/components/button";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormSwitch } from "@workspace/ui/components/custom/custom-form-switch";
@@ -14,11 +14,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
-import { Plus, Trash2, X } from "lucide-react";
-import { useState } from "react";
-import { useForm, UseFormReturn } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
+import { Plus, Trash2, X } from "lucide-react";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+
+import { ProductVariantBulkPayload } from "@/types/product-type";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
 
 type ProductVariantFormType = z.infer<typeof productVariantSchema>;
 
@@ -34,16 +36,13 @@ export const AddNewVariants = ({ productId }: { productId: string }) => {
                 {
                     name: "",
                     isRequired: false,
-                    productVariantOptions: [
-                        { name: "", sku: "", extraPrice: 0, imgUrl: "" },
-                    ],
+                    productVariantOptions: [{ name: "", sku: "", extraPrice: 0, imgUrl: "" }],
                 },
             ],
         },
     });
 
-    const [createProductVariantBulk, { isLoading: isCreatingVariantBulk }] =
-        useCreateProductVariantBulkMutation();
+    const [createProductVariantBulk, { isLoading: isCreatingVariantBulk }] = useCreateProductVariantBulkMutation();
 
     const productVariants = form.watch("variants");
 
@@ -66,23 +65,19 @@ export const AddNewVariants = ({ productId }: { productId: string }) => {
             {
                 name: "",
                 isRequired: false,
-                productVariantOptions: [
-                    { name: "", sku: "", extraPrice: 0, imgUrl: "" },
-                ],
+                productVariantOptions: [{ name: "", sku: "", extraPrice: 0, imgUrl: "" }],
             },
         ]);
     };
 
     const onSubmit = async () => {
         const data = form.getValues();
-        const payload: ProductVariantBulkPayload[] = data.variants.map(
-            (variant) => ({
-                name: variant.name,
-                isRequired: variant.isRequired,
-                productId: productId,
-                options: variant.productVariantOptions,
-            })
-        );
+        const payload: ProductVariantBulkPayload[] = data.variants.map((variant) => ({
+            name: variant.name,
+            isRequired: variant.isRequired,
+            productId: productId,
+            options: variant.productVariantOptions,
+        }));
 
         await createProductVariantBulk({
             id: productId,
@@ -90,7 +85,6 @@ export const AddNewVariants = ({ productId }: { productId: string }) => {
         })
             .unwrap()
             .then((res) => {
-                console.log("res", res);
                 toast.success("Product variants created successfully");
                 form.reset();
                 setOpen(false);
@@ -112,9 +106,7 @@ export const AddNewVariants = ({ productId }: { productId: string }) => {
             <DialogContent className="lg:max-w-5xl">
                 <DialogHeader>
                     <DialogTitle>Add New Variants</DialogTitle>
-                    <DialogDescription>
-                        You can add new variants to the product here.
-                    </DialogDescription>
+                    <DialogDescription>You can add new variants to the product here.</DialogDescription>
                 </DialogHeader>
 
                 <DialogContainer className="space-y-6">
@@ -128,22 +120,13 @@ export const AddNewVariants = ({ productId }: { productId: string }) => {
                         />
                     ))}
                 </DialogContainer>
-                <div className="flex justify-between items-center">
-                    <Button
-                        onClick={handleAddVariant}
-                        variant="accent"
-                        className="w-fit"
-                        type="button"
-                    >
+                <div className="flex items-center justify-between">
+                    <Button onClick={handleAddVariant} variant="accent" className="w-fit" type="button">
                         <Plus className="size-4" />
                         Add Another Variant
                     </Button>
 
-                    <Button
-                        className="w-fit"
-                        disabled={isCreatingVariantBulk}
-                        onClick={onSubmit}
-                    >
+                    <Button className="w-fit" disabled={isCreatingVariantBulk} onClick={onSubmit}>
                         Save Variants
                     </Button>
                 </div>
@@ -187,9 +170,7 @@ const VariantCard = ({
             if (currentVariant) {
                 updatedVariants[variantIndex] = {
                     ...currentVariant,
-                    productVariantOptions: variant.productVariantOptions.filter(
-                        (_, index) => index !== optionIndex
-                    ),
+                    productVariantOptions: variant.productVariantOptions.filter((_, index) => index !== optionIndex),
                 };
                 form.setValue("variants", updatedVariants);
             }
@@ -199,7 +180,7 @@ const VariantCard = ({
     };
 
     return (
-        <div className="border rounded-lg max-w-6xl p-6 border-primary">
+        <div className="border-primary max-w-6xl rounded-lg border p-6">
             <div className="flex justify-between">
                 <CustomFormSwitch
                     name={`variants.${variantIndex}.isRequired`}
@@ -210,12 +191,7 @@ const VariantCard = ({
                         least one of the variant options"
                     parentClassName="justify-between max-w-[96%]"
                 />
-                <Button
-                    onClick={deleteVariant}
-                    variant="destructiveOutline"
-                    size="icon"
-                    type="button"
-                >
+                <Button onClick={deleteVariant} variant="destructiveOutline" size="icon" type="button">
                     <Trash2 className="h-3.5 w-3.5" />
                 </Button>
             </div>
@@ -223,14 +199,14 @@ const VariantCard = ({
             <CustomFormInput
                 label="Title"
                 name={`variants.${variantIndex}.name`}
-                className="pt-6 mb-4"
+                className="mb-4 pt-6"
                 control={form.control}
                 placeholder="Enter the name of the variant (e.g. Size, Color, Material, etc.)"
                 required
             />
 
             {variant.productVariantOptions.map((_option, optionIndex) => (
-                <div key={optionIndex} className="flex  gap-6 pt-4">
+                <div key={optionIndex} className="flex gap-6 pt-4">
                     <CustomFormInput
                         label="Name"
                         name={`variants.${variantIndex}.productVariantOptions.${optionIndex}.name`}
@@ -271,12 +247,7 @@ const VariantCard = ({
                 </div>
             ))}
 
-            <Button
-                onClick={handleAddOption}
-                variant="accent"
-                className="w-fit mt-6"
-                type="button"
-            >
+            <Button onClick={handleAddOption} variant="accent" className="mt-6 w-fit" type="button">
                 <Plus className="size-4" />
                 Add New Option
             </Button>

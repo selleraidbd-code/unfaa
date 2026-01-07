@@ -1,6 +1,5 @@
-import { Dot } from "lucide-react";
-
 import { cn } from "@workspace/ui/lib/utils";
+import { Dot } from "lucide-react";
 
 interface FormErrorProps {
     message?: string;
@@ -15,12 +14,7 @@ export const CustomFormError = ({ message }: FormErrorProps) => {
     if (message.startsWith("Error:")) {
         // Remove 'Error: ' prefix and any auth.js URL references
         parsedMessages = [
-            message
-                .replace(/^Error: /, "")
-                .replace(
-                    /\. Read more at https:\/\/errors\.authjs\.dev#autherror.*/,
-                    ""
-                ),
+            message.replace(/^Error: /, "").replace(/\. Read more at https:\/\/errors\.authjs\.dev#autherror.*/, ""),
         ];
     } else {
         try {
@@ -32,9 +26,7 @@ export const CustomFormError = ({ message }: FormErrorProps) => {
                 for (const key in parsedMessage.errors) {
                     if (parsedMessage.errors[key]) {
                         parsedMessages.push(
-                            ...parsedMessage.errors[key].map(
-                                (err: { message: string }) => err.message
-                            )
+                            ...parsedMessage.errors[key].map((err: { message: string }) => err.message)
                         );
                     }
                 }
@@ -43,7 +35,6 @@ export const CustomFormError = ({ message }: FormErrorProps) => {
                 parsedMessages = [parsedMessage.code];
             }
         } catch (error) {
-            console.log(error);
             parsedMessages = [message];
         }
     }

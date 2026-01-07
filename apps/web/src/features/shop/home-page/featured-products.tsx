@@ -1,10 +1,11 @@
 "use client";
 
 import { ProductCard } from "@/features/shop/home-page/product-card";
-import { ShopSectionProduct } from "@/types/shop-type";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+
+import { ShopSectionProduct } from "@/types/shop-type";
 
 // const featuredProducts: Product[] = [
 //   {
@@ -98,20 +99,13 @@ interface FeaturedProductsProps {
     shopSlug: string;
 }
 
-export const FeaturedProducts = ({
-    subtitle,
-    title,
-    uniqueId,
-    products,
-    shopSlug,
-}: FeaturedProductsProps) => {
-    console.log("products", products);
+export const FeaturedProducts = ({ subtitle, title, uniqueId, products, shopSlug }: FeaturedProductsProps) => {
     return (
-        <section className="pb-16 container relative">
-            <div className="flex items-center justify-between mb-8">
+        <section className="relative container pb-16">
+            <div className="mb-8 flex items-center justify-between">
                 <div>
                     <p className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-6 bg-primary rounded-sm"></span>{" "}
+                        <span className="bg-primary h-6 w-1.5 rounded-sm"></span>{" "}
                         <span className="text-lg">{subtitle}</span>
                     </p>
                     <h2 className="title mt-2">{title}</h2>
@@ -121,13 +115,13 @@ export const FeaturedProducts = ({
                 <div className="flex items-center gap-4">
                     <button
                         type="button"
-                        className={`swiper-button-custom-prev-${uniqueId} size-12 rounded-full cursor-pointer disabled:bg-muted disabled:text-muted-foreground  bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center transition-colors duration-100`}
+                        className={`swiper-button-custom-prev-${uniqueId} disabled:bg-muted disabled:text-muted-foreground bg-primary hover:bg-primary/90 text-primary-foreground flex size-12 cursor-pointer items-center justify-center rounded-full transition-colors duration-100`}
                         aria-label="Previous slide"
                     >
                         <ChevronLeft className="size-6" />
                     </button>
                     <button
-                        className={`swiper-button-custom-next-${uniqueId} size-12 rounded-full cursor-pointer disabled:bg-muted disabled:text-muted-foreground bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center transition-colors duration-100`}
+                        className={`swiper-button-custom-next-${uniqueId} disabled:bg-muted disabled:text-muted-foreground bg-primary hover:bg-primary/90 text-primary-foreground flex size-12 cursor-pointer items-center justify-center rounded-full transition-colors duration-100`}
                         aria-label="Next slide"
                     >
                         <ChevronRight className="size-6" />
@@ -153,10 +147,7 @@ export const FeaturedProducts = ({
             >
                 {products.map((product) => (
                     <SwiperSlide key={product.id}>
-                        <ProductCard
-                            product={product.product}
-                            shopSlug={shopSlug}
-                        />
+                        <ProductCard product={product.product} shopSlug={shopSlug} />
                     </SwiperSlide>
                 ))}
             </Swiper>

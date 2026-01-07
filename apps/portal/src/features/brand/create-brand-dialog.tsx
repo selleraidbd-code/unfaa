@@ -1,10 +1,9 @@
 "use client";
 
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { useState } from "react";
+
 import { useCreateBrandMutation } from "@/redux/api/brand-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { CreateBrand } from "@/types/brand-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
@@ -20,9 +19,12 @@ import {
 import { Form } from "@workspace/ui/components/form";
 import { toast } from "@workspace/ui/components/sonner";
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { CreateBrand } from "@/types/brand-type";
+import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
 
 const brandFormSchema = z.object({
     name: z.string().min(2, {
@@ -65,7 +67,6 @@ export const CreateBrandDialog = () => {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
                 toast.error(error.data.message);
             });
     };
@@ -74,23 +75,16 @@ export const CreateBrandDialog = () => {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button>
-                    <Plus className="w-4 h-4" /> Create Brand
+                    <Plus className="h-4 w-4" /> Create Brand
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:!w-[80vw] lg:!w-[60vw] xl:!w-[40vw]">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Create Brand
-                    </DialogTitle>
-                    <DialogDescription>
-                        Create a new brand for your shop.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Create Brand</DialogTitle>
+                    <DialogDescription>Create a new brand for your shop.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <CustomFormInput
                             label="Name"
                             name="name"
@@ -100,11 +94,7 @@ export const CreateBrandDialog = () => {
                             control={form.control}
                         />
 
-                        <CustomFormImage
-                            label="Image"
-                            name="imgURL"
-                            control={form.control}
-                        />
+                        <CustomFormImage label="Image" name="imgURL" control={form.control} />
 
                         <div className="flex justify-end gap-4">
                             <DialogClose asChild>

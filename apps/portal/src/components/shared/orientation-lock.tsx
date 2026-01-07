@@ -27,12 +27,12 @@ export function OrientationLock() {
                     if (orientation?.lock) {
                         await orientation.lock("portrait-primary").catch((err: Error) => {
                             // Silently handle the error as some browsers/contexts don't support this
-                            console.log("Orientation lock not supported:", err.message);
+                            console.warn("Orientation lock not supported:", err.message);
                         });
                     }
                 } catch (error) {
                     // Some browsers don't support this API
-                    console.log("Screen Orientation API not available");
+                    console.warn("Screen Orientation API not available");
                 }
             };
 

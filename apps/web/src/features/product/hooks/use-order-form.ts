@@ -13,6 +13,7 @@ import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { getLink } from "@/lib/get-link";
 import { buildUserData, trackEventToBackend, trackTikTokPixel } from "@/lib/tracking-events";
 import { collectTrackingData } from "@/lib/tracking-utils";
+import { useCheckoutManagement } from "@/hooks/use-checkout-management";
 import { buildTikTokPackageContents, buildTikTokProductContents, trackTikTokEvent } from "@/hooks/use-tiktok-tracking";
 
 type FormData = {
@@ -29,6 +30,8 @@ type FormErrors = {
 
 export const useOrderForm = (product: Product | WithProductPackage, shopSlug: string) => {
     const router = useRouter();
+    const { checkOrderLimit, incrementOrderCount, getLimitErrorMessage, getCheckoutFormData, saveCheckoutFormData } =
+        useCheckoutManagement();
     const [formData, setFormData] = useState<FormData>({
         name: "",
         address: "",
@@ -45,14 +48,9 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
 
     // Load saved form data from localStorage on mount
     useEffect(() => {
-        const savedForm = localStorage.getItem("checkout_form");
+        const savedForm = getCheckoutFormData();
         if (savedForm) {
-            try {
-                const parsedForm = JSON.parse(savedForm);
-                setFormData(parsedForm);
-            } catch (error) {
-                console.error("Error parsing saved form:", error);
-            }
+            setFormData(savedForm);
         }
 
         // Set default delivery zone to the first one
@@ -78,7 +76,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
         if (packages && packages.length > 0 && packages[0]) {
             setSelectedPackage(packages[0]);
         }
-    }, [product]);
+    }, [product, getCheckoutFormData]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -131,6 +129,14 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             // Validate phone number: must be 11 digits and start with 01
             if (!normalizedPhone || normalizedPhone.length !== 11 || !normalizedPhone.startsWith("01")) {
                 setErrors((prev) => ({ ...prev, phone: "সঠিক মোবাইল নাম্বার লিখুন (০১XXXXXXXXX)" }));
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Check order limit before proceeding
+            const limitCheck = checkOrderLimit(formData.phone);
+            if (limitCheck.isLimitReached) {
+                toast.error(getLimitErrorMessage());
                 setIsSubmitting(false);
                 return;
             }
@@ -230,15 +236,15 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
 
             const data = await response.json();
 
+            // Increment order count after successful order
+            incrementOrderCount(formData.phone);
+
             // Save form data to localStorage for next time
-            localStorage.setItem(
-                "checkout_form",
-                JSON.stringify({
-                    name: formData.name,
-                    phone: formData.phone,
-                    address: formData.address,
-                })
-            );
+            saveCheckoutFormData({
+                name: formData.name,
+                phone: formData.phone,
+                address: formData.address,
+            });
 
             // Track Purchase event
             const purchaseEventId = `purchase_${data?.data?.id || Date.now()}_${Math.random().toString(36).substring(2, 9)}`;

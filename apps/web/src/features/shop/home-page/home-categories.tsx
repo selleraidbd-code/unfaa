@@ -147,17 +147,17 @@ export const HomeCategories = ({ categories, shopSlug }: { categories: ShopTheme
                                     path: `/category/${category.categoryId}`,
                                 })}
                                 key={category.id}
-                                className="group cursor-pointer rounded-md border-1"
+                                className="group cursor-pointer rounded-md border-1 pt-2"
                             >
                                 <Image
                                     alt="category image"
                                     src={category?.category.thumbnailImg || "/placeholder.png"}
                                     width={100}
                                     height={100}
-                                    className="mx-auto mt-5 flex h-[50%] w-[50%] items-center justify-center object-cover duration-300 group-hover:scale-110 group-hover:transition-all"
+                                    className="mx-auto flex h-[80px] w-[80px] items-center justify-center object-cover duration-300 group-hover:scale-110 group-hover:transition-all"
                                 />
 
-                                <h3 className="text-muted-foreground group-hover:text-primary mt-4 text-center text-sm transition-colors duration-300">
+                                <h3 className="text-muted-foreground group-hover:text-primary my-1 text-center text-sm transition-colors duration-300">
                                     {category.category.name}
                                 </h3>
                             </Link>

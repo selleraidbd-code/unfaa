@@ -55,7 +55,7 @@ export const ProductsPageWrapper = ({
         const params = new URLSearchParams(searchParams.toString());
         params.set("minPrice", newRange[0].toString());
         params.set("maxPrice", newRange[1].toString());
-        console.log("params", params.toString());
+        console.warn("params", params.toString());
         router.push(`?${params.toString()}`, { scroll: false });
     };
 

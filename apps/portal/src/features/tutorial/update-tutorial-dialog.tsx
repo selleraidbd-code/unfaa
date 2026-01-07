@@ -1,8 +1,8 @@
 "use client";
 
-import { CustomFormImage } from "@/components/ui/custom-form-image";
+import { useState } from "react";
+
 import { useUpdateTutorialMutation } from "@/redux/api/tutorial-api";
-import { CreateTutorial, Tutorial } from "@/types/tutorial-type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-textarea";
@@ -16,12 +16,14 @@ import {
     DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { Form } from "@workspace/ui/components/form";
-import { Upload } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "@workspace/ui/components/sonner";
+import { Upload } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { CreateTutorial, Tutorial } from "@/types/tutorial-type";
 import { CustomButton } from "@/components/ui/custom-button";
+import { CustomFormImage } from "@/components/ui/custom-form-image";
 
 const TutorialFormSchema = z.object({
     imgURL: z.string(),
@@ -46,8 +48,6 @@ export const UpdateTutorialDialog = ({ tutorial }: { tutorial: Tutorial }) => {
 
     const [updateTutorial, { isLoading }] = useUpdateTutorialMutation();
     const onSubmit = async (data: TutorialFormValues) => {
-        console.log("data :>> ", data);
-
         const payload: CreateTutorial = {
             title: data.title,
             imgURL: data.imgURL,
@@ -67,7 +67,6 @@ export const UpdateTutorialDialog = ({ tutorial }: { tutorial: Tutorial }) => {
                 setOpen(false);
             })
             .catch((error) => {
-                console.log(error);
                 toast.error(error.data.message);
             });
     };
@@ -76,23 +75,16 @@ export const UpdateTutorialDialog = ({ tutorial }: { tutorial: Tutorial }) => {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <CustomButton>
-                    <Upload className="w-2 h-2" /> Upload
+                    <Upload className="h-2 w-2" /> Upload
                 </CustomButton>
             </DialogTrigger>
             <DialogContent className="sm:!w-[80vw] lg:!w-[60vw] xl:!w-[40vw]">
                 <DialogHeader className="pb-3">
-                    <DialogTitle className="text-xl font-bold">
-                        Upload Tutorial
-                    </DialogTitle>
-                    <DialogDescription>
-                        Upload a new Tutorial.
-                    </DialogDescription>
+                    <DialogTitle className="text-xl font-bold">Upload Tutorial</DialogTitle>
+                    <DialogDescription>Upload a new Tutorial.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4"
-                    >
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <CustomFormTextarea
                             label="Title"
                             name="title"
@@ -116,11 +108,7 @@ export const UpdateTutorialDialog = ({ tutorial }: { tutorial: Tutorial }) => {
                             required={true}
                             control={form.control}
                         />
-                        <CustomFormImage
-                            label="Image"
-                            name="imgURL"
-                            control={form.control}
-                        />
+                        <CustomFormImage label="Image" name="imgURL" control={form.control} />
                         <div className="flex justify-end gap-4">
                             <DialogClose asChild>
                                 <CustomButton type="button" variant="outline">

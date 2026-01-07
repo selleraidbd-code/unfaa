@@ -1,23 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import {
-    useDeleteComponentMutation,
-    useGetComponentsQuery,
-} from "@/redux/api/component-api";
+import { useDeleteComponentMutation, useGetComponentsQuery } from "@/redux/api/component-api";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
+import { Checkbox } from "@workspace/ui/components/checkbox";
+import { toast } from "@workspace/ui/components/sonner";
+import { Component } from "@workspace/ui/landing/types";
+import { formatDate } from "@workspace/ui/lib/formateDate";
 import { Trash } from "lucide-react";
 
 import { useAlert } from "@/hooks/useAlert";
 import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
-import { Checkbox } from "@workspace/ui/components/checkbox";
-import { formatDate } from "@workspace/ui/lib/formateDate";
-import { Component } from "@workspace/ui/landing/types";
-import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "@workspace/ui/components/sonner";
 
 const ComponentsPage = () => {
     const router = useRouter();
@@ -35,11 +32,11 @@ const ComponentsPage = () => {
     const [deleteComponentById] = useDeleteComponentMutation();
 
     const handleSearch = (value: string) => {
-        console.log(value);
+        console.warn(value);
     };
 
     const handlePaginationChange = (state: PaginationState) => {
-        console.log(state);
+        console.warn(state);
     };
 
     const handleEdit = (data: Component) => {
@@ -47,7 +44,7 @@ const ComponentsPage = () => {
     };
 
     const handleBulkDelete = () => {
-        console.log("Bulk delete");
+        console.warn("Bulk delete");
     };
 
     const handleDelete = (data: Component) => {
@@ -57,12 +54,10 @@ const ComponentsPage = () => {
             onConfirm: async () => {
                 await deleteComponentById(data.id)
                     .unwrap()
-                    .then((res) => {
-                        console.log(res);
+                    .then(() => {
                         toast.success("Component deleted successfully");
                     })
-                    .catch((err) => {
-                        console.log(err);
+                    .catch(() => {
                         toast.error("Component deletion failed");
                     });
             },
@@ -74,13 +69,8 @@ const ComponentsPage = () => {
             id: "select",
             header: ({ table }) => (
                 <Checkbox
-                    checked={
-                        table.getIsAllPageRowsSelected() ||
-                        (table.getIsSomePageRowsSelected() && "indeterminate")
-                    }
-                    onCheckedChange={(value) =>
-                        table.toggleAllPageRowsSelected(!!value)
-                    }
+                    checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                     aria-label="Select all"
                     className="translate-y-[2px]"
                 />
@@ -99,9 +89,7 @@ const ComponentsPage = () => {
 
         {
             accessorKey: "imgURL",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Image" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Image" />,
             cell: ({ row }) => {
                 return (
                     <Image
@@ -116,41 +104,23 @@ const ComponentsPage = () => {
         },
         {
             accessorKey: "name",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Name" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
             cell: ({ row }) => {
-                return (
-                    <span className="truncate font-medium">
-                        {row.getValue("name")}
-                    </span>
-                );
+                return <span className="truncate font-medium">{row.getValue("name")}</span>;
             },
         },
         {
             accessorKey: "type",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Type" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
             cell: ({ row }) => {
-                return (
-                    <span className="truncate font-medium">
-                        {row.original.type}
-                    </span>
-                );
+                return <span className="truncate font-medium">{row.original.type}</span>;
             },
         },
         {
             accessorKey: "createdAt",
-            header: ({ column }) => (
-                <DataTableColumnHeader column={column} title="Created At" />
-            ),
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
             cell: ({ row }) => {
-                return (
-                    <span className="truncate font-medium">
-                        {formatDate(row.getValue("createdAt"))}
-                    </span>
-                );
+                return <span className="truncate font-medium">{formatDate(row.getValue("createdAt"))}</span>;
             },
         },
         {

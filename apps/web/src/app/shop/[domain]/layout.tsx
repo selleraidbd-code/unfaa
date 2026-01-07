@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 
 import { getShopDetails, getShops } from "@/actions/shop-actions";
+import { config } from "@/config";
 import { ShopProvider } from "@/contexts/shop-context";
 
 import { ShopNotFound } from "@/components/shop-not-found";
 import { TrackingPixels } from "@/components/tracking-pixels";
 
-// Enable ISR with 1 hour revalidation
-export const revalidate = 300; //  5 minutes in seconds
+// Enable ISR with revalidation time from config
+export const revalidate = config.revalidateTime;
 
 // Generate static params for all shops at build time
 export async function generateStaticParams() {

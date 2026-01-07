@@ -8,8 +8,8 @@ import { EPageType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
 
-// Revalidate every 5 minutes (300 seconds)
-export const revalidate = 300;
+// Revalidate using time from config
+export const revalidate = config.revalidateTime;
 
 type Props = {
     params: Promise<{ slug: string; domain: string }>;
@@ -34,7 +34,7 @@ export async function generateStaticParams() {
 async function getShopLayoutDetails(slug: string) {
     try {
         const response = await fetch(`${config.serverUrl}/landingPageLayout/details/${slug}`, {
-            next: { revalidate: 300 },
+            next: { revalidate: config.revalidateTime },
         });
 
         if (!response.ok) {

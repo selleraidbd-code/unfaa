@@ -29,13 +29,17 @@ interface CheckoutFormData {
  * - Daily order limits per phone number (5 orders per day)
  * - Checkout form data persistence
  */
-export const useCheckoutManagement = () => {
+export const useOrderDataManageLocally = () => {
     /**
-     * Get today's date in YYYY-MM-DD format
+     * Get today's date in YYYY-MM-DD format (local timezone)
      */
     const getTodayDate = useCallback((): string => {
         const today = new Date();
-        return today.toISOString().split("T")[0] || today.toLocaleDateString("en-CA");
+        // Use local timezone to get the correct date
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
     }, []);
 
     /**

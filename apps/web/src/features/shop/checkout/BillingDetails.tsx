@@ -1,6 +1,6 @@
 import { useShop } from "@/contexts/shop-context";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
-import { CustomRadioGroup } from "@workspace/ui/components/custom/custom-radio-group";
+import { CustomRadioGroupCard } from "@workspace/ui/components/custom/custom-radio-group-card";
 import { useFormContext } from "react-hook-form";
 
 export const BillingDetails = () => {
@@ -38,12 +38,12 @@ export const BillingDetails = () => {
                 type="text"
                 required
             />
-            <CustomRadioGroup
+            <CustomRadioGroupCard
                 name="deliveryZoneId"
                 control={control}
                 label="ডেলিভারি জোন নির্বাচন করুন"
                 options={deliveryZones}
-                layout="vertical"
+                columns={2}
             />
         </div>
     );

@@ -6,10 +6,7 @@ type ApiRequestInit = RequestInit & {
     next?: NextFetchRequestConfig;
 };
 
-async function apiFetch(
-    endpoint: RequestInfo | URL,
-    init?: ApiRequestInit
-): Promise<Response> {
+async function apiFetch(endpoint: RequestInfo | URL, init?: ApiRequestInit): Promise<Response> {
     // Handle URL construction - support both absolute and relative URLs
     const url =
         typeof endpoint === "string" && !endpoint.startsWith("http")
@@ -48,10 +45,7 @@ async function apiFetch(
  * JSON fetch helper with authentication and error handling
  * Properly handles 204 No Content responses
  */
-async function fetchJSON<T = unknown>(
-    endpoint: RequestInfo | URL,
-    init?: ApiRequestInit
-): Promise<T> {
+async function fetchJSON<T = unknown>(endpoint: RequestInfo | URL, init?: ApiRequestInit): Promise<T> {
     const response = await apiFetch(endpoint, init);
 
     // Handle error responses
@@ -66,9 +60,7 @@ async function fetchJSON<T = unknown>(
         }
 
         const error = new Error(
-            (typeof errorData.detail === "string"
-                ? errorData.detail
-                : undefined) ||
+            (typeof errorData.detail === "string" ? errorData.detail : undefined) ||
                 `API error: ${response.status} ${response.statusText}`
         ) as Error & {
             status?: number;
@@ -94,10 +86,7 @@ async function fetchJSON<T = unknown>(
  * HTTP method shortcuts
  */
 export const api = {
-    async get<T = unknown>(
-        endpoint: string,
-        options?: Omit<ApiRequestInit, "method" | "body">
-    ): Promise<T> {
+    async get<T = unknown>(endpoint: string, options?: Omit<ApiRequestInit, "method" | "body">): Promise<T> {
         return fetchJSON<T>(endpoint, { ...options, method: "GET" });
     },
 
@@ -137,10 +126,7 @@ export const api = {
         });
     },
 
-    async delete<T = unknown>(
-        endpoint: string,
-        options?: Omit<ApiRequestInit, "method">
-    ): Promise<T> {
+    async delete<T = unknown>(endpoint: string, options?: Omit<ApiRequestInit, "method">): Promise<T> {
         return fetchJSON<T>(endpoint, { ...options, method: "DELETE" });
     },
 };

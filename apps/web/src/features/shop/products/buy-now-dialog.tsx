@@ -25,7 +25,7 @@ import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { collectTrackingData } from "@/lib/tracking-utils";
-import { useCheckoutManagement } from "@/hooks/use-checkout-management";
+import { useOrderDataManageLocally } from "@/hooks/use-order-data-manage-locally";
 
 interface BuyNowDialogProps {
     product: Product;
@@ -33,11 +33,11 @@ interface BuyNowDialogProps {
 
 export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
     const { checkOrderLimit, incrementOrderCount, getLimitErrorMessage, getCheckoutFormData, saveCheckoutFormData } =
-        useCheckoutManagement();
+        useOrderDataManageLocally();
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quantity, setQuantity] = useState(1);
-    const [deliveryOption, setDeliveryOption] = useState("inside-dhaka");
+    const [deliveryOption, setDeliveryOption] = useState(product?.delivery?.deliveryZones?.[0]?.id || "");
     const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariantOption>>({});
     const [customerInfo, setCustomerInfo] = useState({
         name: "",
@@ -49,6 +49,11 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
         const savedForm = getCheckoutFormData();
         if (savedForm) {
             setCustomerInfo(savedForm);
+        }
+
+        // Set default delivery option to the first delivery zone
+        if (product?.delivery?.deliveryZones?.[0]?.id) {
+            setDeliveryOption(product.delivery.deliveryZones[0].id);
         }
 
         // Set default variants to the first option of each variant
@@ -66,10 +71,13 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
         }
     }, [open, product, getCheckoutFormData]);
 
-    const deliveryOptions = [
-        { value: "inside-dhaka", label: "Inside Dhaka", price: 60 },
-        { value: "outside-dhaka", label: "Outside Dhaka", price: 120 },
-    ];
+    // Get delivery options from product
+    const deliveryOptions =
+        product?.delivery?.deliveryZones?.map((zone) => ({
+            value: zone.id,
+            label: zone.name,
+            price: zone.isFree ? 0 : zone.fee,
+        })) || [];
 
     // Calculate variant extra prices
     const variantExtraPrice = Object.values(selectedVariants).reduce(
@@ -136,7 +144,7 @@ export const BuyNowDialog = ({ product }: BuyNowDialogProps) => {
             customerName: customerInfo.name,
             customerPhoneNumber: formattedPhone,
             customerAddress: customerInfo.address,
-            deliveryZoneId: product?.delivery?.deliveryZones?.[0]?.id || "",
+            deliveryZoneId: deliveryOption || "",
             orderStatus: OrderStatus.PLACED,
             orderSource,
             orderItems: [{ productId: product.id, quantity, orderItemVariant }],

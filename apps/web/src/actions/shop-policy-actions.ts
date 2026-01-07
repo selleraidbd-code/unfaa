@@ -1,5 +1,6 @@
 import { config } from "@/config";
 import { ResponseObject } from "@/types";
+
 import { ShopExtraInfo, ShopPolicyType } from "@/types/shop-type";
 
 export const getShopPolicy = async (
@@ -9,9 +10,7 @@ export const getShopPolicy = async (
     const shopSlug = slug.split(".")[0];
 
     try {
-        const response = await fetch(
-            `${config.serverUrl}/shop/extra-info/${shopSlug}/${policyType}`
-        );
+        const response = await fetch(`${config.serverUrl}/shop/extra-info/${shopSlug}/${policyType}`);
 
         if (!response.ok) {
             throw new Error("Failed to fetch shop layout details");

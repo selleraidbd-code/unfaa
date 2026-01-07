@@ -21,6 +21,7 @@ import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { getLink } from "@/lib/get-link";
 import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
 import { collectTrackingData } from "@/lib/tracking-utils";
+import { useOrderDataManageLocally } from "@/hooks/use-order-data-manage-locally";
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
 
 const formSchema = z.object({
@@ -49,6 +50,8 @@ const formSchema = z.object({
 const Page = () => {
     const router = useRouter();
     const { shop } = useShop();
+    const { checkOrderLimit, incrementOrderCount, saveCheckoutFormData, getLimitErrorMessage, getCheckoutFormData } =
+        useOrderDataManageLocally();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [summary, setSummary] = useState({
@@ -58,14 +61,33 @@ const Page = () => {
         itemCount: 0,
     });
 
+    const defaultValues = {
+        name: "",
+        address: "",
+        phone: "",
+        deliveryZoneId: shop?.delivery[0]?.deliveryZones?.[0]?.id || "",
+    };
+
+    // Get initial values from localStorage or use shop data as fallback
+    const getInitialValues = () => {
+        if (typeof window === "undefined") {
+            return defaultValues;
+        }
+        const savedForm = getCheckoutFormData();
+        if (!savedForm) {
+            return defaultValues;
+        }
+        return {
+            name: savedForm.name || "",
+            address: savedForm.address || "",
+            phone: savedForm.phone || "",
+            deliveryZoneId: shop?.delivery[0]?.deliveryZones?.[0]?.id || "",
+        };
+    };
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: "",
-            address: "",
-            phone: "",
-            deliveryZoneId: shop?.delivery[0]?.deliveryZones?.[0]?.id || "",
-        },
+        defaultValues: getInitialValues(),
     });
 
     useEffect(() => {
@@ -129,32 +151,19 @@ const Page = () => {
         return () => clearTimeout(timer);
     }, [cartItems.length, summary.total, shop.slug]);
 
-    useEffect(() => {
-        const savedForm = localStorage.getItem("checkout_form");
-        if (savedForm) {
-            const parsedForm = JSON.parse(savedForm);
-            form.setValue("name", parsedForm.name);
-            form.setValue("address", parsedForm.address);
-            form.setValue("phone", parsedForm.phone);
-            form.setValue("deliveryZoneId", parsedForm.deliveryZoneId);
-            form.reset(parsedForm);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     // Set default delivery zone when shop data is available
+    // Only set default if no value exists (either from localStorage or form initialization)
     useEffect(() => {
         if (!shop?.delivery?.[0]?.deliveryZones?.length) return;
 
         const firstDeliveryZoneId = shop.delivery[0].deliveryZones[0]?.id;
         if (!firstDeliveryZoneId) return;
 
-        const savedForm = localStorage.getItem("checkout_form");
         const currentDeliveryZoneId = form.getValues("deliveryZoneId");
 
-        // Only set default if no value is set and no saved form exists
-        if ((!currentDeliveryZoneId || currentDeliveryZoneId === "") && !savedForm) {
-            // Use setTimeout to ensure this runs after the form is fully initialized
+        // Only set shop default if form doesn't have a deliveryZoneId value yet
+        // (form initialization already handles localStorage, so we don't need to check it here)
+        if (!currentDeliveryZoneId || currentDeliveryZoneId === "") {
             setTimeout(() => {
                 form.setValue("deliveryZoneId", firstDeliveryZoneId, {
                     shouldValidate: false,
@@ -182,6 +191,22 @@ const Page = () => {
         setIsSubmitting(true);
 
         try {
+            // Validate phone number format first
+            const formattedPhone = formatPhoneNumber(values.phone);
+            if (!formattedPhone || formattedPhone.length !== 11 || !formattedPhone.startsWith("01")) {
+                toast.error("সঠিক মোবাইল নাম্বার লিখুন (০১XXXXXXXXX)");
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Check order limit before proceeding
+            const limitCheck = checkOrderLimit(values.phone);
+            if (limitCheck.isLimitReached) {
+                toast.error(getLimitErrorMessage());
+                setIsSubmitting(false);
+                return;
+            }
+
             const cartItems = cartStorage.getCart();
 
             const orderItems = cartItems?.map((item: CartItem) => ({
@@ -192,8 +217,6 @@ const Page = () => {
                     productVariantOptionId: variant.optionId,
                 })),
             }));
-
-            const formattedPhone = formatPhoneNumber(values.phone);
 
             // Collect tracking data (include phone number in phRaw)
             const trackingData = collectTrackingData(values.phone);
@@ -292,9 +315,16 @@ const Page = () => {
                 order_id: orderId,
             });
 
+            // Increment order count for this phone number
+            incrementOrderCount(values.phone);
+
             // Clear cart and save form data
             cartStorage.clearCart();
-            localStorage.setItem("checkout_form", JSON.stringify(values));
+            saveCheckoutFormData({
+                name: values.name,
+                address: values.address,
+                phone: values.phone,
+            });
 
             toast.success("অর্ডার সফলভাবে সম্পন্ন হয়েছে! ✅");
 
@@ -310,7 +340,6 @@ const Page = () => {
             const errorMessage =
                 error instanceof Error ? error.message : "অর্ডার তৈরিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।";
             toast.error(errorMessage);
-        } finally {
             setIsSubmitting(false);
         }
     };

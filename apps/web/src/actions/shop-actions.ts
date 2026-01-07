@@ -6,7 +6,7 @@ import { ResponseObject } from "@/types";
 import { Shop } from "@/types/shop-type";
 
 // Cache duration: 1 hour (3600 seconds)
-const REVALIDATE_TIME = config.revalidateTime;
+const REVALIDATE_TIME = 300;
 
 export const getShops = cache(async (): Promise<ResponseObject<Shop[]> | null> => {
     try {

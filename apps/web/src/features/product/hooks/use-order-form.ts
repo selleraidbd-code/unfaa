@@ -13,7 +13,7 @@ import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { getLink } from "@/lib/get-link";
 import { buildUserData, trackEventToBackend, trackTikTokPixel } from "@/lib/tracking-events";
 import { collectTrackingData } from "@/lib/tracking-utils";
-import { useCheckoutManagement } from "@/hooks/use-checkout-management";
+import { useOrderDataManageLocally } from "@/hooks/use-order-data-manage-locally";
 import { buildTikTokPackageContents, buildTikTokProductContents, trackTikTokEvent } from "@/hooks/use-tiktok-tracking";
 
 type FormData = {
@@ -31,7 +31,7 @@ type FormErrors = {
 export const useOrderForm = (product: Product | WithProductPackage, shopSlug: string) => {
     const router = useRouter();
     const { checkOrderLimit, incrementOrderCount, getLimitErrorMessage, getCheckoutFormData, saveCheckoutFormData } =
-        useCheckoutManagement();
+        useOrderDataManageLocally();
     const [formData, setFormData] = useState<FormData>({
         name: "",
         address: "",

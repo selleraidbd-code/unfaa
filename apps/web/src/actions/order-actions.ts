@@ -33,4 +33,4 @@ const getOrderBySerialNumber = async (orderSerialNumber: string) => {
     return data as ResponseObject<OrderResponse>;
 };
 
-export { makeOrder, getOrderById, getOrderBySerialNumber };
+export { getOrderById, getOrderBySerialNumber, makeOrder };

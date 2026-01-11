@@ -30,6 +30,7 @@ export const ProductSelectDialogForLandingPage = ({ open, onClose }: { open: boo
 
     const { data, isLoading, isError } = useGetProductsQuery({
         shopId: user?.shop.id,
+        limit: 50,
     });
 
     const handleSaveAndSelectTemplate = () => {

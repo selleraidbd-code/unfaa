@@ -27,7 +27,7 @@ interface FilterParams {
 export default function ProductsPage() {
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || 1;
-    const limit = searchParams.get("limit") || 10;
+    const limit = searchParams.get("limit") || 50;
     const user = useAppSelector((state) => state.auth.user);
     const { fire } = useAlert();
     const [filterParams, setFilterParams] = useState<FilterParams>({});

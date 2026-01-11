@@ -70,8 +70,8 @@ export const SuperAdminNavData = [
                 icon: PanelTop,
             },
             {
-                title: "Upload Tutorial",
-                url: "/upload-tutorial",
+                title: "Manage Courses",
+                url: "/manage-courses",
                 icon: MonitorUp,
             },
         ],
@@ -163,8 +163,8 @@ const SellerNavData = [
                 icon: Crown,
             },
             {
-                title: "Tutorial",
-                url: "/tutorial",
+                title: "Courses",
+                url: "/courses",
                 icon: CirclePlay,
             },
         ],

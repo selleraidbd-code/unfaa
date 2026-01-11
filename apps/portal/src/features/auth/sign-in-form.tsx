@@ -1,18 +1,19 @@
 "use client";
 
-import { signInFormSchema } from "@/features/auth/auth-schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import Link from "next/link";
 
 import { loginAction } from "@/actions/auth-actions";
-import { CustomButton } from "@/components/ui/custom-button";
+import { signInFormSchema } from "@/features/auth/auth-schemas";
 import { useAuthSuccess } from "@/features/auth/hooks/use-auth-utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormError } from "@workspace/ui/components/custom/custom-form-error";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
 import { Form } from "@workspace/ui/components/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { CustomButton } from "@/components/ui/custom-button";
 
 export const SignInForm = () => {
     const form = useForm<z.infer<typeof signInFormSchema>>({
@@ -30,7 +31,7 @@ export const SignInForm = () => {
 
     const onSubmit = (data: z.infer<typeof signInFormSchema>) => {
         startTransition(async () => {
-            const response = await loginAction(data.email, data.password);
+            const response = await loginAction(data.email.trim(), data.password.trim());
 
             if (response.status === "success") {
                 onSuccess({
@@ -65,7 +66,7 @@ export const SignInForm = () => {
                             control={form.control}
                             required
                         />
-                        <div className="flex items-center text-blue-500 justify-end">
+                        <div className="flex items-center justify-end text-blue-500">
                             <Link
                                 href="/auth/forgot-password"
                                 className="ml-auto text-sm underline-offset-4 hover:underline"
@@ -76,11 +77,7 @@ export const SignInForm = () => {
 
                         <CustomFormError message={error || undefined} />
 
-                        <CustomButton
-                            type="submit"
-                            className="w-full  "
-                            isLoading={isPending}
-                        >
+                        <CustomButton type="submit" className="w-full" isLoading={isPending}>
                             Sign In
                         </CustomButton>
                     </div>
@@ -89,7 +86,7 @@ export const SignInForm = () => {
                         Don&apos;t have an account?{" "}
                         <Link
                             href="/auth/sign-up"
-                            className="hover:text-primary pl-1 underline text-primary/80 underline-offset-4"
+                            className="hover:text-primary text-primary/80 pl-1 underline underline-offset-4"
                         >
                             Sign Up
                         </Link>

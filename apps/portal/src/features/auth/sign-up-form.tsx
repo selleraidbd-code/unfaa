@@ -32,7 +32,7 @@ const SignUpForm = () => {
 
     const onSubmit = (data: z.infer<typeof signUpFormSchema>) => {
         startTransition(async () => {
-            const response = await registerAction(data.name, data.email, data.password);
+            const response = await registerAction(data.name.trim(), data.email.trim(), data.password.trim());
 
             if (response.status === "success") {
                 onSuccess({

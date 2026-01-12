@@ -1,35 +1,25 @@
-import { User } from "@/features/auth/auth-type";
-import {
-    isRouteExactMatched,
-    isRouteMatched,
-    ROUTES,
-} from "@/middleware/route";
-import { UserRole } from "@/types";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+
+import { User } from "@/features/auth/auth-type";
+import { isRouteExactMatched, isRouteMatched, ROUTES } from "@/middleware/route";
+import { UserRole } from "@/types";
 
 export async function middleware(req: NextRequest) {
     const { pathname, searchParams, search } = req.nextUrl;
 
-    const isAuthenticated = await checkAuth();
+    const isAuthenticated = checkAuth(req);
     const isSellerRoute = isRouteMatched(pathname, ROUTES.sellerRoutes);
     const isSuperAdminRoute = isRouteMatched(pathname, ROUTES.superAdminRoutes);
     const isAuthRoute = isRouteExactMatched(pathname, ROUTES.auth);
-    const isAuthNotVerifiedRoute = isRouteExactMatched(
-        pathname,
-        ROUTES.authNotVerified
-    );
+    const isAuthNotVerifiedRoute = isRouteExactMatched(pathname, ROUTES.authNotVerified);
     const isPublicRoute = isRouteMatched(pathname, ROUTES.public);
     const isRootRoute = pathname === "/";
 
     if (isPublicRoute) return NextResponse.next();
 
     if (isAuthenticated) {
-        const { isVerified, isAdmin, isSeller } = await checkUserVerified();
-        if (
-            !isVerified &&
-            (isSellerRoute || isRootRoute || isAuthRoute || isSuperAdminRoute)
-        ) {
+        const { isVerified, isAdmin, isSeller } = checkUserVerified(req);
+        if (!isVerified && (isSellerRoute || isRootRoute || isAuthRoute || isSuperAdminRoute)) {
             return redirectTo("/auth/verify-email", req);
         }
         if (isVerified && !isAdmin && !isSeller) {
@@ -59,15 +49,12 @@ export async function middleware(req: NextRequest) {
 function redirectTo(path: string, req: NextRequest): NextResponse {
     const url = new URL(path, req.url);
 
-    return url.pathname === req.nextUrl.pathname
-        ? NextResponse.next()
-        : NextResponse.redirect(url);
+    return url.pathname === req.nextUrl.pathname ? NextResponse.next() : NextResponse.redirect(url);
 }
 
-const checkAuth = async () => {
-    const cookieStore = await cookies();
-    const accessToken = cookieStore.get("accessToken")?.value;
-    const refreshToken = cookieStore.get("refreshToken")?.value;
+const checkAuth = (req: NextRequest) => {
+    const accessToken = req.cookies.get("accessToken")?.value;
+    const refreshToken = req.cookies.get("refreshToken")?.value;
 
     if (accessToken && refreshToken) {
         return true;
@@ -76,13 +63,12 @@ const checkAuth = async () => {
     return false;
 };
 
-const checkUserVerified = async () => {
-    const cookieStore = await cookies();
-    const user = JSON.parse(cookieStore.get("user")?.value || "{}") as User;
+const checkUserVerified = (req: NextRequest) => {
+    const userCookie = req.cookies.get("user")?.value;
+    const user = userCookie ? (JSON.parse(userCookie) as User) : ({} as User);
 
     const isVerified = user?.isVerified;
-    const isAdmin =
-        user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
+    const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
     const isSeller = user?.role === UserRole.SELLER && user?.shop;
 
     return {
@@ -94,7 +80,5 @@ const checkUserVerified = async () => {
 
 // Matcher configuration - exclude static files and API routes
 export const config = {
-    matcher: [
-        "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
-    ],
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)"],
 };

@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
     pagination = true,
     paginationMeta,
     onPaginationChange,
-    showViewOptions = true,
+    showViewOptions,
 
     createButtonInfo,
     createButton,

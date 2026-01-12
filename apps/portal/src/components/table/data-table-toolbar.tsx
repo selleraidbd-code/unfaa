@@ -1,9 +1,8 @@
 "use client";
 
 import type { Table } from "@tanstack/react-table";
-import { ChevronDown, Plus, X } from "lucide-react";
-
 import { Button } from "@workspace/ui/components/button";
+import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,12 +10,13 @@ import {
     DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { cn } from "@workspace/ui/lib/utils";
-import { DataTableViewOptions } from "./data-table-view-options";
+import { ChevronDown, Plus, X } from "lucide-react";
+
+import { CustomButton } from "@/components/ui/custom-button";
 
 import { FilterableColumn, TableCreateButtonInfoProps } from "./data-table";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { CustomButton } from "@/components/ui/custom-button";
-import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
+import { DataTableViewOptions } from "./data-table-view-options";
 
 interface BulkAction<TData> {
     label: string;
@@ -41,7 +41,7 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
     table,
     filterableColumns = [],
-    showViewOptions = true,
+    showViewOptions,
     onSearch,
     createButtonInfo,
     createButton,
@@ -57,6 +57,8 @@ export function DataTableToolbar<TData>({
             onSearch("");
         }
     };
+
+    console.log("showViewOptions", showViewOptions);
 
     const isFiltered = table.getState().columnFilters.length > 0;
     const hasSelection = selectedRows.length > 0;
@@ -80,11 +82,7 @@ export function DataTableToolbar<TData>({
                     //     onKeyDown={handleSearch}
                     //     className="w-[150px] lg:w-[250px]"
                     // />
-                    <CustomSearch
-                        onSearch={onSearch}
-                        placeholder="Search..."
-                        className="w-[150px] lg:w-[250px]"
-                    />
+                    <CustomSearch onSearch={onSearch} placeholder="Search..." className="w-[150px] lg:w-[250px]" />
                 )}
                 {filterableColumns.length > 0 &&
                     filterableColumns.map((column) => {
@@ -98,9 +96,7 @@ export function DataTableToolbar<TData>({
                                 title={column.title}
                                 options={column.options}
                                 isMulti={column.isMulti}
-                                onFilterChange={(values) =>
-                                    handleFilterChange(column.id, values)
-                                }
+                                onFilterChange={(values) => handleFilterChange(column.id, values)}
                             />
                         );
                     })}
@@ -108,20 +104,12 @@ export function DataTableToolbar<TData>({
                 {bulkActions.length > 0 && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="ml-4 h-8"
-                                disabled={!hasSelection}
-                            >
+                            <Button variant="outline" size="sm" className="ml-4 h-8" disabled={!hasSelection}>
                                 Actions
                                 <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="start"
-                            className="w-[160px]"
-                        >
+                        <DropdownMenuContent align="start" className="w-[160px]">
                             {hasSelection && (
                                 <>
                                     {bulkActions.map((action, index) => (
@@ -135,9 +123,7 @@ export function DataTableToolbar<TData>({
                                                     : ""
                                             )}
                                         >
-                                            {action.icon && (
-                                                <action.icon className="h-4 w-4" />
-                                            )}
+                                            {action.icon && <action.icon className="h-4 w-4" />}
                                             {action.label}
                                         </DropdownMenuItem>
                                     ))}
@@ -157,10 +143,7 @@ export function DataTableToolbar<TData>({
             <div className="flex items-center space-x-2">
                 {showViewOptions && <DataTableViewOptions table={table} />}
                 {createButtonInfo && (
-                    <CustomButton
-                        onClick={createButtonInfo.onClick}
-                        href={createButtonInfo.href}
-                    >
+                    <CustomButton onClick={createButtonInfo.onClick} href={createButtonInfo.href}>
                         <Plus className="h-4 w-4" />
                         {createButtonInfo.label}
                     </CustomButton>

@@ -7,12 +7,14 @@
 // import { TopPaidedCustomer } from "@/features/dashboard/TopPaidedCustomer";
 // import { TopSellingProducts } from "@/features/dashboard/TopSellingProducts";
 // import TopStats from "@/features/dashboard/TopStats";
+// import { ProductBulkCreator } from "@/features/products/product-bulk-creator";
 
 import { ComingSoon } from "@/components/shared/coming-soon";
 
 const Page = () => {
     return (
         <ComingSoon />
+        // <ProductBulkCreator />
         //         <div className="flex flex-col gap-6">
         //             <TopStats />
 

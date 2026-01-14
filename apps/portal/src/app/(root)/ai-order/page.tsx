@@ -87,10 +87,12 @@ const Page = () => {
             .then((res) => {
                 const result = res.data.result;
 
+                const phoneNumber = formatPhoneNumber(result.data.customerPhone || "");
+
                 // Set customer state
                 setCustomerState({
                     customerName: result.data.customerName || "",
-                    customerPhone: result.data.customerPhone || "",
+                    customerPhone: phoneNumber || "",
                     customerAddress: result.data.customerAddress || "",
                     customerId: result.data.customerId || "",
                 });
@@ -106,8 +108,8 @@ const Page = () => {
 
                 setIsProcessing(false);
                 // Check fraud if phone number is available
-                if (result.data.customerPhone) {
-                    checkFraud(result.data.customerPhone);
+                if (phoneNumber) {
+                    checkFraud(phoneNumber);
                 }
             })
             .catch((error) => {

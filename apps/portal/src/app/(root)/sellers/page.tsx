@@ -4,22 +4,14 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { User } from "@/features/auth/auth-type";
-import { CreateUserDialog } from "@/features/auth/create-user-dialog";
-import { UserDetailsDialog } from "@/features/auth/user-details-dialog";
 import { useDeleteUserMutation, useGetUsersQuery } from "@/redux/api/auth-api";
 import { UserRole } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { AlertType } from "@workspace/ui/components/custom/custom-alert-dialogue";
-import {
-    CustomTabs,
-    CustomTabsContent,
-    CustomTabsList,
-    CustomTabsTrigger,
-} from "@workspace/ui/components/custom/custom-tabs";
 import { toast } from "@workspace/ui/components/sonner";
 import { formatDate } from "@workspace/ui/lib/formateDate";
-import { Shield, Trash, User as UserIcon } from "lucide-react";
+import { Trash } from "lucide-react";
 
 import { useAlert } from "@/hooks/useAlert";
 import { DataTable, Meta } from "@/components/table/data-table";
@@ -27,22 +19,19 @@ import { DataTableColumnHeader } from "@/components/table/data-table-column-head
 import { DataTableFieldCopy } from "@/components/table/data-table-field-copy";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 
-const UsersPage = () => {
+const SellersPage = () => {
     const { fire } = useAlert();
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || 1;
     const limit = searchParams.get("limit") || 30;
 
     const [searchTerm, setSearchTerm] = useState("");
-    const [activeTab, setActiveTab] = useState<UserRole>(UserRole.USER);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false);
 
     const { data, isLoading, isError } = useGetUsersQuery({
         page: Number(page),
         limit: Number(limit),
         searchTerm: searchTerm || undefined,
-        role: activeTab,
+        role: UserRole.SELLER,
     });
 
     const [deleteUser] = useDeleteUserMutation();
@@ -55,22 +44,16 @@ const UsersPage = () => {
         console.warn("Bulk delete");
     };
 
-    const handleRowClick = (user: User) => {
-        setSelectedUser(user);
-        setIsUserDetailsOpen(true);
-    };
-
     const handleDelete = async (id: string) => {
         fire({
-            title: "Delete User",
-            description: "Are you sure you want to delete this user? This action cannot be undone.",
+            title: "Delete Seller",
+            description: "Are you sure you want to delete this seller? This action cannot be undone.",
             type: AlertType.ERROR,
             onConfirm: async () => {
                 await deleteUser(id)
                     .unwrap()
                     .then(() => {
-                        toast.success("🎉 User deleted successfully");
-                        setIsUserDetailsOpen(false);
+                        toast.success("🎉 Seller deleted successfully");
                     })
                     .catch((error) => {
                         toast.error(error.data.message || "Something went wrong");
@@ -79,7 +62,7 @@ const UsersPage = () => {
         });
     };
 
-    const usersColumns: ColumnDef<User>[] = [
+    const sellersColumns: ColumnDef<User>[] = [
         {
             id: "select",
             header: ({ table }) => (
@@ -141,7 +124,7 @@ const UsersPage = () => {
                     actions={[
                         {
                             label: "Delete",
-                            onClick: () => handleRowClick(row.original),
+                            onClick: () => handleDelete(row.original.id),
                         },
                     ]}
                 />
@@ -155,83 +138,32 @@ const UsersPage = () => {
         limit: Number(limit),
     };
 
-    const getCreateButton = () => {
-        if (activeTab === UserRole.USER) {
-            return <CreateUserDialog />;
-        }
-        return null;
-    };
-
     return (
         <div className="space-y-4">
             <div>
-                <h2 className="text-2xl font-semibold tracking-tight">Users Management</h2>
-                <p className="text-muted-foreground">Manage users and admins in your system.</p>
+                <h2 className="text-2xl font-semibold tracking-tight">Sellers Management</h2>
+                <p className="text-muted-foreground">Manage sellers in your system.</p>
             </div>
 
-            <CustomTabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserRole)}>
-                <CustomTabsList>
-                    <CustomTabsTrigger value={UserRole.USER} icon={<UserIcon className="h-4 w-4" />}>
-                        Users
-                    </CustomTabsTrigger>
-                    <CustomTabsTrigger value={UserRole.ADMIN} icon={<Shield className="h-4 w-4" />}>
-                        Admins
-                    </CustomTabsTrigger>
-                </CustomTabsList>
-
-                <CustomTabsContent value={UserRole.USER} className="pt-4">
-                    <DataTable
-                        data={data?.data || []}
-                        columns={usersColumns}
-                        onSearch={handleSearch}
-                        pagination={true}
-                        paginationMeta={meta}
-                        createButton={getCreateButton()}
-                        bulkActions={[
-                            {
-                                label: "Delete Selected",
-                                onClick: handleBulkDelete,
-                                variant: "destructive",
-                                icon: Trash,
-                            },
-                        ]}
-                        isLoading={isLoading}
-                        isError={isError}
-                        onRowClick={handleRowClick}
-                    />
-                </CustomTabsContent>
-
-                <CustomTabsContent value={UserRole.ADMIN} className="pt-4">
-                    <DataTable
-                        data={data?.data || []}
-                        columns={usersColumns}
-                        onSearch={handleSearch}
-                        pagination={true}
-                        paginationMeta={meta}
-                        createButton={getCreateButton()}
-                        bulkActions={[
-                            {
-                                label: "Delete Selected",
-                                onClick: handleBulkDelete,
-                                variant: "destructive",
-                                icon: Trash,
-                            },
-                        ]}
-                        isLoading={isLoading}
-                        isError={isError}
-                        onRowClick={handleRowClick}
-                    />
-                </CustomTabsContent>
-            </CustomTabs>
-
-            <UserDetailsDialog
-                user={selectedUser}
-                open={isUserDetailsOpen}
-                onOpenChange={setIsUserDetailsOpen}
-                onDelete={handleDelete}
+            <DataTable
+                data={data?.data || []}
+                columns={sellersColumns}
+                onSearch={handleSearch}
+                pagination={true}
+                paginationMeta={meta}
+                bulkActions={[
+                    {
+                        label: "Delete Selected",
+                        onClick: handleBulkDelete,
+                        variant: "destructive",
+                        icon: Trash,
+                    },
+                ]}
+                isLoading={isLoading}
+                isError={isError}
             />
         </div>
     );
 };
 
-export default UsersPage;
+export default SellersPage;

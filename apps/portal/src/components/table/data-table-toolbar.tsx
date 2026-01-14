@@ -58,8 +58,6 @@ export function DataTableToolbar<TData>({
         }
     };
 
-    console.log("showViewOptions", showViewOptions);
-
     const isFiltered = table.getState().columnFilters.length > 0;
     const hasSelection = selectedRows.length > 0;
 

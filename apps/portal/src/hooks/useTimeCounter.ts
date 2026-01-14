@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
-const useTimeCounter = (initialSeconds: number): { countingTime: number; isEnd: boolean; reset: () => void } => {
+const useTimeCounter = (
+    initialSeconds: number,
+    enabled: boolean = true
+): { countingTime: number; isEnd: boolean; reset: () => void } => {
     const [countingTime, setCountingTime] = useState(initialSeconds);
-    const [isEnd, setIsEnd] = useState(false);
+    const [isEnd, setIsEnd] = useState(!enabled);
 
     useEffect(() => {
-        if (countingTime > 0 && !isEnd) {
+        if (enabled && countingTime > 0 && !isEnd) {
             const interval = setInterval(() => {
                 setCountingTime((prev) => {
                     if (prev === 1) {
@@ -19,7 +22,7 @@ const useTimeCounter = (initialSeconds: number): { countingTime: number; isEnd: 
 
             return () => clearInterval(interval);
         }
-    }, [countingTime, isEnd]);
+    }, [countingTime, isEnd, enabled]);
 
     const reset = useCallback(() => {
         setCountingTime(initialSeconds);

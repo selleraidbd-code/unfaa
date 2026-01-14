@@ -11,9 +11,10 @@ import { useReSendVerificationSignupOTPMutation } from "@/redux/api/auth-api";
 import { logoutThunkWithoutReload } from "@/redux/slices/auth-slice";
 import { useAppDispatch, useAppSelector } from "@/redux/store/hook";
 import { ErrorResponse } from "@/redux/type";
+import { UserRole } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CardDescription, CardTitle } from "@workspace/ui/components/card";
-import CustomOTPFormInput from "@workspace/ui/components/custom/custom-OTP-form-input";
+import { CustomOTPFormInput } from "@workspace/ui/components/custom/custom-OTP-form-input";
 import { Form } from "@workspace/ui/components/form";
 import { REGEXP_ONLY_DIGITS } from "@workspace/ui/components/input-otp";
 import { Separator } from "@workspace/ui/components/separator";
@@ -35,8 +36,12 @@ const OTPVerifyForm = () => {
     const router = useRouter();
     const user = useAppSelector((state) => state?.auth?.user);
     const email = user?.email;
+    const isAdmin = user?.role === UserRole.ADMIN;
+    const redirectPath = isAdmin ? "/overview" : "/onboarding";
+
     const dispatch = useAppDispatch();
-    const { countingTime, isEnd, reset } = useTimeCounter(30);
+    const [isOtpSent, setIsOtpSent] = useState(false);
+    const { countingTime, isEnd, reset } = useTimeCounter(30, isOtpSent);
 
     const [error, setError] = useState<string | null>(null);
     const [resendSuccess, setResendSuccess] = useState(false);
@@ -65,7 +70,7 @@ const OTPVerifyForm = () => {
                     accessToken: response.data.accessToken,
                     refreshToken: response.data.refreshToken,
                     user: response.data.user,
-                    path: "/onboarding",
+                    path: redirectPath,
                 });
             } else {
                 if (response.error?.status === 406) {
@@ -93,6 +98,7 @@ const OTPVerifyForm = () => {
             .then(() => {
                 toast.success("OTP code has been sent.");
                 setResendSuccess(true);
+                setIsOtpSent(true);
                 reset();
                 // Hide success message after 5 seconds
                 setTimeout(() => setResendSuccess(false), 5000);
@@ -100,6 +106,7 @@ const OTPVerifyForm = () => {
             .catch((err: ErrorResponse) => {
                 toast.error(err.message || "OTP code has not been sent.");
                 setResendSuccess(false);
+                setIsOtpSent(false);
             });
     };
 
@@ -112,7 +119,7 @@ const OTPVerifyForm = () => {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="w-sm overflow-hidden">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="overflow-hidden sm:w-sm">
                 <div className="mb-6 text-center">
                     <Image
                         src={logo}
@@ -164,12 +171,12 @@ const OTPVerifyForm = () => {
                     <button
                         type="button"
                         onClick={handleResendOpt}
-                        disabled={isResendLoading || !isEnd}
+                        disabled={isResendLoading || (isOtpSent && !isEnd)}
                         className="text-primary font-semibold hover:underline disabled:opacity-50"
                     >
                         {isResendLoading ? "Sending..." : "Resend"}
                     </button>
-                    {!isEnd && <span className="text-muted-foreground ml-1">(after {countingTime}s)</span>}
+                    {isOtpSent && !isEnd && <span className="text-muted-foreground ml-1">(after {countingTime}s)</span>}
                 </div>
 
                 <div className="my-2 flex items-center justify-center text-center text-sm">

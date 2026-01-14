@@ -7,7 +7,7 @@ import { useResetPasswordMutation } from "@/redux/api/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CustomFormError } from "@workspace/ui/components/custom/custom-form-error";
 import { CustomFormInput } from "@workspace/ui/components/custom/custom-form-input";
-import CustomOTPFormInput from "@workspace/ui/components/custom/custom-OTP-form-input";
+import { CustomOTPFormInput } from "@workspace/ui/components/custom/custom-OTP-form-input";
 import { Form } from "@workspace/ui/components/form";
 import { REGEXP_ONLY_DIGITS } from "@workspace/ui/components/input-otp";
 import { toast } from "@workspace/ui/components/sonner";

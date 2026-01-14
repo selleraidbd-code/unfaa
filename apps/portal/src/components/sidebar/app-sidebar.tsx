@@ -1,48 +1,37 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 
 import { getNavData } from "@/data/nav-data";
 import { useAppSelector } from "@/redux/store/hook";
 import { UserRole } from "@/types";
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarHeader,
-    useSidebar,
-} from "@workspace/ui/components/sidebar";
+import { Sidebar, SidebarContent, SidebarHeader, useSidebar } from "@workspace/ui/components/sidebar";
 import { Store } from "lucide-react";
-import Link from "next/link";
+
 import { NavMain } from "./nav-main";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
     const user = useAppSelector((state) => state.auth.user);
+    const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
     const { open } = useSidebar();
 
-    const data = getNavData(user?.role || UserRole.USER);
+    const data = getNavData(user?.role);
 
     return (
         <Sidebar collapsible="icon" {...props}>
-            <SidebarHeader className="flex justify-center pl-4 lg:pl-6 h-14">
-                <Link href="/" className="flex items-center gap-2 text-primary">
+            <SidebarHeader className="flex h-14 justify-center pl-4 lg:pl-6">
+                <Link href={isAdmin ? "/overview" : "/"} className="text-primary flex items-center gap-2">
                     <Store className="size-5" />
-                    {open && (
-                        <span className="text-base lg:text-lg font-semibold">
-                            Unfaa
-                        </span>
-                    )}
+                    {open && <span className="text-base font-semibold lg:text-lg">Unfaa</span>}
                 </Link>
             </SidebarHeader>
 
             <SidebarContent>
                 {data.navItems.map((item, index) => (
-                    <NavMain
-                        key={index}
-                        items={item.items}
-                        label={item.label}
-                    />
+                    <NavMain key={index} items={item.items} label={item.label} />
                 ))}
             </SidebarContent>
         </Sidebar>
     );
-}
+};

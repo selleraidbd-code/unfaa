@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@workspace/ui/components/card";
 import OTPVerifyForm from "@/features/auth/otp-form";
+import { Card, CardContent } from "@workspace/ui/components/card";
 
-export default function VerifyEmail() {
+const Page = () => {
     return (
-        <div className="grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0">
+        <div className="grid h-svh flex-col items-center justify-center max-sm:px-4 lg:max-w-none lg:px-0">
             <Card>
                 <CardContent className="pt-6">
                     <OTPVerifyForm />
@@ -11,4 +11,6 @@ export default function VerifyEmail() {
             </Card>
         </div>
     );
-}
+};
+
+export default Page;

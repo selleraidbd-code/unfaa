@@ -26,7 +26,7 @@ export const ManageCourseCard = ({
     };
 
     return (
-        <div className="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
+        <div className="group bg-card overflow-hidden rounded-lg border shadow-sm transition-all duration-300 hover:shadow-lg">
             <Link href={isPermission ? `/manage-courses/${course.id}` : `/courses/${course.id}`}>
                 <div className="relative h-48 overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50">
                     {course.thumbnail ? (

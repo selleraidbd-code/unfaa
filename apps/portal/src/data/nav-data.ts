@@ -20,10 +20,19 @@ import {
     Users,
 } from "lucide-react";
 
-export const getNavData = (role: UserRole) => {
+export const getNavData = (role?: UserRole) => {
+    if (!role) {
+        return {
+            navItems: [],
+        };
+    }
     if (role === UserRole.SUPER_ADMIN) {
         return {
             navItems: SuperAdminNavData,
+        };
+    } else if (role === UserRole.ADMIN) {
+        return {
+            navItems: AdminNavData,
         };
     } else if (role === UserRole.SELLER) {
         return {
@@ -40,6 +49,44 @@ export const getNavData = (role: UserRole) => {
     }
 };
 
+export const AdminNavData = [
+    {
+        label: "",
+        items: [
+            {
+                title: "Overview",
+                url: "/overview",
+                icon: LayoutDashboard,
+            },
+            {
+                title: "Sellers",
+                url: "/sellers",
+                icon: Users,
+            },
+            {
+                title: "Components",
+                url: "/components",
+                icon: Component,
+            },
+            {
+                title: "Templates",
+                url: "/templates",
+                icon: PanelTop,
+            },
+            {
+                title: "Manage Courses",
+                url: "/manage-courses",
+                icon: MonitorUp,
+            },
+            {
+                title: "Manage Tickets",
+                url: "/manage-ticket",
+                icon: MessageSquare,
+            },
+        ],
+    },
+];
+
 export const SuperAdminNavData = [
     {
         label: "",
@@ -53,6 +100,11 @@ export const SuperAdminNavData = [
                 title: "Shops",
                 url: "/shops",
                 icon: Store,
+            },
+            {
+                title: "Sellers",
+                url: "/sellers",
+                icon: Users,
             },
             {
                 title: "Users",

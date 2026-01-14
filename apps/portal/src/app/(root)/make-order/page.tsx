@@ -128,9 +128,10 @@ const Page = () => {
 
         // Return parsed data if at least name or phone is found
         if (customerName || customerPhone) {
+            const phoneNumber = formatPhoneNumber(customerPhone || "");
             return {
                 customerName: customerName,
-                customerPhone: customerPhone,
+                customerPhone: phoneNumber,
                 customerAddress: customerAddress,
                 CODAmount: CODAmount,
             };

@@ -18,9 +18,12 @@ export async function middleware(req: NextRequest) {
     if (isPublicRoute) return NextResponse.next();
 
     if (isAuthenticated) {
-        const { isVerified, isAdmin, isSeller } = checkUserVerified(req);
-        if (!isVerified && (isSellerRoute || isRootRoute || isAuthRoute || isSuperAdminRoute)) {
+        const { isVerified, isAdmin, isSeller, isEmployee } = checkUserVerified(req);
+        if (!isVerified && (isSellerRoute || isRootRoute || isAuthRoute || isSuperAdminRoute || isEmployee)) {
             return redirectTo("/auth/verify-email", req);
+        }
+        if (isVerified && isEmployee) {
+            return redirectTo("/", req);
         }
         if (isVerified && !isAdmin && !isSeller) {
             return redirectTo("/onboarding", req);
@@ -70,11 +73,13 @@ const checkUserVerified = (req: NextRequest) => {
     const isVerified = user?.isVerified;
     const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
     const isSeller = user?.role === UserRole.SELLER && user?.shop;
+    const isEmployee = user?.role === UserRole.EMPLOYEE;
 
     return {
         isVerified,
         isAdmin,
         isSeller,
+        isEmployee,
     };
 };
 

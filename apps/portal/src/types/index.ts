@@ -17,6 +17,7 @@ export enum UserRole {
     ADMIN = "ADMIN",
     SELLER = "SELLER",
     USER = "USER",
+    EMPLOYEE = "EMPLOYEE",
 }
 
 export enum EmployeeRole {

@@ -1,6 +1,7 @@
 import { AuthResponse, User } from "@/features/auth/auth-type";
 import { api } from "@/redux/api";
 import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
+import { UserRole } from "@/types";
 
 export const authApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -10,13 +11,14 @@ export const authApi = api.injectEndpoints({
                 accessToken: string;
                 refreshToken: string;
             }>,
-            { name: string; email: string; password: string }
+            { name: string; email: string; password: string; role: UserRole }
         >({
             query: (payload) => ({
                 url: `/auth/signup`,
                 method: METHOD.POST,
                 body: payload,
             }),
+            invalidatesTags: [TagType.User],
         }),
         verifySignupOTP: builder.mutation<{ user: User; accessToken: string }, { token: number }>({
             query: (payload) => ({
@@ -47,7 +49,7 @@ export const authApi = api.injectEndpoints({
         }),
         getUsers: builder.query<PaginatedResponse<User>, QueryParams>({
             query: (payload) => ({
-                url: `/user/`,
+                url: `/user`,
                 method: METHOD.GET,
                 params: payload,
             }),
@@ -84,6 +86,14 @@ export const authApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.User],
         }),
+        updateUser: builder.mutation<void, { id: string; role: UserRole }>({
+            query: ({ id, role }) => ({
+                url: `/user/${id}`,
+                method: METHOD.PATCH,
+                body: { role },
+            }),
+            invalidatesTags: [TagType.User],
+        }),
     }),
 });
 
@@ -95,6 +105,7 @@ export const {
     useGetUserQuery,
     useGetUsersQuery,
     useDeleteUserMutation,
+    useUpdateUserMutation,
     useSendForgotPasswordEmailMutation,
     useVerifyForgotPasswordOTPMutation,
     useResetPasswordMutation,

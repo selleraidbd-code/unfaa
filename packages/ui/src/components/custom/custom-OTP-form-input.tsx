@@ -1,7 +1,5 @@
 "use client";
 
-import { Control, FieldValues, Path } from "react-hook-form";
-
 import {
     FormControl,
     FormDescription,
@@ -10,11 +8,8 @@ import {
     FormLabel,
     FormMessage,
 } from "@workspace/ui/components/form";
-import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSlot,
-} from "@workspace/ui/components/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@workspace/ui/components/input-otp";
+import { Control, FieldValues, Path } from "react-hook-form";
 
 interface CustomOTPFormInputProps<T extends FieldValues> {
     control: Control<T>;
@@ -26,7 +21,7 @@ interface CustomOTPFormInputProps<T extends FieldValues> {
     pattern?: string;
 }
 
-const CustomOTPFormInput = <T extends FieldValues>({
+export const CustomOTPFormInput = <T extends FieldValues>({
     control,
     name,
     label,
@@ -43,12 +38,7 @@ const CustomOTPFormInput = <T extends FieldValues>({
                 <FormItem className="center flex-col">
                     <FormLabel>{label}</FormLabel>
                     <FormControl>
-                        <InputOTP
-                            maxLength={length}
-                            {...field}
-                            placeholder={placeholder}
-                            pattern={pattern}
-                        >
+                        <InputOTP maxLength={length} {...field} placeholder={placeholder} pattern={pattern}>
                             <InputOTPGroup>
                                 {Array.from({ length }, (_, index) => (
                                     <InputOTPSlot key={index} index={index} />
@@ -63,5 +53,3 @@ const CustomOTPFormInput = <T extends FieldValues>({
         />
     );
 };
-
-export default CustomOTPFormInput;

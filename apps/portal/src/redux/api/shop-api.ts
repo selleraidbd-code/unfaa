@@ -1,19 +1,8 @@
 import { api } from "@/redux/api";
-import {
-    METHOD,
-    PaginatedResponse,
-    QueryParams,
-    ResponseObject,
-    TagType,
-} from "@/redux/type";
-import { Category } from "@/types/category-type";
+import { METHOD, PaginatedResponse, QueryParams, ResponseObject, TagType } from "@/redux/type";
 
-import {
-    CreateShop,
-    Shop,
-    ShopExtraInfo,
-    ShopPolicyType,
-} from "@/types/shop-type";
+import { Category } from "@/types/category-type";
+import { CreateShop, Shop, ShopExtraInfo, ShopOverview, ShopPolicyType } from "@/types/shop-type";
 
 const shopApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -33,6 +22,13 @@ const shopApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Shop],
         }),
+        getShopOverview: builder.query<ResponseObject<ShopOverview>, { shopId: string }>({
+            query: ({ shopId }) => ({
+                url: `/shop/overview/${shopId}`,
+                method: METHOD.GET,
+            }),
+            providesTags: [TagType.Shop],
+        }),
         getMyShop: builder.query<ResponseObject<Shop>, void>({
             query: () => ({
                 url: `/shop/my-shop/`,
@@ -40,10 +36,7 @@ const shopApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Shop],
         }),
-        updateShop: builder.mutation<
-            void,
-            { id: string; payload: Partial<Shop> }
-        >({
+        updateShop: builder.mutation<void, { id: string; payload: Partial<Shop> }>({
             query: ({ id, payload }) => ({
                 url: `/shop/${id}`,
                 method: METHOD.PATCH,
@@ -58,20 +51,16 @@ const shopApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.Shop],
         }),
-        getShopPolicies: builder.query<
-            ResponseObject<ShopExtraInfo>,
-            { shopSlug: string; policyType: ShopPolicyType }
-        >({
-            query: ({ shopSlug, policyType }) => ({
-                url: `/shop/extra-info/${shopSlug}/${policyType}`,
-                method: METHOD.GET,
-            }),
-            providesTags: [TagType.Shop],
-        }),
-        getShopCategories: builder.query<
-            PaginatedResponse<Category>,
-            QueryParams
-        >({
+        getShopPolicies: builder.query<ResponseObject<ShopExtraInfo>, { shopSlug: string; policyType: ShopPolicyType }>(
+            {
+                query: ({ shopSlug, policyType }) => ({
+                    url: `/shop/extra-info/${shopSlug}/${policyType}`,
+                    method: METHOD.GET,
+                }),
+                providesTags: [TagType.Shop],
+            }
+        ),
+        getShopCategories: builder.query<PaginatedResponse<Category>, QueryParams>({
             query: (queryParams) => ({
                 url: `/site-category`,
                 method: METHOD.GET,
@@ -85,6 +74,7 @@ const shopApi = api.injectEndpoints({
 export const {
     useCreateShopMutation,
     useGetShopsQuery,
+    useGetShopOverviewQuery,
     useGetMyShopQuery,
     useUpdateShopMutation,
     useDeleteShopMutation,

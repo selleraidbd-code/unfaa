@@ -137,3 +137,55 @@ export type ShopExtraInfo = {
     refundPolicy: string;
     aboutUs: string;
 };
+
+export type ShopCurrentDetails = {
+    totalBrand: number;
+    totalProduct: number;
+    totalCategory: number;
+    totalCustomer: number;
+    totalShopEmployee: number;
+    totalOrder: number;
+    totalOrderCuriourPending: number;
+    totalOrderCuriourInReview: number;
+    totalOrderCuriourDelivered: number;
+    totalOrderCuriourPartialDelivered: number;
+    totalOrderCuriourCancelled: number;
+    totalOrderCuriourUnknown: number;
+};
+
+export type OrderSourceDataItem = {
+    date: string;
+    label: string;
+    customer: number;
+    admin: number;
+    aiOrder: number;
+    manualOrder: number;
+    websiteFacebook: number;
+    websiteTiktok: number;
+    landingPageFacebook: number;
+    landingPageTiktok: number;
+    unknown: number;
+    website: number;
+};
+
+export type OrderSourceData = {
+    data: OrderSourceDataItem[];
+    groupBy: string;
+};
+
+export type OrderStatusData = {
+    totalOrderPlaced: number;
+    totalOrderConfirmed: number;
+    totalOrderProcessing: number;
+    totalOrderHold: number;
+    totalOrderCancelled: number;
+    totalOrderReceived: number;
+    totalOrderReturn: number;
+    totalOrderNzc: number;
+};
+
+export type ShopOverview = {
+    shopCurrentDetails: ShopCurrentDetails;
+    orderSourceData: OrderSourceData;
+    orderStatusData: OrderStatusData;
+};

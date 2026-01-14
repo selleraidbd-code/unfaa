@@ -85,7 +85,6 @@ export const CourierOrderStats = ({ data }: CourierOrderStatsProps) => {
                 {courierStats.map((stat) => {
                     const Icon = stat.icon;
                     const value = data[stat.key];
-                    const percentage = totalCourierOrders > 0 ? ((value / totalCourierOrders) * 100).toFixed(0) : "0";
 
                     return (
                         <div
@@ -98,9 +97,6 @@ export const CourierOrderStats = ({ data }: CourierOrderStatsProps) => {
                             </div>
 
                             <div className="flex items-center gap-3 max-sm:justify-end">
-                                <span className="text-muted-foreground min-w-[3ch] text-right text-xs font-medium">
-                                    {percentage}%
-                                </span>
                                 <span className="min-w-[3ch] text-right text-lg font-bold">{value}</span>
                             </div>
                         </div>

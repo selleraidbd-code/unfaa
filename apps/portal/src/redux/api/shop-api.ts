@@ -22,10 +22,17 @@ const shopApi = api.injectEndpoints({
             }),
             providesTags: [TagType.Shop],
         }),
-        getShopOverview: builder.query<ResponseObject<ShopOverview>, { shopId: string }>({
-            query: ({ shopId }) => ({
+        getShopOverview: builder.query<
+            ResponseObject<ShopOverview>,
+            { shopId: string; startingDate?: string; endDate?: string }
+        >({
+            query: ({ shopId, startingDate, endDate }) => ({
                 url: `/shop/overview/${shopId}`,
                 method: METHOD.GET,
+                params: {
+                    ...(startingDate && { startingDate }),
+                    ...(endDate && { endDate }),
+                },
             }),
             providesTags: [TagType.Shop],
         }),

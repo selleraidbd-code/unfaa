@@ -4,7 +4,6 @@ import { cn } from "@workspace/ui/lib/utils";
 import {
     AlertCircle,
     CheckCircle2,
-    Icon,
     Loader2,
     LucideIcon,
     PackageCheck,
@@ -92,24 +91,14 @@ export const OrderStatusStats = ({ data }: OrderStatusStatsProps) => {
                 {statusConfig.map((stat) => {
                     const value = data[stat.key];
 
-                    return <OrderStatusStatsItem key={stat.key} stat={stat} value={value} totalOrders={totalOrders} />;
+                    return <OrderStatusStatsItem key={stat.key} stat={stat} value={value} />;
                 })}
             </div>
         </div>
     );
 };
 
-const OrderStatusStatsItem = ({
-    stat,
-    value,
-    totalOrders,
-}: {
-    stat: OrderStatusStatsItem;
-    value: number;
-    totalOrders: number;
-}) => {
-    const percentage = totalOrders > 0 ? ((value / totalOrders) * 100).toFixed(0) : "0";
-
+const OrderStatusStatsItem = ({ stat, value }: { stat: OrderStatusStatsItem; value: number }) => {
     const Icon = stat.icon;
 
     return (
@@ -123,7 +112,6 @@ const OrderStatusStatsItem = ({
             </div>
 
             <div className="flex items-center gap-3 max-sm:justify-end">
-                <span className="text-muted-foreground min-w-[3ch] text-right text-xs font-medium">{percentage}%</span>
                 <span className="min-w-[3ch] text-right text-lg font-bold">{value}</span>
             </div>
         </div>

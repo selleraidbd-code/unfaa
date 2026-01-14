@@ -19,9 +19,9 @@ export const FeaturedProducts = memo(function FeaturedProducts({ featureProducts
 
     return (
         <div className="mt-10 space-y-6">
-            <h2 className="text-center text-2xl font-bold md:text-[27px]">আপনার জন্য আরও প্রোডাক্ট 🔥</h2>
+            <h2 className="text-center text-xl font-bold sm:text-2xl md:text-[27px]">আপনার জন্য আরও প্রোডাক্ট 🔥</h2>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 xl:gap-6">
                 {featureProducts.map((featureProduct) => {
                     const product = featureProduct.product;
                     const discountPercent =
@@ -38,11 +38,11 @@ export const FeaturedProducts = memo(function FeaturedProducts({ featureProducts
                         <Link
                             key={featureProduct.productId}
                             href={productLink}
-                            className="group relative overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 hover:shadow-xl"
+                            className="group relative overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-xl md:rounded-xl"
                         >
                             {/* Discount Badge */}
                             {discountPercent > 0 && (
-                                <div className="absolute top-3 right-3 z-10 rounded-full bg-gradient-to-r from-red-600 to-red-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                                <div className="absolute top-1 right-1 z-10 rounded-full bg-gradient-to-r from-red-600 to-red-500 px-2 py-0.5 text-xs font-bold text-white shadow-lg md:top-3 md:right-3 md:px-3 md:py-1.5">
                                     {discountPercent}% ছাড়
                                 </div>
                             )}
@@ -66,7 +66,7 @@ export const FeaturedProducts = memo(function FeaturedProducts({ featureProducts
 
                             {/* Product Info */}
                             <div className="p-4">
-                                <h3 className="mb-3 line-clamp-2 min-h-[3rem] text-base font-semibold text-gray-800 transition-colors group-hover:text-red-600">
+                                <h3 className="mb-3 line-clamp-2 text-sm font-semibold text-gray-800 transition-colors group-hover:text-red-600 sm:min-h-[3rem] sm:text-base">
                                     {product.banglaName || product.name}
                                 </h3>
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { CourierOrderStats } from "@/features/dashboard/CourierOrderStats";
 import { OrderSourceChart } from "@/features/dashboard/OrderSourceChart";
 import { OrderStatusStats } from "@/features/dashboard/OrderStatusStats";
@@ -7,14 +9,44 @@ import { ShopCurrentDetailsStats } from "@/features/dashboard/ShopCurrentDetails
 import { useGetShopOverviewQuery } from "@/redux/api/shop-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { DateRange } from "react-day-picker";
+
+import { DateRangePicker } from "@/components/date-range-picker";
 
 const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
+    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+    const [debouncedDateRange, setDebouncedDateRange] = useState<DateRange | undefined>(undefined);
 
-    const { data: shopOverview, isLoading: isShopOverviewLoading } = useGetShopOverviewQuery({ shopId });
+    // Debounce date range changes
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedDateRange(dateRange);
+        }, 500); // 500ms debounce delay
 
-    if (isShopOverviewLoading) {
+        return () => clearTimeout(timer);
+    }, [dateRange]);
+
+    // Format dates to YYYY-MM-DD string for API
+    const formatDateForApi = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
+    // Single API query with optional date filters
+    const { data: shopOverview, isLoading } = useGetShopOverviewQuery(
+        {
+            shopId,
+            startingDate: debouncedDateRange?.from ? formatDateForApi(debouncedDateRange.from) : undefined,
+            endDate: debouncedDateRange?.to ? formatDateForApi(debouncedDateRange.to) : undefined,
+        },
+        { skip: !shopId }
+    );
+
+    if (isLoading) {
         return (
             <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
@@ -43,8 +75,19 @@ const Page = () => {
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Shop Current Details Stats */}
+            {/* Shop Current Details Stats - Always Static */}
             <ShopCurrentDetailsStats data={shopCurrentDetails} />
+
+            {/* Date Range Picker */}
+            <div className="bg-card flex items-center justify-between gap-4 rounded-lg border p-3">
+                <div className="flex-1">
+                    <h3 className="text-sm font-medium">Filter Orders by Date</h3>
+                    <p className="text-muted-foreground text-xs">
+                        Select a date range to filter order statistics and analytics
+                    </p>
+                </div>
+                <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+            </div>
 
             {/* Two Column Layout for Courier and Order Status */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

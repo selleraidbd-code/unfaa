@@ -125,7 +125,7 @@ export async function trackEventToBackend(
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ body: eventData }),
+            body: JSON.stringify({  ...eventData }),
         });
 
         if (!response.ok) {

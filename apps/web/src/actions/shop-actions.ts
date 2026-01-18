@@ -41,6 +41,7 @@ export const getShopDetails = cache(async (slug: string): Promise<ResponseObject
                 tags: [`shop-${shopSlug}`], // Tag for on-demand revalidation
             },
         });
+        console.log("response", response)
 
         if (!response.ok) {
             throw new Error("Failed to fetch shop layout details");

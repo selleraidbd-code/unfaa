@@ -15,7 +15,7 @@ type Props = {
 };
 
 // Function to fetch all available slugs for static generation
-export async function generateStaticParams() {
+export async function generateStaticParams() { 
     try {
         const response = await getLandingPages();
         if (!response?.data) {
@@ -34,8 +34,7 @@ async function getShopLayoutDetails(slug: string) {
     try {
         const response = await fetch(`${config.serverUrl}/landingPageLayout/details/${slug}`, {
             next: { revalidate: REVALIDATE_TIME },
-        });
-
+        }); 
         if (!response.ok) {
             throw new Error("Failed to fetch shop layout details");
         }
@@ -50,7 +49,7 @@ async function getShopLayoutDetails(slug: string) {
 const PreviewPage = async ({ params }: Props) => {
     const { slug, domain } = await params;
     const shopLayoutData = await getShopLayoutDetails(slug);
-
+    console.log("shopLayoutData", shopLayoutData?.data.name)
     if (!shopLayoutData) {
         return <LandingNotFound slug={slug} />;
     }

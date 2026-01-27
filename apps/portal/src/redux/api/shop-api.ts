@@ -24,7 +24,7 @@ const shopApi = api.injectEndpoints({
         }),
         getShopOverview: builder.query<
             ResponseObject<ShopOverview>,
-            { shopId: string; startingDate?: string; endDate?: string }
+            { shopId?: string; startingDate?: string; endDate?: string }
         >({
             query: ({ shopId, startingDate, endDate }) => ({
                 url: `/shop/overview/${shopId}`,
@@ -67,6 +67,15 @@ const shopApi = api.injectEndpoints({
                 providesTags: [TagType.Shop],
             }
         ),
+        getShopPoliciesById: builder.query<ResponseObject<ShopExtraInfo>, { shopId: string; policyType: ShopPolicyType }>(
+            {
+                query: ({ shopId, policyType }) => ({
+                    url: `/shop/extra-info-by-id/${shopId}/${policyType}`,
+                    method: METHOD.GET,
+                }),
+                providesTags: [TagType.Shop],
+            }
+        ),
         getShopCategories: builder.query<PaginatedResponse<Category>, QueryParams>({
             query: (queryParams) => ({
                 url: `/site-category`,
@@ -86,5 +95,6 @@ export const {
     useUpdateShopMutation,
     useDeleteShopMutation,
     useGetShopPoliciesQuery,
+    useGetShopPoliciesByIdQuery,
     useGetShopCategoriesQuery,
 } = shopApi;

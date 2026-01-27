@@ -11,6 +11,7 @@ type Props = {
 
 export const EasyLandingPageFAQView = ({ landingPage, domain }: Props) => {
     const product = landingPage.product;
+    console.log("product", product)
     const featureProducts = landingPage.featureProducts;
     const shopSlug = domain;
     const sections = landingPage.section;

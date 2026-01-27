@@ -46,7 +46,7 @@ export const ProductSelectionModal = ({ open, onOpenChange, onSelectProduct }: P
     const { data, isLoading, isError } = useGetProductsQuery({
         page: currentPage,
         limit: 20,
-        shopSlug: user?.shop?.slug || "",
+        shopId: user?.shop?.id || "",
         searchTerm: searchTerm || undefined,
     });
 

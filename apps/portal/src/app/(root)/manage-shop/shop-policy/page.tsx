@@ -2,10 +2,7 @@
 
 import { HeaderBackButton } from "@/components/ui/custom-back-button";
 import { AboutUsPolicy } from "@/features/manage-shop/shop-policy/about-us-policy";
-import {
-    useGetShopPoliciesQuery,
-    useUpdateShopMutation,
-} from "@/redux/api/shop-api";
+import { useGetShopPoliciesByIdQuery, useUpdateShopMutation } from "@/redux/api/shop-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { ShopPolicyType } from "@/types/shop-type";
 
@@ -18,34 +15,36 @@ import { TermsConditionsPolicy } from "@/features/manage-shop/shop-policy/terms-
 const ShopPolicy = () => {
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id || "";
-    const shopSlug = user?.shop.slug || "";
 
     const { data: aboutUsData, isLoading: isLoadingAboutUs } =
-        useGetShopPoliciesQuery({
-            shopSlug,
+        useGetShopPoliciesByIdQuery({
+            shopId,
             policyType: ShopPolicyType.ABOUT_US,
         });
 
     const {
         data: termsAndConditionsData,
         isLoading: isLoadingTermsAndConditions,
-    } = useGetShopPoliciesQuery({
-        shopSlug,
+    } = useGetShopPoliciesByIdQuery({
+        shopId,
         policyType: ShopPolicyType.TERMS_AND_CONDITIONS,
     });
+
     const { data: privacyPolicyData, isLoading: isLoadingPrivacyPolicy } =
-        useGetShopPoliciesQuery({
-            shopSlug,
+        useGetShopPoliciesByIdQuery({
+            shopId,
             policyType: ShopPolicyType.PRIVACY_POLICY,
         });
+
     const { data: returnPolicyData, isLoading: isLoadingReturnPolicy } =
-        useGetShopPoliciesQuery({
-            shopSlug,
+        useGetShopPoliciesByIdQuery({
+            shopId,
             policyType: ShopPolicyType.RETURN_POLICY,
         });
+
     const { data: refundPolicyData, isLoading: isLoadingRefundPolicy } =
-        useGetShopPoliciesQuery({
-            shopSlug,
+        useGetShopPoliciesByIdQuery({
+            shopId,
             policyType: ShopPolicyType.REFUND_POLICY,
         });
 

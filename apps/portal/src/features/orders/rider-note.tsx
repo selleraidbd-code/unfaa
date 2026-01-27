@@ -65,7 +65,7 @@ export const RiderNote = () => {
                         {riderNoteData?.data?.map((note) => (
                             <div
                                 key={note.id}
-                                className="rounded-lg border bg-white p-4 transition-shadow hover:shadow-md"
+                                className="rounded-lg border bg-card p-4 transition-shadow hover:shadow-md"
                             >
                                 <div className="mb-3 flex items-start justify-between">
                                     <div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ export const RiderNote = () => {
                                         <span>{formatDateShortWithTime(note.createdAt)}</span>
                                     </div>
                                 </div>
-                                <div className="rounded-md bg-gray-50 p-3">
+                                <div className="rounded-md bg-muted/30 p-3">
                                     <p className="text-sm whitespace-pre-wrap">{note.trackingMessage}</p>
                                 </div>
                             </div>

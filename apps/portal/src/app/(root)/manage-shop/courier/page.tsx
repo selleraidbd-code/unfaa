@@ -437,9 +437,9 @@ const DeliverySupport = () => {
 
                         {/* Validation Error */}
                         {!validateCredentials(courierType) && (
-                            <Alert className="border-red-200 bg-red-50">
+                            <Alert className="border-red-200 bg-red-50 dark:bg-transparent">
                                 <AlertCircle className="h-4 w-4 text-red-600" />
-                                <AlertDescription className="text-red-800">
+                                <AlertDescription className="text-red-800 dark:text-red-400">
                                     Please fill in all required fields to save credentials.
                                 </AlertDescription>
                             </Alert>
@@ -499,7 +499,7 @@ const DeliverySupport = () => {
                     <CardContent>
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">Webhook URL</Label>
-                            <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 p-3">
+                            <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 dark:bg-transparent p-3">
                                 <CustomTextCopy
                                     text={webhookUrl}
                                     copy={true}
@@ -514,8 +514,8 @@ const DeliverySupport = () => {
 
             {/* Current Setup Status */}
             {currentCourierType && (
-                <Alert className="border-green-200 bg-green-50">
-                    <AlertDescription className="text-green-800">
+                <Alert className="border-green-200 bg-green-50 dark:bg-transparent">
+                    <AlertDescription className="text-green-800 dark:text-green-400">
                         <strong>{courierConfigs[currentCourierType].name}</strong> is currently configured and active.
                     </AlertDescription>
                 </Alert>

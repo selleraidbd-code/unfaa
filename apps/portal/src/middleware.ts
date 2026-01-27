@@ -22,10 +22,7 @@ export async function middleware(req: NextRequest) {
         if (!isVerified && (isSellerRoute || isRootRoute || isAuthRoute || isSuperAdminRoute || isEmployee)) {
             return redirectTo("/auth/verify-email", req);
         }
-        if (isVerified && isEmployee) {
-            return redirectTo("/", req);
-        }
-        if (isVerified && !isAdmin && !isSeller) {
+        if (isVerified && !isAdmin && !isSeller && !isEmployee) {
             return redirectTo("/onboarding", req);
         }
         if (isVerified && isAuthNotVerifiedRoute) {

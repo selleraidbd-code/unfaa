@@ -36,11 +36,11 @@ export const ProductBulkCreator = () => {
     const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
     const { data: productsDataResponse, refetch: refetchProducts } = useGetProductsQuery(
         {
-            shopSlug: user?.shop.slug || "",
+            shopId: user?.shop.id || "",
             limit: 1000,
             page: 1,
         },
-        { skip: !user?.shop.slug }
+        { skip: !user?.shop.id }
     );
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -112,7 +112,7 @@ export const ProductBulkCreator = () => {
     };
 
     const handleDeleteAllProducts = async () => {
-        if (!user?.shop.slug) {
+        if (!user?.shop.id) {
             toast.error("Shop information not available");
             return;
         }

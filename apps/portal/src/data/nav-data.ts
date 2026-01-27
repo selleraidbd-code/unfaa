@@ -27,35 +27,27 @@ export const getNavData = (role?: UserRole) => {
         };
     }
     if (role === UserRole.SUPER_ADMIN) {
-        return {
-            navItems: SuperAdminNavData,
-        };
+        return {navItems: SuperAdminNavData};
     } else if (role === UserRole.ADMIN) {
-        return {
-            navItems: AdminNavData,
-        };
+        return {navItems: AdminNavData};
     } else if (role === UserRole.SELLER) {
-        return {
-            navItems: SellerNavData,
-        };
-    } else if (role === UserRole.USER) {
-        return {
-            navItems: UserNavData,
-        };
+        return {navItems: SellerNavData};
+    }else if (role === UserRole.EMPLOYEE) {
+        return {navItems: EmployeeNavData};
+    }else if (role === UserRole.USER) {
+        return {navItems: UserNavData};
     } else {
-        return {
-            navItems: [],
-        };
+        return {navItems: []};
     }
 };
 
-export const AdminNavData = [
+const AdminNavData = [
     {
         label: "",
         items: [
             {
                 title: "Overview",
-                url: "/overview",
+                url: "/",
                 icon: LayoutDashboard,
             },
             {
@@ -87,7 +79,7 @@ export const AdminNavData = [
     },
 ];
 
-export const SuperAdminNavData = [
+const SuperAdminNavData = [
     {
         label: "",
         items: [
@@ -233,7 +225,90 @@ const SellerNavData = [
     },
 ];
 
-export const UserNavData = [
+const EmployeeNavData = [
+    {
+        label: "",
+        items: [
+            {
+                title: "Dashboard",
+                url: "/",
+                icon: LayoutDashboard,
+            },
+        ],
+    },
+    {
+        label: "Manage Order",
+        items: [
+            {
+                title: "AI Order",
+                url: "/ai-order",
+                icon: Bot,
+            },
+            // {
+            //     title: "Manual Order",
+            //     url: "/make-order",
+            //     icon: ClipboardPlus,
+            // },
+            {
+                title: "Orders",
+                url: "/orders",
+                icon: ShoppingCart,
+            },
+            {
+                title: "In Delivery",
+                url: "/delivery-orders",
+                icon: Truck,
+            },
+            {
+                title: "Customers",
+                url: "/customers",
+                icon: Users,
+            },
+        ],
+    },
+    {
+        label: "Manage Products",
+        items: [
+            {
+                title: "Products",
+                url: "/products",
+                icon: ShoppingBag,
+            },
+            {
+                title: "Categories",
+                url: "/categories",
+                icon: Package,
+            },
+            {
+                title: "Brands",
+                url: "/brands",
+                icon: Pocket,
+            },
+        ],
+    },
+    {
+        label: "Configuration",
+        items: [
+            {
+                title: "Landing Page",
+                url: "/landing-page",
+                icon: PanelTop,
+            },
+            {
+                title: "Courses",
+                url: "/courses",
+                icon: CirclePlay,
+            },
+            {
+                title: "Tickets",
+                url: "/tickets",
+                icon: MessageSquare,
+            },
+        ],
+    },
+];
+
+const UserNavData = [
     {
         label: "",
         items: [

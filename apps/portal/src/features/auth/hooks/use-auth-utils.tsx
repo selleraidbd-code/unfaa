@@ -28,7 +28,7 @@ export const useAuthSuccess = () => {
         }
 
         setTimeout(() => {
-            router.push(path || callbackUrl);
+            router.replace(path || callbackUrl);
         }, 0);
     };
 

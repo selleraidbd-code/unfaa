@@ -33,7 +33,7 @@ export default function ProductsPage() {
     const [filterParams, setFilterParams] = useState<FilterParams>({});
 
     const { data, isLoading, isError } = useGetProductsQuery({
-        shopSlug: user?.shop.slug,
+        shopId: user?.shop.id,
         ...filterParams,
         page: Number(page),
         limit: Number(limit),

@@ -118,7 +118,7 @@ export async function trackEventToBackend(
         const endpoint = eventName
             .replace(/([a-z])([A-Z])/g, "$1-$2") // Add dash before capital letters (but not before first char)
             .toLowerCase();
-        const url = `${config.serverUrl}/extranal-tracking/${endpoint}/${shopSlug}`;
+        const url = `${config.serverUrl}/extranal-tracking/view-content/${shopSlug}`;
 
         const response = await fetch(url, {
             method: "POST",

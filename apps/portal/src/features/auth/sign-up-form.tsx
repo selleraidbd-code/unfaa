@@ -79,15 +79,6 @@ const SignUpForm = () => {
                             required
                         />
 
-                        {/* <CustomFormInput
-                            name="confirmPassword"
-                            label="Confirm Password"
-                            placeholder="********"
-                            type="password"
-                            control={form.control}
-                            required
-                        /> */}
-
                         <CustomFormError message={error || undefined} />
 
                         <CustomButton type="submit" className="w-full" isLoading={isPending}>

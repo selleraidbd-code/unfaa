@@ -150,9 +150,10 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
 
             if (trackingData) {
                 // Check for Facebook tracking parameters
-                const isFacebook = trackingData.fbclid || trackingData.fbc || trackingData.fbp;
+                const isFacebook = trackingData.utmSource === "fb" || trackingData.utmSource === "facebook";
+
                 // Check for TikTok tracking parameters
-                isTikTok = !!(trackingData.ttclid || trackingData.ttp);
+                isTikTok = !!(trackingData.utmSource === "tiktok");
 
                 if (isFacebook) {
                     orderSource = OrderSource.WEBSITE_FACEBOOK;
@@ -249,29 +250,6 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             // Track Purchase event
             const purchaseEventId = `purchase_${data?.data?.id || Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
             const orderId = data?.data?.orderSerialNumber || data?.data?.id;
-            const categoryName = product.categories?.[0]?.category?.name || "Uncategorized";
-
-            // Track to backend
-            await trackEventToBackend(
-                "Purchase",
-                {
-                    event_id: purchaseEventId,
-                    external_id: orderId,
-                    content_name: product.name,
-                    content_category: categoryName,
-                    content_ids: [product.id],
-                    content_type: "product",
-                    value: totalAmount,
-                    currency: "BDT",
-                    user_data: {
-                        ...buildUserData(),
-                        phone: normalizedPhone,
-                        first_name: formData.name.split(/\s+/)[0] || "",
-                        last_name: formData.name.split(/\s+/).slice(1).join(" ") || "",
-                    },
-                },
-                shopSlug
-            );
 
             // Track TikTok Purchase event if TikTok tracking information is present
             if (isTikTok) {

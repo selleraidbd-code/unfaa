@@ -14,7 +14,12 @@ import { OrderSourceChart } from "./OrderSourceChart";
 import { OrderStatusStats } from "./OrderStatusStats";
 import { ShopCurrentDetailsStats } from "./ShopCurrentDetailsStats";
 
-export const SellerEmployeeDashboard = ({ shopId }: { shopId: string }) => {
+interface SellerEmployeeDashboardProps {
+    shopId: string;
+    isOwner: boolean;
+}
+
+export const SellerEmployeeDashboard = ({ shopId, isOwner }: SellerEmployeeDashboardProps) => {
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
     const [debouncedDateRange, setDebouncedDateRange] = useState<DateRange | undefined>(undefined);
 
@@ -75,7 +80,7 @@ export const SellerEmployeeDashboard = ({ shopId }: { shopId: string }) => {
     return (
         <div className="flex flex-col gap-4">
             {/* Shop Current Details Stats - Always Static */}
-            <ShopCurrentDetailsStats data={shopCurrentDetails} />
+            <ShopCurrentDetailsStats data={shopCurrentDetails} isOwner={isOwner} />
 
             {/* Date Range Picker */}
             <div className="bg-card flex items-center justify-between gap-4 rounded-lg border p-3">

@@ -30,7 +30,7 @@ export async function generateStaticParams() {
     }
 }
 
-async function getShopLayoutDetails(slug: string,shopSlug: string) {
+async function getShopLayoutDetails(slug: string, shopSlug: string) {
     try {
         const response = await fetch(`${config.serverUrl}/landingPageLayout/details/${slug}/${shopSlug}`, {
             next: { revalidate: REVALIDATE_TIME },
@@ -47,8 +47,9 @@ async function getShopLayoutDetails(slug: string,shopSlug: string) {
 }
 
 const PreviewPage = async ({ params }: Props) => {
-    const { slug, domain } = await params;
-    const shopLayoutData = await getShopLayoutDetails(slug,domain);
+    const { domain, slug } = await params;
+    console.log("domain", domain, "slug", slug);
+    const shopLayoutData = await getShopLayoutDetails(slug, domain);
 
     if (!shopLayoutData) {
         return <LandingNotFound slug={slug} />;

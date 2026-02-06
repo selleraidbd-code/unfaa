@@ -6,14 +6,8 @@ type GetLinkProps = {
     includeDomain?: boolean;
 };
 
-export const getLink = ({
-    shopSlug,
-    path,
-    includeDomain = false,
-}: GetLinkProps) => {
-    const link = includeDomain
-        ? `${config.webUrl}/shop/${shopSlug}${path}`
-        : `/shop/${shopSlug}${path}`;
+export const getLink = ({ shopSlug, path, includeDomain = false }: GetLinkProps) => {
+    const link = includeDomain ? `${config.webUrl}/${shopSlug}${path}` : `/${shopSlug}${path}`;
 
     return link;
 };

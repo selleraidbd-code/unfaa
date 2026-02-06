@@ -24,7 +24,7 @@ export const LandingPageCard = ({ landingPage }: LandingPageCardProps) => {
     const [deleteLandingPage, { isLoading: isDeleting }] = useDeleteLandingPageMutation();
 
     const getLandingPageUrl = (pageSlug: string) => {
-        return `${config.rootDomain}/shop/${user?.shop?.slug}/${pageSlug}`;
+        return `${config.rootDomain}/${user?.shop?.slug}/${pageSlug}`;
     };
 
     const getLandingPageMode = (pageType: EPageType) => {

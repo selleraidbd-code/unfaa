@@ -21,7 +21,7 @@ const SellerDetailsPage = () => {
     return (
         <div className="space-y-4">
             <HeaderBackButton title="Sellers" href="/sellers" />
-            <SellerEmployeeDashboard shopId={shopId} />
+            <SellerEmployeeDashboard shopId={shopId} isOwner={false} />
         </div>
     );
 };

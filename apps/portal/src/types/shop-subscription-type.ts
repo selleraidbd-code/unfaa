@@ -18,4 +18,5 @@ export interface ShopSubscriptionCreatePayload {
     shopId: string;
     subscriptionId: string;
     refaranceId: string;
+    status?: ShopSubscriptionStatus;
 }

@@ -16,7 +16,7 @@ const Page = () => {
 
     // For SELLER and EMPLOYEE roles
     if (user?.role === UserRole.SELLER || user?.role === UserRole.EMPLOYEE) {
-        return <SellerEmployeeDashboard shopId={shopId} />;
+        return <SellerEmployeeDashboard shopId={shopId} isOwner={true} />;
     }
 
     // Fallback for other roles

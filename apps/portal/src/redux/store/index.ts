@@ -7,14 +7,16 @@ import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, R
 
 import { storage } from "./storage";
 
+const storageKeyPrefix = "unfaa";
+
 const persistConfig = {
     auth: {
-        key: "auth",
+        key: `${storageKeyPrefix}_auth`,
         storage: storage,
         whitelist: ["accessToken", "refreshToken"],
     },
     components: {
-        key: "components",
+        key: `${storageKeyPrefix}_components`,
         storage: storage,
         whitelist: ["components"],
     },

@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+
 import { MobileMenu } from "@/components/shared/mobile-menu";
 
 export const Navbar = () => {
@@ -15,18 +16,14 @@ export const Navbar = () => {
         { label: "Contact", href: "#contact" },
     ];
 
-    const scrollToSection = (
-        e: React.MouseEvent<HTMLAnchorElement>,
-        href: string
-    ) => {
+    const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
         e.preventDefault();
         const id = href.replace("#", "");
         const element = document.getElementById(id);
         if (element) {
             const navHeight = 64; // Height of fixed navbar
             const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition =
-                elementPosition + window.pageYOffset - navHeight;
+            const offsetPosition = elementPosition + window.pageYOffset - navHeight;
 
             window.scrollTo({
                 top: offsetPosition,
@@ -36,29 +33,27 @@ export const Navbar = () => {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-sm border-b border-gray-200/20 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
+        <nav className="fixed top-0 right-0 left-0 z-50 border-b border-gray-200/20 bg-white/60 shadow-sm backdrop-blur-sm">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="flex h-16 items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-lg">
-                                U
-                            </span>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-purple-600">
+                            <span className="text-lg font-bold text-white">U</span>
                         </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-xl font-bold text-transparent">
                             Unfaa
                         </span>
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden items-center space-x-8 md:flex">
                         {navItems.map((item) => (
                             <a
                                 key={item.label}
                                 href={item.href}
                                 onClick={(e) => scrollToSection(e, item.href)}
-                                className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium text-sm cursor-pointer"
+                                className="cursor-pointer text-sm font-medium text-gray-700 transition-colors duration-200 hover:text-blue-600"
                             >
                                 {item.label}
                             </a>
@@ -66,16 +61,18 @@ export const Navbar = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="hidden md:flex items-center space-x-4">
+                    <div className="hidden items-center space-x-4 md:flex">
                         <Link
-                            href="/auth/sign-in"
-                            className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium text-sm px-4 py-2 rounded-lg hover:bg-gray-100/50"
+                            href="https://portal.unfaa.com/auth/sign-in"
+                            target="_blank"
+                            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100/50 hover:text-blue-600"
                         >
                             Log In
                         </Link>
                         <Link
-                            href="/auth/sign-up"
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm shadow-sm"
+                            href="https://portal.unfaa.com/auth/sign-up"
+                            target="_blank"
+                            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700"
                         >
                             Create Your Store
                         </Link>

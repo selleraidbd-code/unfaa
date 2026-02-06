@@ -62,22 +62,23 @@ export const SubscriptionPurchaseModal = ({ open, onOpenChange, plan }: Subscrip
             return;
         }
 
-        try {
-            setIsSubmitting(true);
+        setIsSubmitting(true);
 
-            await createShopSubscription({
-                shopId: user.shop.id,
-                subscriptionId: plan.id,
-                refaranceId: paymentMethod + "-" + transactionId.trim(),
-            }).unwrap();
-
-            toast.success("Subscription request submitted successfully.");
-            handleClose();
-        } catch {
-            toast.error("Failed to submit subscription request.");
-        } finally {
-            setIsSubmitting(false);
-        }
+        await createShopSubscription({
+            shopId: user.shop.id,
+            subscriptionId: plan.id,
+            refaranceId: paymentMethod + "-" + transactionId.trim(),
+        })
+            .unwrap()
+            .then(() => {
+                toast.success("Subscription request submitted successfully.");
+                handleClose();
+                setIsSubmitting(false);
+            })
+            .catch((error) => {
+                toast.error(error.data.message || "Failed to submit subscription request.");
+                setIsSubmitting(false);
+            });
     };
 
     return (

@@ -141,7 +141,7 @@ const Page = async ({
                     {/* Buy More Button */}
                     <div className="flex justify-center">
                         <Link
-                            href={`/shop/${domain}`}
+                            href={`/${domain}`}
                             className="rounded-lg bg-green-600 px-8 py-3 font-semibold text-white transition-colors hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
                         >
                             আরো কিনুন
@@ -150,7 +150,7 @@ const Page = async ({
                 </div>
             </div>
 
-            <AutoRedirect href={`/shop/${domain}`} delay={5000} />
+            <AutoRedirect href={`/${domain}`} delay={5000} />
         </div>
     );
 };

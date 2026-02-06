@@ -9,23 +9,11 @@ import {
 } from "@/redux/api/shop-subscription-api";
 import { useGetSubscriptionPlansQuery } from "@/redux/api/subscription-api";
 import { Button } from "@workspace/ui/components/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@workspace/ui/components/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@workspace/ui/components/dialog";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@workspace/ui/components/select";
 import { RadioGroup, RadioGroupItem } from "@workspace/ui/components/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { toast } from "@workspace/ui/components/sonner";
 
 import { ShopSubscriptionStatus } from "@/types/shop-subscription-type";
@@ -48,16 +36,9 @@ interface AssignSubscriptionModalProps {
     onSuccess?: () => void;
 }
 
-export const AssignSubscriptionModal = ({
-    open,
-    onOpenChange,
-    seller,
-    onSuccess,
-}: AssignSubscriptionModalProps) => {
+export const AssignSubscriptionModal = ({ open, onOpenChange, seller, onSuccess }: AssignSubscriptionModalProps) => {
     const [planId, setPlanId] = useState<string>("");
-    const [status, setStatus] = useState<ShopSubscriptionStatus>(
-        ShopSubscriptionStatus.UNDER_REVIEW
-    );
+    const [status, setStatus] = useState<ShopSubscriptionStatus>(ShopSubscriptionStatus.UNDER_REVIEW);
     const [paymentMethod, setPaymentMethod] = useState<string>("bkash");
     const [transactionId, setTransactionId] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,9 +68,7 @@ export const AssignSubscriptionModal = ({
             return;
         }
 
-        const refaranceId = transactionId.trim()
-            ? `${paymentMethod}-${transactionId.trim()}`
-            : "admin-assigned";
+        const refaranceId = transactionId.trim() ? `${paymentMethod}-${transactionId.trim()}` : "admin-assigned";
 
         try {
             setIsSubmitting(true);
@@ -98,16 +77,12 @@ export const AssignSubscriptionModal = ({
                 shopId: seller.shop.id,
                 subscriptionId: planId,
                 refaranceId,
+                status,
             }).unwrap();
 
             const created = result?.data;
 
-            if (
-                status === ShopSubscriptionStatus.ACTIVE &&
-                created?.id &&
-                created.shopId &&
-                created.subscriptionId
-            ) {
+            if (status === ShopSubscriptionStatus.ACTIVE && created?.id && created.shopId && created.subscriptionId) {
                 await updateStatus({
                     id: created.id,
                     shopId: created.shopId,
@@ -132,8 +107,7 @@ export const AssignSubscriptionModal = ({
 
     if (!seller) return null;
 
-    const paymentLabelPrefix =
-        paymentMethod === "bkash" ? "Bkash" : paymentMethod === "nagad" ? "Nagad" : "Rocket";
+    const paymentLabelPrefix = paymentMethod === "bkash" ? "Bkash" : paymentMethod === "nagad" ? "Nagad" : "Rocket";
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
@@ -144,8 +118,8 @@ export const AssignSubscriptionModal = ({
 
                 <div className="space-y-4">
                     <p className="text-muted-foreground text-sm">
-                        Assign a subscription plan to <strong>{seller.name}</strong>{" "}
-                        ({seller.email}). Shop: {seller.shop?.name ?? seller.shop?.id ?? "—"}
+                        Assign a subscription plan to <strong>{seller.name}</strong> ({seller.email}). Shop:{" "}
+                        {seller.shop?.name ?? seller.shop?.id ?? "—"}
                     </p>
 
                     <div className="space-y-2">
@@ -167,10 +141,7 @@ export const AssignSubscriptionModal = ({
 
                     <div className="space-y-2">
                         <Label>Status</Label>
-                        <Select
-                            value={status}
-                            onValueChange={(v) => setStatus(v as ShopSubscriptionStatus)}
-                        >
+                        <Select value={status} onValueChange={(v) => setStatus(v as ShopSubscriptionStatus)}>
                             <SelectTrigger>
                                 <SelectValue />
                             </SelectTrigger>
@@ -204,9 +175,7 @@ export const AssignSubscriptionModal = ({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="assign-txn-id">
-                            {paymentLabelPrefix} transaction ID (optional)
-                        </Label>
+                        <Label htmlFor="assign-txn-id">{paymentLabelPrefix} transaction ID (optional)</Label>
                         <Input
                             id="assign-txn-id"
                             placeholder="Leave empty for admin-assigned"
@@ -214,19 +183,14 @@ export const AssignSubscriptionModal = ({
                             onChange={(e) => setTransactionId(e.target.value)}
                         />
                         <p className="text-muted-foreground text-xs">
-                            Reference will be saved as{" "}
-                            <span className="font-semibold">refaranceId</span>. Use
+                            Reference will be saved as <span className="font-semibold">refaranceId</span>. Use
                             &quot;admin-assigned&quot; if left empty.
                         </p>
                     </div>
                 </div>
 
                 <DialogFooter className="mt-4">
-                    <Button
-                        variant="outline"
-                        onClick={handleClose}
-                        disabled={isSubmitting}
-                    >
+                    <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
                         Cancel
                     </Button>
                     <Button onClick={handleSubmit} disabled={isSubmitting}>

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { AssignSubscriptionModal } from "@/features/subscription/assign-subscription-modal";
 import { User } from "@/features/auth/auth-type";
+import { AssignSubscriptionModal } from "@/features/subscription/assign-subscription-modal";
 import { useDeleteUserMutation, useGetUsersQuery } from "@/redux/api/auth-api";
 import { UserRole } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
@@ -49,7 +49,12 @@ const SellersPage = () => {
     };
 
     const handleRowClick = (row: User) => {
-        router.push(`/sellers/${row.id}`);
+        const shopId = row.shop?.id;
+        if (shopId) {
+            router.push(`/sellers/${shopId}`);
+        } else {
+            toast.error("Seller has no shop");
+        }
     };
 
     const handleAssignSubscription = (seller: User) => {

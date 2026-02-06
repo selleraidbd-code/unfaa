@@ -9,6 +9,7 @@ import { ShopCurrentDetails } from "@/types/shop-type";
 
 interface ShopCurrentDetailsStatsProps {
     data: ShopCurrentDetails;
+    isOwner: boolean;
 }
 
 const stats = [
@@ -56,7 +57,7 @@ const stats = [
     },
 ];
 
-export const ShopCurrentDetailsStats = ({ data }: ShopCurrentDetailsStatsProps) => {
+export const ShopCurrentDetailsStats = ({ data, isOwner }: ShopCurrentDetailsStatsProps) => {
     return (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {stats.map((stat) => {
@@ -66,8 +67,11 @@ export const ShopCurrentDetailsStats = ({ data }: ShopCurrentDetailsStatsProps) 
                 return (
                     <Link
                         key={stat.key}
-                        href={stat.href}
-                        className="bg-card hover:bg-primary/5 hover:border-primary flex items-center justify-between gap-2 rounded-md border p-3 transition-shadow hover:shadow-md xl:px-4"
+                        href={isOwner ? stat.href : ``}
+                        className={cn(
+                            "bg-card flex items-center justify-between gap-2 rounded-md border p-3 transition-shadow xl:px-4",
+                            isOwner ? "hover:bg-primary/5 hover:border-primary hover:shadow-md" : "cursor-default"
+                        )}
                     >
                         <div className="min-w-0 flex-1 space-y-0.5">
                             <p className="text-muted-foreground truncate text-sm font-medium">{stat.label}</p>

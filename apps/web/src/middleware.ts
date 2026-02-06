@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
     if (!domain || domain.trim() === "") return NextResponse.next();
 
     const isPrimary = domain.includes(PRIMARY_DOMAIN);
-    console.log("isPrimary", isPrimary,{domain,PRIMARY_DOMAIN});
+    console.log("isPrimary", isPrimary, { domain, PRIMARY_DOMAIN });
 
     // Primary domain (oneielts.com)
     if (isPrimary) {
@@ -31,7 +31,7 @@ export async function middleware(req: NextRequest) {
     // Tenant domain - rewrite /shop/domain to /domain
     // If NOT primary domain, always redirect to `/shop/{domain}`
     if (!isPrimary && !domain.includes("localhost")) {
-        const shopPath = `/shop/${domain}`;
+        const shopPath = `/${domain}`;
         // If we are not already on `/shop/{domain}`, redirect there
         if (!pathname.startsWith(shopPath)) {
             const redirectUrl = new URL(shopPath, req.url);

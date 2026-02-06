@@ -85,6 +85,10 @@ export const SellerCourseDetailPage = () => {
     const course = courseData?.data;
     const videos = course?.videos || [];
 
+    const videoContainerClass = isMobile
+        ? "relative w-full overflow-hidden rounded-lg bg-black shadow-lg aspect-[9/16]"
+        : "relative aspect-[5/3] w-full overflow-hidden rounded-lg bg-black shadow-lg";
+
     const [selectedVideo, setSelectedVideo] = useState<CourseVideo | null>(null);
 
     // Update selected video when videos load
@@ -149,7 +153,7 @@ export const SellerCourseDetailPage = () => {
                 {/* Video Player - Left Side */}
                 <div className="flex-1">
                     <div className="sticky top-4">
-                        <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black shadow-lg">
+                        <div className={videoContainerClass}>
                             {selectedVideoId ? (
                                 <iframe
                                     src={`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1&rel=0&modestbranding=1`}
@@ -179,11 +183,12 @@ export const SellerCourseDetailPage = () => {
                         {/* Video Info */}
                         {selectedVideo && (
                             <div className="mt-4 rounded-lg bg-white p-4 shadow-sm">
-                                <h3 className="text-lg font-semibold text-gray-900">{selectedVideo.title}</h3>
+                                <h3 className="text-base font-semibold text-gray-900 lg:text-lg">
+                                    {selectedVideo.title}
+                                </h3>
                                 {selectedVideo.duration && (
                                     <p className="mt-1 text-sm text-gray-600">
-                                        Duration: {Math.floor(selectedVideo.duration / 60)}h{" "}
-                                        {selectedVideo.duration % 60}m
+                                        Duration: {selectedVideo.duration % 60}m
                                     </p>
                                 )}
                             </div>

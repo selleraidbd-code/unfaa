@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
+import { AssignSubscriptionModal } from "@/features/subscription/assign-subscription-modal";
 import { User } from "@/features/auth/auth-type";
 import { useDeleteUserMutation, useGetUsersQuery } from "@/redux/api/auth-api";
 import { UserRole } from "@/types";
@@ -20,12 +21,15 @@ import { DataTableFieldCopy } from "@/components/table/data-table-field-copy";
 import { DataTableRowActions } from "@/components/table/data-table-row-actions";
 
 const SellersPage = () => {
+    const router = useRouter();
     const { fire } = useAlert();
     const searchParams = useSearchParams();
     const page = searchParams.get("page") || 1;
     const limit = searchParams.get("limit") || 30;
 
     const [searchTerm, setSearchTerm] = useState("");
+    const [assignModalOpen, setAssignModalOpen] = useState(false);
+    const [selectedSeller, setSelectedSeller] = useState<User | null>(null);
 
     const { data, isLoading, isError } = useGetUsersQuery({
         page: Number(page),
@@ -42,6 +46,15 @@ const SellersPage = () => {
 
     const handleBulkDelete = () => {
         console.warn("Bulk delete");
+    };
+
+    const handleRowClick = (row: User) => {
+        router.push(`/sellers/${row.id}`);
+    };
+
+    const handleAssignSubscription = (seller: User) => {
+        setSelectedSeller(seller);
+        setAssignModalOpen(true);
     };
 
     const handleDelete = async (id: string) => {
@@ -123,6 +136,10 @@ const SellersPage = () => {
                     row={row}
                     actions={[
                         {
+                            label: "Assign Subscription",
+                            onClick: () => handleAssignSubscription(row.original),
+                        },
+                        {
                             label: "Delete",
                             onClick: () => handleDelete(row.original.id),
                         },
@@ -149,6 +166,7 @@ const SellersPage = () => {
                 data={data?.data || []}
                 columns={sellersColumns}
                 onSearch={handleSearch}
+                onRowClick={handleRowClick}
                 pagination={true}
                 paginationMeta={meta}
                 bulkActions={[
@@ -161,6 +179,13 @@ const SellersPage = () => {
                 ]}
                 isLoading={isLoading}
                 isError={isError}
+            />
+
+            <AssignSubscriptionModal
+                open={assignModalOpen}
+                onOpenChange={setAssignModalOpen}
+                seller={selectedSeller}
+                onSuccess={() => setSelectedSeller(null)}
             />
         </div>
     );

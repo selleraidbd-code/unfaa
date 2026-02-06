@@ -17,12 +17,9 @@ export const logoutThunk = createAsyncThunk("auth/logout", async () => {
     window.location.reload();
 });
 
-export const logoutThunkWithoutReload = createAsyncThunk(
-    "auth/logout",
-    async () => {
-        await logoutAction();
-    }
-);
+export const logoutThunkWithoutReload = createAsyncThunk("auth/logout", async () => {
+    await logoutAction();
+});
 
 // Set token to server side storage
 export const setTokensThunk = createAsyncThunk(
@@ -49,15 +46,7 @@ const authSlice = createSlice({
             state.state = "success";
             state.user = action.payload;
         },
-        clearAuth: (state) => {
-            state.user = null;
-            state.accessToken = null;
-            state.refreshToken = null;
-        },
-        setTokens: (
-            state,
-            action: PayloadAction<{ accessToken: string; refreshToken: string }>
-        ) => {
+        setTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
             state.accessToken = action.payload.accessToken;
             state.refreshToken = action.payload.refreshToken;
         },
@@ -74,6 +63,6 @@ const authSlice = createSlice({
     },
 });
 
-export const { setUser, clearAuth, setTokens, setState } = authSlice.actions;
+export const { setUser, setTokens, setState } = authSlice.actions;
 
 export default authSlice.reducer;

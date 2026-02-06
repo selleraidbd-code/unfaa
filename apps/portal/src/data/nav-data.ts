@@ -4,6 +4,7 @@ import {
     Bot,
     CirclePlay,
     Component,
+    CreditCard,
     Crown,
     Folder,
     LayoutDashboard,
@@ -27,17 +28,17 @@ export const getNavData = (role?: UserRole) => {
         };
     }
     if (role === UserRole.SUPER_ADMIN) {
-        return {navItems: SuperAdminNavData};
+        return { navItems: SuperAdminNavData };
     } else if (role === UserRole.ADMIN) {
-        return {navItems: AdminNavData};
+        return { navItems: AdminNavData };
     } else if (role === UserRole.SELLER) {
-        return {navItems: SellerNavData};
-    }else if (role === UserRole.EMPLOYEE) {
-        return {navItems: EmployeeNavData};
-    }else if (role === UserRole.USER) {
-        return {navItems: UserNavData};
+        return { navItems: SellerNavData };
+    } else if (role === UserRole.EMPLOYEE) {
+        return { navItems: EmployeeNavData };
+    } else if (role === UserRole.USER) {
+        return { navItems: UserNavData };
     } else {
-        return {navItems: []};
+        return { navItems: [] };
     }
 };
 
@@ -122,6 +123,16 @@ const SuperAdminNavData = [
                 title: "Manage Tickets",
                 url: "/manage-ticket",
                 icon: MessageSquare,
+            },
+            {
+                title: "Manage Subscriptions",
+                url: "/manage-subscriptions",
+                icon: CreditCard,
+            },
+            {
+                title: "Shop Subscriptions",
+                url: "/shop-subscriptions",
+                icon: ShoppingCart,
             },
         ],
     },

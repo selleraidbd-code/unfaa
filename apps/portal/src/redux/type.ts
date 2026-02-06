@@ -23,6 +23,8 @@ export enum TagType {
     Course = "Course",
     CourseVideo = "CourseVideo",
     Ticket = "Ticket",
+    SubscriptionPlan = "SubscriptionPlan",
+    ShopSubscription = "ShopSubscription",
 }
 
 export const tagTypes = Object.values(TagType);

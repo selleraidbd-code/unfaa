@@ -2,21 +2,19 @@
 
 import { useEffect, useState } from "react";
 
-import { DateRange } from "react-day-picker";
-
-import { DateRangePicker } from "@/components/date-range-picker";
 import { useGetShopOverviewQuery } from "@/redux/api/shop-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+import { DateRange } from "react-day-picker";
+
+import { DateRangePicker } from "@/components/date-range-picker";
 
 import { CourierOrderStats } from "./CourierOrderStats";
 import { OrderSourceChart } from "./OrderSourceChart";
 import { OrderStatusStats } from "./OrderStatusStats";
 import { ShopCurrentDetailsStats } from "./ShopCurrentDetailsStats";
 
-export const SellerEmployeeDashboard = () => {
-    const user = useAppSelector((state) => state.auth.user);
-    const shopId = user?.shop?.id || "";
+export const SellerEmployeeDashboard = ({ shopId }: { shopId: string }) => {
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
     const [debouncedDateRange, setDebouncedDateRange] = useState<DateRange | undefined>(undefined);
 

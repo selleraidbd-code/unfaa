@@ -1,183 +1,143 @@
-import { Badge } from "@workspace/ui/components/badge";
-import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
-import { Check, ArrowRight } from "lucide-react";
+"use client";
 
-interface PricingPlan {
-    name: string;
-    originalPrice: number;
-    price: number;
-    savings: number;
-    popular?: boolean;
-    description?: string;
-    features: string[];
+import { useMemo, useState } from "react";
+
+import { SubscriptionCard, type SubscriptionCardPlan } from "@/features/subscription/subscription-card";
+import { SubscriptionLoadingCard } from "@/features/subscription/subscription-loading-card";
+import { SubscriptionPurchaseModal } from "@/features/subscription/subscription-purchase-modal";
+import { useGetShopSubscriptionsQuery } from "@/redux/api/shop-subscription-api";
+import { useGetSubscriptionPlansQuery } from "@/redux/api/subscription-api";
+import { useAppSelector } from "@/redux/store/hook";
+import { formatDateWithTime } from "@workspace/ui/lib/formateDate";
+
+import { ShopSubscriptionStatus, type ShopSubscription } from "@/types/shop-subscription-type";
+import type { SubscriptionPlan } from "@/types/subscription-plan-type";
+
+function planToCard(plan: SubscriptionPlan & { discountPrice?: number }): SubscriptionCardPlan {
+    const originalPrice = plan.discountPrice ?? plan.price;
+    const price = plan.price;
+    const savings = Math.max(0, originalPrice - price);
+    const isPopular = plan.duration === 90 || plan.duration === 365;
+    return {
+        id: "id" in plan ? (plan as SubscriptionPlan).id : undefined,
+        name: plan.name,
+        originalPrice,
+        price,
+        savings,
+        description: plan.description,
+        features: plan.features ?? [],
+        isFree: plan.isFree,
+        isTrial: plan.isTrial,
+        popular: isPopular,
+    };
 }
 
-const pricingPlans: PricingPlan[] = [
-    {
-        name: "Monthly Plan",
-        originalPrice: 700,
-        price: 500,
-        savings: 200,
-        features: [
-            "Explore our 4 free subdomains",
-            "Add your custom domain",
-            "Free access to Zatiq Academy",
-            "Integrated logistics and payment solutions",
-            "Unlimited order and receipt processing",
-            "Theme customization",
-            "Track customer loyalty & customer list",
-            "Enable alerts",
-            "Dashboard",
-            "Export reports",
-        ],
-    },
-    {
-        name: "3 Months Plan",
-        originalPrice: 1500,
-        price: 1200,
-        savings: 300,
-        popular: true,
-        description: "Our most popular plan for small teams.",
-        features: [
-            "Explore our 4 free subdomains",
-            "Add your custom domain",
-            "Free access to Zatiq Academy",
-            "Integrated logistics and payment solutions",
-            "Unlimited order and receipt processing",
-            "Theme customization",
-            "Track customer loyalty & customer list",
-            "Enable alerts",
-            "Dashboard",
-            "Export reports",
-        ],
-    },
-    {
-        name: "6 Months Plan",
-        originalPrice: 3000,
-        price: 2200,
-        savings: 800,
-        features: [
-            "Explore our 4 free subdomains",
-            "Add your custom domain",
-            "Free access to Zatiq Academy",
-            "Integrated logistics and payment solutions",
-            "Unlimited order and receipt processing",
-            "Theme customization",
-            "Track customer loyalty & customer list",
-            "Enable alerts",
-            "Dashboard",
-            "Export reports",
-        ],
-    },
-    {
-        name: "Yearly Plan",
-        originalPrice: 6000,
-        price: 4000,
-        savings: 2000,
-        popular: true,
-        description: "Our most popular plan for small teams.",
-        features: [
-            "Explore our 4 free subdomains",
-            "Add your custom domain",
-            "Free access to Zatiq Academy",
-            "Integrated logistics and payment solutions",
-            "Unlimited order and receipt processing",
-            "Theme customization",
-            "Track customer loyalty & customer list",
-            "Enable alerts",
-            "Dashboard",
-            "Export reports",
-        ],
-    },
-];
-
 const SubscriptionsPage = () => {
+    const user = useAppSelector((state) => state.auth.user);
+    const shopId = user?.shop?.id || "";
+
+    const { data, isLoading, isError } = useGetSubscriptionPlansQuery({
+        limit: 20,
+    });
+
+    const { data: shopSubscriptions } = useGetShopSubscriptionsQuery(
+        {
+            shopId,
+            status: ShopSubscriptionStatus.ACTIVE,
+        },
+        { skip: !shopId }
+    );
+
+    const [selectedPlan, setSelectedPlan] = useState<SubscriptionCardPlan | null>(null);
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const plansFromApi = data?.data ?? [];
+
+    const activeSubscription = useMemo<ShopSubscription | null>(() => {
+        const items = shopSubscriptions?.data ?? [];
+        if (!items.length) return null;
+        const latest = items.slice().sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))[0];
+        return latest ?? null;
+    }, [shopSubscriptions]);
+
+    let highlightedPlanId: string | null = null;
+    let remainingDays: number | null = null;
+    let expiryDateText: string | null = null;
+
+    if (activeSubscription && plansFromApi.length) {
+        const matchedPlan = plansFromApi.find((p) => p.id === activeSubscription.subscriptionId);
+        if (matchedPlan && matchedPlan.duration) {
+            const createdAt = new Date(activeSubscription.createdAt);
+            const expiryDate = new Date(createdAt);
+            expiryDate.setDate(expiryDate.getDate() + matchedPlan.duration);
+
+            const now = new Date();
+            const diffMs = expiryDate.getTime() - now.getTime();
+            remainingDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+            expiryDateText = formatDateWithTime(expiryDate.toISOString());
+            highlightedPlanId = matchedPlan.id;
+        }
+    }
+
+    const plans: SubscriptionCardPlan[] =
+        plansFromApi.length > 0
+            ? plansFromApi
+                  .filter((p) => p.price > 0)
+                  .map((p) => {
+                      const base = planToCard({ ...p, discountPrice: p.discountPrice });
+                      if (p.id && p.id === highlightedPlanId) {
+                          return {
+                              ...base,
+                              isActive: true,
+                              remainingDays,
+                              expiryDateText,
+                          };
+                      }
+                      return base;
+                  })
+            : [];
+
+    const handleCardClick = (plan: SubscriptionCardPlan) => {
+        setSelectedPlan(plan);
+        setModalOpen(true);
+    };
+
     return (
-        <div className="mx-auto max-w-7xl px-4 py-12">
-            {/* Header */}
-            <div className="mb-12 text-center">
-                <h1 className="mb-3 text-4xl font-bold tracking-tight md:text-5xl">
+        <div className="mx-auto max-w-7xl px-4 py-4">
+            <div className="mb-8 text-center">
+                <h1 className="mb-1 text-xl font-bold tracking-tight sm:text-3xl md:text-4xl">
                     Choose The Plan To Grow Your Business
                 </h1>
-                <p className="text-lg text-muted-foreground">
-                    No hidden fees. Flexible pricing. Try any plan free for 3
-                    days.
+                <p className="text-muted-foreground text-sm md:text-lg">
+                    No hidden fees. Flexible pricing. Try any plan free for 3 days.
                 </p>
             </div>
 
-            {/* Pricing Cards Grid */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {pricingPlans.map((plan) => (
-                    <Card
-                        key={plan.name}
-                        className="relative flex flex-col bg-white transition-shadow hover:shadow-lg"
-                    >
-                        {/* Popular Badge */}
-                        {plan.popular && (
-                            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                                <Badge className="bg-blue-50 text-blue-600 border-blue-200">
-                                    Popular
-                                </Badge>
-                            </div>
-                        )}
+            {isLoading ? (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <SubscriptionLoadingCard key={i} />
+                    ))}
+                </div>
+            ) : (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    {plans.map((plan) => (
+                        <SubscriptionCard
+                            key={plan.id ?? plan.name}
+                            plan={plan}
+                            onClick={() => handleCardClick(plan)}
+                        />
+                    ))}
+                </div>
+            )}
 
-                        <CardHeader className="space-y-4 pb-6">
-                            <div>
-                                <h3 className="text-xl font-bold">
-                                    {plan.name}
-                                </h3>
-                                {plan.description && (
-                                    <p className="mt-2 text-sm text-blue-600">
-                                        {plan.description}
-                                    </p>
-                                )}
-                            </div>
+            {isError && plans.length === 0 && (
+                <p className="text-muted-foreground text-center">Unable to load plans. Please try again later.</p>
+            )}
 
-                            {/* Pricing */}
-                            <div className="space-y-1">
-                                <div className="text-sm text-muted-foreground line-through">
-                                    ৳{plan.originalPrice.toLocaleString()}
-                                </div>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-bold">
-                                        ৳{plan.price.toLocaleString()}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground">
-                                        save ৳{plan.savings.toLocaleString()}
-                                    </span>
-                                </div>
-                            </div>
-                        </CardHeader>
-
-                        <CardContent className="flex flex-1 flex-col space-y-6">
-                            {/* Features */}
-                            <div className="flex-1 space-y-3">
-                                <h4 className="font-bold">FEATURES</h4>
-                                <ul className="space-y-3">
-                                    {plan.features.map((feature, index) => (
-                                        <li key={index} className="flex gap-3">
-                                            <Check className="mt-0.5 size-5 shrink-0 text-green-600" />
-                                            <span className="text-sm">
-                                                {feature}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Get Started Button */}
-                            <Button
-                                className="w-full rounded-lg bg-blue-600 py-6 text-base font-medium hover:bg-blue-700"
-                                size="lg"
-                            >
-                                Get started
-                                <ArrowRight className="ml-2 size-5" />
-                            </Button>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+            {selectedPlan && modalOpen && (
+                <SubscriptionPurchaseModal open={modalOpen} onOpenChange={setModalOpen} plan={selectedPlan} />
+            )}
         </div>
     );
 };

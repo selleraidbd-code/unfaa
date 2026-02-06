@@ -30,16 +30,20 @@ export function DataTableRowActions<TData>({
         <Button
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+          onClick={(e) => e.stopPropagation()}
         >
           <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[160px]" onClick={(e) => e.stopPropagation()}>
         {actions.map((action, index) => (
           <DropdownMenuItem
             key={index}
-            onClick={() => action.onClick(row.original)}
+            onClick={(e) => {
+              e.stopPropagation();
+              action.onClick(row.original);
+            }}
             className={action.className}
           >
             {action.label}

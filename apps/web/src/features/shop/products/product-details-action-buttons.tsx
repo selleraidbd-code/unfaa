@@ -39,7 +39,7 @@ export const ProductDetailsActionButtons = ({ product, shopSlug }: { product: Pr
 
     // Check if current item is in cart
     const checkCartStatus = useCallback(() => {
-        const cart = cartStorage.getCart();
+        const cart = cartStorage.getCart(shopSlug);
         const currentSelectedVariants = createSelectedVariants(variants, variantSelection);
 
         const existingItem = cart.find(
@@ -56,7 +56,7 @@ export const ProductDetailsActionButtons = ({ product, shopSlug }: { product: Pr
             setIsInCart(false);
             setCartQuantity(0);
         }
-    }, [product.id, product.shopId, variants, variantSelection]);
+    }, [product.id, product.shopId, shopSlug, variants, variantSelection]);
 
     // Check cart status when variants change
     useEffect(() => {
@@ -84,6 +84,7 @@ export const ProductDetailsActionButtons = ({ product, shopSlug }: { product: Pr
             const cartItem = {
                 productId: product.id,
                 shopId: product.shopId,
+                shopSlug,
                 quantity: 1,
                 name: product.name,
                 price: product.discountPrice || product.price,

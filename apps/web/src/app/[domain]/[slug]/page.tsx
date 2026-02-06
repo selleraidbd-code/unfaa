@@ -1,10 +1,8 @@
 import { getLandingPages } from "@/actions/landing-page-actions";
 import { config } from "@/config";
-import { AdvanceLandingPageView } from "@/features/shop/landing-page/AdvanceLandingPageView";
-import { EasyLandingPageFAQView } from "@/features/shop/landing-page/EasyLandingPageFAQView";
 import { LandingNotFound } from "@/features/shop/landing-page/landing-not-found";
+import { LandingPageWrapper } from "@/features/shop/landing-page/landing-page-wrapper";
 import { ResponseObject } from "@/types";
-import { EPageType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
 
@@ -46,24 +44,15 @@ async function getShopLayoutDetails(slug: string, shopSlug: string) {
     }
 }
 
-const PreviewPage = async ({ params }: Props) => {
+const Page = async ({ params }: Props) => {
     const { domain, slug } = await params;
-    console.log("domain", domain, "slug", slug);
     const shopLayoutData = await getShopLayoutDetails(slug, domain);
 
     if (!shopLayoutData) {
         return <LandingNotFound slug={slug} />;
     }
 
-    if (shopLayoutData.data.pageType === EPageType.ADVANCED) {
-        return <AdvanceLandingPageView sections={shopLayoutData.data.section || []} />;
-    }
-
-    if (shopLayoutData.data.pageType === EPageType.EASY_WITH_FAQ) {
-        return <EasyLandingPageFAQView landingPage={shopLayoutData.data} domain={domain} />;
-    }
-
-    return <LandingNotFound slug={slug} />;
+    return <LandingPageWrapper landingPage={shopLayoutData.data} domain={domain} />;
 };
 
-export default PreviewPage;
+export default Page;

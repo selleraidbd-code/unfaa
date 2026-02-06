@@ -18,7 +18,7 @@ import { HtmlRenderer } from "@/components/shared/html-renderer";
 export const ProductDetails = ({ product, shopSlug }: { product: Product; shopSlug: string }) => {
     return (
         <section className="container pb-12">
-            <Breadcrumb className="my-6">
+            <Breadcrumb className="my-5">
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink
@@ -82,6 +82,13 @@ export const ProductDetails = ({ product, shopSlug }: { product: Product; shopSl
 
                     <ProductDetailsActionButtons product={product} shopSlug={shopSlug} />
                 </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            <div className="space-y-4">
+                <h2 className="text-lg font-medium">Description</h2>
+                <HtmlRenderer html={product?.fullDescription} />
             </div>
         </section>
     );

@@ -91,16 +91,17 @@ const Page = () => {
     });
 
     useEffect(() => {
+        if (!shop?.slug) return;
         const updateCart = () => {
-            const items = cartStorage.getCart();
+            const items = cartStorage.getCart(shop.slug);
             setCartItems(items);
-            setSummary(cartStorage.getCartSummary());
+            setSummary(cartStorage.getCartSummary(shop.slug));
         };
 
         updateCart();
         window.addEventListener("cart-updated", updateCart);
         return () => window.removeEventListener("cart-updated", updateCart);
-    }, []);
+    }, [shop?.slug]);
 
     // Track InitiateCheckout when checkout page loads
     useEffect(() => {
@@ -207,7 +208,7 @@ const Page = () => {
                 return;
             }
 
-            const cartItems = cartStorage.getCart();
+            const cartItems = cartStorage.getCart(shop.slug);
 
             const orderItems = cartItems?.map((item: CartItem) => ({
                 productId: item.productId,
@@ -319,7 +320,7 @@ const Page = () => {
             incrementOrderCount(values.phone);
 
             // Clear cart and save form data
-            cartStorage.clearCart();
+            cartStorage.clearCart(shop.slug);
             saveCheckoutFormData({
                 name: values.name,
                 address: values.address,

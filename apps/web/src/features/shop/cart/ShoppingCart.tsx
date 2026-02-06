@@ -25,7 +25,7 @@ export const ShoppingCart = () => {
 
     useEffect(() => {
         const updateCart = () => {
-            const items = cartStorage.getCart();
+            const items = cartStorage.getCart(shop.slug);
             setCartItems(items);
 
             if (items.length === 0) {
@@ -37,7 +37,7 @@ export const ShoppingCart = () => {
                 return;
             }
 
-            const cartSummary = cartStorage.getCartSummary();
+            const cartSummary = cartStorage.getCartSummary(shop.slug);
             setSummary({
                 subtotal: cartSummary.subtotal,
                 total: cartSummary.total,
@@ -48,10 +48,10 @@ export const ShoppingCart = () => {
         updateCart();
         window.addEventListener("cart-updated", updateCart);
         return () => window.removeEventListener("cart-updated", updateCart);
-    }, []);
+    }, [shop.slug]);
 
     const handleRemoveItem = (productId: string, selectedVariants: SelectedVariant[]) => {
-        cartStorage.removeItem(productId, shop.id, selectedVariants);
+        cartStorage.removeItem(productId, shop.slug, selectedVariants);
         window.dispatchEvent(new Event("cart-updated"));
     };
 

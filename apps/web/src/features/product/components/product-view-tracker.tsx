@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { buildUserData, trackEventToBackend, trackFacebookPixel, trackTikTokPixel } from "@/lib/tracking-events";
 
-interface ProductViewTrackerProps {
+interface Props {
     productId: string;
     productName: string;
     productSlug: string;
@@ -14,7 +14,7 @@ interface ProductViewTrackerProps {
     shopSlug: string;
 }
 
-export function ProductViewTracker({
+export const ProductViewTracker = ({
     productId,
     productName,
     productSlug,
@@ -22,7 +22,7 @@ export function ProductViewTracker({
     discountPrice,
     category,
     shopSlug,
-}: ProductViewTrackerProps) {
+}: Props) => {
     const [tracked, setTracked] = useState(false);
 
     useEffect(() => {
@@ -149,4 +149,4 @@ export function ProductViewTracker({
     }, [productId, productName, productSlug, price, discountPrice, category, shopSlug, tracked]);
 
     return null;
-}
+};

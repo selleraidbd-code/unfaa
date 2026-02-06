@@ -1,8 +1,22 @@
-import { ProductPageDetails } from "@/features/product/product-page-details";
+"use client";
+
+import { useMemo } from "react";
+import Image from "next/image";
+
+import { ContactButtons } from "@/features/product/components/contact-buttons";
+import { FeaturedProducts } from "@/features/product/components/featured-products";
+import { OrderSection } from "@/features/product/components/order-section";
+import { ProductFAQ } from "@/features/product/components/product-faq";
+import { ProductFooter } from "@/features/product/components/product-footer";
+import { ProductImageGallery } from "@/features/product/components/product-image-gallery";
+import { ProductPricing } from "@/features/product/components/product-pricing";
+import { ProductVideo } from "@/features/product/components/product-video";
+import { ProductWarranty } from "@/features/product/components/product-warranty";
+import { useOrderForm } from "@/features/product/hooks/use-order-form";
 import { EComponentType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
-import { ProductViewTracker } from "@/components/product-view-tracker";
+import { HtmlRenderer } from "@/components/shared/html-renderer";
 
 type Props = {
     landingPage: LandingPage;
@@ -11,10 +25,10 @@ type Props = {
 
 export const EasyLandingPageFAQView = ({ landingPage, domain }: Props) => {
     const product = landingPage.product;
-    console.log("product", product)
     const featureProducts = landingPage.featureProducts;
     const shopSlug = domain;
     const sections = landingPage.section;
+    const title = landingPage.name;
 
     // Find FAQ section (first section or FAQ type)
     const faqSection =
@@ -24,25 +38,122 @@ export const EasyLandingPageFAQView = ({ landingPage, domain }: Props) => {
     // Find Contact section
     const contactSection = sections?.find((s) => s.sectionType === EComponentType.CTA);
 
+    const discountPercent = useMemo(
+        () =>
+            product.discountPrice < product.price
+                ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+                : 0,
+        [product.price, product.discountPrice]
+    );
+
+    const firstImage = product.images?.[0];
+    const secondImage = product.images?.[1];
+
+    const {
+        formData,
+        errors,
+        isSubmitting,
+        selectedDeliveryZone,
+        selectedVariants,
+        selectedPackage,
+        packages,
+        totalAmount,
+        handleInputChange,
+        handleVariantChange,
+        setSelectedDeliveryZone,
+        handlePackageSelect,
+        handleSubmit,
+    } = useOrderForm(product, shopSlug);
+
     return (
         <>
-            <ProductViewTracker
-                productId={product.id}
-                productName={product.name}
-                productSlug={product.slug}
-                price={product.price}
-                discountPrice={product.discountPrice}
-                category={product.categories?.[0]?.category?.name}
-                shopSlug={shopSlug}
-            />
-            <ProductPageDetails
-                product={product}
-                featureProducts={featureProducts}
-                title={landingPage.name}
-                shopSlug={shopSlug}
-                section={faqSection}
-                contactSection={contactSection}
-            />
+            <div className="min-h-screen bg-gray-50 pb-4" style={{ fontFamily: "'Noto Sans Bengali', sans-serif" }}>
+                <div className="mx-auto max-w-2xl space-y-4 rounded-xl bg-white px-4 py-6 shadow-lg lg:space-y-6">
+                    <h1 className="px-4 text-center text-3xl leading-snug font-bold text-red-600">
+                        {title || product.banglaName}
+                    </h1>
+
+                    <ProductImageGallery
+                        photoURL={product.photoURL}
+                        productName={product.name}
+                        discountPercent={discountPercent}
+                    />
+
+                    <ProductPricing price={product.price} discountPrice={product.discountPrice} />
+
+                    <div className="mb-4 rounded-xl border-l-4 border-blue-500 bg-blue-50 p-5 lg:border-l-6">
+                        <h3 className="mb-3 text-xl font-bold text-blue-600">সংক্ষিপ্ত বিবরণ</h3>
+                        <HtmlRenderer html={product.description} />
+                    </div>
+
+                    {firstImage && (
+                        <Image
+                            src={firstImage}
+                            alt="Product"
+                            className="mb-4 w-full rounded-xl shadow-md"
+                            width={1000}
+                            height={1000}
+                        />
+                    )}
+
+                    {/* Contact section */}
+                    {contactSection && (
+                        <ContactButtons
+                            whatsappNumber={contactSection.title}
+                            facebookPageId={contactSection.subTitle}
+                        />
+                    )}
+
+                    <div className="mb-4 rounded-xl border-l-4 border-gray-500 bg-gray-100 p-5 lg:border-l-6">
+                        <h3 className="mb-3 text-xl font-bold text-gray-700">বিস্তারিত বিবরণ</h3>
+                        <HtmlRenderer html={product.fullDescription} />
+                    </div>
+                    {secondImage && (
+                        <Image
+                            src={secondImage}
+                            alt="Product"
+                            className="mb-4 w-full rounded-xl shadow-md"
+                            width={1000}
+                            height={1000}
+                        />
+                    )}
+
+                    {product.warranty && <ProductWarranty warranty={product.warranty} />}
+
+                    <div className="rounded-xl bg-gradient-to-r from-red-600 to-red-400 p-2 text-center font-bold text-white md:p-6">
+                        <div className="text-lg leading-relaxed">
+                            🚚 আপনি রাইডারের সামনে প্রোডাক্ট চেক করে তারপরে রাইডারকে টাকা দিবেন।
+                            <br />
+                            💰 অগ্রীম এক টাকাও দেয়া লাগবে না!
+                        </div>
+                    </div>
+
+                    {product.videoLink && <ProductVideo videoLink={product.videoLink} />}
+
+                    {faqSection && <ProductFAQ section={faqSection} />}
+
+                    <OrderSection
+                        product={product}
+                        packages={packages}
+                        formData={formData}
+                        errors={errors}
+                        isSubmitting={isSubmitting}
+                        selectedDeliveryZone={selectedDeliveryZone}
+                        selectedVariants={selectedVariants}
+                        selectedPackage={selectedPackage}
+                        totalAmount={totalAmount}
+                        handleInputChange={handleInputChange}
+                        handleVariantChange={handleVariantChange}
+                        setSelectedDeliveryZone={setSelectedDeliveryZone}
+                        handlePackageSelect={handlePackageSelect}
+                        handleSubmit={handleSubmit}
+                    />
+
+                    <FeaturedProducts featureProducts={featureProducts} shopSlug={shopSlug} />
+
+                    <ProductFooter banglaName={product.banglaName} shopSlug={shopSlug} />
+                </div>
+            </div>
         </>
     );
 };

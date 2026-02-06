@@ -1,8 +1,8 @@
 import { getProductBySlug } from "@/actions/product-actions";
+import { ProductViewTracker } from "@/features/product/components/product-view-tracker";
 import { ProductDetails } from "@/features/shop/products/product-details";
 
 import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
-import { ProductViewTracker } from "@/components/product-view-tracker";
 
 const page = async ({ params }: { params: Promise<{ slug: string; domain: string }> }) => {
     const { slug, domain } = await params;

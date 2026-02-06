@@ -3,6 +3,7 @@ import { ProductVariant } from "@/types/product-type";
 export type CartItem = {
     productId: string;
     shopId: string;
+    shopSlug: string;
     quantity: number;
     name?: string;
     price?: number | null;
@@ -22,7 +23,9 @@ export type VariantSelection = {
     [variantId: string]: string; // variantId -> optionId
 };
 
-const CART_STORAGE_KEY = "shopping_cart_items";
+const CART_STORAGE_KEY = "cart_";
+
+const getCartKey = (shopSlug: string) => `${CART_STORAGE_KEY}${shopSlug}`;
 
 export const MAX_QUANTITY = 20;
 
@@ -37,15 +40,16 @@ export const calculateSubtotal = (items: CartItem[]) => {
 };
 
 export const cartStorage = {
-    getCart: (): CartItem[] => {
+    getCart: (shopSlug: string): CartItem[] => {
         if (typeof window === "undefined") return [];
-
-        const cart = localStorage.getItem(CART_STORAGE_KEY);
+        const key = getCartKey(shopSlug);
+        const cart = localStorage.getItem(key);
         return cart ? JSON.parse(cart) : [];
     },
 
     addItem: (item: CartItem) => {
-        const cart = cartStorage.getCart();
+        const key = getCartKey(item.shopSlug);
+        const cart = cartStorage.getCart(item.shopSlug);
         const existingItemIndex = cart.findIndex(
             (i) =>
                 i.productId === item.productId &&
@@ -73,59 +77,59 @@ export const cartStorage = {
             cart.push(item);
         }
 
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+        localStorage.setItem(key, JSON.stringify(cart));
         window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
-    removeItem: (productId: string, shopId: string, selectedVariants: SelectedVariant[]) => {
-        const cart = cartStorage.getCart();
+    removeItem: (productId: string, shopSlug: string, selectedVariants: SelectedVariant[]) => {
+        const key = getCartKey(shopSlug);
+        const cart = cartStorage.getCart(shopSlug);
         const updatedCart = cart.filter(
             (item) =>
                 !(
                     item.productId === productId &&
-                    item.shopId === shopId &&
                     JSON.stringify(item.selectedVariants) === JSON.stringify(selectedVariants)
                 )
         );
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updatedCart));
+        localStorage.setItem(key, JSON.stringify(updatedCart));
         window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
-    updateQuantity: (productId: string, shopId: string, selectedVariants: SelectedVariant[], newQuantity: number) => {
+    updateQuantity: (productId: string, shopSlug: string, selectedVariants: SelectedVariant[], newQuantity: number) => {
         if (newQuantity > MAX_QUANTITY) {
             console.warn(`Maximum quantity of ${MAX_QUANTITY} exceeded`);
             return;
         }
 
-        const cart = cartStorage.getCart();
+        const key = getCartKey(shopSlug);
+        const cart = cartStorage.getCart(shopSlug);
         const updatedCart = cart.map((item) =>
             item.productId === productId &&
-            item.shopId === shopId &&
             JSON.stringify(item.selectedVariants) === JSON.stringify(selectedVariants)
                 ? { ...item, quantity: newQuantity }
                 : item
         );
-        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(updatedCart));
+        localStorage.setItem(key, JSON.stringify(updatedCart));
         window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
-    clearCart: () => {
-        localStorage.removeItem(CART_STORAGE_KEY);
+    clearCart: (shopSlug: string) => {
+        localStorage.removeItem(getCartKey(shopSlug));
         window.dispatchEvent(new CustomEvent("cart-updated"));
     },
 
-    getTotalItems: (): number => {
-        const cart = cartStorage.getCart();
+    getTotalItems: (shopSlug: string): number => {
+        const cart = cartStorage.getCart(shopSlug);
         return cart.reduce((total, item) => total + item.quantity, 0);
     },
 
-    getSubtotal: (): number => {
-        const items = cartStorage.getCart();
+    getSubtotal: (shopSlug: string): number => {
+        const items = cartStorage.getCart(shopSlug);
         return calculateSubtotal(items);
     },
 
-    getCartSummary: () => {
-        const items = cartStorage.getCart();
+    getCartSummary: (shopSlug: string) => {
+        const items = cartStorage.getCart(shopSlug);
         const subtotal = calculateSubtotal(items);
         const shipping = 0; // Free shipping
         const total = subtotal + shipping;

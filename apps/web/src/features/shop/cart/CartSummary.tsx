@@ -24,7 +24,7 @@ export const CartSummary = ({ shopSlug }: { shopSlug: string }) => {
 
     useEffect(() => {
         const updateSummary = () => {
-            const items = cartStorage.getCart();
+            const items = cartStorage.getCart(shopSlug);
             if (items.length === 0) {
                 setSummary({
                     subtotal: 0,
@@ -35,14 +35,14 @@ export const CartSummary = ({ shopSlug }: { shopSlug: string }) => {
                 return;
             }
 
-            const cartSummary = cartStorage.getCartSummary();
+            const cartSummary = cartStorage.getCartSummary(shopSlug);
             setSummary(cartSummary);
         };
 
         updateSummary();
         window.addEventListener("cart-updated", updateSummary);
         return () => window.removeEventListener("cart-updated", updateSummary);
-    }, []);
+    }, [shopSlug]);
 
     return (
         <div className="h-fit rounded-sm border-2 p-4 lg:p-6">

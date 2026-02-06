@@ -26,14 +26,14 @@ export const CartItems = ({ shopId, shopSlug }: CartItemsProps) => {
 
     useEffect(() => {
         const updateCart = () => {
-            const items = cartStorage.getCart();
+            const items = cartStorage.getCart(shopSlug);
             setCartItems(items);
         };
 
         updateCart();
         window.addEventListener("cart-updated", updateCart);
         return () => window.removeEventListener("cart-updated", updateCart);
-    }, []);
+    }, [shopSlug]);
 
     const handleQuantityChange = (
         productId: string,
@@ -49,7 +49,7 @@ export const CartItems = ({ shopId, shopSlug }: CartItemsProps) => {
 
         cartStorage.updateQuantity(
             productId,
-            shopId,
+            shopSlug,
             selectedVariants,
             newQuantity
         );
@@ -60,7 +60,7 @@ export const CartItems = ({ shopId, shopSlug }: CartItemsProps) => {
         productId: string,
         selectedVariants: SelectedVariant[]
     ) => {
-        cartStorage.removeItem(productId, shopId, selectedVariants);
+        cartStorage.removeItem(productId, shopSlug, selectedVariants);
         window.dispatchEvent(new Event("cart-updated"));
     };
 

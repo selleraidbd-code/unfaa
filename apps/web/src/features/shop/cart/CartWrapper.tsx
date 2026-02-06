@@ -16,7 +16,7 @@ const CartWrapper = () => {
 
     useEffect(() => {
         const updateCartState = () => {
-            const items = cartStorage.getCart();
+            const items = cartStorage.getCart(shop.slug);
             setIsEmpty(items.length === 0);
         };
 
@@ -24,7 +24,7 @@ const CartWrapper = () => {
         window.addEventListener("cart-updated", updateCartState);
         return () =>
             window.removeEventListener("cart-updated", updateCartState);
-    }, []);
+    }, [shop.slug]);
 
     if (isEmpty) {
         return (

@@ -26,7 +26,7 @@ export const ShowSelectedSection = ({ index, componentInfo, componentData }: Pro
 
     const totalSectionLength = useAppSelector((state) => state.landingPage.landingPageSections.length);
 
-    const selectedComponent = allComponents.find((single) => single.name === componentInfo.name);
+    const selectedComponent = allComponents.find((single) => single.name === componentInfo?.name);
 
     if (!selectedComponent) return <div>Component not found</div>;
     const RenderComponent = selectedComponent.component;

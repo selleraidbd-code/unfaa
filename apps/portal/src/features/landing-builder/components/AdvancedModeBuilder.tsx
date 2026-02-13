@@ -9,7 +9,7 @@ import { useGetLandingPagesTemplateQuery } from "@/redux/api/landing-page-templa
 import { Component } from "@workspace/ui/landing/types";
 import { Settings } from "lucide-react";
 
-import { LandingPage, LandingPageDemo } from "@/types/landing-page-type";
+import { LandingPageDemo } from "@/types/landing-page-type";
 import { DataStateHandler } from "@/components/shared/data-state-handler";
 
 type AdvancedModeBuilderProps = {
@@ -19,6 +19,7 @@ type AdvancedModeBuilderProps = {
 
 export const AdvancedModeBuilder = ({ productId, landingPage }: AdvancedModeBuilderProps) => {
     const [selectedTemplate, setSelectedTemplate] = useState<LandingPageDemo | null>(null);
+    console.log("landingPage", landingPage);
 
     const {
         data: templates,

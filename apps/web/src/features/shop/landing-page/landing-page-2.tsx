@@ -12,6 +12,7 @@ import { useOrderForm } from "@/features/product/hooks/use-order-form";
 import { FAQ02 } from "@/features/shop/landing-page/components/faq-2";
 import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
 import { EComponentType } from "@workspace/ui/landing/types";
+import { cn } from "@workspace/ui/lib/utils";
 import { Phone } from "lucide-react";
 
 import { LandingPage as LandingPageType } from "@/types/landing-type";
@@ -51,6 +52,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
 
     // Find About/Services section
     const aboutSection = sections?.find((s) => s.sectionType === EComponentType.HERO);
+    const aboutImageHave = aboutSection?.imgURL && aboutSection?.imgURL.trim() !== "";
 
     // Find Banner section
     const bannerSection = sections?.find((s) => s.sectionType === EComponentType.BANNER);
@@ -81,10 +83,10 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
 
     const importantPoints = [
         {
-            title: "আমারা কোনো অগ্রিম টাকা নেই না। ইন্সটলমেন্ট সহায়ে ক্যাশ অন ডেলিভারিতে পন্য রিসিভ করবেন।",
+            title: "আমরা অগ্রীম কোন টাকা নেই না। আপনি পন্য হাতে পেয়ে চেক করে তারপরে রাইডার কে টাকা দিবেন",
         },
         {
-            title: "অর্ডার করার পরে আমাদের কল সেন্টার থেকে ফোন করে পন্যের কালার ও সাইজ কনফার্ম করা হবে।",
+            title: "অর্ডার করার পরে আমাদের কল সেন্টার থেকে কল দিয়ে অর্ডার কনফার্ম করা হবে। কল দিলে দয়া করে রিসিভ করবেন।",
         },
     ];
 
@@ -224,7 +226,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                                 <h2 className="mb-10 text-center text-2xl font-bold tracking-wide uppercase md:text-3xl">
                                     {aboutSection.title || "আমাদের সার্ভিস কেন সেরা?"}
                                 </h2>
-                                <div className="grid gap-8 md:grid-cols-2">
+                                <div className={cn("grid gap-8", aboutImageHave ? "md:grid-cols-2" : "")}>
                                     <ul className="space-y-6">
                                         {aboutSection.sectionList?.map((service, index) => (
                                             <li key={service.id || index} className="flex items-start gap-4">
@@ -238,9 +240,9 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                                             </li>
                                         ))}
                                     </ul>
-                                    {(aboutSection.imgURL || product.videoLink) &&
+                                    {aboutImageHave &&
                                         (() => {
-                                            const mediaUrl = aboutSection.imgURL || product.videoLink || "";
+                                            const mediaUrl = aboutSection.imgURL || "";
                                             const isEmbedHtml = mediaUrl.trim().startsWith("<");
                                             const isYoutubeUrl =
                                                 !isEmbedHtml && /youtube\.com|youtu\.be/i.test(mediaUrl);
@@ -384,6 +386,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
 
                 {/* Order Section */}
                 <OrderSection
+                    theme={{ primary: "#2563eb", secondary: "#eff6ff" }}
                     product={product}
                     packages={packages}
                     formData={formData}

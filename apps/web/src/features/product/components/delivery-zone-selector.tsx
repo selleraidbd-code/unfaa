@@ -29,12 +29,13 @@ export const DeliveryZoneSelector = ({ zones, selectedZoneId, onZoneChange }: Pr
                     <label
                         htmlFor={`delivery-zone-${zone.id}`}
                         className={cn(
-                            "flex flex-1 cursor-pointer items-center gap-3.5 rounded-xl border-2 bg-[#eafbea] px-4 py-4 text-lg transition-all duration-200 hover:border-[#0fa54c]",
-                            selectedZoneId === zone.id ? "border-[#0fa54c]" : "border-[#eafbea]"
+                            "flex flex-1 cursor-pointer items-center gap-3.5 rounded-xl border-2 px-4 py-4 text-lg transition-all duration-200",
+                            "bg-[var(--order-container-bg)] hover:border-[var(--order-primary)]",
+                            selectedZoneId === zone.id ? "border-[var(--order-primary)]" : "border-[var(--order-border)]"
                         )}
                     >
                         <div className="flex flex-col">
-                            <h4 className="text-base font-semibold text-[#0fa54c]">{zone.name}</h4>
+                            <h4 className="text-base font-semibold text-[var(--order-primary)]">{zone.name}</h4>
                             <p className="text-lg font-bold">{zone.fee === 0 ? "0" : zone.fee} টাকা</p>
                         </div>
                     </label>

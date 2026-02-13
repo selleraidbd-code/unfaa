@@ -32,11 +32,11 @@ export const ProductVariants = ({ variants, selectedVariants, onVariantChange }:
                                 />
                                 <label
                                     htmlFor={`variant-${variant.id}-option-${option.id}`}
-                                    className={`flex cursor-pointer items-center gap-4 rounded-xl border-2 bg-green-50 p-4 transition-all ${
+                                    className={`flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-all ${
                                         selectedVariants[variant.id]?.id === option.id
-                                            ? "border-green-600"
-                                            : "border-green-50"
-                                    } hover:border-green-600`}
+                                            ? "border-[var(--order-primary)]"
+                                            : "border-[var(--order-border)]"
+                                    } bg-[var(--order-container-bg)] hover:border-[var(--order-primary)]`}
                                 >
                                     {option.imgUrl && (
                                         <img
@@ -46,7 +46,7 @@ export const ProductVariants = ({ variants, selectedVariants, onVariantChange }:
                                         />
                                     )}
                                     <div className="flex-1">
-                                        <h4 className="text-base font-bold text-green-600">{option.name}</h4>
+                                        <h4 className="text-base font-bold text-[var(--order-primary)]">{option.name}</h4>
                                         {option.extraPrice > 0 && (
                                             <p className="mt-1 text-lg font-bold text-gray-800">
                                                 💰 অতিরিক্ত ৳{option.extraPrice.toLocaleString()} টাকা

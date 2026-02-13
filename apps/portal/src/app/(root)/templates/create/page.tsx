@@ -25,9 +25,9 @@ const CreateTemplate = () => {
     const dispatch = useAppDispatch();
 
     const user = useAppSelector((state) => state.auth.user);
-    const shopId = user?.shop.id;
+    // const shopId = user?.shop.id;
+    const shopId = "67b0a0470453b73686545614";
     const portfolioName = useAppSelector((state) => state.landingPage.landingPageData.name);
-    const portfolioKeyword = useAppSelector((state) => state.landingPage.landingPageData.keyword);
     const portfolioImage = useAppSelector((state) => state.landingPage.landingPageData.imgUrl);
     const shopCategory = useAppSelector((state) => state.landingPage.landingPageData.category);
 
@@ -41,8 +41,8 @@ const CreateTemplate = () => {
             toast.error("Please fill Name and Slug");
             return;
         }
-        if (!portfolioName || !portfolioKeyword || !portfolioImage) {
-            toast.error("Please fill Name and Keyword and Image");
+        if (!portfolioName || !portfolioImage) {
+            toast.error("Please fill Name and Image");
             return;
         }
         const section = landingPageSections.map((single, i) => ({
@@ -58,7 +58,6 @@ const CreateTemplate = () => {
             shopId: shopId || "",
             productId: "",
             name: portfolioName,
-            keyword: portfolioKeyword,
             pageType: EPageType.EASY_LANDING_PAGE_2,
         };
 
@@ -132,20 +131,6 @@ const CreateTemplate = () => {
                     }
                 />
 
-                <CustomTextarea
-                    className="col-span-2"
-                    label="Template Keyword"
-                    placeholder="Template Keyword"
-                    value={portfolioKeyword}
-                    onChange={(value) =>
-                        dispatch(
-                            setLandingPageData({
-                                fieldName: "keyword",
-                                value: String(value),
-                            })
-                        )
-                    }
-                />
                 <FileUpload
                     className="col-span-2"
                     limit={1}

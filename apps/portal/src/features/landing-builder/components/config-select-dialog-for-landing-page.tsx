@@ -71,7 +71,6 @@ export const ConfigSelectDialogForLandingPage = ({ open, onClose }: { open: bool
                         <button
                             type="button"
                             onClick={() => setSelectedMode("easy")}
-                            disabled={false}
                             className="group border-border bg-card hover:border-primary hover:bg-accent/50 focus:ring-primary disabled:hover:border-border disabled:hover:bg-card relative flex flex-col items-center justify-center rounded-lg border-2 p-8 transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
                         >
                             <div className="bg-primary/10 group-hover:bg-primary/20 disabled:group-hover:bg-primary/10 mb-4 rounded-full p-4 transition-colors">
@@ -86,7 +85,6 @@ export const ConfigSelectDialogForLandingPage = ({ open, onClose }: { open: bool
                         <button
                             type="button"
                             onClick={() => setSelectedMode("advanced")}
-                            disabled={true}
                             className="group border-border bg-card hover:border-primary hover:bg-accent/50 focus:ring-primary disabled:hover:border-border disabled:hover:bg-card relative flex flex-col items-center justify-center rounded-lg border-2 p-8 transition-all focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
                         >
                             <div className="bg-primary/10 group-hover:bg-primary/20 disabled:group-hover:bg-primary/10 mb-4 rounded-full p-4 transition-colors">

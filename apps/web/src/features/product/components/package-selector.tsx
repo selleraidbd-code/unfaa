@@ -32,8 +32,9 @@ export const PackageSelector = memo(function PackageSelector({
                         key={pkg.id}
                         onClick={() => onPackageSelect(isSelected ? null : pkg.id)}
                         className={cn(
-                            "flex cursor-pointer items-center gap-3.5 rounded-xl border-2 bg-[#eafbea] p-4 text-lg transition-all duration-200 hover:border-[#0fa54c] max-[480px]:flex-row max-[480px]:items-start",
-                            isSelected ? "border-[#0fa54c]" : "border-[#eafbea]"
+                            "flex cursor-pointer items-center gap-3.5 rounded-xl border-2 p-4 text-lg transition-all duration-200 max-[480px]:flex-row max-[480px]:items-start",
+                            "bg-[var(--order-container-bg)] hover:border-[var(--order-primary)]",
+                            isSelected ? "border-[var(--order-primary)]" : "border-[var(--order-border)]"
                         )}
                     >
                         <Image
@@ -44,7 +45,7 @@ export const PackageSelector = memo(function PackageSelector({
                             className="h-20 w-20 shrink-0 rounded-lg object-cover max-[480px]:h-[70px] max-[480px]:w-[70px]"
                         />
                         <div className="flex flex-col">
-                            <h4 className="m-0 text-base font-semibold text-[#0fa54c]">{pkg.title}</h4>
+                            <h4 className="m-0 text-base font-semibold text-[var(--order-primary)]">{pkg.title}</h4>
                             <p className="text-lg font-bold">৳ {pkg.codAmount.toLocaleString("bn-BD")} টাকা</p>
                         </div>
                     </div>

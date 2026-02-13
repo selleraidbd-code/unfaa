@@ -232,6 +232,17 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                     </div>
                 </header>
 
+                <div className="flex justify-center py-4 md:hidden">
+                    <button
+                        onClick={() => {
+                            document.getElementById("order-section")?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="rounded-full bg-blue-600 px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:bg-green-700 active:scale-95"
+                    >
+                        এখনি অর্ডার করুন
+                    </button>
+                </div>
+
                 <section className="bg-white py-10">
                     <div className="container mx-auto grid max-w-4xl grid-cols-2 gap-6 px-6 md:grid-cols-4">
                         <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">

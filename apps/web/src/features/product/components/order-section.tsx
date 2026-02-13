@@ -106,7 +106,7 @@ export const OrderSection = memo(function OrderSection({
     );
 
     return (
-        <section id="order-section" className="scroll-mt-20 py-6 lg:py-12">
+        <section id="order-section" className="scroll-mt-10 py-6 lg:scroll-mt-20 lg:py-12">
             <div
                 className="landing-width rounded-2xl border-2 px-4 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
                 style={{

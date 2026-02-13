@@ -1,21 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { ContactData, ContactSection } from "@/features/landing-builder/components/contact-section";
-import { FAQData, FAQSection } from "@/features/landing-builder/components/faq-section";
+import { AboutSection } from "@/features/landing-builder/components/about-section";
+import { BasicInfoSection } from "@/features/landing-builder/components/basic-info-section";
+import { BuilderHeader } from "@/features/landing-builder/components/builder-header";
+import { FAQSection } from "@/features/landing-builder/components/faq-section";
+import { FeaturedProductsSection } from "@/features/landing-builder/components/featured-products-section";
 import { FeaturedProductsSelectionDialog } from "@/features/landing-builder/components/featured-products-selection-dialog";
+import { FeaturesSection } from "@/features/landing-builder/components/features-section";
 import { PackageSection } from "@/features/landing-builder/components/package-section";
+import { TestimonialsSection } from "@/features/landing-builder/components/testimonials-section";
+import {
+    defaultLandingPageFormValues,
+    landingPageFormSchema,
+    LandingPageFormValues,
+} from "@/features/landing-builder/landing-page-form-schema";
 import { useCreateLandingPageMutation } from "@/redux/api/landing-page-api";
 import { useGetProductsQuery } from "@/redux/api/product-api";
 import { useAppSelector } from "@/redux/store/hook";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@workspace/ui/components/button";
-import { CustomInput } from "@workspace/ui/components/custom/custom-input";
 import { toast } from "@workspace/ui/components/sonner";
 import { EComponentType, EPageType } from "@workspace/ui/landing/types";
-import { ArrowLeft, Package, Plus, X } from "lucide-react";
+import { FormProvider, useForm } from "react-hook-form";
 
 import {
     CreateLandingPagePayload,
@@ -28,25 +37,109 @@ import { CustomButton } from "@/components/ui/custom-button";
 
 type EasyModeBuilderProps = {
     productId: string;
+    mode: EPageType;
     landingPage?: LandingPageDemo;
 };
 
-export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps) => {
+function getDefaultValuesFromLandingPage(landingPage?: LandingPageDemo): LandingPageFormValues {
+    const base = { ...defaultLandingPageFormValues };
+
+    if (!landingPage) return base;
+
+    base.name = landingPage.name || "";
+
+    const contactSection = landingPage.section?.find((s) => s.sectionType === EComponentType.CTA);
+    if (contactSection) {
+        base.contact = {
+            whatsappNumber: contactSection.title || "",
+            facebookPageId: contactSection.subTitle || "",
+        };
+    }
+
+    const faqSection = landingPage.section?.find((s) => s.sectionType === EComponentType.FAQ);
+    if (faqSection?.sectionList?.length) {
+        base.faq = {
+            title: faqSection.title || "",
+            subTitle: faqSection.subTitle || "",
+            items: faqSection.sectionList.map((item, i) => ({
+                id: item.id || `${Date.now()}-${i}`,
+                question: item.title || "",
+                answer: item.description || "",
+            })),
+        };
+    } else {
+        base.faq.items = [{ id: crypto.randomUUID?.() ?? Date.now().toString(), question: "", answer: "" }];
+    }
+
+    const featuresSection = landingPage.section?.find((s) => s.sectionType === EComponentType.FEATURES);
+    if (featuresSection?.sectionList?.length) {
+        base.features = {
+            title: featuresSection.title || "",
+            subTitle: featuresSection.subTitle || "",
+            items: featuresSection.sectionList.map((item, i) => ({
+                id: item.id || `${Date.now()}-${i}`,
+                title: item.title || "",
+                description: item.description || "",
+            })),
+        };
+    }
+
+    const testimonialsSection = landingPage.section?.find((s) => s.sectionType === EComponentType.TESTIMONIALS);
+    if (testimonialsSection?.sectionList?.length) {
+        const imageUrls = testimonialsSection.sectionList.map((item) => item.imgURL).filter(Boolean) as string[];
+        if (imageUrls.length > 0) {
+            base.testimonials = {
+                title: testimonialsSection.title || "",
+                subTitle: testimonialsSection.subTitle || "",
+                images: imageUrls,
+            };
+        }
+    }
+
+    const aboutSection = landingPage.section?.find((s) => s.sectionType === EComponentType.HERO);
+    if (aboutSection?.sectionList?.length) {
+        base.about = {
+            title: aboutSection.title || "",
+            subTitle: aboutSection.subTitle || "",
+            imgURL: aboutSection.imgURL || "",
+            items: aboutSection.sectionList.map((item, i) => ({
+                id: item.id || `${Date.now()}-${i}`,
+                title: item.title || "",
+                description: item.description || "",
+            })),
+        };
+    }
+
+    const featureProducts = (landingPage as { featureProducts?: { productId?: string; product?: { id: string } }[] })
+        ?.featureProducts;
+    if (featureProducts && Array.isArray(featureProducts)) {
+        const ids = featureProducts
+            .map((fp) => fp.productId || fp.product?.id)
+            .filter((id): id is string => Boolean(id));
+        if (ids.length > 0) base.selectedProductIds = ids;
+    }
+
+    return base;
+}
+
+export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilderProps) => {
     const router = useRouter();
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id;
-    const [name, setName] = useState("");
-    const [contactData, setContactData] = useState<ContactData>({
-        whatsappNumber: "",
-        facebookPageId: "",
-    });
-    const [faqData, setFaqData] = useState<FAQData>({
-        title: "",
-        subTitle: "",
-        items: [{ id: Date.now().toString(), question: "", answer: "" }],
-    });
-    const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
+    const form = useForm<LandingPageFormValues>({
+        resolver: zodResolver(landingPageFormSchema),
+        defaultValues: getDefaultValuesFromLandingPage(landingPage),
+    });
+
+    const { watch, setValue, reset } = form;
+    const selectedProductIds = watch("selectedProductIds");
+
+    useEffect(() => {
+        reset(getDefaultValuesFromLandingPage(landingPage));
+    }, [landingPage, reset]);
 
     const [createLandingPage, { isLoading: isCreating }] = useCreateLandingPageMutation();
 
@@ -58,111 +151,132 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
     const products = productsData?.data || [];
     const selectedProducts = products.filter((p) => selectedProductIds.includes(p.id));
 
-    // Prepopulate form when landing page data exists
-    useEffect(() => {
-        if (landingPage) {
-            // Set landing page name
-            setName(landingPage.name || "");
-
-            // Extract Contact section if it exists
-            const contactSection = landingPage.section?.find((section) => section.sectionType === EComponentType.CTA);
-
-            if (contactSection) {
-                // WhatsApp number is stored in title, Facebook page ID in subTitle
-                setContactData({
-                    whatsappNumber: contactSection.title || "",
-                    facebookPageId: contactSection.subTitle || "",
-                });
-            }
-
-            // Extract feature product IDs if available
-            // Note: LandingPageDemo type doesn't include featureProducts, but API might return it
-            const featureProducts = (landingPage as any)?.featureProducts;
-            if (featureProducts && Array.isArray(featureProducts)) {
-                const productIds = featureProducts.map((fp: any) => fp.productId || fp.product?.id).filter(Boolean);
-                if (productIds.length > 0) {
-                    setSelectedProductIds(productIds);
-                }
-            }
-        }
-    }, [landingPage]);
-
     const handleRemoveProduct = (productId: string) => {
-        setSelectedProductIds(selectedProductIds.filter((id) => id !== productId));
+        setValue(
+            "selectedProductIds",
+            selectedProductIds.filter((id) => id !== productId)
+        );
     };
 
-    const handleProductSelectionChange = (productIds: string[]) => {
-        setSelectedProductIds(productIds);
+    const handleProductSelectionChange = (ids: string[]) => {
+        setValue("selectedProductIds", ids);
     };
 
-    const handleCreateLandingPage = async () => {
-        if (!name.trim()) {
-            toast.error("Please enter a landing page name");
-            return;
-        }
-
+    const onSubmit = async (values: LandingPageFormValues) => {
         if (!shopId) {
             toast.error("Please login to create a landing page");
             return;
         }
 
-        // Build sections array
         const sections: CreateSectionPayload[] = [];
         let sectionIndex = 0;
 
-        // Check if Contact section has any data
-        const hasContactData = contactData.whatsappNumber.trim() || contactData.facebookPageId.trim();
-
+        const hasContactData = values.contact.whatsappNumber.trim() || values.contact.facebookPageId.trim();
         if (hasContactData) {
-            const whatsappNumber = formatPhoneNumber(contactData.whatsappNumber);
-
-            const contactSection: CreateSectionPayload = {
+            const whatsappNumber = formatPhoneNumber(values.contact.whatsappNumber);
+            sections.push({
                 index: sectionIndex++,
                 componentName: "Contact",
                 sectionType: EComponentType.CTA,
                 title: whatsappNumber || undefined,
-                subTitle: contactData.facebookPageId.trim() || undefined,
-            };
-
-            sections.push(contactSection);
+                subTitle: values.contact.facebookPageId.trim() || undefined,
+            });
         }
 
-        // Check if FAQ section has any data
         const hasFaqData =
-            faqData.title.trim() ||
-            faqData.subTitle.trim() ||
-            faqData.items.some((item) => item.question.trim() || item.answer.trim());
-
+            values.faq.title.trim() ||
+            values.faq.subTitle?.trim() ||
+            values.faq.items.some((i) => i.question.trim() || i.answer.trim());
         if (hasFaqData) {
-            // Filter out empty FAQ items
-            const validFaqItems = faqData.items.filter((item) => item.question.trim() && item.answer.trim());
-
+            const validFaqItems = values.faq.items.filter((i) => i.question.trim() && i.answer.trim());
             if (validFaqItems.length > 0) {
                 const faqSectionList: CreateSectionListPayload[] = validFaqItems.map((item) => ({
                     title: item.question,
                     description: item.answer,
                 }));
-
-                const faqSection: CreateSectionPayload = {
+                sections.push({
                     index: sectionIndex++,
                     componentName: "FAQ",
                     sectionType: EComponentType.FAQ,
-                    title: faqData.title.trim() || undefined,
-                    subTitle: faqData.subTitle.trim() || undefined,
+                    title: values.faq.title.trim() || undefined,
+                    subTitle: values.faq.subTitle?.trim() || undefined,
                     sectionList: faqSectionList,
-                };
+                });
+            }
+        }
 
-                sections.push(faqSection);
+        const isEasyLandingPage2 = mode === EPageType.EASY_LANDING_PAGE_2;
+        const hasFeaturesData =
+            values.features.title.trim() ||
+            values.features.subTitle?.trim() ||
+            values.features.items.some((i) => i.title.trim() || i.description.trim());
+        if (isEasyLandingPage2 && hasFeaturesData) {
+            const validFeatureItems = values.features.items.filter((i) => i.title.trim() && i.description.trim());
+            if (validFeatureItems.length > 0) {
+                const featureSectionList: CreateSectionListPayload[] = validFeatureItems.map((item) => ({
+                    title: item.title,
+                    description: item.description,
+                }));
+                sections.push({
+                    index: sectionIndex++,
+                    componentName: "Features",
+                    sectionType: EComponentType.FEATURES,
+                    title: values.features.title.trim() || undefined,
+                    subTitle: values.features.subTitle?.trim() || undefined,
+                    sectionList: featureSectionList,
+                });
+            }
+        }
+
+        const hasTestimonialsData =
+            values.testimonials.title.trim() ||
+            values.testimonials.subTitle?.trim() ||
+            (values.testimonials.images?.length ?? 0) > 0;
+        if (isEasyLandingPage2 && hasTestimonialsData && values.testimonials.images?.length) {
+            const testimonialSectionList: CreateSectionListPayload[] = values.testimonials.images.map((imgURL) => ({
+                imgURL,
+            }));
+            sections.push({
+                index: sectionIndex++,
+                componentName: "Testimonials",
+                sectionType: EComponentType.TESTIMONIALS,
+                title: values.testimonials.title.trim() || undefined,
+                subTitle: values.testimonials.subTitle?.trim() || undefined,
+                sectionList: testimonialSectionList,
+            });
+        }
+
+        const hasAboutData =
+            values.about.title.trim() ||
+            values.about.subTitle?.trim() ||
+            values.about.imgURL?.trim() ||
+            values.about.items.some((i) => i.title.trim() || i.description.trim());
+        if (isEasyLandingPage2 && hasAboutData) {
+            const validAboutItems = values.about.items.filter((i) => i.title.trim() && i.description.trim());
+            if (validAboutItems.length > 0 || values.about.title.trim() || values.about.imgURL?.trim()) {
+                const aboutSectionList: CreateSectionListPayload[] = validAboutItems.map((item) => ({
+                    title: item.title,
+                    description: item.description,
+                }));
+                sections.push({
+                    index: sectionIndex++,
+                    componentName: "About",
+                    sectionType: EComponentType.HERO,
+                    title: values.about.title.trim() || undefined,
+                    subTitle: values.about.subTitle?.trim() || undefined,
+                    imgURL: values.about.imgURL?.trim() || undefined,
+                    sectionList: aboutSectionList,
+                });
             }
         }
 
         const data: CreateLandingPagePayload = {
-            name,
+            name: values.name.trim(),
             productId,
             shopId,
             section: sections,
-            featureProductIds: selectedProductIds,
-            pageType: EPageType.EASY_WITH_FAQ,
+            featureProductIds: values.selectedProductIds,
+            pageType: mode,
         };
 
         await createLandingPage(data)
@@ -177,137 +291,57 @@ export const EasyModeBuilder = ({ productId, landingPage }: EasyModeBuilderProps
     };
 
     return (
-        <div className="mx-auto max-w-3xl space-y-4 lg:space-y-6 lg:p-6">
-            <div className="flex items-center gap-2 lg:gap-3">
-                <div className="bg-primary/10 rounded-full p-1 lg:p-2">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => router.push("/landing-page")}
-                        className="h-9 w-9"
-                    >
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </div>
-                <div>
-                    <h1 className="title lg:text-2xl">Easy Landing Page Builder</h1>
-                    <p className="text-muted-foreground text-sm max-sm:hidden">
-                        Create your landing page in just a few simple steps
-                    </p>
-                </div>
-            </div>
-
-            <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
-                <CustomInput
-                    label="Landing Page Title"
-                    placeholder="Enter landing page title"
-                    value={name}
-                    onChange={(value) => setName(String(value))}
-                    required
+        <FormProvider {...form}>
+            <div className="landing-width space-y-4 lg:space-y-6 lg:p-6">
+                <BuilderHeader
+                    title="Easy Landing Page Builder"
+                    subtitle="Create your landing page in just a few simple steps"
+                    onBack={() => router.push("/landing-page")}
                 />
-            </div>
 
-            {/* Contact Section */}
-            <ContactSection
-                whatsappNumber={contactData.whatsappNumber}
-                facebookPageId={contactData.facebookPageId}
-                onWhatsappNumberChange={(value) =>
-                    setContactData((prev: ContactData) => ({ ...prev, whatsappNumber: value }))
-                }
-                onFacebookPageIdChange={(value) =>
-                    setContactData((prev: ContactData) => ({ ...prev, facebookPageId: value }))
-                }
-            />
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 lg:space-y-6">
+                    <BasicInfoSection />
 
-            {/* FAQ Section */}
-            <FAQSection landingPage={landingPage} onDataChange={setFaqData} />
+                    {mode === EPageType.EASY_LANDING_PAGE_2 && (
+                        <>
+                            <AboutSection />
+                            <FeaturesSection />
+                            <TestimonialsSection />
+                        </>
+                    )}
 
-            {/* Package Section */}
-            {shopId && <PackageSection shopId={shopId} productId={productId} />}
+                    <FAQSection landingPage={landingPage} />
 
-            {/* Featured Products Section */}
-            <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
-                <div>
-                    <h2 className="mb-2 text-lg font-semibold">Featured Products</h2>
-                    <p className="text-muted-foreground text-sm max-sm:hidden">
-                        Select products to feature on your landing page
-                    </p>
-                </div>
+                    {shopId && <PackageSection shopId={shopId} productId={productId} />}
 
-                {selectedProducts.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 text-center">
-                        <div className="bg-muted mb-4 rounded-full p-4">
-                            <Package className="text-muted-foreground h-8 w-8" />
-                        </div>
-                        <h3 className="mb-2 text-lg font-semibold">No featured products</h3>
-                        <p className="text-muted-foreground mb-4 text-sm">
-                            Add products to showcase on your landing page
-                        </p>
-                        <Button type="button" variant="outline" onClick={() => setIsProductModalOpen(true)}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Select Products
+                    <FeaturedProductsSection
+                        selectedProducts={selectedProducts.map((p) => ({
+                            id: p.id,
+                            name: p.name,
+                            photoURL: p.photoURL ?? null,
+                        }))}
+                        onOpenSelectModal={() => setIsProductModalOpen(true)}
+                        onRemoveProduct={handleRemoveProduct}
+                    />
+
+                    <FeaturedProductsSelectionDialog
+                        open={isProductModalOpen}
+                        onOpenChange={setIsProductModalOpen}
+                        selectedProductIds={selectedProductIds}
+                        onSelectionChange={handleProductSelectionChange}
+                        shopId={shopId || ""}
+                    />
+
+                    <div className="flex items-center justify-end gap-3 pt-4">
+                        <CustomButton type="button" variant="outline" onClick={() => router.back()}>
+                            Cancel
+                        </CustomButton>
+                        <Button type="submit" disabled={isCreating}>
+                            {isCreating ? "Creating..." : "Create Landing Page"}
                         </Button>
                     </div>
-                ) : (
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <p className="text-muted-foreground text-sm">
-                                {selectedProducts.length} product{selectedProducts.length !== 1 ? "s" : ""} selected
-                            </p>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setIsProductModalOpen(true)}
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add More
-                            </Button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                            {selectedProducts.map((product) => (
-                                <div key={product.id} className="relative rounded-lg border p-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveProduct(product.id)}
-                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90 absolute -top-2 -right-2 rounded-full p-1"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                    <div className="bg-muted relative mb-2 aspect-square w-full overflow-hidden rounded-md">
-                                        <Image
-                                            src={product.photoURL || "/placeholder.jpg"}
-                                            alt={product.name}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    </div>
-                                    <p className="line-clamp-2 text-sm font-medium">{product.name}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                </form>
             </div>
-
-            {/* Product Selection Modal */}
-            <FeaturedProductsSelectionDialog
-                open={isProductModalOpen}
-                onOpenChange={setIsProductModalOpen}
-                selectedProductIds={selectedProductIds}
-                onSelectionChange={handleProductSelectionChange}
-                shopId={shopId || ""}
-            />
-
-            <div className="flex items-center justify-end gap-3 pt-4">
-                <CustomButton variant="outline" onClick={() => router.back()}>
-                    Cancel
-                </CustomButton>
-                <Button onClick={handleCreateLandingPage} disabled={isCreating}>
-                    {isCreating ? "Creating..." : "Create Landing Page"}
-                </Button>
-            </div>
-        </div>
+        </FormProvider>
     );
 };

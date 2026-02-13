@@ -1,6 +1,7 @@
 import { ProductViewTracker } from "@/features/product/components/product-view-tracker";
 import { AdvanceLandingPageView } from "@/features/shop/landing-page/AdvanceLandingPageView";
-import { EasyLandingPageFAQView } from "@/features/shop/landing-page/EasyLandingPageFAQView";
+import { LandingPage01 } from "@/features/shop/landing-page/landing-page-1";
+import { LandingPage02 } from "@/features/shop/landing-page/landing-page-2";
 import { EPageType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
@@ -22,11 +23,14 @@ export const LandingPageWrapper = ({ landingPage, domain }: Props) => {
                 category={landingPage.product.categories?.[0]?.category?.name}
                 shopSlug={domain}
             />
-            {landingPage.pageType === EPageType.ADVANCED && (
+            {landingPage.pageType === EPageType.ADVANCED_LANDING_PAGE_1 && (
                 <AdvanceLandingPageView sections={landingPage.section || []} />
             )}
-            {landingPage.pageType === EPageType.EASY_WITH_FAQ && (
-                <EasyLandingPageFAQView landingPage={landingPage} domain={domain} />
+            {landingPage.pageType === EPageType.EASY_LANDING_PAGE_1 && (
+                <LandingPage01 landingPage={landingPage} domain={domain} />
+            )}
+            {landingPage.pageType === EPageType.EASY_LANDING_PAGE_2 && (
+                <LandingPage02 landingPage={landingPage} domain={domain} />
             )}
         </>
     );

@@ -6,7 +6,7 @@ import { ResponseObject } from "@/types";
 
 import { LandingPage } from "@/types/landing-type";
 
-const REVALIDATE_TIME = 300;
+const REVALIDATE_TIME = 60 * 5; // 5 minutes
 
 type Props = {
     params: Promise<{ slug: string; domain: string }>;

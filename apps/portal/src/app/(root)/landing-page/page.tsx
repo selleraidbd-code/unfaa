@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
+import { ConfigSelectDialogForLandingPage } from "@/features/landing-builder/components/config-select-dialog-for-landing-page";
 import { LandingPageCard } from "@/features/landing-builder/components/landing-page-card";
-import { ProductSelectDialogForLandingPage } from "@/features/landing-builder/components/product-select-dialog-for-landing-page";
 import { useGetLandingPagesQuery } from "@/redux/api/landing-page-api";
 import { useAppSelector } from "@/redux/store/hook";
 import { Button } from "@workspace/ui/components/button";
@@ -13,7 +13,7 @@ import { DataStateHandler } from "@/components/shared/data-state-handler";
 
 const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
-    const [productSelectModalOpen, setProductSelectModalOpen] = useState(false);
+    const [configSelectModalOpen, setConfigSelectModalOpen] = useState(false);
 
     const { data, isLoading, isError } = useGetLandingPagesQuery({
         shopId: user?.shop.id,
@@ -30,7 +30,7 @@ const Page = () => {
                         </p>
                     </div>
 
-                    <CustomButton onClick={() => setProductSelectModalOpen(true)}>Add Landing Page</CustomButton>
+                    <CustomButton onClick={() => setConfigSelectModalOpen(true)}>Add Landing Page</CustomButton>
                 </div>
 
                 <DataStateHandler
@@ -40,7 +40,7 @@ const Page = () => {
                     isEmpty={data?.data.length === 0}
                     emptyTitle="No landing pages found"
                     emptyDescription="Create your first landing page to get started with building your online presence."
-                    emptyButton={<Button onClick={() => setProductSelectModalOpen(true)}>Create Landing Page</Button>}
+                    emptyButton={<Button onClick={() => setConfigSelectModalOpen(true)}>Create Landing Page</Button>}
                     className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
                 >
                     {(landingPages) =>
@@ -51,10 +51,10 @@ const Page = () => {
                 </DataStateHandler>
             </div>
 
-            {productSelectModalOpen && (
-                <ProductSelectDialogForLandingPage
-                    open={productSelectModalOpen}
-                    onClose={() => setProductSelectModalOpen(false)}
+            {configSelectModalOpen && (
+                <ConfigSelectDialogForLandingPage
+                    open={configSelectModalOpen}
+                    onClose={() => setConfigSelectModalOpen(false)}
                 />
             )}
         </>

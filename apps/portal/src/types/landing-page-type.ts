@@ -1,5 +1,6 @@
 import { EComponentType, EPageType, Section } from "@workspace/ui/landing/types";
 
+import { Product } from "@/types/product-type";
 import { ShopSectionType } from "@/types/shop-type";
 
 export enum LANDING_PAGE {
@@ -66,10 +67,10 @@ export type LandingPage = {
     metaData: null;
     name: string;
     slug: string;
-    keyword: string;
     createdAt: string;
     updatedAt: string;
     pageType: EPageType;
+    product: Product;
 };
 
 export type LandingPageDemo = {

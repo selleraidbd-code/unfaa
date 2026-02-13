@@ -1,22 +1,16 @@
+import Link from "next/link";
+
 import { Button } from "@workspace/ui/components/button";
 import { Loader } from "lucide-react";
-import Link from "next/link";
 
 type TCustomButton = {
     children: React.ReactNode;
-    onClick?: () => void;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     href?: string;
     className?: string;
     isLoading?: boolean;
     disabled?: boolean;
-    variant?:
-        | "default"
-        | "outline"
-        | "ghost"
-        | "link"
-        | "destructive"
-        | "destructiveOutline"
-        | "accent";
+    variant?: "default" | "outline" | "ghost" | "link" | "destructive" | "destructiveOutline" | "accent";
     size?: "default" | "sm" | "lg" | "icon";
     icon?: React.ReactNode;
     type?: "button" | "submit" | "reset";
@@ -39,12 +33,7 @@ export const CustomButton = ({
     if (href) {
         return (
             <Link href={href} target={target}>
-                <Button
-                    className={className}
-                    disabled={isLoading || disabled}
-                    variant={variant}
-                    size={size}
-                >
+                <Button className={className} disabled={isLoading || disabled} variant={variant} size={size}>
                     {isLoading && <Loader className="h-4 w-4 animate-spin" />}
                     {icon}
                     {children}

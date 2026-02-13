@@ -1,0 +1,215 @@
+# Unfaa Store - Cursor AI Rules
+
+## Project Type
+This is a **Turborepo monorepo** for an e-commerce platform with separate admin portal and customer-facing storefront.
+
+## Tech Stack
+- Next.js 15.5.9 with App Router
+- React 19
+- TypeScript 5.7+
+- Tailwind CSS
+- shadcn/ui components
+- pnpm workspaces
+
+## TypeScript Conventions
+
+### Strict Mode
+- Always use TypeScript strict mode
+- Avoid `any` types - use `unknown` or proper typing
+- Prefer explicit return types for functions
+- Use type imports: `import type { Type } from 'module'`
+
+### Naming Conventions
+- **Files**: kebab-case for all files (e.g., `user-profile.tsx`, `auth-api.ts`)
+- **Components**: PascalCase (e.g., `UserProfile`, `OrderCard`)
+- **Variables/Functions**: camelCase (e.g., `getUserData`, `isLoading`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `API_BASE_URL`, `MAX_RETRIES`)
+- **Types/Interfaces**: PascalCase (e.g., `User`, `ProductResponse`)
+- **Enums**: PascalCase for name, UPPER_SNAKE_CASE for values
+
+### Type Definitions
+- Use `type` for object shapes, unions, and intersections
+- Use `interface` for object types that might be extended
+- Suffix type names with context when needed (e.g., `ProductType`, `OrderPayload`)
+- Keep types close to usage or in dedicated `types/` directories
+
+## Import Organization
+
+### Import Order
+1. React and Next.js imports
+2. External packages (alphabetical)
+3. Workspace packages (`@workspace/*`)
+4. Internal absolute imports (`@/...`)
+5. Relative imports (`./`, `../`)
+
+### Example
+```typescript
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+import { Button } from "@workspace/ui/components/button";
+import { toast } from "@workspace/ui/components/sonner";
+
+import { useGetProductsQuery } from "@/redux/api/product-api";
+import { config } from "@/config";
+
+import { ProductCard } from "./product-card";
+```
+
+## Component Conventions
+
+### React Components
+- Use functional components with arrow functions
+- Use named exports for components
+- Place hooks at the top of the component
+- Extract complex logic into custom hooks
+
+### Component Structure
+```typescript
+"use client"; // Only if needed
+
+import { useState } from "react";
+import { ExternalPackage } from "external";
+import { WorkspaceComponent } from "@workspace/ui/components";
+import { InternalUtil } from "@/lib/utils";
+
+type ComponentProps = {
+  // Props definition
+};
+
+export const ComponentName = ({ prop1, prop2 }: ComponentProps) => {
+  // Hooks first
+  const [state, setState] = useState();
+  
+  // Event handlers
+  const handleClick = () => {
+    // Implementation
+  };
+  
+  // Render
+  return (
+    <div>
+      {/* JSX */}
+    </div>
+  );
+};
+```
+
+## Code Style
+
+### General
+- Use arrow functions for all functions
+- Prefer `const` over `let`, avoid `var`
+- Use template literals for string interpolation
+- Use optional chaining (`?.`) and nullish coalescing (`??`)
+- Destructure props and objects when possible
+
+### Async/Await
+- Always use `async/await` instead of `.then()` chains
+- Handle errors with try-catch blocks
+- Use proper error types
+
+### Conditional Rendering
+- Use ternary for simple conditions
+- Use `&&` for conditional rendering
+- Extract complex conditions to variables
+
+## Error Handling
+
+### API Errors
+- Always wrap API calls in try-catch
+- Show user-friendly error messages
+- Log errors for debugging
+- Use toast notifications for user feedback
+
+### Example
+```typescript
+try {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    toast.error(errorData.message || "An error occurred");
+    return;
+  }
+  const data = await response.json();
+  // Handle success
+} catch (error) {
+  console.error("Error:", error);
+  toast.error("An unexpected error occurred");
+}
+```
+
+## Monorepo-Specific Rules
+
+### Workspace Packages
+- Import UI components from `@workspace/ui/components/*`
+- Use shared utilities from `@workspace/ui/lib/*`
+- Respect package boundaries - don't import between apps
+
+### Path Aliases
+- Use `@/` for absolute imports within each app
+- Never use relative imports that go up more than one level
+- Configure path aliases in `tsconfig.json`
+
+## Performance Best Practices
+
+### React Optimization
+- Use `React.memo()` for expensive components
+- Implement proper dependency arrays in hooks
+- Avoid inline function definitions in props when possible
+- Use `useCallback` and `useMemo` judiciously
+
+### Next.js Optimization
+- Use Server Components by default
+- Only add `"use client"` when necessary
+- Implement proper caching strategies
+- Use `next/image` for images
+
+## Accessibility
+- Always include proper ARIA labels
+- Ensure keyboard navigation works
+- Use semantic HTML elements
+- Test with screen readers when possible
+
+## Comments
+- Write comments for complex logic only
+- Avoid obvious comments
+- Use JSDoc for public APIs and utilities
+- Keep comments up-to-date with code changes
+
+## Testing Considerations
+- Write testable code (pure functions, separated logic)
+- Keep business logic separate from UI
+- Use dependency injection when possible
+
+## Security
+- Never commit sensitive data (API keys, tokens)
+- Validate all user inputs
+- Sanitize data before rendering
+- Use environment variables for configuration
+
+## State Management
+- Use local state for component-specific data
+- Use Redux (portal) or Context (web) for global state
+- Keep state as close to usage as possible
+- Avoid prop drilling - use composition or state management
+
+## Form Handling
+- Use React Hook Form with Zod validation
+- Use custom form components from `@workspace/ui`
+- Implement proper error messages
+- Show loading states during submission
+
+## File Organization
+- Group related files in feature folders
+- Keep components, hooks, and utilities together
+- Use barrel exports (`index.ts`) for cleaner imports
+- Separate concerns (UI, logic, data fetching)
+
+## Git Commit Messages
+- Use conventional commits format
+- Be descriptive but concise
+- Reference issue numbers when applicable

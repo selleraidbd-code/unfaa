@@ -18,10 +18,10 @@ export const FeaturedProducts = memo(function FeaturedProducts({ featureProducts
     }
 
     return (
-        <div className="mt-10 space-y-6">
+        <div className="landing-width space-y-6 py-6 lg:py-8">
             <h2 className="text-center text-xl font-bold sm:text-2xl md:text-[27px]">আপনার জন্য আরও প্রোডাক্ট 🔥</h2>
 
-            <div className="grid grid-cols-2 gap-3 md:gap-4 xl:gap-6">
+            <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
                 {featureProducts.map((featureProduct) => {
                     const product = featureProduct.product;
                     const discountPercent =
@@ -38,7 +38,7 @@ export const FeaturedProducts = memo(function FeaturedProducts({ featureProducts
                         <Link
                             key={featureProduct.productId}
                             href={productLink}
-                            className="group relative overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-xl md:rounded-xl"
+                            className="group relative overflow-hidden rounded-md bg-white shadow-md transition-all duration-300 hover:shadow-xl md:rounded-xl"
                         >
                             {/* Discount Badge */}
                             {discountPercent > 0 && (
@@ -66,7 +66,7 @@ export const FeaturedProducts = memo(function FeaturedProducts({ featureProducts
 
                             {/* Product Info */}
                             <div className="p-4">
-                                <h3 className="mb-3 line-clamp-2 text-sm font-semibold text-gray-800 transition-colors group-hover:text-red-600 sm:min-h-[3rem] sm:text-base">
+                                <h3 className="mb-3 line-clamp-2 text-sm font-semibold text-gray-800 transition-colors group-hover:text-red-600 sm:text-base">
                                     {product.banglaName || product.name}
                                 </h3>
 

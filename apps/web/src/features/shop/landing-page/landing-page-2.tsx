@@ -1,0 +1,411 @@
+"use client";
+
+import { useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
+import { FeaturedProducts } from "@/features/product/components/featured-products";
+import { OrderSection } from "@/features/product/components/order-section";
+import { ProductFooter } from "@/features/product/components/product-footer";
+import { ProductVideo } from "@/features/product/components/product-video";
+import { useOrderForm } from "@/features/product/hooks/use-order-form";
+import { FAQ02 } from "@/features/shop/landing-page/components/faq-2";
+import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
+import { EComponentType } from "@workspace/ui/landing/types";
+import { Phone } from "lucide-react";
+
+import { LandingPage as LandingPageType } from "@/types/landing-type";
+import { HtmlRenderer } from "@/components/shared/html-renderer";
+
+const BENGALI_DIGITS = "০১২৩৪৫৬৭৮৯";
+const toBengaliNumber = (n: number) =>
+    String(n)
+        .padStart(2, "0")
+        .split("")
+        .map((c) => BENGALI_DIGITS[parseInt(c, 10)])
+        .join("");
+
+type Props = {
+    landingPage: LandingPageType;
+    domain: string;
+};
+
+export const LandingPage02 = ({ landingPage, domain }: Props) => {
+    const product = landingPage.product;
+    const featureProducts = landingPage.featureProducts;
+    const shopSlug = domain;
+    const sections = landingPage.section;
+    const title = landingPage.name;
+
+    // Find FAQ section
+    const faqSection = sections?.find((s) => s.sectionType === EComponentType.FAQ);
+
+    // Find Contact section
+    const contactSection = sections?.find((s) => s.sectionType === EComponentType.CTA);
+
+    // Find Features section
+    const featuresSection = sections?.find((s) => s.sectionType === EComponentType.FEATURES);
+
+    // Find Testimonials / Customer Review section
+    const testimonialsSection = sections?.find((s) => s.sectionType === EComponentType.TESTIMONIALS);
+
+    // Find About/Services section
+    const aboutSection = sections?.find((s) => s.sectionType === EComponentType.HERO);
+
+    // Find Banner section
+    const bannerSection = sections?.find((s) => s.sectionType === EComponentType.BANNER);
+
+    const discountPercent = useMemo(
+        () =>
+            product.discountPrice < product.price
+                ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+                : 0,
+        [product.price, product.discountPrice]
+    );
+
+    const {
+        formData,
+        errors,
+        isSubmitting,
+        selectedDeliveryZone,
+        selectedVariants,
+        selectedPackage,
+        packages,
+        totalAmount,
+        handleInputChange,
+        handleVariantChange,
+        setSelectedDeliveryZone,
+        handlePackageSelect,
+        handleSubmit,
+    } = useOrderForm(product, shopSlug);
+
+    const importantPoints = [
+        {
+            title: "আমারা কোনো অগ্রিম টাকা নেই না। ইন্সটলমেন্ট সহায়ে ক্যাশ অন ডেলিভারিতে পন্য রিসিভ করবেন।",
+        },
+        {
+            title: "অর্ডার করার পরে আমাদের কল সেন্টার থেকে ফোন করে পন্যের কালার ও সাইজ কনফার্ম করা হবে।",
+        },
+    ];
+
+    return (
+        <div className="bg-gray-50" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+            <style jsx global>{`
+                @import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&display=swap");
+                body {
+                    font-family: "Hind Siliguri", sans-serif;
+                }
+                @keyframes pulse-subtle {
+                    0% {
+                        transform: scale(1);
+                        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+                    }
+                    70% {
+                        transform: scale(1.05);
+                        box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+                    }
+                    100% {
+                        transform: scale(1);
+                        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+                    }
+                }
+                .animate-pulse-subtle {
+                    animation: pulse-subtle 3s infinite;
+                }
+                @keyframes slide-loop {
+                    0%,
+                    45% {
+                        transform: translateX(0);
+                    }
+                    50%,
+                    95% {
+                        transform: translateX(-50%);
+                    }
+                    100% {
+                        transform: translateX(0);
+                    }
+                }
+                .slider-wrapper {
+                    animation: slide-loop 12s infinite ease-in-out;
+                }
+                html {
+                    scroll-behavior: smooth;
+                }
+            `}</style>
+
+            <>
+                {/* Action Sidebar - Contact Buttons */}
+                {contactSection && (
+                    <div className="fixed top-1/2 left-2.5 z-[1000] flex -translate-y-1/2 flex-col gap-2.5">
+                        <a
+                            href={`tel:${contactSection.title}`}
+                            className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-blue-600 shadow-md transition-colors hover:bg-blue-50"
+                        >
+                            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                            </svg>
+                        </a>
+                        {contactSection.subTitle && (
+                            <a
+                                href={`https://wa.me/${contactSection.subTitle}`}
+                                className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-green-500 shadow-md transition-colors hover:bg-green-50"
+                            >
+                                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.414 0 .004 5.411.001 12.049a11.802 11.802 0 001.608 6.008L0 24l6.102-1.6a11.777 11.777 0 005.943 1.648h.005c6.635 0 12.046-5.412 12.049-12.05a11.776 11.776 0 00-3.541-8.517z" />
+                                </svg>
+                            </a>
+                        )}
+                    </div>
+                )}
+
+                {/* Header/Banner Section */}
+                <header className="border-b border-gray-200 bg-white py-12">
+                    <div className="landing-width flex flex-col items-center gap-12 md:flex-row">
+                        <div className="md:w-1/2">
+                            <div className="mb-6 h-1 w-16 bg-blue-600"></div>
+                            <h1 className="mb-6 text-3xl font-bold text-gray-900 md:text-5xl md:leading-12">
+                                {bannerSection?.title || title || product.banglaName}
+                            </h1>
+
+                            <HtmlRenderer
+                                html={bannerSection?.subTitle || product.description}
+                                className="mb-8 border-l-4 border-gray-100 pl-4 text-lg leading-relaxed text-gray-600"
+                            />
+
+                            <Link
+                                href={`#order-section`}
+                                className="inline-block rounded-r-full bg-gray-900 px-7 py-2.5 font-extrabold text-amber-400"
+                            >
+                                <span className="text-sm font-normal opacity-80">স্পেশাল প্রাইজ: </span>
+                                <span className="text-3xl">৳{product.discountPrice.toLocaleString()}</span>
+                            </Link>
+                        </div>
+                        <div className="relative md:w-1/2">
+                            <div className="absolute -top-4 -left-4 -z-10 h-24 w-24 rounded-full bg-blue-50"></div>
+                            <Image
+                                src={bannerSection?.imgURL || product.photoURL}
+                                alt={product.banglaName}
+                                className="h-auto w-full border border-gray-100 bg-white p-2 shadow-2xl"
+                                width={600}
+                                height={600}
+                            />
+                        </div>
+                    </div>
+                </header>
+
+                <section className="bg-white py-10">
+                    <div className="container mx-auto grid max-w-4xl grid-cols-2 gap-6 px-6 md:grid-cols-4">
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">🚚</p>
+                            <h4 className="text-sm font-bold">দ্রুত ডেলিভারি</h4>
+                        </div>
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">🤝</p>
+                            <h4 className="text-sm font-bold">ক্যাশ অন ডেলিভারি</h4>
+                        </div>
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">✅</p>
+                            <h4 className="text-sm font-bold">১০০% অথেন্টিক</h4>
+                        </div>
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">🛡️</p>
+                            <h4 className="text-sm font-bold">মান নিশ্চিত</h4>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Services/About Section - title, left: sectionList (title+description), right: imgURL (video/image) */}
+                {aboutSection &&
+                    ((aboutSection.sectionList && aboutSection.sectionList.length > 0) ||
+                        aboutSection.imgURL ||
+                        aboutSection.title) && (
+                        <section className="bg-gray-900 py-12 text-white">
+                            <div className="container mx-auto max-w-4xl px-6">
+                                <h2 className="mb-10 text-center text-2xl font-bold tracking-wide uppercase md:text-3xl">
+                                    {aboutSection.title || "আমাদের সার্ভিস কেন সেরা?"}
+                                </h2>
+                                <div className="grid gap-8 md:grid-cols-2">
+                                    <ul className="space-y-6">
+                                        {aboutSection.sectionList?.map((service, index) => (
+                                            <li key={service.id || index} className="flex items-start gap-4">
+                                                <span className="center size-6 rounded bg-blue-600">✔</span>
+                                                <div>
+                                                    <p className="mb-2 text-lg leading-none font-bold">
+                                                        {service.title}
+                                                    </p>
+                                                    <p className="text-sm text-gray-400">{service.description}</p>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    {(aboutSection.imgURL || product.videoLink) &&
+                                        (() => {
+                                            const mediaUrl = aboutSection.imgURL || product.videoLink || "";
+                                            const isEmbedHtml = mediaUrl.trim().startsWith("<");
+                                            const isYoutubeUrl =
+                                                !isEmbedHtml && /youtube\.com|youtu\.be/i.test(mediaUrl);
+                                            const embedSrc =
+                                                isYoutubeUrl && mediaUrl
+                                                    ? (() => {
+                                                          const match = mediaUrl.match(
+                                                              /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s?]+)/
+                                                          );
+                                                          return match
+                                                              ? `https://www.youtube.com/embed/${match[1]}`
+                                                              : mediaUrl;
+                                                      })()
+                                                    : null;
+                                            return (
+                                                <div className="overflow-hidden rounded-xl border-4 border-gray-800 shadow-2xl">
+                                                    {isEmbedHtml ? (
+                                                        <div
+                                                            className="[&>iframe]:aspect-video [&>iframe]:w-full"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: mediaUrl,
+                                                            }}
+                                                        />
+                                                    ) : embedSrc ? (
+                                                        <iframe
+                                                            src={embedSrc}
+                                                            className="aspect-video w-full"
+                                                            title="Video"
+                                                            allowFullScreen
+                                                        />
+                                                    ) : (
+                                                        <img
+                                                            src={mediaUrl}
+                                                            alt=""
+                                                            className="aspect-video w-full object-cover"
+                                                        />
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
+                                </div>
+                            </div>
+                        </section>
+                    )}
+
+                {/* Benefits / Features Section */}
+                {featuresSection && featuresSection.sectionList && featuresSection.sectionList.length > 0 && (
+                    <section className="bg-white py-12">
+                        <div className="container mx-auto max-w-4xl px-6">
+                            <div className="mb-10 text-center">
+                                <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
+                                    {featuresSection.title || "পণ্যের বিশেষত্ব ও সুবিধা"}
+                                </h2>
+                                <div className="mx-auto mt-4 h-1 w-20 bg-blue-600"></div>
+                            </div>
+                            <div className="grid gap-6 md:grid-cols-3">
+                                {featuresSection.sectionList.map((feature, index) => (
+                                    <div
+                                        key={feature.id ?? index}
+                                        className="rounded-xl border border-gray-100 bg-gray-50/50 p-6 shadow-sm"
+                                    >
+                                        <div className="mb-3 text-xl font-bold text-blue-600">
+                                            #{toBengaliNumber(index + 1)}
+                                        </div>
+                                        <h4 className="mb-2 text-lg font-bold text-gray-900">{feature.title}</h4>
+                                        <p className="text-sm text-gray-600">{feature.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Customer Review / Testimonials Section */}
+                {testimonialsSection && <Testimonials section={testimonialsSection} />}
+
+                {product.videoLink && !aboutSection && (
+                    <div className="px-6">
+                        <ProductVideo videoLink={product.videoLink} />
+                    </div>
+                )}
+
+                {/* FAQ Section */}
+                {faqSection && <FAQ02 section={faqSection} />}
+
+                {/* Important Points Section */}
+                <section className="bg-gradient-to-br from-blue-50 to-white px-6 py-12">
+                    <div className="landing-width rounded-2xl border-2 border-blue-600 bg-white p-6 shadow-2xl md:p-10">
+                        {/* Title */}
+                        <h2 className="mb-6 text-center text-2xl font-bold text-blue-600 md:text-3xl">
+                            ২ টি গুরুত্বপূর্ণ বিষয়
+                        </h2>
+
+                        {/* Checkpoints */}
+                        <div className="mb-8 space-y-6">
+                            {importantPoints.map((point) => (
+                                <div
+                                    key={point.title}
+                                    className="flex items-start gap-4 rounded-xl border-blue-100 transition-all"
+                                >
+                                    <div className="flex-shrink-0">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600">
+                                            <svg
+                                                className="h-5 w-5 text-white"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={3}
+                                                    d="M5 13l4 4L19 7"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <p className="flex-1 text-base leading-relaxed text-gray-800 md:text-lg">
+                                        {point.title}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {contactSection && (
+                            <div className="text-center">
+                                <a
+                                    href={`tel:${contactSection.title}`}
+                                    className="group inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-blue-500 px-6 py-2 text-xl font-bold text-white transition-all md:px-10 md:py-4 md:text-xl"
+                                >
+                                    <Phone className="h-6 w-6" />
+                                    <span>
+                                        <span className="max-sm:hidden">যে কোনো প্রয়োজনে কল করুন:</span>{" "}
+                                        {contactSection.title}
+                                    </span>
+                                </a>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* Order Section */}
+                <OrderSection
+                    product={product}
+                    packages={packages}
+                    formData={formData}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    selectedDeliveryZone={selectedDeliveryZone}
+                    selectedVariants={selectedVariants}
+                    selectedPackage={selectedPackage}
+                    totalAmount={totalAmount}
+                    handleInputChange={handleInputChange}
+                    handleVariantChange={handleVariantChange}
+                    setSelectedDeliveryZone={setSelectedDeliveryZone}
+                    handlePackageSelect={handlePackageSelect}
+                    handleSubmit={handleSubmit}
+                />
+
+                {/* Featured Products */}
+                <FeaturedProducts featureProducts={featureProducts} shopSlug={shopSlug} />
+
+                {/* Footer */}
+                <ProductFooter banglaName={product.banglaName} shopSlug={shopSlug} />
+            </>
+        </div>
+    );
+};

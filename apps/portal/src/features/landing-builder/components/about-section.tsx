@@ -7,74 +7,66 @@ import { CustomFormTextarea } from "@workspace/ui/components/custom/custom-form-
 import { Plus, Trash2 } from "lucide-react";
 
 import type { LandingPageFormValues } from "@/features/landing-builder/landing-page-form-schema";
-import type { LandingPageDemo } from "@/types/landing-page-type";
 
-export type FAQItem = {
-    id: string;
-    question: string;
-    answer: string;
-};
-
-export type FAQData = {
-    title: string;
-    subTitle: string;
-    items: FAQItem[];
-};
-
-type FAQSectionProps = {
-    landingPage?: LandingPageDemo;
-};
-
-export const FAQSection = ({ landingPage: _landingPage }: FAQSectionProps) => {
+export const AboutSection = () => {
     const { control } = useFormContext<LandingPageFormValues>();
     const { fields, append, remove } = useFieldArray({
         control,
-        name: "faq.items",
+        name: "about.items",
     });
 
-    const handleAddFAQItem = () => {
+    const handleAddItem = () => {
         append({
             id: crypto.randomUUID?.() ?? Date.now().toString(),
-            question: "",
-            answer: "",
+            title: "",
+            description: "",
         });
     };
 
     return (
         <div className="bg-card space-y-4 rounded-lg border p-4 lg:space-y-6 lg:p-6">
             <div>
-                <h2 className="mb-2 text-lg font-semibold">FAQ Section</h2>
-                <p className="text-muted-foreground text-sm">Add frequently asked questions to your landing page</p>
+                <h2 className="mb-2 text-lg font-semibold">আমাদের সার্ভিস কেন সেরা? (About / Why us)</h2>
+                <p className="text-muted-foreground text-sm">
+                    Left side: list of benefits (title + description). Right side: video or image URL (imgURL).
+                </p>
             </div>
 
             <div className="space-y-4">
                 <CustomFormInput<LandingPageFormValues>
                     control={control}
-                    name="faq.title"
-                    label="FAQ Section Title"
-                    placeholder="e.g., Frequently Asked Questions"
+                    name="about.title"
+                    label="Section Title"
+                    placeholder="e.g., আমাদের সার্ভিস কেন সেরা?"
                 />
                 <CustomFormInput<LandingPageFormValues>
                     control={control}
-                    name="faq.subTitle"
-                    label="FAQ Section Subtitle"
-                    placeholder="e.g., Find answers to common questions"
+                    name="about.subTitle"
+                    label="Section Subtitle (optional)"
+                    placeholder="e.g., Why our service is the best?"
                 />
             </div>
+
+            <CustomFormInput<LandingPageFormValues>
+                control={control}
+                name="about.imgURL"
+                label="Right side video / image URL (imgURL)"
+                placeholder="e.g., https://example.com/image.jpg or embed HTML"
+            />
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium">Questions & Answers</h3>
-                    <Button type="button" variant="outline" size="sm" onClick={handleAddFAQItem} className="gap-2">
+                    <h3 className="text-sm font-medium">Left side list (benefits)</h3>
+                    <Button type="button" variant="outline" size="sm" onClick={handleAddItem} className="gap-2">
                         <Plus className="h-4 w-4" />
-                        Add Question
+                        Add item
                     </Button>
                 </div>
 
                 {fields.map((field, index) => (
                     <div key={field.id} className="space-y-3 rounded-lg border p-4">
                         <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground text-sm font-medium">Question {index + 1}</span>
+                            <span className="text-muted-foreground text-sm font-medium">Item {index + 1}</span>
                             {fields.length > 1 && (
                                 <Button
                                     type="button"
@@ -89,16 +81,16 @@ export const FAQSection = ({ landingPage: _landingPage }: FAQSectionProps) => {
                         </div>
                         <CustomFormInput<LandingPageFormValues>
                             control={control}
-                            name={`faq.items.${index}.question`}
-                            label="Question"
-                            placeholder="Enter your question"
+                            name={`about.items.${index}.title`}
+                            label="Title"
+                            placeholder="e.g., অরিজিনাল প্রোডাক্ট গ্যারান্টি"
                         />
                         <CustomFormTextarea<LandingPageFormValues>
                             control={control}
-                            name={`faq.items.${index}.answer`}
-                            label="Answer"
-                            placeholder="Enter the answer"
-                            rows={3}
+                            name={`about.items.${index}.description`}
+                            label="Description"
+                            placeholder="e.g., সরাসরি আমদানিকারক থেকে সংগৃহীত জেনুইন পণ্য।"
+                            rows={2}
                         />
                     </div>
                 ))}

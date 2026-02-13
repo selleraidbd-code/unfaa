@@ -59,7 +59,7 @@ const CreateTemplate = () => {
             productId: "",
             name: portfolioName,
             keyword: portfolioKeyword,
-            pageType: EPageType.TEMPLATE,
+            pageType: EPageType.EASY_LANDING_PAGE_2,
         };
 
         await createLandingPageDemoWithSection(data)

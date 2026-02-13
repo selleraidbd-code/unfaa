@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
+
 import { config } from "@/config";
 import { AlertType } from "@/providers/AlertProvider";
 import { useDeleteLandingPageMutation } from "@/redux/api/landing-page-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/components/sonner";
 import { EPageType } from "@workspace/ui/landing/types";
 import { formatDateWithTime } from "@workspace/ui/lib/formateDate";
@@ -27,16 +28,6 @@ export const LandingPageCard = ({ landingPage }: LandingPageCardProps) => {
         return `${config.rootDomain}/${user?.shop?.slug}/${pageSlug}`;
     };
 
-    const getLandingPageMode = (pageType: EPageType) => {
-        if (pageType === EPageType.ADVANCED) {
-            return "advanced";
-        }
-        if (pageType === EPageType.EASY_WITH_FAQ) {
-            return "easy";
-        }
-        return null;
-    };
-
     const handleDelete = () => {
         fire({
             title: "Delete Landing Page",
@@ -53,49 +44,77 @@ export const LandingPageCard = ({ landingPage }: LandingPageCardProps) => {
         });
     };
 
+    const getLandingPageType = (pageType: EPageType) => {
+        return pageType.includes("ADVANCED") ? "Advanced" : "Easy";
+    };
+
     return (
-        <Card className="transition-shadow duration-200 hover:shadow-lg">
-            <CardHeader>
-                <CardTitle className="sub-title line-clamp-2">{landingPage.name}</CardTitle>
+        <Link
+            href={getLandingPageUrl(landingPage.slug)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group bg-card hover:border-primary/50 relative flex cursor-pointer flex-col overflow-hidden rounded-xl border transition-all duration-300 hover:shadow-lg"
+        >
+            {/* Header Section */}
+            <div className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1 space-y-2">
+                        <h3 className="group-hover:text-primary line-clamp-2 text-lg leading-tight font-semibold transition-colors">
+                            {landingPage.name}
+                        </h3>
+                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                            <Globe className="size-3.5 flex-shrink-0" />
+                            <span className="truncate font-medium">/{landingPage.slug}</span>
+                        </div>
+                    </div>
 
-                <CardDescription className="flex items-center gap-1 text-sm">
-                    <Globe className="size-3" />/{landingPage.slug}
-                </CardDescription>
-            </CardHeader>
-
-            <CardContent className="pt-0">
-                <div className="text-muted-foreground flex items-center gap-1 text-sm">
-                    <Calendar className="size-3" />
-                    Created : {formatDateWithTime(landingPage.createdAt)}
+                    {/* Page Type Badge */}
+                    <div className="flex-shrink-0">
+                        <span className="bg-primary/10 text-primary border-primary/20 inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-semibold">
+                            {getLandingPageType(landingPage.pageType)}
+                        </span>
+                    </div>
                 </div>
-            </CardContent>
 
-            <CardFooter className="grid grid-cols-2 gap-4">
+                {/* Metadata */}
+                <div className="text-muted-foreground mt-3 flex items-center gap-2 pt-2 text-xs">
+                    <Calendar className="size-3.5 flex-shrink-0" />
+                    <span>{formatDateWithTime(landingPage.createdAt)}</span>
+                </div>
+            </div>
+
+            {/* Actions Footer - All buttons in one line */}
+            <div className="bg-muted/20 grid grid-cols-3 gap-2 border-t p-3">
                 <CustomButton
-                    variant="outline"
-                    href={`/landing-page/builder?productId=${landingPage.productId}${getLandingPageMode(landingPage.pageType) ? `&mode=${getLandingPageMode(landingPage.pageType)}` : ""}`}
+                    variant="destructiveOutline"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        handleDelete();
+                    }}
+                    isLoading={isDeleting}
+                    disabled={isDeleting}
                     className="w-full"
                 >
-                    <Edit className="size-4" />
-                    Edit Page
+                    <Trash className="size-4" />
+                    Delete
                 </CustomButton>
+                <div onClick={(e) => e.stopPropagation()}>
+                    <CustomButton
+                        variant="outline"
+                        href={`/landing-page/builder?productId=${landingPage.productId}&mode=${landingPage.pageType}`}
+                        className="w-full"
+                    >
+                        <Edit className="size-4" />
+                        Edit
+                    </CustomButton>
+                </div>
 
                 <CustomButton target="_blank" href={getLandingPageUrl(landingPage.slug)} className="w-full">
                     <ExternalLink className="size-4" />
-                    View Page
+                    Preview
                 </CustomButton>
-
-                <CustomButton
-                    variant="destructive"
-                    onClick={handleDelete}
-                    className="col-span-2 w-full"
-                    isLoading={isDeleting}
-                    disabled={isDeleting}
-                >
-                    <Trash className="size-4" />
-                    Delete Page
-                </CustomButton>
-            </CardFooter>
-        </Card>
+            </div>
+        </Link>
     );
 };

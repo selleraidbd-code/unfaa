@@ -6,13 +6,13 @@ import Image from "next/image";
 import { ContactButtons } from "@/features/product/components/contact-buttons";
 import { FeaturedProducts } from "@/features/product/components/featured-products";
 import { OrderSection } from "@/features/product/components/order-section";
-import { ProductFAQ } from "@/features/product/components/product-faq";
 import { ProductFooter } from "@/features/product/components/product-footer";
 import { ProductImageGallery } from "@/features/product/components/product-image-gallery";
 import { ProductPricing } from "@/features/product/components/product-pricing";
 import { ProductVideo } from "@/features/product/components/product-video";
 import { ProductWarranty } from "@/features/product/components/product-warranty";
 import { useOrderForm } from "@/features/product/hooks/use-order-form";
+import { FAQ01 } from "@/features/shop/landing-page/components/faq-1";
 import { EComponentType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
@@ -23,7 +23,7 @@ type Props = {
     domain: string;
 };
 
-export const EasyLandingPageFAQView = ({ landingPage, domain }: Props) => {
+export const LandingPage01 = ({ landingPage, domain }: Props) => {
     const product = landingPage.product;
     const featureProducts = landingPage.featureProducts;
     const shopSlug = domain;
@@ -130,7 +130,7 @@ export const EasyLandingPageFAQView = ({ landingPage, domain }: Props) => {
 
                     {product.videoLink && <ProductVideo videoLink={product.videoLink} />}
 
-                    {faqSection && <ProductFAQ section={faqSection} />}
+                    {faqSection && <FAQ01 section={faqSection} />}
 
                     <OrderSection
                         product={product}

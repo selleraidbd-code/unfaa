@@ -1,3 +1,3 @@
-export const HtmlRenderer = ({ html }: { html: string }) => {
-    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+export const HtmlRenderer = ({ html, className }: { html: string; className?: string }) => {
+    return <div className={className} dangerouslySetInnerHTML={{ __html: html }} />;
 };

@@ -4,7 +4,7 @@ type Props = {
     section: Section;
 };
 
-export const ProductFAQ = ({ section }: Props) => {
+export const FAQ01 = ({ section }: Props) => {
     if (!section.sectionList || section.sectionList.length === 0) {
         return null;
     }
@@ -21,7 +21,6 @@ export const ProductFAQ = ({ section }: Props) => {
                     {section.title && (
                         <h2 className="text-2xl font-bold md:text-[28px]">
                             <span className="text-green-600">{titleWithoutMark}</span>
-                            <span className="text-red-600"> ?</span>
                         </h2>
                     )}
                     {section.subTitle && <p className="mt-2 text-base text-gray-600 md:text-lg">{section.subTitle}</p>}

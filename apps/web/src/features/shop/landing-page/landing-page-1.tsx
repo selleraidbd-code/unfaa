@@ -56,12 +56,14 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
         selectedDeliveryZone,
         selectedVariants,
         selectedPackage,
+        selectedPackageProductVariants,
         packages,
         totalAmount,
         handleInputChange,
         handleVariantChange,
         setSelectedDeliveryZone,
         handlePackageSelect,
+        handlePackageProductVariantChange,
         handleSubmit,
     } = useOrderForm(product, shopSlug);
 
@@ -141,11 +143,13 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
                         selectedDeliveryZone={selectedDeliveryZone}
                         selectedVariants={selectedVariants}
                         selectedPackage={selectedPackage}
+                        selectedPackageProductVariants={selectedPackageProductVariants}
                         totalAmount={totalAmount}
                         handleInputChange={handleInputChange}
                         handleVariantChange={handleVariantChange}
                         setSelectedDeliveryZone={setSelectedDeliveryZone}
                         handlePackageSelect={handlePackageSelect}
+                        handlePackageProductVariantChange={handlePackageProductVariantChange}
                         handleSubmit={handleSubmit}
                     />
 

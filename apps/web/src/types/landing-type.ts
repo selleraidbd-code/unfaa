@@ -40,10 +40,13 @@ export type PackageProduct = {
     packageId: string;
     productId: string;
     quantity: number;
+    product: Product;
     packageProductVariants: PackageProductVariant[];
 };
 
 export type PackageProductVariant = {
+    id: string;
+    packageProductId: string;
     productVariantId: string;
     productVariantOptionId: string;
 };

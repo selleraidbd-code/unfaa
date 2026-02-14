@@ -42,6 +42,11 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
     const [selectedDeliveryZone, setSelectedDeliveryZone] = useState<string>("");
     const [selectedVariants, setSelectedVariants] = useState<Record<string, ProductVariantOption>>({});
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+    // Track user-selected variants for package products where packageProductVariants is empty
+    // Structure: { [packageProductId]: { [variantId]: ProductVariantOption } }
+    const [selectedPackageProductVariants, setSelectedPackageProductVariants] = useState<
+        Record<string, Record<string, ProductVariantOption>>
+    >({});
 
     // Check if product has packages
     const packages = "package" in product ? product.package : [];
@@ -168,11 +173,25 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
             if (selectedPackage) {
                 // If package is selected, create order items for all products in the package
                 orderItems = selectedPackage.packageProducts.map((packageProduct) => {
-                    // Map variants directly from package data
-                    const orderItemVariant = packageProduct.packageProductVariants.map((variant) => ({
-                        productVariantId: variant.productVariantId || "",
-                        productVariantOptionId: variant.productVariantOptionId,
-                    }));
+                    let orderItemVariant: { productVariantId: string; productVariantOptionId: string }[];
+
+                    if (packageProduct.packageProductVariants.length > 0) {
+                        // Use pre-selected variants from the package
+                        orderItemVariant = packageProduct.packageProductVariants.map((variant) => ({
+                            productVariantId: variant.productVariantId || "",
+                            productVariantOptionId: variant.productVariantOptionId,
+                        }));
+                    } else if (selectedPackageProductVariants[packageProduct.id]) {
+                        // Use user-selected variants for this package product
+                        orderItemVariant = Object.entries(selectedPackageProductVariants[packageProduct.id]!).map(
+                            ([variantId, option]) => ({
+                                productVariantId: variantId,
+                                productVariantOptionId: option.id,
+                            })
+                        );
+                    } else {
+                        orderItemVariant = [];
+                    }
 
                     return {
                         productId: packageProduct.productId,
@@ -334,9 +353,42 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
         if (packageId) {
             const pkg = packages.find((p) => p.id === packageId);
             setSelectedPackage(pkg || null);
+
+            // Auto-initialize variant selections for package products that need user input
+            if (pkg) {
+                const defaults: Record<string, Record<string, ProductVariantOption>> = {};
+                pkg.packageProducts.forEach((pp) => {
+                    // Only if packageProductVariants is empty but product has variants
+                    if (pp.packageProductVariants.length === 0 && pp.product?.productVariant?.length) {
+                        const variantDefaults: Record<string, ProductVariantOption> = {};
+                        pp.product.productVariant.forEach((variant) => {
+                            if (variant.options.length > 0 && variant.options[0]) {
+                                variantDefaults[variant.id] = variant.options[0];
+                            }
+                        });
+                        defaults[pp.id] = variantDefaults;
+                    }
+                });
+                setSelectedPackageProductVariants(defaults);
+            }
         } else {
             setSelectedPackage(null);
+            setSelectedPackageProductVariants({});
         }
+    };
+
+    const handlePackageProductVariantChange = (
+        packageProductId: string,
+        variantId: string,
+        option: ProductVariantOption
+    ) => {
+        setSelectedPackageProductVariants((prev) => ({
+            ...prev,
+            [packageProductId]: {
+                ...prev[packageProductId],
+                [variantId]: option,
+            },
+        }));
     };
 
     return {
@@ -346,12 +398,14 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
         selectedDeliveryZone,
         selectedVariants,
         selectedPackage,
+        selectedPackageProductVariants,
         packages,
         totalAmount,
         handleInputChange,
         handleVariantChange,
         setSelectedDeliveryZone,
         handlePackageSelect,
+        handlePackageProductVariantChange,
         handleSubmit,
     };
 };

@@ -60,11 +60,17 @@ type OrderSectionProps = {
     selectedDeliveryZone: string;
     selectedVariants: Record<string, ProductVariantOption>;
     selectedPackage: Package | null;
+    selectedPackageProductVariants: Record<string, Record<string, ProductVariantOption>>;
     totalAmount: number;
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleVariantChange: (variantId: string, option: ProductVariantOption) => void;
     setSelectedDeliveryZone: (zoneId: string) => void;
     handlePackageSelect: (packageId: string | null) => void;
+    handlePackageProductVariantChange: (
+        packageProductId: string,
+        variantId: string,
+        option: ProductVariantOption
+    ) => void;
     handleSubmit: () => void;
 };
 
@@ -78,11 +84,13 @@ export const OrderSection = memo(function OrderSection({
     selectedDeliveryZone,
     selectedVariants,
     selectedPackage,
+    selectedPackageProductVariants,
     totalAmount,
     handleInputChange,
     handleVariantChange,
     setSelectedDeliveryZone,
     handlePackageSelect,
+    handlePackageProductVariantChange,
     handleSubmit,
 }: OrderSectionProps) {
     const theme = themeProp ?? DEFAULT_THEME;
@@ -105,6 +113,8 @@ export const OrderSection = memo(function OrderSection({
         [primary, secondary]
     );
 
+    console.log("packages", packages);
+
     return (
         <section id="order-section" className="scroll-mt-10 py-6 lg:scroll-mt-20 lg:py-12">
             <div
@@ -116,7 +126,7 @@ export const OrderSection = memo(function OrderSection({
                 }}
             >
                 <div
-                    className="mb-[18px] rounded-xl border px-[18px] py-4 text-left text-[22px] font-bold"
+                    className="mb-[18px] rounded-xl border px-[18px] py-4 text-center text-[22px] font-bold"
                     style={{
                         borderColor: "var(--order-header-border)",
                         background: "linear-gradient(to right, var(--order-header-from), var(--order-header-to))",
@@ -131,6 +141,8 @@ export const OrderSection = memo(function OrderSection({
                         packages={packages}
                         selectedPackageId={selectedPackage?.id || null}
                         onPackageSelect={handlePackageSelect}
+                        selectedPackageProductVariants={selectedPackageProductVariants}
+                        onPackageProductVariantChange={handlePackageProductVariantChange}
                     />
                 )}
 

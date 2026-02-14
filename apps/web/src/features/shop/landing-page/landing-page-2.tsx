@@ -26,6 +26,15 @@ const toBengaliNumber = (n: number) =>
         .map((c) => BENGALI_DIGITS[parseInt(c, 10)])
         .join("");
 
+/** Ensure a phone number includes the Bangladesh country code (+880). */
+const ensureCountryCode = (phone: string): string => {
+    const digits = phone.replace(/[^0-9+]/g, "");
+    if (digits.startsWith("+")) return digits;
+    if (digits.startsWith("880")) return `+${digits}`;
+    if (digits.startsWith("0")) return `+880${digits.slice(1)}`;
+    return `+880${digits}`;
+};
+
 type Props = {
     landingPage: LandingPageType;
     domain: string;
@@ -141,7 +150,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                     <div className="fixed top-1/2 right-2 z-[1000] flex -translate-y-1/2 flex-col gap-2.5">
                         {contactSection.title && (
                             <a
-                                href={`tel:${contactSection.title}`}
+                                href={`tel:${ensureCountryCode(contactSection.title)}`}
                                 className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-blue-600 shadow-md transition-colors hover:bg-blue-50"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -153,7 +162,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                         )}
                         {contactSection.title && (
                             <a
-                                href={`https://wa.me/${contactSection.title}`}
+                                href={`https://wa.me/${ensureCountryCode(contactSection.title).replace("+", "")}`}
                                 className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-green-500 shadow-md transition-colors hover:bg-green-50"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -422,7 +431,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                         {contactSection && (
                             <div className="text-center">
                                 <a
-                                    href={`tel:${contactSection.title}`}
+                                    href={`tel:${ensureCountryCode(contactSection.title ?? "")}`}
                                     className="group inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-blue-500 px-6 py-2 text-xl font-bold text-white transition-all md:px-10 md:py-4 md:text-xl"
                                 >
                                     <Phone className="h-6 w-6" />

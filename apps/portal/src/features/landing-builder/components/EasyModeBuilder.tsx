@@ -127,6 +127,9 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id;
 
+    const eligibleModes = [EPageType.EASY_LANDING_PAGE_2, EPageType.EASY_LANDING_PAGE_3];
+    const isEligibleMode = eligibleModes.includes(mode as EPageType);
+
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
     const form = useForm<LandingPageFormValues>({
@@ -205,12 +208,11 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             }
         }
 
-        const isEasyLandingPage2 = mode === EPageType.EASY_LANDING_PAGE_2;
         const hasFeaturesData =
             values.features.title.trim() ||
             values.features.subTitle?.trim() ||
             values.features.items.some((i) => i.title.trim() || i.description.trim());
-        if (isEasyLandingPage2 && hasFeaturesData) {
+        if (isEligibleMode && hasFeaturesData) {
             const validFeatureItems = values.features.items.filter((i) => i.title.trim() && i.description.trim());
             if (validFeatureItems.length > 0) {
                 const featureSectionList: CreateSectionListPayload[] = validFeatureItems.map((item) => ({
@@ -232,7 +234,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             values.testimonials.title.trim() ||
             values.testimonials.subTitle?.trim() ||
             (values.testimonials.images?.length ?? 0) > 0;
-        if (isEasyLandingPage2 && hasTestimonialsData && values.testimonials.images?.length) {
+        if (isEligibleMode && hasTestimonialsData && values.testimonials.images?.length) {
             const testimonialSectionList: CreateSectionListPayload[] = values.testimonials.images.map((imgURL) => ({
                 imgURL,
             }));
@@ -251,7 +253,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             values.about.subTitle?.trim() ||
             values.about.imgURL?.trim() ||
             values.about.items.some((i) => i.title.trim() || i.description.trim());
-        if (isEasyLandingPage2 && hasAboutData) {
+        if (isEligibleMode && hasAboutData) {
             const validAboutItems = values.about.items.filter((i) => i.title.trim() && i.description.trim());
             if (validAboutItems.length > 0 || values.about.title.trim() || values.about.imgURL?.trim()) {
                 const aboutSectionList: CreateSectionListPayload[] = validAboutItems.map((item) => ({
@@ -302,7 +304,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 lg:space-y-6">
                     <BasicInfoSection />
 
-                    {mode === EPageType.EASY_LANDING_PAGE_2 && (
+                    {isEligibleMode && (
                         <>
                             <AboutSection />
                             <FeaturesSection />

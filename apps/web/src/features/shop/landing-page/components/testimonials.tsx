@@ -1,10 +1,9 @@
 "use client";
 
+import type { Section } from "@workspace/ui/landing/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-
-import type { Section } from "@workspace/ui/landing/types";
 
 type Props = {
     section: Section;
@@ -49,7 +48,7 @@ export const Testimonials = ({ section }: Props) => {
                                             <img
                                                 src={item.imgURL}
                                                 alt={item.title || `Customer review ${index + 1}`}
-                                                className="size-full object-cover object-top"
+                                                className="size-full object-contain object-center"
                                             />
                                         )}
                                     </div>

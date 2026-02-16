@@ -409,13 +409,15 @@ export const LandingPage03 = ({ landingPage, domain }: Props) => {
                 )}
 
                 {secondImage && (
-                    <Image
-                        src={secondImage}
-                        alt="Product"
-                        className="landing-width mb-4 rounded-xl shadow-md max-md:w-full"
-                        width={1000}
-                        height={1000}
-                    />
+                    <div className="landing-width bg-white p-4">
+                        <Image
+                            src={secondImage}
+                            alt="Product"
+                            className="w-full rounded-sm shadow-xl"
+                            width={1000}
+                            height={1000}
+                        />
+                    </div>
                 )}
 
                 {/* Customer Review / Testimonials Section */}
@@ -440,7 +442,7 @@ export const LandingPage03 = ({ landingPage, domain }: Props) => {
                                 <Image
                                     src={image}
                                     alt="Product"
-                                    className="w-full rounded-xl shadow-md"
+                                    className="w-full rounded-sm shadow-xl"
                                     width={1000}
                                     height={1000}
                                 />

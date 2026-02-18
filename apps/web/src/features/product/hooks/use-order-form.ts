@@ -235,6 +235,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                 orderItems,
                 trackingData,
                 discountedPrice,
+                // notes: "these is order note from customer",
             };
 
             const url = `${config.serverUrl}/order`;

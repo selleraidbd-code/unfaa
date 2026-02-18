@@ -1,8 +1,16 @@
 import React from "react";
 
-import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
 import { Order } from "@/types/order-type";
+
+Font.register({
+    family: "NotoSansBengali",
+    fonts: [
+        { src: "/fonts/NotoSansBengali-Regular.ttf", fontWeight: 400 },
+        { src: "/fonts/NotoSansBengali-Bold.ttf", fontWeight: 700 },
+    ],
+});
 
 // 3x2 inch = 216x144 points (72 points per inch)
 const PAGE_WIDTH = 216;
@@ -18,6 +26,7 @@ const styles = StyleSheet.create({
         alignItems: "stretch",
         justifyContent: "flex-start",
         backgroundColor: "#ffffff",
+        fontFamily: "NotoSansBengali",
         gap: 4,
     },
     header: {
@@ -70,6 +79,23 @@ const styles = StyleSheet.create({
         textAlign: "left",
         lineHeight: 1.2,
     },
+    notesSection: {
+        width: "100%",
+        marginTop: 4,
+        display: "flex",
+        flexDirection: "row",
+        gap: 2,
+    },
+    notesLabel: {
+        fontSize: 8,
+        fontWeight: "600",
+        textAlign: "left",
+    },
+    notesText: {
+        fontSize: 8,
+        textAlign: "left",
+        lineHeight: 1.3,
+    },
 });
 
 interface OrderPDFDocumentProps {
@@ -118,6 +144,13 @@ export const OrderPDFDocument = ({ orders, shopLogo, merchantId, shopName }: Ord
                                     </Text>
                                 );
                             })}
+                        </View>
+                    )}
+
+                    {order.notes && order.notes.trim() !== "" && (
+                        <View style={styles.notesSection}>
+                            <Text style={styles.notesLabel}>Note:</Text>
+                            <Text style={styles.notesText}>{order.notes}</Text>
                         </View>
                     )}
                 </Page>

@@ -30,6 +30,11 @@ interface Props {
     orderSource: OrderSource;
 }
 
+let lineItemCounter = 0;
+function generateLineItemId(): string {
+    return `li_${Date.now()}_${++lineItemCounter}`;
+}
+
 export const ProductInfoOrder = ({
     customerInfo,
     productInfo,
@@ -59,17 +64,14 @@ export const ProductInfoOrder = ({
         }, 0);
     }, [orderItems]);
 
-    // When a valid productId exists, fetch full product
     useEffect(() => {
         const fetchProducts = async () => {
             if (!productInfo?.length) return;
 
-            // Filter out invalid or missing product IDs
             const validProducts = productInfo.filter((p) => isValidId(p.productId));
 
             if (!validProducts.length) return;
 
-            // Fetch all valid products in parallel
             const productResponses = await Promise.all(
                 validProducts.map((p) =>
                     triggerGetProductById({ id: p.productId! })
@@ -79,21 +81,19 @@ export const ProductInfoOrder = ({
                 )
             );
 
-            // Filter out failed responses
             const fetchedProducts = productResponses.filter(
                 (res): res is { data: ResponseObject<Product>; quantity: number } => !!res
             );
 
-            // Set products
             setProducts(fetchedProducts.map((res) => res.data.data));
 
-            // Map to orderItems
             const items: OrderItem[] = fetchedProducts.map(({ data, quantity }) => ({
-                id: data.data.id,
+                id: generateLineItemId(),
+                productId: data.data.id,
                 name: data.data.name,
                 price: data.data.discountPrice ?? data.data.price ?? 0,
                 quantity,
-                selectedVariants: [], // can be filled later
+                selectedVariants: [],
             }));
 
             setOrderItems(items);
@@ -103,7 +103,7 @@ export const ProductInfoOrder = ({
     }, [productInfo, triggerGetProductById]);
 
     const upsertSelectedVariant = (
-        productId: string,
+        itemId: string,
         variantId: string,
         variantName: string,
         optionId: string,
@@ -112,7 +112,7 @@ export const ProductInfoOrder = ({
     ) => {
         setOrderItems((prev) => {
             const next = [...prev];
-            const idx = next.findIndex((o) => o.id === productId);
+            const idx = next.findIndex((o) => o.id === itemId);
             if (idx === -1) return prev;
             const currentItem = next[idx] as OrderItem;
             const list = currentItem.selectedVariants ?? [];
@@ -138,10 +138,10 @@ export const ProductInfoOrder = ({
         });
     };
 
-    const updateQuantity = (productId: string, quantity: number) => {
+    const updateQuantity = (itemId: string, quantity: number) => {
         setOrderItems((prev) => {
             const next = [...prev];
-            const idx = next.findIndex((o) => o.id === productId);
+            const idx = next.findIndex((o) => o.id === itemId);
             if (idx === -1) return prev;
             const normalized = Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1;
             next[idx] = { ...next[idx], quantity: normalized } as OrderItem;
@@ -153,7 +153,8 @@ export const ProductInfoOrder = ({
         setOrderItems([
             ...orderItems,
             {
-                id: product.id,
+                id: generateLineItemId(),
+                productId: product.id,
                 name: product.name,
                 price: product.discountPrice ?? product.price ?? 0,
                 quantity: 1,
@@ -163,13 +164,12 @@ export const ProductInfoOrder = ({
         setIsModalOpen(false);
     };
 
-    const removeProduct = (productId: string) => {
-        if (products.length === 1 || orderItems.length === 1) {
+    const removeProduct = (itemId: string) => {
+        if (orderItems.length === 1) {
             toast.error("You cannot remove the last product");
             return;
         }
-        setProducts((prev) => prev.filter((p) => p.id !== productId));
-        setOrderItems((prev) => prev.filter((o) => o.id !== productId));
+        setOrderItems((prev) => prev.filter((o) => o.id !== itemId));
     };
 
     return (
@@ -193,17 +193,18 @@ export const ProductInfoOrder = ({
                 </div>
 
                 <div className="space-y-3 md:space-y-6">
-                    {products.map((product) => {
-                        const item = orderItems.find((oi) => oi.id === product.id);
+                    {orderItems.map((item) => {
+                        const product = products.find((p) => p.id === item.productId);
+                        if (!product) return null;
                         return (
                             <ProductOrderControls
-                                key={product.id}
+                                key={item.id}
                                 product={product}
                                 item={item}
-                                onUpdateQuantity={(q) => updateQuantity(product.id, q)}
+                                onUpdateQuantity={(q) => updateQuantity(item.id, q)}
                                 onSelectVariant={(variantId, variantName, optionId, optionName, extraPrice) =>
                                     upsertSelectedVariant(
-                                        product.id,
+                                        item.id,
                                         variantId,
                                         variantName,
                                         optionId,
@@ -211,7 +212,7 @@ export const ProductInfoOrder = ({
                                         extraPrice
                                     )
                                 }
-                                onRemove={() => removeProduct(product.id)}
+                                onRemove={() => removeProduct(item.id)}
                             />
                         );
                     })}
@@ -256,7 +257,9 @@ export const ProductInfoOrder = ({
                             </span>
                         </p>
                         {orderDetails.discountedPrice > grandTotal && (
-                            <p className="text-destructive text-xs md:text-sm">Please enter a valid discount amount</p>
+                            <p className="text-destructive text-xs md:text-sm" aria-live="polite" role="alert">
+                                The entered COD amount exceeds the total product price.
+                            </p>
                         )}
                     </div>
                 )}

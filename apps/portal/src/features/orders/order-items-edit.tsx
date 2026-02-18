@@ -24,6 +24,11 @@ interface OrderItemsEditProps {
     onSuccess?: () => void;
 }
 
+let editLineItemCounter = 0;
+function generateEditLineItemId(): string {
+    return `eli_${Date.now()}_${++editLineItemCounter}`;
+}
+
 export const OrderItemsEdit = ({
     orderId,
     orderItems: initialOrderItems,
@@ -38,7 +43,6 @@ export const OrderItemsEdit = ({
     const [triggerGetProductById, { isLoading: isLoadingGetProductById }] = useLazyGetProductByIdQuery();
     const [editOrderItems, { isLoading }] = useEditOrderItemsMutation();
 
-    // Convert OrderDetailsItem to Product and OrderItem when component mounts
     useEffect(() => {
         if (initialOrderItems.length > 0) {
             const fetchProducts = async () => {
@@ -68,7 +72,8 @@ export const OrderItemsEdit = ({
                     }));
 
                     return {
-                        id: data.id,
+                        id: generateEditLineItemId(),
+                        productId: data.id,
                         name: data.name,
                         price: orderItem.productPrice,
                         quantity: orderItem.quantity,
@@ -97,16 +102,11 @@ export const OrderItemsEdit = ({
     }, [orderItems]);
 
     const handleSelectProduct = (product: Product) => {
-        // Check if product is already added
-        if (products.some((p) => p.id === product.id)) {
-            toast.error("This product is already in the order");
-            return;
-        }
-
         setOrderItems([
             ...orderItems,
             {
-                id: product.id,
+                id: generateEditLineItemId(),
+                productId: product.id,
                 name: product.name,
                 price: product.discountPrice ?? product.price ?? 0,
                 quantity: 1,
@@ -116,19 +116,18 @@ export const OrderItemsEdit = ({
         setIsModalOpen(false);
     };
 
-    const removeProduct = (productId: string) => {
-        if (products.length === 1 || orderItems.length === 1) {
+    const removeProduct = (itemId: string) => {
+        if (orderItems.length === 1) {
             toast.error("You cannot remove the last product");
             return;
         }
-        setProducts((prev) => prev.filter((p) => p.id !== productId));
-        setOrderItems((prev) => prev.filter((o) => o.id !== productId));
+        setOrderItems((prev) => prev.filter((o) => o.id !== itemId));
     };
 
-    const updateQuantity = (productId: string, quantity: number) => {
+    const updateQuantity = (itemId: string, quantity: number) => {
         setOrderItems((prev) => {
             const next = [...prev];
-            const idx = next.findIndex((o) => o.id === productId);
+            const idx = next.findIndex((o) => o.id === itemId);
             if (idx === -1) return prev;
             const normalized = Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1;
             next[idx] = { ...next[idx], quantity: normalized } as OrderItemType;
@@ -137,7 +136,7 @@ export const OrderItemsEdit = ({
     };
 
     const upsertSelectedVariant = (
-        productId: string,
+        itemId: string,
         variantId: string,
         variantName: string,
         optionId: string,
@@ -146,7 +145,7 @@ export const OrderItemsEdit = ({
     ) => {
         setOrderItems((prev) => {
             const next = [...prev];
-            const idx = next.findIndex((o) => o.id === productId);
+            const idx = next.findIndex((o) => o.id === itemId);
             if (idx === -1) return prev;
             const currentItem = next[idx] as OrderItemType;
             const list = currentItem.selectedVariants ?? [];
@@ -183,10 +182,10 @@ export const OrderItemsEdit = ({
             const calculatedTotalAmount = grandTotal;
 
             // Validate discounted price
-            if (discountedPrice !== null && discountedPrice !== undefined && discountedPrice > calculatedTotalAmount) {
-                toast.error("Discounted price cannot be greater than total amount");
-                return;
-            }
+            // if (discountedPrice !== null && discountedPrice !== undefined && discountedPrice > calculatedTotalAmount) {
+            //     toast.error("Discounted price cannot be greater than total amount");
+            //     return;
+            // }
 
             // Calculate final payable amount
             const finalPayableAmount =
@@ -201,7 +200,7 @@ export const OrderItemsEdit = ({
                 const unitPrice = Number(item.price ?? 0) + extras;
 
                 return {
-                    productId: String(item.id),
+                    productId: String(item.productId),
                     productPrice: unitPrice,
                     quantity: Number(item.quantity) || 1,
                     orderItemVariant: (item.selectedVariants ?? []).map((sv) => ({
@@ -266,17 +265,18 @@ export const OrderItemsEdit = ({
                 </div>
 
                 <div className="space-y-3 md:space-y-4">
-                    {products.map((product) => {
-                        const item = orderItems.find((oi) => oi.id === product.id);
+                    {orderItems.map((item) => {
+                        const product = products.find((p) => p.id === item.productId);
+                        if (!product) return null;
                         return (
                             <ProductOrderControls
-                                key={product.id}
+                                key={item.id}
                                 product={product}
                                 item={item}
-                                onUpdateQuantity={(q) => updateQuantity(product.id, q)}
+                                onUpdateQuantity={(q) => updateQuantity(item.id, q)}
                                 onSelectVariant={(variantId, variantName, optionId, optionName, extraPrice) =>
                                     upsertSelectedVariant(
-                                        product.id,
+                                        item.id,
                                         variantId,
                                         variantName,
                                         optionId,
@@ -284,7 +284,7 @@ export const OrderItemsEdit = ({
                                         extraPrice
                                     )
                                 }
-                                onRemove={() => removeProduct(product.id)}
+                                onRemove={() => removeProduct(item.id)}
                             />
                         );
                     })}

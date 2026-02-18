@@ -43,7 +43,7 @@ export const PlaceOrder = ({
         // Validate required fields
         const missingFields = [];
         if (orderItems.length === 0) missingFields.push("At least one product");
-        if (orderItems.some((p) => !p.id)) missingFields.push("Product selection");
+        if (orderItems.some((p) => !p.productId)) missingFields.push("Product selection");
 
         if (missingFields.length > 0) {
             toast.error(`Please fill: ${missingFields.join(", ")}`);
@@ -63,10 +63,10 @@ export const PlaceOrder = ({
 
         const customerId = isValidId(customerInfo.customerId) ? customerInfo.customerId : "";
 
-        if (orderDetails.discountedPrice && orderDetails.discountedPrice > grandTotal) {
-            toast.error("Discount amount cannot be greater than total");
-            return;
-        }
+        // if (orderDetails.discountedPrice && orderDetails.discountedPrice > grandTotal) {
+        //     toast.error("Discount amount cannot be greater than total");
+        //     return;
+        // }
 
         // Map fraudchecker data to order payload
         const customerTotalConfirmOrder = fraudState?.total_delivered ?? 0;
@@ -92,7 +92,7 @@ export const PlaceOrder = ({
                 }));
 
                 return {
-                    productId: String(item.id),
+                    productId: String(item.productId),
                     quantity: Number(item.quantity) || 1,
                     productPrice: unitPrice,
                     orderItemVariant,

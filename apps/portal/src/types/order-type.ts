@@ -113,6 +113,7 @@ export interface OrderItemVariant {
 
 export interface OrderItem {
     id: string;
+    productId: string;
     name: string;
     price: number;
     quantity: number;

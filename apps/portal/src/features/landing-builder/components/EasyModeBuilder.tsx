@@ -53,6 +53,7 @@ function getDefaultValuesFromLandingPage(landingPage?: LandingPageDemo): Landing
         base.contact = {
             whatsappNumber: contactSection.title || "",
             facebookPageId: contactSection.subTitle || "",
+            specialNote: contactSection.buttonText || "",
         };
     }
 
@@ -174,7 +175,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
         const sections: CreateSectionPayload[] = [];
         let sectionIndex = 0;
 
-        const hasContactData = values.contact.whatsappNumber.trim() || values.contact.facebookPageId.trim();
+        const hasContactData = values.contact.whatsappNumber.trim() || values.contact.facebookPageId.trim() || values.contact.specialNote.trim();
         if (hasContactData) {
             const whatsappNumber = formatPhoneNumber(values.contact.whatsappNumber);
             sections.push({
@@ -183,6 +184,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
                 sectionType: EComponentType.CTA,
                 title: whatsappNumber || undefined,
                 subTitle: values.contact.facebookPageId.trim() || undefined,
+                buttonText: values.contact.specialNote.trim() || undefined,
             });
         }
 

@@ -30,6 +30,13 @@ export const BasicInfoSection = () => {
                 label="Facebook Messenger ( আপনার Facebook পেজ ID বা username যোগ করুন )"
                 placeholder="আপনার Facebook পেজের username দিন (@ ছাড়া) অথবা Page ID"
             />
+
+            <CustomFormInput<LandingPageFormValues>
+                control={control}
+                name="contact.specialNote"
+                label="Special Note ( অর্ডার ফর্মে বিশেষ নোট যোগ করুন )"
+                placeholder="e.g., আপনার পছন্দের রং বা সাইজ লিখুন"
+            />
         </div>
     );
 };

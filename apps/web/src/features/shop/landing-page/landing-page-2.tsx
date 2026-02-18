@@ -452,6 +452,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                     theme={{ primary: "#2563eb", secondary: "#eff6ff" }}
                     product={product}
                     packages={packages}
+                    specialNote={contactSection?.buttonText}
                     formData={formData}
                     errors={errors}
                     isSubmitting={isSubmitting}

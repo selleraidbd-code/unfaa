@@ -20,6 +20,7 @@ type FormData = {
     name: string;
     address: string;
     phone: string;
+    notes: string;
 };
 
 type FormErrors = {
@@ -36,6 +37,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
         name: "",
         address: "",
         phone: "",
+        notes: "",
     });
     const [errors, setErrors] = useState<FormErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,7 +57,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
     useEffect(() => {
         const savedForm = getCheckoutFormData();
         if (savedForm) {
-            setFormData(savedForm);
+            setFormData((prev) => ({ ...prev, ...savedForm }));
         }
 
         // Set default delivery zone to the first one
@@ -83,7 +85,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
         }
     }, [product, getCheckoutFormData]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
         // Clear error for this field when user starts typing
@@ -235,7 +237,7 @@ export const useOrderForm = (product: Product | WithProductPackage, shopSlug: st
                 orderItems,
                 trackingData,
                 discountedPrice,
-                // notes: "these is order note from customer",
+                notes: formData.notes.trim() || undefined,
             };
 
             const url = `${config.serverUrl}/order`;

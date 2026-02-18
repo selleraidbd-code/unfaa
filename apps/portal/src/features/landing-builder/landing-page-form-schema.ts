@@ -17,6 +17,7 @@ export const landingPageFormSchema = z.object({
     contact: z.object({
         whatsappNumber: z.string(),
         facebookPageId: z.string(),
+        specialNote: z.string(),
     }),
     faq: z.object({
         title: z.string(),
@@ -49,6 +50,7 @@ export const defaultLandingPageFormValues: LandingPageFormValues = {
     contact: {
         whatsappNumber: "",
         facebookPageId: "",
+        specialNote: "",
     },
     faq: {
         title: "",

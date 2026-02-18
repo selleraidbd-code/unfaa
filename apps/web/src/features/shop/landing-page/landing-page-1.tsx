@@ -137,6 +137,7 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
                     <OrderSection
                         product={product}
                         packages={packages}
+                        specialNote={contactSection?.buttonText}
                         formData={formData}
                         errors={errors}
                         isSubmitting={isSubmitting}

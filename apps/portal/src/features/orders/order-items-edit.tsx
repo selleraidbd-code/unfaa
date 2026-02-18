@@ -7,8 +7,6 @@ import { ProductSelectionModal } from "@/features/create-order/product-selection
 import { useEditOrderItemsMutation } from "@/redux/api/order-api";
 import { useLazyGetProductByIdQuery } from "@/redux/api/product-api";
 import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { toast } from "@workspace/ui/components/sonner";
 import { Plus, ShoppingCart, X } from "lucide-react";
@@ -39,7 +37,6 @@ export const OrderItemsEdit = ({
     const [products, setProducts] = useState<Product[]>([]);
     const [orderItems, setOrderItems] = useState<OrderItemType[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [discountedPrice, setDiscountedPrice] = useState<number | null>(initialDiscountedPrice);
     const [triggerGetProductById, { isLoading: isLoadingGetProductById }] = useLazyGetProductByIdQuery();
     const [editOrderItems, { isLoading }] = useEditOrderItemsMutation();
 
@@ -181,15 +178,11 @@ export const OrderItemsEdit = ({
             // Calculate total amount from all order items
             const calculatedTotalAmount = grandTotal;
 
-            // Validate discounted price
-            // if (discountedPrice !== null && discountedPrice !== undefined && discountedPrice > calculatedTotalAmount) {
-            //     toast.error("Discounted price cannot be greater than total amount");
-            //     return;
-            // }
-
-            // Calculate final payable amount
+            // Use initial discounted price if set, otherwise total
             const finalPayableAmount =
-                discountedPrice !== null && discountedPrice !== undefined ? discountedPrice : calculatedTotalAmount;
+                initialDiscountedPrice !== null && initialDiscountedPrice !== undefined
+                    ? initialDiscountedPrice
+                    : calculatedTotalAmount;
 
             // Transform order items to EditOrderItem format
             const transformedOrderItems = orderItems.map((item) => {
@@ -213,7 +206,7 @@ export const OrderItemsEdit = ({
 
             // Prepare order info
             const orderInfo = {
-                discountedPrice: discountedPrice ?? calculatedTotalAmount,
+                discountedPrice: initialDiscountedPrice ?? calculatedTotalAmount,
                 finalPayableAmount,
                 paidAmount: 0, // This might need to be retrieved from the current order if available
                 totalAmount: calculatedTotalAmount,
@@ -295,42 +288,6 @@ export const OrderItemsEdit = ({
                     <span className="text-base font-semibold">{grandTotal.toLocaleString()}</span>
                 </div>
 
-                <div className="ms-auto flex gap-2 md:max-w-md">
-                    <Label className="flex-shrink-0" htmlFor="cod-amount">
-                        COD Amount (optional)
-                    </Label>
-                    <Input
-                        id="cod-amount"
-                        type="number"
-                        placeholder="Enter COD amount"
-                        value={discountedPrice ?? ""}
-                        onChange={(e) => {
-                            const nextValue = e.target.value;
-                            const parsed = Number(nextValue);
-                            setDiscountedPrice(nextValue === "" || !Number.isFinite(parsed) ? null : parsed);
-                        }}
-                        onWheel={(e) => {
-                            e.currentTarget.blur();
-                        }}
-                    />
-                </div>
-
-                {discountedPrice !== null && discountedPrice !== undefined && (
-                    <div className="flex flex-col items-end gap-2">
-                        <p>
-                            <span className="pr-2 text-sm md:text-base">Discount:</span>
-                            <span>
-                                {discountedPrice !== null && discountedPrice !== undefined
-                                    ? (grandTotal - discountedPrice).toLocaleString()
-                                    : "Not set"}
-                            </span>
-                        </p>
-                        {discountedPrice > grandTotal && (
-                            <p className="text-destructive text-xs md:text-sm">Please enter a valid discount amount</p>
-                        )}
-                    </div>
-                )}
-
                 <div className="flex justify-end gap-4">
                     <Button variant="outline" onClick={onCancel} disabled={isLoading}>
                         <X className="h-4 w-4" />
@@ -399,11 +356,6 @@ const OrderItemsEditSkeleton = () => {
             <div className="flex items-center justify-end gap-2">
                 <Skeleton className="h-5 w-12" />
                 <Skeleton className="h-6 w-20" />
-            </div>
-
-            <div className="ms-auto flex gap-2 md:max-w-md">
-                <Skeleton className="h-5 w-32 flex-shrink-0" />
-                <Skeleton className="h-10 flex-1" />
             </div>
 
             <div className="flex justify-end gap-4">

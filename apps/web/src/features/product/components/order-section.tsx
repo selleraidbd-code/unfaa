@@ -46,10 +46,12 @@ type OrderSectionProps = {
     packages?: Package[];
     /** Optional theme: primary and optional secondary color. Defaults to green primary + light blue secondary. */
     theme?: OrderSectionTheme;
+    specialNote?: string;
     formData: {
         name: string;
         address: string;
         phone: string;
+        notes: string;
     };
     errors: {
         name?: string;
@@ -62,7 +64,7 @@ type OrderSectionProps = {
     selectedPackage: Package | null;
     selectedPackageProductVariants: Record<string, Record<string, ProductVariantOption>>;
     totalAmount: number;
-    handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     handleVariantChange: (variantId: string, option: ProductVariantOption) => void;
     setSelectedDeliveryZone: (zoneId: string) => void;
     handlePackageSelect: (packageId: string | null) => void;
@@ -78,6 +80,7 @@ export const OrderSection = memo(function OrderSection({
     product,
     packages = [],
     theme: themeProp,
+    specialNote,
     formData,
     errors,
     isSubmitting,
@@ -201,6 +204,19 @@ export const OrderSection = memo(function OrderSection({
                         </div>
                     )}
                 </div>
+
+                {specialNote && (
+                    <div>
+                        <textarea
+                            name="notes"
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                            placeholder={specialNote}
+                            rows={3}
+                            className="mb-3.5 w-full rounded-[10px] border border-[#ccc] bg-white px-3.5 py-4 text-lg transition-colors outline-none focus:border-[var(--order-primary)]"
+                        />
+                    </div>
+                )}
 
                 <DeliveryZoneSelector
                     zones={product.delivery.deliveryZones}

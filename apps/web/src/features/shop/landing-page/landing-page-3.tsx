@@ -11,20 +11,13 @@ import { ProductVideo } from "@/features/product/components/product-video";
 import { useOrderForm } from "@/features/product/hooks/use-order-form";
 import { FAQ02 } from "@/features/shop/landing-page/components/faq-2";
 import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
+import { toBengaliNumber } from "@/features/shop/landing-page/lib";
 import { EComponentType } from "@workspace/ui/landing/types";
 import { cn } from "@workspace/ui/lib/utils";
 import { Phone } from "lucide-react";
 
 import { LandingPage as LandingPageType } from "@/types/landing-type";
 import { HtmlRenderer } from "@/components/shared/html-renderer";
-
-const BENGALI_DIGITS = "০১২৩৪৫৬৭৮৯";
-const toBengaliNumber = (n: number) =>
-    String(n)
-        .padStart(2, "0")
-        .split("")
-        .map((c) => BENGALI_DIGITS[parseInt(c, 10)])
-        .join("");
 
 /** Ensure a phone number includes the Bangladesh country code (+880). */
 const ensureCountryCode = (phone: string): string => {
@@ -105,8 +98,8 @@ export const LandingPage03 = ({ landingPage, domain }: Props) => {
     ];
 
     const theme = {
-        primary: "#D94C6A",
-        secondary: "#FFF6E9",
+        primary: contactSection?.imgURL || "#D94C6A",
+        secondary: contactSection?.bgURL || "#FFF6E9",
     };
 
     return (
@@ -490,7 +483,7 @@ export const LandingPage03 = ({ landingPage, domain }: Props) => {
                             ))}
                         </div>
 
-                        {contactSection && (
+                        {contactSection?.title && contactSection.title.trim() !== "" && (
                             <div className="text-center">
                                 <a
                                     href={`tel:${ensureCountryCode(contactSection.title ?? "")}`}

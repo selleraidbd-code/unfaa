@@ -35,12 +35,6 @@ import {
 import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { CustomButton } from "@/components/ui/custom-button";
 
-type EasyModeBuilderProps = {
-    productId: string;
-    mode: EPageType;
-    landingPage?: LandingPageDemo;
-};
-
 function getDefaultValuesFromLandingPage(landingPage?: LandingPageDemo): LandingPageFormValues {
     const base = { ...defaultLandingPageFormValues };
 
@@ -54,6 +48,8 @@ function getDefaultValuesFromLandingPage(landingPage?: LandingPageDemo): Landing
             whatsappNumber: contactSection.title || "",
             facebookPageId: contactSection.subTitle || "",
             specialNote: contactSection.buttonText || "",
+            primaryColor: contactSection.imgURL || "",
+            secondaryColor: contactSection.bgURL || "",
         };
     }
 
@@ -123,13 +119,18 @@ function getDefaultValuesFromLandingPage(landingPage?: LandingPageDemo): Landing
     return base;
 }
 
+type EasyModeBuilderProps = {
+    productId: string;
+    mode: EPageType;
+    landingPage?: LandingPageDemo;
+};
+
 export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilderProps) => {
     const router = useRouter();
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop.id;
 
-    const eligibleModes = [EPageType.EASY_LANDING_PAGE_2, EPageType.EASY_LANDING_PAGE_3];
-    const isEligibleMode = eligibleModes.includes(mode as EPageType);
+    const isNeedToHideSection = EPageType.EASY_LANDING_PAGE_1 === mode;
 
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
@@ -175,16 +176,24 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
         const sections: CreateSectionPayload[] = [];
         let sectionIndex = 0;
 
-        const hasContactData = values.contact.whatsappNumber.trim() || values.contact.facebookPageId.trim() || values.contact.specialNote.trim();
+        const hasContactData =
+            values.contact.whatsappNumber?.trim() ||
+            values.contact.facebookPageId?.trim() ||
+            values.contact.specialNote?.trim() ||
+            values.contact.primaryColor?.trim() ||
+            values.contact.secondaryColor?.trim();
+
         if (hasContactData) {
-            const whatsappNumber = formatPhoneNumber(values.contact.whatsappNumber);
+            const whatsappNumber = formatPhoneNumber(values.contact.whatsappNumber || "");
             sections.push({
                 index: sectionIndex++,
                 componentName: "Contact",
                 sectionType: EComponentType.CTA,
                 title: whatsappNumber || undefined,
-                subTitle: values.contact.facebookPageId.trim() || undefined,
-                buttonText: values.contact.specialNote.trim() || undefined,
+                subTitle: values.contact.facebookPageId?.trim() || undefined,
+                buttonText: values.contact.specialNote?.trim() || undefined,
+                imgURL: values.contact.primaryColor?.trim() || undefined,
+                bgURL: values.contact.secondaryColor?.trim() || undefined,
             });
         }
 
@@ -193,7 +202,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             values.faq.subTitle?.trim() ||
             values.faq.items.some((i) => i.question.trim() || i.answer.trim());
         if (hasFaqData) {
-            const validFaqItems = values.faq.items.filter((i) => i.question.trim() && i.answer.trim());
+            const validFaqItems = values.faq.items.filter((i) => i.question.trim() || i.answer.trim());
             if (validFaqItems.length > 0) {
                 const faqSectionList: CreateSectionListPayload[] = validFaqItems.map((item) => ({
                     title: item.question,
@@ -210,12 +219,13 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             }
         }
 
+        const featureItems = values.features?.items ?? [];
         const hasFeaturesData =
-            values.features.title.trim() ||
-            values.features.subTitle?.trim() ||
-            values.features.items.some((i) => i.title.trim() || i.description.trim());
-        if (isEligibleMode && hasFeaturesData) {
-            const validFeatureItems = values.features.items.filter((i) => i.title.trim() && i.description.trim());
+            values.features?.title?.trim() ||
+            values.features?.subTitle?.trim() ||
+            featureItems.some((i) => i?.title?.trim() || i?.description?.trim());
+        if (hasFeaturesData && !isNeedToHideSection) {
+            const validFeatureItems = featureItems.filter((i) => i?.title?.trim() || i?.description?.trim());
             if (validFeatureItems.length > 0) {
                 const featureSectionList: CreateSectionListPayload[] = validFeatureItems.map((item) => ({
                     title: item.title,
@@ -225,8 +235,8 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
                     index: sectionIndex++,
                     componentName: "Features",
                     sectionType: EComponentType.FEATURES,
-                    title: values.features.title.trim() || undefined,
-                    subTitle: values.features.subTitle?.trim() || undefined,
+                    title: values.features?.title?.trim() || undefined,
+                    subTitle: values.features?.subTitle?.trim() || undefined,
                     sectionList: featureSectionList,
                 });
             }
@@ -236,7 +246,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             values.testimonials.title.trim() ||
             values.testimonials.subTitle?.trim() ||
             (values.testimonials.images?.length ?? 0) > 0;
-        if (isEligibleMode && hasTestimonialsData && values.testimonials.images?.length) {
+        if (hasTestimonialsData && values.testimonials.images?.length) {
             const testimonialSectionList: CreateSectionListPayload[] = values.testimonials.images.map((imgURL) => ({
                 imgURL,
             }));
@@ -250,14 +260,15 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             });
         }
 
+        const aboutItems = values.about?.items ?? [];
         const hasAboutData =
-            values.about.title.trim() ||
-            values.about.subTitle?.trim() ||
-            values.about.imgURL?.trim() ||
-            values.about.items.some((i) => i.title.trim() || i.description.trim());
-        if (isEligibleMode && hasAboutData) {
-            const validAboutItems = values.about.items.filter((i) => i.title.trim() && i.description.trim());
-            if (validAboutItems.length > 0 || values.about.title.trim() || values.about.imgURL?.trim()) {
+            values.about?.title?.trim() ||
+            values.about?.subTitle?.trim() ||
+            values.about?.imgURL?.trim() ||
+            aboutItems.some((i) => i?.title?.trim() || i?.description?.trim());
+        if (hasAboutData && !isNeedToHideSection) {
+            const validAboutItems = aboutItems.filter((i) => i?.title?.trim() || i?.description?.trim());
+            if (validAboutItems.length > 0 || values.about?.title?.trim() || values.about?.imgURL?.trim()) {
                 const aboutSectionList: CreateSectionListPayload[] = validAboutItems.map((item) => ({
                     title: item.title,
                     description: item.description,
@@ -266,9 +277,9 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
                     index: sectionIndex++,
                     componentName: "About",
                     sectionType: EComponentType.HERO,
-                    title: values.about.title.trim() || undefined,
-                    subTitle: values.about.subTitle?.trim() || undefined,
-                    imgURL: values.about.imgURL?.trim() || undefined,
+                    title: values.about?.title?.trim() || undefined,
+                    subTitle: values.about?.subTitle?.trim() || undefined,
+                    imgURL: values.about?.imgURL?.trim() || undefined,
                     sectionList: aboutSectionList,
                 });
             }
@@ -306,13 +317,14 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 lg:space-y-6">
                     <BasicInfoSection />
 
-                    {isEligibleMode && (
+                    {!isNeedToHideSection && (
                         <>
                             <AboutSection />
                             <FeaturesSection />
-                            <TestimonialsSection />
                         </>
                     )}
+
+                    <TestimonialsSection />
 
                     <FAQSection landingPage={landingPage} />
 

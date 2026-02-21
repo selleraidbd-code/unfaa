@@ -11,7 +11,7 @@ import { CreateOrderPayload, OrderSource, OrderStatus } from "@/types/order-type
 import { Product, ProductVariantOption } from "@/types/product-type";
 import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { getLink } from "@/lib/get-link";
-import { buildUserData, trackEventToBackend, trackTikTokPixel } from "@/lib/tracking-events";
+import { trackTikTokPixel } from "@/lib/tracking-events";
 import { collectTrackingData } from "@/lib/tracking-utils";
 import { useOrderDataManageLocally } from "@/hooks/use-order-data-manage-locally";
 import { buildTikTokPackageContents, buildTikTokProductContents, trackTikTokEvent } from "@/hooks/use-tiktok-tracking";

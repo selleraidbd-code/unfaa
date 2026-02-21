@@ -37,6 +37,24 @@ export const BasicInfoSection = () => {
                 label="Special Note ( অর্ডার ফর্মে বিশেষ নোট যোগ করুন )"
                 placeholder="e.g., আপনার পছন্দের রং বা সাইজ লিখুন"
             />
+
+            <div className="grid gap-4 md:grid-cols-2">
+                <CustomFormInput<LandingPageFormValues>
+                    control={control}
+                    type="color"
+                    name="contact.primaryColor"
+                    label="Primary Color"
+                    placeholder="e.g. #3B82F6"
+                />
+
+                <CustomFormInput<LandingPageFormValues>
+                    control={control}
+                    type="color"
+                    name="contact.secondaryColor"
+                    label="Secondary Color"
+                    placeholder="e.g. #10B981"
+                />
+            </div>
         </div>
     );
 };

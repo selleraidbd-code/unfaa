@@ -15,9 +15,11 @@ const featureItemSchema = z.object({
 export const landingPageFormSchema = z.object({
     name: z.string().min(1, "Please enter a landing page name"),
     contact: z.object({
-        whatsappNumber: z.string(),
-        facebookPageId: z.string(),
-        specialNote: z.string(),
+        whatsappNumber: z.string().optional(),
+        facebookPageId: z.string().optional(),
+        specialNote: z.string().optional(),
+        primaryColor: z.string().optional(),
+        secondaryColor: z.string().optional(),
     }),
     faq: z.object({
         title: z.string(),
@@ -51,6 +53,8 @@ export const defaultLandingPageFormValues: LandingPageFormValues = {
         whatsappNumber: "",
         facebookPageId: "",
         specialNote: "",
+        primaryColor: "",
+        secondaryColor: "",
     },
     faq: {
         title: "",

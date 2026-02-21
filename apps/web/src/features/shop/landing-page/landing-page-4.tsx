@@ -1,327 +1,533 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-// Static landing page data
-const landingPageData = {
-    badge: "Premium Collection",
-    title: "আপনার জীবনযাত্রায় আধুনিকতার ছোঁয়া",
-    subtitle: "সবচেয়ে কার্যকর এবং প্রিমিয়াম কোয়ালিটির নিশ্চয়তা নিয়ে আমাদের এই বিশেষ পণ্য।",
-    price: "৳৯৯৯",
-    priceLabel: "সেরা অফার",
-    phone: "01XXXXXXXXX",
-    whatsapp: "8801XXXXXXXXX",
-    messenger: "YourPage",
-    mainImage: "1.png",
-    reviewImages: ["rev1.png", "rev2.png"],
-    videoUrl: "https://www.youtube.com/embed/3Y46v1ymdfQ",
-    videoTitle: "দেখুন কীভাবে কাজ করে",
-    features: [
-        {
-            icon: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-            ),
-            title: "উন্নত মান",
-            description: "১০০% গ্যারান্টিড কোয়ালিটি পণ্য।",
-            bgColor: "bg-slate-900",
-        },
-        {
-            icon: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            ),
-            title: "দ্রুত ডেলিভারি",
-            description: "সারা দেশে দ্রুত ক্যাশ অন ডেলিভারি।",
-            bgColor: "bg-blue-600",
-        },
-    ],
-    benefits: [
-        {
-            title: "ব্যবহার করা অত্যন্ত সহজ এবং আরামদায়ক।",
-            barColor: "bg-blue-600",
-        },
-        {
-            title: "প্রিমিয়াম ডিজাইনের কারণে এটি দীর্ঘস্থায়ী হয়।",
-            barColor: "bg-amber-500",
-        },
-        {
-            title: "আপনার সময় এবং শ্রম উভয়ই বাঁচিয়ে দিবে।",
-            barColor: "bg-green-500",
-        },
-    ],
-    faqs: [
-        {
-            question: "১. পণ্যটির স্থায়িত্ব কেমন?",
-            answer: "জি, এটি দীর্ঘস্থায়ী ব্যবহারের জন্য প্রিমিয়াম উপাদান দিয়ে তৈরি করা হয়েছে।",
-        },
-        {
-            question: "২. ক্যাশ অন ডেলিভারি আছে?",
-            answer: "জি, আমরা সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা প্রদান করি।",
-        },
-    ],
-    reviewsTitle: "রিয়াল রিভিউ",
-    faqTitle: "সাধারণ জিজ্ঞাসা",
-    faqSubtitle: "সঠিক তথ্য জেনে অর্ডার করুন",
-    whyTitle: "কেন এই পণ্যটি আপনার প্রয়োজন?",
-    ctaButton: "এখনি অর্ডার করুন",
-    ctaWhatsapp: "WHATSAPP ORDER",
+import { FeaturedProducts } from "@/features/product/components/featured-products";
+import { OrderSection } from "@/features/product/components/order-section";
+import { ProductFooter } from "@/features/product/components/product-footer";
+import { ProductVideo } from "@/features/product/components/product-video";
+import { useOrderForm } from "@/features/product/hooks/use-order-form";
+import { FAQ02 } from "@/features/shop/landing-page/components/faq-2";
+import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
+import { toBengaliNumber } from "@/features/shop/landing-page/lib";
+import { EComponentType } from "@workspace/ui/landing/types";
+import { cn } from "@workspace/ui/lib/utils";
+import { Phone } from "lucide-react";
+
+import { LandingPage as LandingPageType } from "@/types/landing-type";
+import { HtmlRenderer } from "@/components/shared/html-renderer";
+
+/** Ensure a phone number includes the Bangladesh country code (+880). */
+const ensureCountryCode = (phone: string): string => {
+    const digits = phone.replace(/[^0-9+]/g, "");
+    if (digits.startsWith("+")) return digits;
+    if (digits.startsWith("880")) return `+${digits}`;
+    if (digits.startsWith("0")) return `+880${digits.slice(1)}`;
+    return `+880${digits}`;
 };
 
-export const LandingPage4 = () => {
-    const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(null);
+type Props = {
+    landingPage: LandingPageType;
+    domain: string;
+};
 
-    const toggleFaq = (index: number) => {
-        setActiveFaqIndex(activeFaqIndex === index ? null : index);
+export const LandingPage04 = ({ landingPage, domain }: Props) => {
+    const product = landingPage.product;
+    const featureProducts = landingPage.featureProducts;
+    const shopSlug = domain;
+    const sections = landingPage.section;
+    const title = landingPage.name;
+    const firstImage = product.images?.[0];
+    const secondImage = product.images?.[1];
+    const otherImages = product.images?.slice(2);
+
+    // Find FAQ section
+    const faqSection = sections?.find((s) => s.sectionType === EComponentType.FAQ);
+
+    // Find Contact section
+    const contactSection = sections?.find((s) => s.sectionType === EComponentType.CTA);
+
+    // Find Features section
+    const featuresSection = sections?.find((s) => s.sectionType === EComponentType.FEATURES);
+
+    // Find Testimonials / Customer Review section
+    const testimonialsSection = sections?.find((s) => s.sectionType === EComponentType.TESTIMONIALS);
+
+    // Find About/Services section
+    const aboutSection = sections?.find((s) => s.sectionType === EComponentType.HERO);
+    const aboutImageHave = aboutSection?.imgURL && aboutSection?.imgURL.trim() !== "";
+
+    // Find Banner section
+    const bannerSection = sections?.find((s) => s.sectionType === EComponentType.BANNER);
+
+    const discountPercent = useMemo(
+        () =>
+            product.discountPrice < product.price
+                ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+                : 0,
+        [product.price, product.discountPrice]
+    );
+
+    const {
+        formData,
+        errors,
+        isSubmitting,
+        selectedDeliveryZone,
+        selectedVariants,
+        selectedPackage,
+        selectedPackageProductVariants,
+        packages,
+        totalAmount,
+        handleInputChange,
+        handleVariantChange,
+        setSelectedDeliveryZone,
+        handlePackageSelect,
+        handlePackageProductVariantChange,
+        handleSubmit,
+    } = useOrderForm(product, shopSlug);
+
+    const importantPoints = [
+        {
+            title: "আমরা অগ্রীম কোন টাকা নেই না। আপনি পন্য হাতে পেয়ে চেক করে তারপরে রাইডার কে টাকা দিবেন",
+        },
+        {
+            title: "অর্ডার করার পরে আমাদের কল সেন্টার থেকে কল দিয়ে অর্ডার কনফার্ম করা হবে। কল দিলে দয়া করে রিসিভ করবেন।",
+        },
+    ];
+
+    const theme = {
+        primary: contactSection?.imgURL || "#D94C6A",
+        secondary: contactSection?.bgURL || "#FFF6E9",
     };
 
     return (
-        <div className="bg-white text-slate-900 font-['Hind_Siliguri',sans-serif] pb-20">
+        <div className="bg-gray-50" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
             <style jsx global>{`
-                @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&display=swap');
-                
+                @import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&display=swap");
+                :root {
+                    --theme-primary: ${theme.primary};
+                    --theme-secondary: ${theme.secondary};
+                }
                 body {
-                    font-family: 'Hind Siliguri', sans-serif;
-                    background-color: #fff;
-                    color: #1e293b;
+                    font-family: "Hind Siliguri", sans-serif;
                 }
-
-                /* Circular Hero Image Design */
-                .hero-circle {
-                    background: #f1f5f9;
-                    border-radius: 0 0 50% 50% / 0 0 15% 15%;
+                @keyframes pulse-subtle {
+                    0% {
+                        transform: scale(1);
+                        box-shadow: 0 0 0 0 ${theme.primary}66;
+                    }
+                    70% {
+                        transform: scale(1.05);
+                        box-shadow: 0 0 0 10px ${theme.primary}00;
+                    }
+                    100% {
+                        transform: scale(1);
+                        box-shadow: 0 0 0 0 ${theme.primary}00;
+                    }
                 }
-
-                /* Floating Badge */
-                .badge-gold {
-                    background: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
-                    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+                .animate-pulse-subtle {
+                    animation: pulse-subtle 3s infinite;
                 }
-
-                /* Feature Grid Hover */
-                .feature-box:hover {
-                    transform: translateY(-5px);
-                    border-color: #d4af37;
-                }
-
-                /* Reviews Carousel */
-                .slider-wrapper {
-                    display: flex;
-                    width: 200%;
-                    animation: slide-loop 12s infinite ease-in-out;
-                }
-                
                 @keyframes slide-loop {
-                    0%, 45% {
+                    0%,
+                    45% {
                         transform: translateX(0);
                     }
-                    50%, 95% {
+                    50%,
+                    95% {
                         transform: translateX(-50%);
                     }
                     100% {
                         transform: translateX(0);
                     }
                 }
-
+                .slider-wrapper {
+                    animation: slide-loop 12s infinite ease-in-out;
+                }
                 html {
                     scroll-behavior: smooth;
                 }
             `}</style>
 
-            {/* Hero Section */}
-            <header className="hero-circle pb-12">
-                <div className="container mx-auto max-w-2xl px-6 pt-10 text-center">
-                    <span className="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold mb-4 uppercase tracking-widest">
-                        {landingPageData.badge}
-                    </span>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight mb-6">
-                        {landingPageData.title}
-                    </h1>
+            <>
+                {/* Action Sidebar - Contact Buttons */}
+                {contactSection && (
+                    <div className="fixed top-1/2 right-2 z-[1000] flex -translate-y-1/2 flex-col gap-2.5">
+                        {contactSection.title && (
+                            <a
+                                href={`tel:${ensureCountryCode(contactSection.title)}`}
+                                className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-[var(--theme-primary)] shadow-md transition-colors hover:bg-[var(--theme-secondary)]"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                                </svg>
+                            </a>
+                        )}
+                        {contactSection.title && (
+                            <a
+                                href={`https://wa.me/${ensureCountryCode(contactSection.title).replace("+", "")}`}
+                                className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-green-500 shadow-md transition-colors hover:bg-green-50"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.414 0 .004 5.411.001 12.049a11.802 11.802 0 001.608 6.008L0 24l6.102-1.6a11.777 11.777 0 005.943 1.648h.005c6.635 0 12.046-5.412 12.049-12.05a11.776 11.776 0 00-3.541-8.517z" />
+                                </svg>
+                            </a>
+                        )}
+                        {contactSection.subTitle && (
+                            <a
+                                href={`https://m.me/${contactSection.subTitle}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-[#0084ff] shadow-md transition-colors hover:bg-[#e7f3ff]"
+                                aria-label="Messenger"
+                            >
+                                <svg height={24} width={24} viewBox="0 0 256 256" preserveAspectRatio="xMidYMid">
+                                    <defs>
+                                        <radialGradient
+                                            id="messenger__a"
+                                            cx="19.247%"
+                                            cy="99.465%"
+                                            r="108.96%"
+                                            fx="19.247%"
+                                            fy="99.465%"
+                                        >
+                                            <stop offset="0%" stop-color="#09F" />
+                                            <stop offset="60.975%" stop-color="#A033FF" />
+                                            <stop offset="93.482%" stop-color="#FF5280" />
+                                            <stop offset="100%" stop-color="#FF7061" />
+                                        </radialGradient>
+                                    </defs>
+                                    <path
+                                        fill="url(#messenger__a)"
+                                        d="M128 0C55.894 0 0 52.818 0 124.16c0 37.317 15.293 69.562 40.2 91.835 2.09 1.871 3.352 4.493 3.438 7.298l.697 22.77c.223 7.262 7.724 11.988 14.37 9.054L84.111 243.9a10.218 10.218 0 0 1 6.837-.501c11.675 3.21 24.1 4.92 37.052 4.92 72.106 0 128-52.818 128-124.16S200.106 0 128 0Z"
+                                    />
+                                    <path
+                                        fill="#FFF"
+                                        d="m51.137 160.47 37.6-59.653c5.98-9.49 18.788-11.853 27.762-5.123l29.905 22.43a7.68 7.68 0 0 0 9.252-.027l40.388-30.652c5.39-4.091 12.428 2.36 8.82 8.085l-37.6 59.654c-5.981 9.489-18.79 11.852-27.763 5.122l-29.906-22.43a7.68 7.68 0 0 0-9.25.027l-40.39 30.652c-5.39 4.09-12.427-2.36-8.818-8.085Z"
+                                    />
+                                </svg>
+                            </a>
+                        )}
+                    </div>
+                )}
 
-                    <div className="relative mx-auto w-64 h-64 md:w-80 md:h-80 mb-8">
-                        <div className="absolute inset-0 bg-white rounded-full shadow-2xl scale-110"></div>
-                        <img
-                            src={landingPageData.mainImage}
-                            alt="Product"
-                            className="relative z-10 w-full h-full object-cover rounded-full border-4 border-white"
-                        />
-                        <div className="absolute bottom-4 -right-4 badge-gold text-white px-4 py-3 rounded-2xl font-bold rotate-6 z-20">
-                            <p className="text-[10px] leading-none opacity-80">
-                                {landingPageData.priceLabel}
-                            </p>
-                            <p className="text-xl">{landingPageData.price}</p>
+                {/* Header/Banner Section */}
+                <header className="border-b border-gray-200 bg-white py-12">
+                    <div className="landing-width flex flex-col-reverse items-center gap-12 md:flex-row">
+                        <div className="md:w-1/2">
+                            <div className="mb-6 h-1 w-16 bg-[var(--theme-primary)]"></div>
+                            <h1 className="mb-6 text-3xl font-bold text-gray-900 md:text-5xl md:leading-12">
+                                {bannerSection?.title || title || product.banglaName}
+                            </h1>
+
+                            <HtmlRenderer
+                                html={bannerSection?.subTitle || product.description}
+                                className="mb-8 border-l-4 border-gray-100 pl-4 text-lg leading-relaxed text-gray-600"
+                            />
+
+                            <Link
+                                href={`#order-section`}
+                                className="inline-block rounded-r-full bg-gray-900 px-7 py-2.5 font-extrabold text-amber-400"
+                            >
+                                <span className="text-sm font-normal opacity-80">স্পেশাল প্রাইজ: </span>
+                                <span className="text-3xl">৳{product.discountPrice.toLocaleString()}</span>
+                            </Link>
+                        </div>
+                        <div className="relative md:w-1/2">
+                            <div className="absolute -top-4 -left-4 -z-10 h-24 w-24 rounded-full bg-[var(--theme-secondary)]"></div>
+                            <Image
+                                src={bannerSection?.imgURL || product.photoURL}
+                                alt={product.banglaName}
+                                className="h-auto w-full border border-gray-100 bg-white p-2 shadow-2xl"
+                                width={600}
+                                height={600}
+                            />
                         </div>
                     </div>
+                </header>
 
-                    <p className="text-slate-500 text-sm md:text-base max-w-sm mx-auto mb-8">
-                        {landingPageData.subtitle}
-                    </p>
-
-                    <div className="flex flex-col space-y-3 px-10">
-                        <a
-                            href={`https://wa.me/${landingPageData.whatsapp}`}
-                            className="bg-slate-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl"
-                        >
-                            {landingPageData.ctaButton}
-                        </a>
-                    </div>
+                <div className="flex justify-center py-4 md:hidden">
+                    <button
+                        onClick={() => {
+                            document.getElementById("order-section")?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="rounded-full bg-[var(--theme-primary)] px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:opacity-90 active:scale-95"
+                    >
+                        এখনি অর্ডার করুন
+                    </button>
                 </div>
-            </header>
 
-            {/* Features Section */}
-            <section className="py-10">
-                <div className="container mx-auto max-w-xl px-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        {landingPageData.features.map((feature, index) => (
-                            <div
-                                key={index}
-                                className="feature-box p-5 bg-white border border-slate-100 rounded-2xl shadow-sm transition-all"
-                            >
+                <section className="bg-white py-10">
+                    <div className="container mx-auto grid max-w-4xl grid-cols-2 gap-6 px-6 md:grid-cols-4">
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">🚚</p>
+                            <h4 className="text-sm font-bold">দ্রুত ডেলিভারি</h4>
+                        </div>
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">🤝</p>
+                            <h4 className="text-sm font-bold">ক্যাশ অন ডেলিভারি</h4>
+                        </div>
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">✅</p>
+                            <h4 className="text-sm font-bold">১০০% অথেন্টিক</h4>
+                        </div>
+                        <div className="rounded-lg border border-gray-100 bg-gray-50/30 p-4 text-center">
+                            <p className="mb-2 text-2xl">🛡️</p>
+                            <h4 className="text-sm font-bold">মান নিশ্চিত</h4>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Services/About Section - title, left: sectionList (title+description), right: imgURL (video/image) */}
+                {aboutSection &&
+                    ((aboutSection.sectionList && aboutSection.sectionList.length > 0) ||
+                        aboutSection.imgURL ||
+                        aboutSection.title) && (
+                        <section className="bg-gray-900 py-12 text-white">
+                            <div className="container mx-auto max-w-4xl px-6">
+                                <h2 className="mb-10 text-center text-2xl font-bold tracking-wide uppercase md:text-3xl">
+                                    {aboutSection.title || "আমাদের সার্ভিস কেন সেরা?"}
+                                </h2>
                                 <div
-                                    className={`w-10 h-10 ${feature.bgColor} text-white rounded-lg flex items-center justify-center mb-4`}
+                                    className={cn(
+                                        "flex flex-col-reverse gap-8 md:grid",
+                                        aboutImageHave ? "md:grid-cols-2" : ""
+                                    )}
                                 >
-                                    {feature.icon}
+                                    <ul className="space-y-6">
+                                        {aboutSection.sectionList?.map((service, index) => (
+                                            <li key={service.id || index} className="flex items-start gap-4">
+                                                <span className="center size-6 rounded bg-[var(--theme-primary)]">
+                                                    ✔
+                                                </span>
+                                                <div>
+                                                    <p className="mb-2 text-lg leading-none font-bold">
+                                                        {service.title}
+                                                    </p>
+                                                    <p className="text-sm text-gray-400">{service.description}</p>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    {aboutImageHave &&
+                                        (() => {
+                                            const mediaUrl = aboutSection.imgURL || "";
+                                            const isEmbedHtml = mediaUrl.trim().startsWith("<");
+                                            const isYoutubeUrl =
+                                                !isEmbedHtml && /youtube\.com|youtu\.be/i.test(mediaUrl);
+                                            const embedSrc =
+                                                isYoutubeUrl && mediaUrl
+                                                    ? (() => {
+                                                          const match = mediaUrl.match(
+                                                              /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s?]+)/
+                                                          );
+                                                          return match
+                                                              ? `https://www.youtube.com/embed/${match[1]}`
+                                                              : mediaUrl;
+                                                      })()
+                                                    : null;
+                                            return (
+                                                <div className="overflow-hidden rounded-xl border-4 border-gray-800 shadow-2xl">
+                                                    {isEmbedHtml ? (
+                                                        <div
+                                                            className="[&>iframe]:aspect-video [&>iframe]:w-full"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: mediaUrl,
+                                                            }}
+                                                        />
+                                                    ) : embedSrc ? (
+                                                        <iframe
+                                                            src={embedSrc}
+                                                            className="aspect-video w-full"
+                                                            title="Video"
+                                                            allowFullScreen
+                                                        />
+                                                    ) : (
+                                                        <img
+                                                            src={mediaUrl}
+                                                            alt=""
+                                                            className="aspect-video w-full object-cover"
+                                                        />
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
                                 </div>
-                                <h4 className="font-bold text-sm mb-1">{feature.title}</h4>
-                                <p className="text-[10px] text-slate-400">{feature.description}</p>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+                        </section>
+                    )}
 
-            {/* Video Section */}
-            <section className="py-8">
-                <div className="container mx-auto max-w-xl px-6">
-                    <div className="bg-slate-900 rounded-[2rem] p-4 shadow-2xl overflow-hidden">
-                        <h3 className="text-center text-white font-bold mb-4 text-sm opacity-80 italic">
-                            {landingPageData.videoTitle}
-                        </h3>
-                        <div className="relative pb-[56.25%] h-0 rounded-xl overflow-hidden border border-slate-700">
-                            <iframe
-                                className="absolute top-0 left-0 w-full h-full"
-                                src={landingPageData.videoUrl}
-                                frameBorder="0"
-                                allowFullScreen
-                                title="Product Video"
-                            ></iframe>
+                {firstImage && (
+                    <Image
+                        src={firstImage}
+                        alt="Product"
+                        className="landing-width mb-4 rounded-xl shadow-md max-md:w-full lg:px-4"
+                        width={1000}
+                        height={1000}
+                    />
+                )}
+
+                {/* Benefits / Features Section */}
+                {featuresSection && featuresSection.sectionList && featuresSection.sectionList.length > 0 && (
+                    <section className="bg-white py-12">
+                        <div className="container mx-auto max-w-4xl px-6">
+                            <div className="mb-10 text-center">
+                                <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
+                                    {featuresSection.title || "পণ্যের বিশেষত্ব ও সুবিধা"}
+                                </h2>
+                                <div className="mx-auto mt-4 h-1 w-20 bg-[var(--theme-primary)]"></div>
+                            </div>
+                            <div className="grid gap-6 md:grid-cols-3">
+                                {featuresSection.sectionList.map((feature, index) => (
+                                    <div
+                                        key={feature.id ?? index}
+                                        className="rounded-xl border border-gray-100 bg-gray-50/50 p-6 shadow-sm"
+                                    >
+                                        <div className="mb-3 text-xl font-bold text-[var(--theme-primary)]">
+                                            #{toBengaliNumber(index + 1)}
+                                        </div>
+                                        <h4 className="mb-2 text-lg font-bold text-gray-900">{feature.title}</h4>
+                                        <p className="text-sm text-gray-600">{feature.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {secondImage && (
+                    <div className="landing-width bg-white p-4">
+                        <Image
+                            src={secondImage}
+                            alt="Product"
+                            className="w-full rounded-sm shadow-xl"
+                            width={1000}
+                            height={1000}
+                        />
+                    </div>
+                )}
+
+                {/* Customer Review / Testimonials Section */}
+                {testimonialsSection && <Testimonials section={testimonialsSection} />}
+
+                {product.videoLink && !aboutSection && (
+                    <div className="px-6">
+                        <ProductVideo videoLink={product.videoLink} />
+                    </div>
+                )}
+
+                {/* FAQ Section */}
+                {faqSection && <FAQ02 section={faqSection} />}
+
+                {otherImages && otherImages.length > 0 && (
+                    <div className="landing-width py-12">
+                        <h2 className="mb-6 text-center text-2xl font-bold text-[var(--theme-primary)] md:text-3xl lg:mb-8">
+                            আমাদের পণ্যের কোয়ালিটি
+                        </h2>
+                        <div className="grid gap-4 md:grid-cols-3">
+                            {otherImages.map((image) => (
+                                <Image
+                                    src={image}
+                                    alt="Product"
+                                    className="w-full rounded-sm shadow-xl"
+                                    width={1000}
+                                    height={1000}
+                                />
+                            ))}
                         </div>
                     </div>
-                </div>
-            </section>
+                )}
 
-            {/* Why Section */}
-            <section className="py-10 bg-slate-50 border-y border-slate-100">
-                <div className="container mx-auto max-w-xl px-6">
-                    <h2 className="text-center font-bold text-xl mb-8">{landingPageData.whyTitle}</h2>
-                    <div className="space-y-3">
-                        {landingPageData.benefits.map((benefit, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm"
-                            >
-                                <div className={`w-2 h-8 ${benefit.barColor} rounded-full`}></div>
-                                <p className="text-sm font-semibold text-slate-700">{benefit.title}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+                {/* Important Points Section */}
+                <section className="bg-gradient-to-br from-[var(--theme-secondary)] to-white px-6 py-12">
+                    <div className="landing-width rounded-2xl border-2 border-[var(--theme-primary)] bg-white p-6 shadow-2xl md:p-10">
+                        {/* Title */}
+                        <h2 className="mb-6 text-center text-2xl font-bold text-[var(--theme-primary)] md:text-3xl">
+                            ২ টি গুরুত্বপূর্ণ বিষয়
+                        </h2>
 
-            {/* Reviews Section */}
-            <section className="py-10 text-center">
-                <h2 className="text-sm uppercase tracking-widest font-bold text-slate-400 mb-6">
-                    {landingPageData.reviewsTitle}
-                </h2>
-                <div className="max-w-[300px] mx-auto rounded-3xl overflow-hidden shadow-xl border-4 border-slate-100">
-                    <div className="slider-wrapper">
-                        {landingPageData.reviewImages.map((image, index) => (
-                            <img key={index} src={image} alt={`Feedback ${index + 1}`} className="w-1/2" />
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* FAQ Section */}
-            <section className="py-10 bg-white">
-                <div className="container mx-auto max-w-xl px-6">
-                    <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold">{landingPageData.faqTitle}</h2>
-                        <p className="text-xs text-slate-400">{landingPageData.faqSubtitle}</p>
-                    </div>
-
-                    <div className="space-y-2">
-                        {landingPageData.faqs.map((faq, index) => (
-                            <div
-                                key={index}
-                                className={`border border-slate-100 rounded-xl transition-all cursor-pointer ${
-                                    activeFaqIndex === index ? "border-l-4 border-l-[#d4af37] bg-[#fafafa]" : ""
-                                }`}
-                                onClick={() => toggleFaq(index)}
-                            >
-                                <div className="flex items-center justify-between p-4">
-                                    <span className="font-bold text-sm">{faq.question}</span>
-                                    <svg
-                                        className={`w-4 h-4 transition-transform ${
-                                            activeFaqIndex === index ? "rotate-180" : ""
-                                        }`}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M19 9l-7 7-7-7"
-                                        />
-                                    </svg>
-                                </div>
-                                {activeFaqIndex === index && (
-                                    <div className="px-4 pb-4 text-xs text-slate-500 leading-relaxed">
-                                        {faq.answer}
+                        {/* Checkpoints */}
+                        <div className="mb-8 space-y-6">
+                            {importantPoints.map((point) => (
+                                <div
+                                    key={point.title}
+                                    className="flex items-start gap-4 rounded-xl border-[var(--theme-secondary)] transition-all"
+                                >
+                                    <div className="flex-shrink-0">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--theme-primary)]">
+                                            <svg
+                                                className="h-5 w-5 text-white"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={3}
+                                                    d="M5 13l4 4L19 7"
+                                                />
+                                            </svg>
+                                        </div>
                                     </div>
-                                )}
+                                    <p className="flex-1 text-base leading-relaxed text-gray-800 md:text-lg">
+                                        {point.title}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {contactSection?.title && contactSection.title.trim() !== "" && (
+                            <div className="text-center">
+                                <a
+                                    href={`tel:${ensureCountryCode(contactSection.title ?? "")}`}
+                                    className="group inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-[var(--theme-primary)] px-6 py-2 text-xl font-bold text-white transition-all md:px-10 md:py-4 md:text-xl"
+                                >
+                                    <Phone className="h-6 w-6" />
+                                    <span>
+                                        <span className="max-sm:hidden">যে কোনো প্রয়োজনে কল করুন:</span>{" "}
+                                        {contactSection.title}
+                                    </span>
+                                </a>
                             </div>
-                        ))}
+                        )}
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* Fixed Bottom CTA */}
-            <div className="fixed bottom-4 left-4 right-4 z-50">
-                <div className="flex items-center justify-between bg-white/90 backdrop-blur-lg p-2 rounded-2xl shadow-2xl border border-slate-100">
-                    <a
-                        href={`tel:${landingPageData.phone}`}
-                        className="flex items-center justify-center w-12 h-12 bg-slate-100 rounded-xl text-slate-700 hover:bg-slate-200 transition-colors"
-                    >
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-                        </svg>
-                    </a>
-                    <a
-                        href={`https://wa.me/${landingPageData.whatsapp}`}
-                        className="flex-1 mx-2 flex items-center justify-center bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-green-200 hover:bg-green-600 transition-colors"
-                    >
-                        {landingPageData.ctaWhatsapp}
-                    </a>
-                    <a
-                        href={`https://m.me/${landingPageData.messenger}`}
-                        className="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-xl text-white hover:bg-blue-600 transition-colors"
-                    >
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.654V24l4.088-2.242c1.112.309 2.298.474 3.443.474 6.627 0 12-4.974 12-11.111C24 4.974 18.627 0 12 0zm1.291 14.393l-3.048-3.253-5.939 3.253 6.541-6.947 3.12 3.253 5.866-3.253-6.54 6.947z" />
-                        </svg>
-                    </a>
-                </div>
-            </div>
+                {/* Order Section */}
+                <OrderSection
+                    theme={{ primary: theme.primary, secondary: theme.secondary }}
+                    product={product}
+                    packages={packages}
+                    specialNote={contactSection?.buttonText}
+                    formData={formData}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    selectedDeliveryZone={selectedDeliveryZone}
+                    selectedVariants={selectedVariants}
+                    selectedPackage={selectedPackage}
+                    selectedPackageProductVariants={selectedPackageProductVariants}
+                    totalAmount={totalAmount}
+                    handleInputChange={handleInputChange}
+                    handleVariantChange={handleVariantChange}
+                    setSelectedDeliveryZone={setSelectedDeliveryZone}
+                    handlePackageSelect={handlePackageSelect}
+                    handlePackageProductVariantChange={handlePackageProductVariantChange}
+                    handleSubmit={handleSubmit}
+                />
 
-            {/* Footer */}
-            <footer className="py-6 text-center text-slate-400 text-[10px] bg-white border-t border-slate-50">
-                <p>© 2026 Elite Store. All Rights Reserved.</p>
-            </footer>
+                {/* Featured Products */}
+                <FeaturedProducts featureProducts={featureProducts} shopSlug={shopSlug} />
+
+                {/* Footer */}
+                <ProductFooter banglaName={product.banglaName} shopSlug={shopSlug} />
+            </>
         </div>
     );
 };

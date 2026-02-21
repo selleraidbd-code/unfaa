@@ -6,7 +6,37 @@ import { AdvancedModeBuilder } from "@/features/landing-builder/components/Advan
 import { ConfigSelectDialogForLandingPage } from "@/features/landing-builder/components/config-select-dialog-for-landing-page";
 import { EasyModeBuilder } from "@/features/landing-builder/components/EasyModeBuilder";
 import { useGetLandingPageWithProductIdQuery } from "@/redux/api/landing-page-api";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { EPageType } from "@workspace/ui/landing/types";
+
+import { CustomErrorOrEmpty } from "@/components/ui/custom-error-or-empty";
+
+function BuilderPageSkeleton() {
+    return (
+        <div className="flex flex-1 flex-col">
+            <div className="bg-card flex flex-col gap-4 border-b px-4 py-4 lg:px-6">
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <Skeleton className="h-9 w-9 rounded-md" />
+                        <div className="space-y-1">
+                            <Skeleton className="h-5 w-40" />
+                            <Skeleton className="h-4 w-56" />
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <Skeleton className="h-9 w-24" />
+                        <Skeleton className="h-9 w-28" />
+                    </div>
+                </div>
+            </div>
+            <div className="flex-1 space-y-4 overflow-auto p-4 lg:p-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Skeleton key={i} className="h-16 w-full rounded-lg border" />
+                ))}
+            </div>
+        </div>
+    );
+}
 
 const Page = () => {
     const searchParams = useSearchParams();
@@ -24,8 +54,8 @@ const Page = () => {
         return <ConfigSelectDialogForLandingPage open={true} />;
     }
 
-    if (landingPageLoading) return <div>Loading...</div>;
-    if (landingPageError) return <div>Error</div>;
+    if (landingPageLoading) return <BuilderPageSkeleton />;
+    if (landingPageError) return <CustomErrorOrEmpty isError={true} title="Error" description="Something went wrong" />;
 
     // Render based on mode
     if (

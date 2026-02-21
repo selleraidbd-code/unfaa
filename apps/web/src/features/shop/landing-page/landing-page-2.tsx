@@ -11,20 +11,13 @@ import { ProductVideo } from "@/features/product/components/product-video";
 import { useOrderForm } from "@/features/product/hooks/use-order-form";
 import { FAQ02 } from "@/features/shop/landing-page/components/faq-2";
 import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
+import { toBengaliNumber } from "@/features/shop/landing-page/lib";
 import { EComponentType } from "@workspace/ui/landing/types";
 import { cn } from "@workspace/ui/lib/utils";
 import { Phone } from "lucide-react";
 
 import { LandingPage as LandingPageType } from "@/types/landing-type";
 import { HtmlRenderer } from "@/components/shared/html-renderer";
-
-const BENGALI_DIGITS = "০১২৩৪৫৬৭৮৯";
-const toBengaliNumber = (n: number) =>
-    String(n)
-        .padStart(2, "0")
-        .split("")
-        .map((c) => BENGALI_DIGITS[parseInt(c, 10)])
-        .join("");
 
 /** Ensure a phone number includes the Bangladesh country code (+880). */
 const ensureCountryCode = (phone: string): string => {
@@ -101,25 +94,34 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
         },
     ];
 
+    const theme = {
+        primary: contactSection?.imgURL || "#2563eb",
+        secondary: contactSection?.bgURL || "#eff6ff",
+    };
+
     return (
         <div className="bg-gray-50" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
             <style jsx global>{`
                 @import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&display=swap");
+                :root {
+                    --theme-primary: ${theme.primary};
+                    --theme-secondary: ${theme.secondary};
+                }
                 body {
                     font-family: "Hind Siliguri", sans-serif;
                 }
                 @keyframes pulse-subtle {
                     0% {
                         transform: scale(1);
-                        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+                        box-shadow: 0 0 0 0 ${theme.primary}66;
                     }
                     70% {
                         transform: scale(1.05);
-                        box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+                        box-shadow: 0 0 0 10px ${theme.primary}00;
                     }
                     100% {
                         transform: scale(1);
-                        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+                        box-shadow: 0 0 0 0 ${theme.primary}00;
                     }
                 }
                 .animate-pulse-subtle {
@@ -153,7 +155,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                         {contactSection.title && (
                             <a
                                 href={`tel:${ensureCountryCode(contactSection.title)}`}
-                                className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-blue-600 shadow-md transition-colors hover:bg-blue-50"
+                                className="animate-pulse-subtle flex h-12 w-12 items-center justify-center rounded-lg border border-gray-200 bg-white text-[var(--theme-primary)] shadow-md transition-colors hover:bg-[var(--theme-secondary)]"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -216,7 +218,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                 <header className="border-b border-gray-200 bg-white py-12">
                     <div className="landing-width flex flex-col items-center gap-12 md:flex-row">
                         <div className="md:w-1/2">
-                            <div className="mb-6 h-1 w-16 bg-blue-600"></div>
+                            <div className="mb-6 h-1 w-16 bg-[var(--theme-primary)]"></div>
                             <h1 className="mb-6 text-3xl font-bold text-gray-900 md:text-5xl md:leading-12">
                                 {bannerSection?.title || title || product.banglaName}
                             </h1>
@@ -235,7 +237,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                             </Link>
                         </div>
                         <div className="relative md:w-1/2">
-                            <div className="absolute -top-4 -left-4 -z-10 h-24 w-24 rounded-full bg-blue-50"></div>
+                            <div className="absolute -top-4 -left-4 -z-10 h-24 w-24 rounded-full bg-[var(--theme-secondary)]"></div>
                             <Image
                                 src={bannerSection?.imgURL || product.photoURL}
                                 alt={product.banglaName}
@@ -252,7 +254,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                         onClick={() => {
                             document.getElementById("order-section")?.scrollIntoView({ behavior: "smooth" });
                         }}
-                        className="rounded-full bg-blue-600 px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:bg-green-700 active:scale-95"
+                        className="rounded-full bg-[var(--theme-primary)] px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:opacity-90 active:scale-95"
                     >
                         এখনি অর্ডার করুন
                     </button>
@@ -293,7 +295,9 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                                     <ul className="space-y-6">
                                         {aboutSection.sectionList?.map((service, index) => (
                                             <li key={service.id || index} className="flex items-start gap-4">
-                                                <span className="center size-6 rounded bg-blue-600">✔</span>
+                                                <span className="center size-6 rounded bg-[var(--theme-primary)]">
+                                                    ✔
+                                                </span>
                                                 <div>
                                                     <p className="mb-2 text-lg leading-none font-bold">
                                                         {service.title}
@@ -359,7 +363,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                                 <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
                                     {featuresSection.title || "পণ্যের বিশেষত্ব ও সুবিধা"}
                                 </h2>
-                                <div className="mx-auto mt-4 h-1 w-20 bg-blue-600"></div>
+                                <div className="mx-auto mt-4 h-1 w-20 bg-[var(--theme-primary)]"></div>
                             </div>
                             <div className="grid gap-6 md:grid-cols-3">
                                 {featuresSection.sectionList.map((feature, index) => (
@@ -367,7 +371,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                                         key={feature.id ?? index}
                                         className="rounded-xl border border-gray-100 bg-gray-50/50 p-6 shadow-sm"
                                     >
-                                        <div className="mb-3 text-xl font-bold text-blue-600">
+                                        <div className="mb-3 text-xl font-bold text-[var(--theme-primary)]">
                                             #{toBengaliNumber(index + 1)}
                                         </div>
                                         <h4 className="mb-2 text-lg font-bold text-gray-900">{feature.title}</h4>
@@ -392,10 +396,10 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                 {faqSection && <FAQ02 section={faqSection} />}
 
                 {/* Important Points Section */}
-                <section className="bg-gradient-to-br from-blue-50 to-white px-6 py-12">
-                    <div className="landing-width rounded-2xl border-2 border-blue-600 bg-white p-6 shadow-2xl md:p-10">
+                <section className="bg-gradient-to-br from-[var(--theme-secondary)] to-white px-6 py-12">
+                    <div className="landing-width rounded-2xl border-2 border-[var(--theme-primary)] bg-white p-6 shadow-2xl md:p-10">
                         {/* Title */}
-                        <h2 className="mb-6 text-center text-2xl font-bold text-blue-600 md:text-3xl">
+                        <h2 className="mb-6 text-center text-2xl font-bold text-[var(--theme-primary)] md:text-3xl">
                             ২ টি গুরুত্বপূর্ণ বিষয়
                         </h2>
 
@@ -404,10 +408,10 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                             {importantPoints.map((point) => (
                                 <div
                                     key={point.title}
-                                    className="flex items-start gap-4 rounded-xl border-blue-100 transition-all"
+                                    className="flex items-start gap-4 rounded-xl border-[var(--theme-secondary)] transition-all"
                                 >
                                     <div className="flex-shrink-0">
-                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--theme-primary)]">
                                             <svg
                                                 className="h-5 w-5 text-white"
                                                 fill="none"
@@ -434,7 +438,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
                             <div className="text-center">
                                 <a
                                     href={`tel:${ensureCountryCode(contactSection.title ?? "")}`}
-                                    className="group inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-blue-500 px-6 py-2 text-xl font-bold text-white transition-all md:px-10 md:py-4 md:text-xl"
+                                    className="group inline-flex items-center justify-center gap-3 overflow-hidden rounded-full bg-[var(--theme-primary)] px-6 py-2 text-xl font-bold text-white transition-all md:px-10 md:py-4 md:text-xl"
                                 >
                                     <Phone className="h-6 w-6" />
                                     <span>
@@ -449,7 +453,7 @@ export const LandingPage02 = ({ landingPage, domain }: Props) => {
 
                 {/* Order Section */}
                 <OrderSection
-                    theme={{ primary: "#2563eb", secondary: "#eff6ff" }}
+                    theme={{ primary: theme.primary, secondary: theme.secondary }}
                     product={product}
                     packages={packages}
                     specialNote={contactSection?.buttonText}

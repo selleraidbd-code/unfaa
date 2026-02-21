@@ -13,6 +13,7 @@ import { ProductVideo } from "@/features/product/components/product-video";
 import { ProductWarranty } from "@/features/product/components/product-warranty";
 import { useOrderForm } from "@/features/product/hooks/use-order-form";
 import { FAQ01 } from "@/features/shop/landing-page/components/faq-1";
+import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
 import { EComponentType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
@@ -35,6 +36,9 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
         sections?.find((s) => s.sectionType === EComponentType.FAQ) ||
         (sections && sections.length > 0 ? sections[0] : undefined);
 
+    // Find Testimonials / Customer Review section
+    const testimonialsSection = sections?.find((s) => s.sectionType === EComponentType.TESTIMONIALS);
+
     // Find Contact section
     const contactSection = sections?.find((s) => s.sectionType === EComponentType.CTA);
 
@@ -48,6 +52,7 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
 
     const firstImage = product.images?.[0];
     const secondImage = product.images?.[1];
+    const otherImages = product.images?.slice(2);
 
     const {
         formData,
@@ -67,11 +72,22 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
         handleSubmit,
     } = useOrderForm(product, shopSlug);
 
+    const theme = {
+        primary: contactSection?.imgURL || "#dc2626",
+        secondary: contactSection?.bgURL || "#fef2f2",
+    };
+
     return (
         <>
             <div className="min-h-screen bg-gray-50 pb-4" style={{ fontFamily: "'Noto Sans Bengali', sans-serif" }}>
+                <style jsx global>{`
+                    :root {
+                        --theme-primary: ${theme.primary};
+                        --theme-secondary: ${theme.secondary};
+                    }
+                `}</style>
                 <div className="mx-auto max-w-2xl space-y-4 rounded-xl bg-white px-4 py-6 shadow-lg lg:space-y-6">
-                    <h1 className="px-4 text-center text-3xl leading-snug font-bold text-red-600">
+                    <h1 className="px-4 text-center text-3xl leading-snug font-bold text-[var(--theme-primary)]">
                         {title || product.banglaName}
                     </h1>
 
@@ -83,8 +99,8 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
 
                     <ProductPricing price={product.price} discountPrice={product.discountPrice} />
 
-                    <div className="mb-4 rounded-xl border-l-4 border-blue-500 bg-blue-50 p-5 lg:border-l-6">
-                        <h3 className="mb-3 text-xl font-bold text-blue-600">সংক্ষিপ্ত বিবরণ</h3>
+                    <div className="mb-4 rounded-xl border-l-4 border-[var(--theme-primary)] bg-[var(--theme-secondary)] p-5 lg:border-l-6">
+                        <h3 className="mb-3 text-xl font-bold text-[var(--theme-primary)]">সংক্ষিপ্ত বিবরণ</h3>
                         <HtmlRenderer html={product.description} />
                     </div>
 
@@ -122,7 +138,10 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
 
                     {product.warranty && <ProductWarranty warranty={product.warranty} />}
 
-                    <div className="rounded-xl bg-gradient-to-r from-red-600 to-red-400 p-2 text-center font-bold text-white md:p-6">
+                    {/* Customer Review / Testimonials Section */}
+                    {testimonialsSection && <Testimonials section={testimonialsSection} />}
+
+                    <div className="rounded-xl bg-[var(--theme-primary)] p-2 text-center font-bold text-white md:p-6">
                         <div className="text-lg leading-relaxed">
                             🚚 আপনি রাইডারের সামনে প্রোডাক্ট চেক করে তারপরে রাইডারকে টাকা দিবেন।
                             <br />
@@ -135,6 +154,7 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
                     {faqSection && <FAQ01 section={faqSection} />}
 
                     <OrderSection
+                        theme={{ primary: theme.primary, secondary: theme.secondary }}
                         product={product}
                         packages={packages}
                         specialNote={contactSection?.buttonText}

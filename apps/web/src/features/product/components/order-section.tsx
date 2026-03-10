@@ -2,6 +2,8 @@
 
 import { memo, useMemo } from "react";
 
+import { Separator } from "@workspace/ui/components/separator";
+
 import { Package } from "@/types/landing-type";
 import { Product, ProductVariantOption } from "@/types/product-type";
 
@@ -116,28 +118,27 @@ export const OrderSection = memo(function OrderSection({
         [primary, secondary]
     );
 
-    console.log("packages", packages);
-
     return (
         <section id="order-section" className="scroll-mt-10 py-6 lg:scroll-mt-20 lg:py-12">
             <div
-                className="landing-width rounded-2xl border-2 px-4 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+                className="mx-auto max-w-2xl rounded-2xl px-4 py-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)] lg:p-6"
                 style={{
                     ...themeStyle,
-                    borderColor: "var(--order-border)",
                     backgroundColor: "var(--order-container-bg)",
                 }}
             >
                 <div
-                    className="mb-[18px] rounded-xl border px-[18px] py-4 text-center text-[22px] font-bold"
+                    className="rounded-xl border px-[18px] text-center text-[22px] font-bold"
                     style={{
                         borderColor: "var(--order-header-border)",
                         background: "linear-gradient(to right, var(--order-header-from), var(--order-header-to))",
                         color: "var(--order-primary)",
                     }}
                 >
-                    অর্ডার করুন
+                    অর্ডার করতে নিচের ফর্মটি পূরণ করুন
                 </div>
+
+                <Separator className="mt-3 mb-5" />
 
                 {packages.length > 0 && (
                     <PackageSelector

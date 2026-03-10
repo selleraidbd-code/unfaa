@@ -3,7 +3,8 @@
 import { FC, useEffect } from "react";
 
 import { Button } from "@workspace/ui/components/button";
-import { Brand } from "@/components/shared/brand";
+
+import { Logo } from "@/components/shared/logo";
 
 type ErrorProps = { error: Error; reset: () => void };
 const Error: FC<ErrorProps> = ({ error, reset }) => {
@@ -16,24 +17,23 @@ const Error: FC<ErrorProps> = ({ error, reset }) => {
     };
 
     return (
-        <div className="fixed inset-0 overflow-hidden bg-background text-foreground">
+        <div className="bg-background text-foreground fixed inset-0 overflow-hidden">
             <div className="pointer-events-none fixed inset-0 overflow-hidden">
-                <div className="absolute left-0 top-0 h-full w-full bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+                <div className="absolute top-0 left-0 h-full w-full bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
             </div>
 
             <main className="relative z-10 flex h-[calc(100vh-4px)] w-full items-center justify-center">
                 <div className="container flex flex-col items-center justify-center gap-4 px-4 text-center sm:gap-6">
-                    <Brand />
-                    <h1 className="bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                    <Logo />
+                    <h1 className="from-primary bg-gradient-to-r to-violet-500 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
                         Oops! Something went wrong
                     </h1>
 
-                    <p className="max-w-md text-base text-muted-foreground sm:text-lg">
-                        We apologize for the inconvenience. Please try again or
-                        contact our support team
+                    <p className="text-muted-foreground max-w-md text-base sm:text-lg">
+                        We apologize for the inconvenience. Please try again or contact our support team
                         <a
                             href="mailto:unfaa9@gmail.com"
-                            className="hover:text-gradient px-1 text-primary hover:underline"
+                            className="hover:text-gradient text-primary px-1 hover:underline"
                         >
                             unfaa9@gmail.com
                         </a>
@@ -41,11 +41,7 @@ const Error: FC<ErrorProps> = ({ error, reset }) => {
                     </p>
 
                     <div className="mt-2 flex flex-col gap-3 sm:mt-4 sm:flex-row sm:gap-4">
-                        <Button
-                            size="lg"
-                            onClick={handleReset}
-                            className="min-w-[160px] sm:min-w-[200px]"
-                        >
+                        <Button size="lg" onClick={handleReset} className="min-w-[160px] sm:min-w-[200px]">
                             Try again
                         </Button>
 
@@ -61,12 +57,8 @@ const Error: FC<ErrorProps> = ({ error, reset }) => {
 
                     {process.env.NODE_ENV === "development" && (
                         <div className="container mt-4 max-h-[30vh] overflow-x-auto overflow-y-auto rounded-md border p-3 text-left backdrop-blur-sm sm:mt-6 sm:p-4">
-                            <p className="text-sm font-medium text-muted-foreground">
-                                Error details:
-                            </p>
-                            <pre className="mt-2 text-wrap text-sm">
-                                {error.message}
-                            </pre>
+                            <p className="text-muted-foreground text-sm font-medium">Error details:</p>
+                            <pre className="mt-2 text-sm text-wrap">{error.message}</pre>
                         </div>
                     )}
                 </div>

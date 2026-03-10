@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-const WhatsApp = (props: SVGProps<SVGSVGElement>) => (
+const WhatsAppIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg {...props} fill="none" viewBox="0 0 360 362">
         <path
             fill="currentColor"
@@ -11,7 +11,7 @@ const WhatsApp = (props: SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-const Facebook = (props: SVGProps<SVGSVGElement>) => (
+const FacebookIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg {...props} viewBox="0 0 666.667 666.667">
         <defs>
             <clipPath id="facebook_icon__a" clipPathUnits="userSpaceOnUse">
@@ -43,7 +43,7 @@ const Facebook = (props: SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-const Messenger = (props: SVGProps<SVGSVGElement>) => (
+const MessengerIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg {...props} viewBox="0 0 256 256" preserveAspectRatio="xMidYMid">
         <defs>
             <radialGradient id="messenger__a" cx="19.247%" cy="99.465%" r="108.96%" fx="19.247%" fy="99.465%">
@@ -64,4 +64,4 @@ const Messenger = (props: SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-export { Messenger, Facebook, WhatsApp };
+export { MessengerIcon, FacebookIcon, WhatsAppIcon };

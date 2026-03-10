@@ -12,7 +12,7 @@ type Props = {
     shopSlug: string;
 };
 
-export const FeaturedProducts = memo(function FeaturedProducts({ featureProducts, shopSlug }: Props) {
+export const LandingFeaturedProducts = memo(function LandingFeaturedProducts({ featureProducts, shopSlug }: Props) {
     if (!featureProducts || featureProducts.length === 0) {
         return null;
     }

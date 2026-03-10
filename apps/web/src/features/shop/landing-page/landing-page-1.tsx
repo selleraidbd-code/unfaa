@@ -4,15 +4,15 @@ import { useMemo } from "react";
 import Image from "next/image";
 
 import { ContactButtons } from "@/features/product/components/contact-buttons";
-import { FeaturedProducts } from "@/features/product/components/featured-products";
 import { OrderSection } from "@/features/product/components/order-section";
-import { ProductFooter } from "@/features/product/components/product-footer";
 import { ProductImageGallery } from "@/features/product/components/product-image-gallery";
 import { ProductPricing } from "@/features/product/components/product-pricing";
 import { ProductVideo } from "@/features/product/components/product-video";
 import { ProductWarranty } from "@/features/product/components/product-warranty";
 import { useOrderForm } from "@/features/product/hooks/use-order-form";
 import { FAQ01 } from "@/features/shop/landing-page/components/faq-1";
+import { LandingFeaturedProducts } from "@/features/shop/landing-page/components/landing-featured-products";
+import { LandingFooter } from "@/features/shop/landing-page/components/landing-footer";
 import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
 import { EComponentType } from "@workspace/ui/landing/types";
 
@@ -174,9 +174,9 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
                         handleSubmit={handleSubmit}
                     />
 
-                    <FeaturedProducts featureProducts={featureProducts} shopSlug={shopSlug} />
+                    <LandingFeaturedProducts featureProducts={featureProducts} shopSlug={shopSlug} />
 
-                    <ProductFooter banglaName={product.banglaName} shopSlug={shopSlug} />
+                    <LandingFooter banglaName={product.banglaName} shopSlug={shopSlug} />
                 </div>
             </div>
         </>

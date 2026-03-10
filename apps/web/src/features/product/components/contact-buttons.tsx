@@ -1,6 +1,6 @@
 "use client";
 
-import { Messenger, WhatsApp } from "@/assets/icons";
+import { MessengerIcon, WhatsAppIcon } from "@/assets/icons";
 
 type ContactButtonsProps = {
     whatsappNumber?: string;
@@ -101,7 +101,7 @@ export const ContactButtons = ({ whatsappNumber, facebookPageId }: ContactButton
                         onClick={handleWhatsAppClick}
                         className="group flex items-center justify-center gap-3 rounded-lg bg-green-500 px-6 py-4 font-semibold text-white transition-all hover:bg-green-600 hover:shadow-lg active:scale-95"
                     >
-                        <WhatsApp className="h-6 w-6" />
+                        <WhatsAppIcon className="size-6" />
                         <span className="text-lg">WhatsApp করুন</span>
                     </button>
                 )}
@@ -111,7 +111,7 @@ export const ContactButtons = ({ whatsappNumber, facebookPageId }: ContactButton
                         onClick={handleMessengerClick}
                         className="group flex items-center justify-center gap-3 rounded-lg bg-blue-500 px-6 py-4 font-semibold text-white transition-all hover:bg-blue-600 hover:shadow-lg active:scale-95"
                     >
-                        <Messenger className="h-6 w-6" />
+                        <MessengerIcon className="size-6" />
                         <span className="text-lg">মেসেজ করুন</span>
                     </button>
                 )}

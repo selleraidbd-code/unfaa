@@ -1,7 +1,6 @@
-import { Inter } from "next/font/google";
+import { Hind_Siliguri, Inter } from "next/font/google";
 
 import "@workspace/ui/globals.css";
-
 /* Swiper CSS imports */
 import "swiper/css";
 import "swiper/css/navigation";
@@ -14,6 +13,12 @@ const fontSans = Inter({
     variable: "--font-sans",
 });
 
+const fontHindSiliguri = Hind_Siliguri({
+    subsets: ["latin"],
+    variable: "--font-hind-siliguri",
+    weight: ["300", "400", "500", "600", "700"],
+});
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -21,7 +26,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${fontSans.variable} font-sans antialiased `}>
+            <body className={`${fontSans.variable} ${fontHindSiliguri.variable} font-sans antialiased`}>
                 <Providers>{children}</Providers>
             </body>
         </html>

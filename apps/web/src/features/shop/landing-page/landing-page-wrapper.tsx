@@ -3,6 +3,7 @@ import { AdvanceLandingPageView } from "@/features/shop/landing-page/AdvanceLand
 import { LandingPage01 } from "@/features/shop/landing-page/landing-page-1";
 import { LandingPage02 } from "@/features/shop/landing-page/landing-page-2";
 import { LandingPage03 } from "@/features/shop/landing-page/landing-page-3";
+import { LandingPage04 } from "@/features/shop/landing-page/landing-page-4";
 import { EPageType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
@@ -35,6 +36,9 @@ export const LandingPageWrapper = ({ landingPage, domain }: Props) => {
             )}
             {landingPage.pageType === EPageType.EASY_LANDING_PAGE_3 && (
                 <LandingPage03 landingPage={landingPage} domain={domain} />
+            )}
+            {landingPage.pageType === EPageType.EASY_LANDING_PAGE_4 && (
+                <LandingPage04 landingPage={landingPage} domain={domain} />
             )}
         </>
     );

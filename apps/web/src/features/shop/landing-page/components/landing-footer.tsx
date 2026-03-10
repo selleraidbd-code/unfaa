@@ -8,16 +8,16 @@ type Props = {
     shopSlug: string;
 };
 
-export const ProductFooter = memo(function ProductFooter({ banglaName, shopSlug }: Props) {
+export const LandingFooter = memo(function LandingFooter({ banglaName, shopSlug }: Props) {
     return (
         <footer className="border-t border-gray-200 py-6 text-center text-gray-600">
             <div className="landing-width">
                 <p className="mb-2">
-                    <Link href={getLink({ shopSlug, path: "/privacy-policy" })} className="hover:text-green-600">
+                    <Link href={getLink({ shopSlug, path: "/privacy-policy" })} className="hover:text-blue-600">
                         Privacy Policy
                     </Link>{" "}
                     |
-                    <Link href={getLink({ shopSlug, path: "/terms-conditions" })} className="ml-2 hover:text-green-600">
+                    <Link href={getLink({ shopSlug, path: "/terms-conditions" })} className="ml-2 hover:text-blue-600">
                         Terms & Conditions
                     </Link>
                 </p>

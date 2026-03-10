@@ -81,16 +81,18 @@ const SignUpForm = () => {
 
                         <CustomFormError message={error || undefined} />
 
-                        <CustomButton type="submit" className="w-full" isLoading={isPending}>
-                            Sign Up
-                        </CustomButton>
+                        <div className="pt-2">
+                            <CustomButton type="submit" className="w-full" isLoading={isPending}>
+                                Sign Up
+                            </CustomButton>
+                        </div>
                     </div>
 
                     <div className="text-center text-sm">
                         Already have an account?{" "}
                         <Link
                             href="/auth/sign-in"
-                            className="text-primary/80 hover:text-primary pl-1 underline underline-offset-4"
+                            className="text-primary pl-1 font-medium underline-offset-4 hover:underline"
                         >
                             Sign In
                         </Link>

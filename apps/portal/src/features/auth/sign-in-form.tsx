@@ -69,7 +69,7 @@ export const SignInForm = () => {
                         <div className="flex items-center justify-end text-blue-500">
                             <Link
                                 href="/auth/forgot-password"
-                                className="ml-auto text-sm underline-offset-4 hover:underline"
+                                className="ml-auto text-sm font-medium underline-offset-4 hover:underline"
                             >
                                 Forgot your password?
                             </Link>
@@ -86,7 +86,7 @@ export const SignInForm = () => {
                         Don&apos;t have an account?{" "}
                         <Link
                             href="/auth/sign-up"
-                            className="hover:text-primary text-primary/80 pl-1 underline underline-offset-4"
+                            className="text-primary pl-1 font-medium underline-offset-4 hover:underline"
                         >
                             Sign Up
                         </Link>

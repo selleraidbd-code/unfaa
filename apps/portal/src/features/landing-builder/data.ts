@@ -22,6 +22,13 @@ export const easyModeTemplateData = [
         image: "https://mediaserver.unfaa.com/uploads/img/1767166515749-525147587.jpg",
         href: "https://www.google.com",
     },
+    {
+        id: EPageType.EASY_LANDING_PAGE_4,
+        name: "Landing Page 4",
+        description: "Landing Page 4 description",
+        image: "https://mediaserver.unfaa.com/uploads/img/1767166515749-525147587.jpg",
+        href: "https://www.google.com",
+    },
     // {
     //     id: EPageType.EASY_LANDING_PAGE_4,
     //     name: "Landing Page 4",

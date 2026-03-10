@@ -9,7 +9,7 @@ import { Logo } from "@/components/shared/logo";
 
 export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className="flex h-screen w-full bg-[#FCFCFC]">
+        <div className="bg-background flex h-screen w-full">
             {/* Left Side – Premium Visuals (lg+ only) */}
             <div className="relative hidden h-full w-[40%] flex-col overflow-hidden bg-[#0F1115] lg:flex xl:w-[45%]">
                 {/* Modern Mesh Gradient Background */}
@@ -40,14 +40,14 @@ export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
                                 Join the Elite 1%
                             </span>
                             <h2 className="text-5xl leading-[1.1] font-semibold text-white xl:text-6xl">
-                                Elevate your <br />
+                                Build and manage <br />
                                 <span className="bg-linear-to-r from-[#3B82F6] to-[#0EA5E9] bg-clip-text text-transparent">
-                                    digital influence.
+                                    your online store.
                                 </span>
                             </h2>
                             <p className="mt-6 max-w-md text-lg leading-relaxed text-slate-400">
-                                The world’s most powerful social growth engine. Verified results, premium accounts, and
-                                unparalleled reach.
+                                Unfaa Store gives you a modern portal to launch shops, design landing pages, and control
+                                products, orders, and customers from one powerful dashboard.
                             </p>
                         </motion.div>
 
@@ -75,7 +75,7 @@ export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
 
                     {/* Footer link */}
                     <div className="text-sm text-slate-500">
-                        © 2026 Inventory — The Standard for Inventory Management
+                        © 2026 Unfaa Store — The Standard for E-commerce Management
                     </div>
                 </div>
             </div>
@@ -86,7 +86,7 @@ export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
                     {/* Back to site link - Premium touch */}
                     <Link
                         href="/"
-                        className="group text-primary mb-12 flex items-center gap-2 text-sm transition-colors hover:text-slate-900"
+                        className="group text-primary mb-12 hidden items-center gap-2 text-sm transition-colors hover:text-slate-900"
                     >
                         <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm transition-all group-hover:border-[#3B82F6] group-hover:text-[#3B82F6]">
                             <ArrowRight size={14} className="rotate-180" />

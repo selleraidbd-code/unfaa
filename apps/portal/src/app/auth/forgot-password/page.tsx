@@ -1,45 +1,37 @@
-import Image from "next/image";
 import Link from "next/link";
 
-import logo from "@/assets/icons/logo.svg";
+import { AuthWrapper } from "@/features/auth/components/auth-wrapper";
 import { ForgotForm } from "@/features/auth/forgot-form";
-import { Card, CardDescription, CardTitle } from "@workspace/ui/components/card";
 
-const ForgotPassword = () => {
+import { Logo } from "@/components/shared/logo";
+
+const Page = () => {
     return (
-        <div className="center bg-accent h-svh">
-            <div className="mx-auto flex flex-col justify-center space-y-2 sm:w-[480px] lg:p-8">
-                <Card className="p-6">
-                    <div className="space-y-4 pb-4 text-left">
-                        <Image
-                            src={logo}
-                            alt="Logo"
-                            width={100}
-                            height={40}
-                            className="mx-auto mb-1 flex items-center justify-center"
-                        />
-                        <CardTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-2xl text-transparent italic">
-                            Forgot your password?
-                        </CardTitle>
-                        <CardDescription className="text-base text-gray-600">
-                            If you have an account with us you will receive an email with 6 digit OTP for verification.
-                        </CardDescription>
-                    </div>
-                    <ForgotForm />
+        <AuthWrapper>
+            <div>
+                <Logo size="sm" />
 
-                    <p className="px-8 text-center text-sm">
-                        Already have an account?{" "}
-                        <Link
-                            href="/auth/sign-in"
-                            className="text-primary/80 hover:text-primary underline underline-offset-4"
-                        >
-                            Sign in
-                        </Link>
+                <div className="mt-6 mb-4 space-y-1">
+                    <h1 className="text-2xl font-semibold">Forgot your password?</h1>
+                    <p className="text-muted-foreground text-sm">
+                        If you have an account with us you will receive an email with 6 digit OTP for verification.
                     </p>
-                </Card>
+                </div>
+
+                <ForgotForm />
+
+                <p className="mt-4 px-8 text-center text-sm">
+                    Already have an account?{" "}
+                    <Link
+                        href="/auth/sign-in"
+                        className="text-primary/80 hover:text-primary underline underline-offset-4"
+                    >
+                        Sign In
+                    </Link>
+                </p>
             </div>
-        </div>
+        </AuthWrapper>
     );
 };
 
-export default ForgotPassword;
+export default Page;

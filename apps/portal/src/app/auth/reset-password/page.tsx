@@ -1,46 +1,37 @@
-import Image from "next/image";
 import Link from "next/link";
 
-import logo from "@/assets/icons/logo.svg";
+import { AuthWrapper } from "@/features/auth/components/auth-wrapper";
 import { ResetPasswordForm } from "@/features/auth/reset-password-form";
-import { Card, CardDescription, CardTitle } from "@workspace/ui/components/card";
 
-const ResetPassword = () => {
+import { Logo } from "@/components/shared/logo";
+
+const Page = () => {
     return (
-        <div className="center bg-accent h-svh">
-            <div className="mx-auto flex flex-col justify-center space-y-2 sm:w-[480px] lg:p-8">
-                <Card className="p-6">
-                    <div className="space-y-4 pb-4 text-left">
-                        <Image
-                            src={logo}
-                            alt="Logo"
-                            width={100}
-                            height={40}
-                            className="mx-auto mb-1 flex items-center justify-center"
-                        />
-                        <CardTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-2xl text-transparent italic">
-                            Reset your password
-                        </CardTitle>
-                        <CardDescription className="text-base text-gray-600">
-                            Enter the OTP code sent to your email and create a new password.
-                        </CardDescription>
-                    </div>
+        <AuthWrapper>
+            <div>
+                <Logo size="sm" />
 
-                    <ResetPasswordForm />
-
-                    <p className="mt-4 px-8 text-center text-sm">
-                        Remember your password?{" "}
-                        <Link
-                            href="/auth/sign-in"
-                            className="text-primary/80 hover:text-primary underline underline-offset-4"
-                        >
-                            Sign in
-                        </Link>
+                <div className="mt-4 mb-2 space-y-1">
+                    <h1 className="text-2xl font-semibold">Reset your password</h1>
+                    <p className="text-muted-foreground text-sm">
+                        Enter the OTP code sent to your email and create a new password.
                     </p>
-                </Card>
+                </div>
+
+                <ResetPasswordForm />
+
+                <p className="mt-4 px-8 text-center text-sm">
+                    Remember your password?{" "}
+                    <Link
+                        href="/auth/sign-in"
+                        className="text-primary/80 hover:text-primary underline underline-offset-4"
+                    >
+                        Sign in
+                    </Link>
+                </p>
             </div>
-        </div>
+        </AuthWrapper>
     );
 };
 
-export default ResetPassword;
+export default Page;

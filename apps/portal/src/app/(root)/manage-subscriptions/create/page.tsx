@@ -24,6 +24,7 @@ const formSchema = z.object({
     durationName: z.string().optional(),
     isFree: z.boolean(),
     isTrial: z.boolean(),
+    isActive: z.boolean(),
     featuresText: z.string().optional(),
     popular: z.boolean(),
     description: z.string().optional(),
@@ -43,6 +44,7 @@ const Page = () => {
             durationName: "",
             isFree: false,
             isTrial: false,
+            isActive: true,
             featuresText: "",
             popular: false,
             description: "",
@@ -63,6 +65,7 @@ const Page = () => {
             duration: data.duration,
             isFree: data.isFree,
             isTrial: data.isTrial,
+            isActive: data.isActive,
             features,
         };
         if (data.discountPrice != null && data.discountPrice > 0) payload.discountPrice = data.discountPrice;
@@ -128,6 +131,7 @@ const Page = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
+                    <CustomFormSwitch control={form.control} name="isActive" label="Active plan" />
                     <CustomFormSwitch control={form.control} name="isFree" label="Free plan" />
                     <CustomFormSwitch control={form.control} name="isTrial" label="Trial plan" />
                     {/* <CustomFormSwitch control={form.control} name="popular" label="Mark as popular" /> */}

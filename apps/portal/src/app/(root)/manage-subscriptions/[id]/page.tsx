@@ -25,6 +25,7 @@ const formSchema = z.object({
     durationName: z.string().optional(),
     isFree: z.boolean(),
     isTrial: z.boolean(),
+    isActive: z.boolean(),
     featuresText: z.string().optional(),
     description: z.string().optional(),
 });
@@ -47,6 +48,7 @@ const EditSubscriptionPlanPage = () => {
             durationName: "",
             isFree: false,
             isTrial: false,
+            isActive: true,
             featuresText: "",
             description: "",
         },
@@ -57,11 +59,12 @@ const EditSubscriptionPlanPage = () => {
         form.reset({
             name: plan.name,
             price: plan.price,
-            discountPrice: plan.discountPrice,
+            discountPrice: plan.discountPrice ?? undefined,
             duration: plan.duration,
             durationName: plan.durationName ?? "",
             isFree: plan.isFree,
             isTrial: plan.isTrial,
+            isActive: plan.isActive,
             featuresText: plan.features?.join("\n") ?? "",
             description: plan.description ?? "",
         });
@@ -80,9 +83,14 @@ const EditSubscriptionPlanPage = () => {
             duration: data.duration,
             isFree: data.isFree,
             isTrial: data.isTrial,
+            isActive: data.isActive,
             features: features ?? [],
         };
-        if (data.discountPrice != null && data.discountPrice > 0) payload.discountPrice = data.discountPrice;
+        if (data.discountPrice != null && data.discountPrice > 0) {
+            payload.discountPrice = data.discountPrice;
+        } else {
+            payload.discountPrice = 0;
+        }
         if (data.durationName !== undefined) payload.durationName = data.durationName;
         if (data.description !== undefined) payload.description = data.description;
 
@@ -153,6 +161,7 @@ const EditSubscriptionPlanPage = () => {
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
+                    <CustomFormSwitch control={form.control} name="isActive" label="Active plan" />
                     <CustomFormSwitch control={form.control} name="isFree" label="Free plan" />
                     <CustomFormSwitch control={form.control} name="isTrial" label="Trial plan" />
                 </div>

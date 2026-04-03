@@ -7,6 +7,7 @@ export interface SubscriptionPlan {
     durationName?: string;
     isFree: boolean;
     isTrial: boolean;
+    isActive: boolean;
     features: string[];
     description?: string;
     status?: "active" | "inactive";
@@ -22,6 +23,7 @@ export interface CreateSubscriptionPlanPayload {
     durationName?: string;
     isFree: boolean;
     isTrial: boolean;
+    isActive: boolean;
     features: string[];
     description?: string;
 }

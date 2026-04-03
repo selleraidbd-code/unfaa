@@ -50,7 +50,7 @@ export const CustomerOrderStatsChart = ({
     ].filter((item) => item.orders > 0); // Only show segments with orders
 
     return (
-        <ChartContainer config={chartConfig} className={cn("size-10 flex-shrink-0", className)}>
+        <ChartContainer config={chartConfig} className={cn("aspect-square size-10 flex-shrink-0", className)}>
             <PieChart>
                 <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                 <Pie data={chartData} dataKey="orders" nameKey="status" stroke="0" />

@@ -10,6 +10,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { RadioGroup, RadioGroupItem } from "@workspace/ui/components/radio-group";
 import { toast } from "@workspace/ui/components/sonner";
+import { Check, Copy } from "lucide-react";
 
 import type { SubscriptionCardPlan } from "./subscription-card";
 
@@ -19,16 +20,19 @@ interface SubscriptionPurchaseModalProps {
     plan: SubscriptionCardPlan | null;
 }
 
+type CopyTarget = "bkash" | "nagad" | "bank" | null;
+
 const PAYMENT_METHODS = [
     { value: "bkash", label: "Bkash" },
     { value: "nagad", label: "Nagad" },
-    { value: "rocket", label: "Rocket" },
+    { value: "bank", label: "Bank" },
 ];
 
 export const SubscriptionPurchaseModal = ({ open, onOpenChange, plan }: SubscriptionPurchaseModalProps) => {
     const [paymentMethod, setPaymentMethod] = useState<string>("bkash");
     const [transactionId, setTransactionId] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [copiedTarget, setCopiedTarget] = useState<CopyTarget>(null);
 
     const user = useAppSelector((state) => state.auth.user);
     const [createShopSubscription] = useCreateShopSubscriptionMutation();
@@ -38,13 +42,22 @@ export const SubscriptionPurchaseModal = ({ open, onOpenChange, plan }: Subscrip
         onOpenChange(false);
         setTransactionId("");
         setPaymentMethod("bkash");
+        setCopiedTarget(null);
+    };
+
+    const handleCopy = (value: string, target: CopyTarget) => {
+        navigator.clipboard.writeText(value);
+        setCopiedTarget(target);
+        setTimeout(() => {
+            setCopiedTarget((prev) => (prev === target ? null : prev));
+        }, 1500);
     };
 
     if (!plan) {
         return null;
     }
 
-    const paymentLabelPrefix = paymentMethod === "bkash" ? "Bkash" : paymentMethod === "nagad" ? "Nagad" : "Rocket";
+    const paymentLabelPrefix = paymentMethod === "bkash" ? "Bkash" : paymentMethod === "nagad" ? "Nagad" : "Bank";
 
     const handleSubmit = async () => {
         if (!user?.shop?.id) {
@@ -98,38 +111,127 @@ export const SubscriptionPurchaseModal = ({ open, onOpenChange, plan }: Subscrip
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label className="text-sm font-medium">Payment Method</Label>
-                        <RadioGroup
-                            value={paymentMethod}
-                            onValueChange={setPaymentMethod}
-                            className="grid grid-cols-3 gap-2"
-                        >
-                            {PAYMENT_METHODS.map((method) => (
-                                <Label
-                                    key={method.value}
-                                    className="data-[state=checked]:border-primary data-[state=checked]:bg-primary/5 flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+                    {plan.price > 0 && (
+                        <>
+                            <div className="space-y-2">
+                                <Label className="text-sm font-medium">Payment method</Label>
+                                <RadioGroup
+                                    value={paymentMethod}
+                                    onValueChange={setPaymentMethod}
+                                    className="grid grid-cols-3 gap-2"
                                 >
-                                    <RadioGroupItem value={method.value} />
-                                    {method.label}
-                                </Label>
-                            ))}
-                        </RadioGroup>
-                    </div>
+                                    {PAYMENT_METHODS.map((method) => (
+                                        <Label
+                                            key={method.value}
+                                            className="data-[state=checked]:border-primary data-[state=checked]:bg-primary/5 flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium"
+                                        >
+                                            <RadioGroupItem value={method.value} />
+                                            {method.label}
+                                        </Label>
+                                    ))}
+                                </RadioGroup>
+                            </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="transactionId">{paymentLabelPrefix} transaction ID</Label>
-                        <Input
-                            id="transactionId"
-                            placeholder="Enter transaction ID"
-                            value={transactionId}
-                            onChange={(e) => setTransactionId(e.target.value)}
-                        />
-                        <p className="text-muted-foreground text-xs">
-                            This will be sent as the <span className="font-semibold">refaranceId</span> in the request
-                            payload.
+                            {/* Payment instructions */}
+                            <div className="bg-muted/50 space-y-2 rounded-md border p-3 text-xs sm:text-sm">
+                                {paymentMethod === "bkash" && (
+                                    <>
+                                        <p className="font-semibold">Send money with Bkash</p>
+                                        <div className="bg-background mt-1 flex items-center justify-between gap-2 rounded-md px-2 py-1 font-mono text-sm">
+                                            <span>01713688944</span>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() => handleCopy("01713688944", "bkash")}
+                                            >
+                                                {copiedTarget === "bkash" ? (
+                                                    <Check className="h-3 w-3" />
+                                                ) : (
+                                                    <Copy className="h-3 w-3" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
+                                {paymentMethod === "nagad" && (
+                                    <>
+                                        <p className="font-semibold">Send money with Nagad</p>
+                                        <div className="bg-background mt-1 flex items-center justify-between gap-2 rounded-md px-2 py-1 font-mono text-sm">
+                                            <span>01713688944</span>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() => handleCopy("01713688944", "nagad")}
+                                            >
+                                                {copiedTarget === "nagad" ? (
+                                                    <Check className="h-3 w-3" />
+                                                ) : (
+                                                    <Copy className="h-3 w-3" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
+                                {paymentMethod === "bank" && (
+                                    <>
+                                        <p className="font-semibold">Send money by Bank transfer</p>
+                                        <div className="bg-background mt-2 grid gap-1 rounded-md px-2 py-2 text-xs sm:text-sm">
+                                            <div>
+                                                <span className="font-semibold">Bank:</span> Islami Bank Bangladesh PLC
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold">Title:</span> RAKIBUL HASAN
+                                            </div>
+                                            <div>
+                                                <span className="font-semibold">Account:</span>{" "}
+                                                <span className="font-mono">20503180200962017</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-background mt-2 flex items-center justify-between gap-2 rounded-md px-2 py-1 font-mono text-xs sm:text-sm">
+                                            <span>20503180200962017</span>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-7 w-7"
+                                                onClick={() => handleCopy("20503180200962017", "bank")}
+                                            >
+                                                {copiedTarget === "bank" ? (
+                                                    <Check className="h-3 w-3" />
+                                                ) : (
+                                                    <Copy className="h-3 w-3" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="transactionId">{paymentLabelPrefix} transaction / reference ID</Label>
+                                <Input
+                                    id="transactionId"
+                                    placeholder="Enter transaction or reference ID"
+                                    value={transactionId}
+                                    onChange={(e) => setTransactionId(e.target.value)}
+                                />
+                                <p className="text-muted-foreground text-xs">
+                                    This will be sent as the <span className="font-semibold">refaranceId</span> in the
+                                    request payload.
+                                </p>
+                            </div>
+                        </>
+                    )}
+
+                    {plan.price === 0 && (
+                        <p className="text-muted-foreground text-sm">
+                            This is a free subscription. No payment is required; just confirm your request.
                         </p>
-                    </div>
+                    )}
                 </div>
 
                 <DialogFooter className="mt-4">

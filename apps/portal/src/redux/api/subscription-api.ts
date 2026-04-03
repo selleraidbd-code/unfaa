@@ -24,6 +24,13 @@ const subscriptionPlanApi = api.injectEndpoints({
             }),
             providesTags: [TagType.SubscriptionPlan],
         }),
+        getSubscriptionPlanByShopId: builder.query<ResponseObject<SubscriptionPlan>, string>({
+            query: (shopId) => ({
+                url: `/subscription/shop/${shopId}`,
+                method: METHOD.GET,
+            }),
+            providesTags: [TagType.SubscriptionPlan],
+        }),
         createSubscriptionPlan: builder.mutation<ResponseObject<SubscriptionPlan>, CreateSubscriptionPlanPayload>({
             query: (payload) => ({
                 url: "/subscription",
@@ -56,6 +63,7 @@ const subscriptionPlanApi = api.injectEndpoints({
 export const {
     useGetSubscriptionPlansQuery,
     useGetSubscriptionPlanQuery,
+    useGetSubscriptionPlanByShopIdQuery,
     useCreateSubscriptionPlanMutation,
     useUpdateSubscriptionPlanMutation,
     useDeleteSubscriptionPlanMutation,

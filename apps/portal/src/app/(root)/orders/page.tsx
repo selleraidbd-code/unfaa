@@ -1,320 +1,85 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+import Link from "next/link";
 
-import { orderStatusOptions, orderStatusOptionsMobile } from "@/features/orders/data";
-import { OrderDetailsWrapper } from "@/features/orders/order-details-wrapper";
-import { OrderMobileList } from "@/features/orders/order-mobile-list";
-import { OrderTable } from "@/features/orders/order-table";
-import { PackageGroupingDialog } from "@/features/orders/package-grouping-dialog";
-import { AlertType } from "@/providers/AlertProvider";
-import { useCourierEntryMutation } from "@/redux/api/couriar-api";
-import { useBulkDeleteOrdersMutation, useGetOrdersQuery } from "@/redux/api/order-api";
+import OrdersPage from "@/features/orders/components/orders-page";
+import { useGetShopSubscriptionsQuery } from "@/redux/api/shop-subscription-api";
 import { useAppSelector } from "@/redux/store/hook";
-import { PaginationState } from "@tanstack/react-table";
-import { CustomSearch } from "@workspace/ui/components/custom/custom-search";
-import { CustomTabs, CustomTabsList, CustomTabsTrigger } from "@workspace/ui/components/custom/custom-tabs";
-import { toast } from "@workspace/ui/components/sonner";
-import { useBreakpoint } from "@workspace/ui/hooks/use-breakpoint";
-import { Bot, CheckSquare, DownloadCloud, Plus, Square, Trash2, Truck } from "lucide-react";
+import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent } from "@workspace/ui/components/card";
+import { AlertCircle, Crown } from "lucide-react";
 
-import { Order, OrderStatus } from "@/types/order-type";
-import { useAlert } from "@/hooks/useAlert";
-import { CustomButton } from "@/components/ui/custom-button";
-import { Meta } from "@/components/table/data-table";
-
-interface FilterParams {
-    searchTerm?: string;
-}
-
-const OrdersPage = () => {
+const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const isMobile = useBreakpoint();
-    const tabItems = isMobile ? orderStatusOptionsMobile : orderStatusOptions;
-    const status = searchParams.get("status") || "all";
-    const limit = Number(searchParams.get("limit")) || 50;
+    const shopId = user?.shop?.id || "";
 
-    const [filterParams, setFilterParams] = useState<FilterParams>({});
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-    const [selectedRows, setSelectedRows] = useState<Order[]>([]);
-    const [activeTab, setActiveTab] = useState<string>(status);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
-
-    const { data, isLoading, isError } = useGetOrdersQuery({
-        shopId: user?.shop?.id,
-        ...filterParams,
-        orderStatus: status === "all" ? undefined : status,
-        page: currentPage,
-        limit,
-    });
-
-    const [courierEntry, { isLoading: isCourierEntryLoading }] = useCourierEntryMutation();
-    const [bulkDeleteOrders, { isLoading: isBulkDeleteLoading }] = useBulkDeleteOrdersMutation();
-    const { fire } = useAlert();
-
-    const handleSearch = (value: string) => {
-        setFilterParams({ ...filterParams, searchTerm: value });
-        setCurrentPage(1);
-    };
-
-    const handleRowClick = (row: Order) => {
-        setSelectedOrder(row);
-    };
-
-    const handleTabClick = (tab: string) => {
-        setActiveTab(tab);
-        router.replace(`/orders?status=${tab}`);
-        setCurrentPage(1);
-        setSelectedRows([]);
-    };
-
-    const handlePaginationChange = (state: PaginationState) => {
-        setCurrentPage(state.pageIndex + 1);
-    };
-
-    const toggleSelectAll = () => {
-        const orders = data?.data || [];
-        if (selectedRows.length === orders.length) {
-            setSelectedRows([]);
-        } else {
-            setSelectedRows([...orders]);
-        }
-    };
-
-    const allSelected = (data?.data || []).length > 0 && selectedRows.length === (data?.data || []).length;
-
-    const handleCourierEntry = async () => {
-        if (!user?.shop?.id || selectedRows.length === 0) return;
-
-        const confirmedIds = selectedRows.filter((o) => o.orderStatus === OrderStatus.CONFIRMED).map((o) => o.id);
-
-        if (confirmedIds.length === 0) return toast.error("No confirmed orders to send to courier");
-
-        await courierEntry({
-            ids: confirmedIds,
-            shopId: user.shop?.id,
-        })
-            .unwrap()
-            .then(() => {
-                toast.success("Orders sent to courier successfully");
-                setSelectedRows([]);
-            })
-            .catch((error) => {
-                toast.error(error.data?.message || "Failed to send orders to courier");
-                setSelectedRows([]);
-            });
-    };
-
-    const handleBulkDelete = () => {
-        if (selectedRows.length === 0) return;
-
-        const orderIds = selectedRows.map((o) => o.id);
-
-        fire({
-            title: "Delete Orders",
-            description: `Are you sure you want to delete ${selectedRows.length} order(s)? This action cannot be undone.`,
-            type: AlertType.ERROR,
-            confirmButtonOptions: {
-                variant: "destructive",
-                text: "Delete",
-            },
-            onConfirm: async () => {
-                await bulkDeleteOrders({ ids: orderIds })
-                    .unwrap()
-                    .then(() => {
-                        toast.success("Orders deleted successfully");
-                        setSelectedRows([]);
-                    })
-                    .catch((error) => {
-                        toast.error(error.data?.message || "Failed to delete orders");
-                        setSelectedRows([]);
-                    });
-            },
-        });
-    };
-
-    const meta: Meta = {
-        total: data?.meta?.total || 0,
-        page: currentPage,
-        limit: Number(limit),
-    };
-
-    return (
-        <>
-            <div className="grid gap-2 md:gap-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h1 className="title">Orders ( {data?.meta?.total || 0} )</h1>
-
-                    <div className="ms-auto flex items-center gap-2 md:gap-4">
-                        <CustomButton variant="accent" className="hidden">
-                            <DownloadCloud />
-                            Export
-                        </CustomButton>
-
-                        <CustomButton href="/ai-order">
-                            <Bot />
-                            AI <span className="max-sm:hidden">Order</span>
-                        </CustomButton>
-
-                        <CustomButton href="/make-order">
-                            <Plus />
-                            Create <span className="max-sm:hidden">Order</span>
-                        </CustomButton>
-                    </div>
-                </div>
-
-                <CustomTabs value={activeTab} onValueChange={handleTabClick}>
-                    <CustomTabsList>
-                        {tabItems.map((tab) => {
-                            const Icon = tab.icon;
-                            return (
-                                <CustomTabsTrigger
-                                    key={tab.value}
-                                    value={tab.value}
-                                    icon={Icon ? <Icon className="size-4 lg:size-5" /> : undefined}
-                                >
-                                    {tab.label}
-                                </CustomTabsTrigger>
-                            );
-                        })}
-                    </CustomTabsList>
-                </CustomTabs>
-
-                {activeTab === OrderStatus.CONFIRMED ? (
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 sm:gap-4">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Total: {data?.meta?.total || 0}</p>
-                            {(data?.data || []).length > 0 && (
-                                <button
-                                    onClick={toggleSelectAll}
-                                    className="text-primary hover:text-primary/80 flex items-center gap-2 text-sm font-medium transition-colors"
-                                >
-                                    {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
-                                    <span>
-                                        {allSelected ? (
-                                            <>
-                                                Deselect <span className="max-sm:hidden">All</span>
-                                            </>
-                                        ) : (
-                                            "Select All"
-                                        )}
-                                    </span>
-                                </button>
-                            )}
-                            {selectedRows.length > 0 && (
-                                <p className="text-primary text-sm font-medium">
-                                    {selectedRows.length} <span className="max-sm:hidden">selected</span>
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <CustomButton variant="outline" onClick={() => setIsPackageDialogOpen(true)}>
-                                Package
-                            </CustomButton>
-                            <CustomButton
-                                onClick={handleCourierEntry}
-                                disabled={selectedRows.length === 0 || isCourierEntryLoading}
-                            >
-                                <Truck />
-                                Send
-                                <span className="max-sm:hidden">to Courier</span>
-                            </CustomButton>
-                        </div>
-                    </div>
-                ) : activeTab === OrderStatus.PLACED ? (
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2 sm:gap-4">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Total: {data?.meta?.total || 0}</p>
-                            {(data?.data || []).length > 0 && (
-                                <button
-                                    onClick={toggleSelectAll}
-                                    className="text-primary hover:text-primary/80 flex items-center gap-2 text-sm font-medium transition-colors"
-                                >
-                                    {allSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
-                                    <span>
-                                        {allSelected ? (
-                                            <>
-                                                Deselect <span className="max-sm:hidden">All</span>
-                                            </>
-                                        ) : (
-                                            "Select All"
-                                        )}
-                                    </span>
-                                </button>
-                            )}
-                            {selectedRows.length > 0 && (
-                                <p className="text-primary text-sm font-medium">
-                                    {selectedRows.length} <span className="max-sm:hidden">selected</span>
-                                </p>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <CustomButton
-                                onClick={handleBulkDelete}
-                                disabled={selectedRows.length === 0 || isBulkDeleteLoading}
-                                variant="destructive"
-                            >
-                                <Trash2 />
-                                Delete
-                                <span className="max-sm:hidden">Selected</span>
-                            </CustomButton>
-                        </div>
-                    </div>
-                ) : (
-                    <CustomSearch onSearch={handleSearch} placeholder="Search orders" />
-                )}
-
-                {/* Desktop Table View */}
-                <div className="max-lg:hidden">
-                    <OrderTable
-                        data={data?.data || []}
-                        isLoading={isLoading}
-                        isError={isError}
-                        meta={meta}
-                        onPaginationChange={handlePaginationChange}
-                        onRowClick={handleRowClick}
-                        onSelectionChange={setSelectedRows}
-                        enableSelection={activeTab === OrderStatus.CONFIRMED || activeTab === OrderStatus.PLACED}
-                    />
-                </div>
-
-                {/* Mobile Card View */}
-                <div className="lg:hidden">
-                    <OrderMobileList
-                        data={data?.data || []}
-                        isLoading={isLoading}
-                        isError={isError}
-                        meta={meta}
-                        selectedRows={selectedRows}
-                        enableSelection={activeTab === OrderStatus.CONFIRMED || activeTab === OrderStatus.PLACED}
-                        onPaginationChange={handlePaginationChange}
-                        onRowClick={handleRowClick}
-                        onSelectionChange={setSelectedRows}
-                    />
-                </div>
-            </div>
-
-            {selectedOrder && (
-                <OrderDetailsWrapper
-                    open={!!selectedOrder}
-                    onOpenChange={() => setSelectedOrder(null)}
-                    order={selectedOrder}
-                />
-            )}
-
-            <PackageGroupingDialog
-                isOpen={isPackageDialogOpen}
-                onClose={() => setIsPackageDialogOpen(false)}
-                orders={data?.data || []}
-            />
-        </>
+    const { data: shopSubscriptions, isLoading } = useGetShopSubscriptionsQuery(
+        {
+            shopId,
+        },
+        { skip: !shopId }
     );
+
+    const hasActiveSubscription = useMemo(() => {
+        const items = shopSubscriptions?.data ?? [];
+        return items.length > 0;
+    }, [shopSubscriptions]);
+
+    if (isLoading) {
+        return (
+            <div className="flex h-[50vh] items-center justify-center">
+                <div className="text-muted-foreground">Loading...</div>
+            </div>
+        );
+    }
+
+    if (!hasActiveSubscription) {
+        return (
+            <div className="flex min-h-[60vh] items-center justify-center p-4">
+                <Card className="w-full max-w-2xl border-orange-200 bg-orange-50/50 dark:border-orange-800 dark:bg-orange-950/20">
+                    <CardContent className="space-y-6 p-8 text-center">
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
+                            <Crown className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+                        </div>
+
+                        <div className="space-y-2">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                                Subscription Required
+                            </h2>
+                            <p className="text-muted-foreground text-base">
+                                To access the orders page and manage your orders, you need an active subscription plan.
+                            </p>
+                        </div>
+
+                        <div className="flex items-start gap-3 rounded-lg border border-orange-200 bg-white p-4 text-left dark:border-orange-800 dark:bg-orange-950/10">
+                            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-orange-600 dark:text-orange-400" />
+                            <div className="space-y-1 text-sm">
+                                <p className="font-medium text-gray-900 dark:text-gray-100">
+                                    Why do I need a subscription?
+                                </p>
+                                <p className="text-muted-foreground">
+                                    Our subscription plans unlock powerful features including order management,
+                                    analytics, customer insights, and more to help you grow your business.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                            <Button asChild size="lg" className="bg-orange-600 hover:bg-orange-700">
+                                <Link href="/subscriptions">
+                                    <Crown className="mr-2 h-4 w-4" />
+                                    View Subscription Plans
+                                </Link>
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+    return <OrdersPage user={user} />;
 };
 
-export default OrdersPage;
+export default Page;

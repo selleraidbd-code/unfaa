@@ -83,7 +83,7 @@ export const SellerEmployeeDashboard = ({ shopId, isOwner }: SellerEmployeeDashb
             <ShopCurrentDetailsStats data={shopCurrentDetails} isOwner={isOwner} />
 
             {/* Date Range Picker */}
-            <div className="bg-card flex items-center justify-between gap-4 rounded-lg border p-3">
+            <div className="bg-card flex items-center justify-between gap-4 rounded-lg border p-3 max-sm:flex-col">
                 <div className="flex-1">
                     <h3 className="text-sm font-medium">Filter Orders by Date</h3>
                     <p className="text-muted-foreground text-xs">

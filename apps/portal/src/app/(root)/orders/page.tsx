@@ -10,6 +10,8 @@ import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { AlertCircle, Crown } from "lucide-react";
 
+import { ShopSubscriptionStatus } from "@/types/shop-subscription-type";
+
 const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
     const shopId = user?.shop?.id || "";
@@ -26,6 +28,11 @@ const Page = () => {
         return items.length > 0;
     }, [shopSubscriptions]);
 
+    const isActiveSubscription = useMemo(() => {
+        const items = shopSubscriptions?.data ?? [];
+        return items.length > 0 && items[0]?.status === ShopSubscriptionStatus.ACTIVE;
+    }, [shopSubscriptions]);
+
     if (isLoading) {
         return (
             <div className="flex h-[50vh] items-center justify-center">
@@ -34,7 +41,7 @@ const Page = () => {
         );
     }
 
-    if (!hasActiveSubscription) {
+    if (!hasActiveSubscription || !isActiveSubscription) {
         return (
             <div className="flex min-h-[60vh] items-center justify-center p-4">
                 <Card className="w-full max-w-2xl border-orange-200 bg-orange-50/50 dark:border-orange-800 dark:bg-orange-950/20">

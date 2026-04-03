@@ -39,6 +39,13 @@ const shopSubscriptionApi = api.injectEndpoints({
             }),
             invalidatesTags: [TagType.ShopSubscription],
         }),
+        deleteShopSubscription: builder.mutation<void, string>({
+            query: (id) => ({
+                url: `/shop-subscription/${id}`,
+                method: METHOD.DELETE,
+            }),
+            invalidatesTags: [TagType.ShopSubscription],
+        }),
     }),
 });
 
@@ -46,4 +53,5 @@ export const {
     useCreateShopSubscriptionMutation,
     useGetShopSubscriptionsQuery,
     useUpdateShopSubscriptionStatusMutation,
+    useDeleteShopSubscriptionMutation,
 } = shopSubscriptionApi;

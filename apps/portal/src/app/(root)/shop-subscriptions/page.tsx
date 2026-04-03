@@ -1,9 +1,11 @@
 "use client";
 
 import {
+    useDeleteShopSubscriptionMutation,
     useGetShopSubscriptionsQuery,
     useUpdateShopSubscriptionStatusMutation,
 } from "@/redux/api/shop-subscription-api";
+import { useAlert } from "@/hooks/useAlert";
 import { useAppSelector } from "@/redux/store/hook";
 import { UserRole } from "@/types";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
@@ -17,13 +19,15 @@ import { ShopSubscriptionStatus, type ShopSubscription } from "@/types/shop-subs
 import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
 
-const ShopSubscriptionsPage = () => {
+const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
     const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
+    const { fire } = useAlert();
 
     const { data, isLoading, isError } = useGetShopSubscriptionsQuery({});
 
     const [updateStatus, { isLoading: isUpdating }] = useUpdateShopSubscriptionStatusMutation();
+    const [deleteShopSubscription, { isLoading: isDeleting }] = useDeleteShopSubscriptionMutation();
 
     const subscriptions = data?.data ?? [];
 
@@ -53,6 +57,25 @@ const ShopSubscriptionsPage = () => {
         } catch {
             toast.error("Failed to expire subscription.");
         }
+    };
+
+    const handleDelete = (item: ShopSubscription) => {
+        fire({
+            title: "Delete shop subscription?",
+            description:
+                "This will permanently remove this shop subscription record. This action cannot be undone.",
+            onConfirm: async () => {
+                await deleteShopSubscription(item.id)
+                    .unwrap()
+                    .then(() => {
+                        toast.success("Shop subscription deleted.");
+                    })
+                    .catch((err: { data?: { message?: string } }) => {
+                        toast.error(err?.data?.message || "Failed to delete shop subscription.");
+                    });
+            },
+            confirmButtonOptions: { variant: "destructive", text: "Delete" },
+        });
     };
 
     const columns: ColumnDef<ShopSubscription>[] = [
@@ -108,29 +131,36 @@ const ShopSubscriptionsPage = () => {
             header: "Actions",
             cell: ({ row }) => {
                 const item = row.original;
+                const busy = isUpdating || isDeleting;
 
-                if (item.status === ShopSubscriptionStatus.UNDER_REVIEW) {
-                    return (
-                        <Button size="sm" onClick={() => handleApprove(item)} disabled={isUpdating}>
-                            Accept
-                        </Button>
-                    );
-                }
-
-                if (item.status === ShopSubscriptionStatus.ACTIVE) {
-                    return (
+                return (
+                    <div className="flex flex-wrap items-center gap-2">
+                        {item.status === ShopSubscriptionStatus.UNDER_REVIEW && (
+                            <Button size="sm" onClick={() => handleApprove(item)} disabled={busy}>
+                                Accept
+                            </Button>
+                        )}
+                        {item.status === ShopSubscriptionStatus.ACTIVE && (
+                            <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleExpire(item)}
+                                disabled={busy}
+                            >
+                                Mark as Expired
+                            </Button>
+                        )}
                         <Button
                             size="sm"
-                            variant="destructive"
-                            onClick={() => handleExpire(item)}
-                            disabled={isUpdating}
+                            variant="outline"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => handleDelete(item)}
+                            disabled={busy}
                         >
-                            Mark as Expired
+                            Delete
                         </Button>
-                    );
-                }
-
-                return <span className="text-muted-foreground text-xs">No actions</span>;
+                    </div>
+                );
             },
         },
     ];
@@ -173,4 +203,4 @@ const ShopSubscriptionsPage = () => {
     );
 };
 
-export default ShopSubscriptionsPage;
+export default Page;

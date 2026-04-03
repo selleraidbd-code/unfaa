@@ -1,8 +1,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { User } from "@/features/auth/auth-type";
 import { setTokens, setUser } from "@/redux/slices/auth-slice";
 import { useAppDispatch } from "@/redux/store/hook";
-import { User } from "@/features/auth/auth-type";
 
 export const useAuthSuccess = () => {
     const router = useRouter();
@@ -22,6 +22,8 @@ export const useAuthSuccess = () => {
         path?: string;
     }) => {
         dispatch(setTokens({ accessToken, refreshToken }));
+
+        console.log("user", user);
 
         if (user) {
             dispatch(setUser(user));

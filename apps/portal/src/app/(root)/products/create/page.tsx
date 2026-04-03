@@ -46,7 +46,6 @@ const AddProduct = () => {
         discountPrice: 0,
         photoURL: "",
         images: [],
-        keywords: "",
         stock: 0,
         categoryIds: [],
         description: "",
@@ -61,6 +60,8 @@ const AddProduct = () => {
         resolver: zodResolver(createProductSchema),
         defaultValues,
     });
+
+    console.log("form errors", form.formState.errors);
 
     // Initialize draft hook
     const { saveDraft, autoSave, debouncedAutoSave, clearDraft } = useProductDraft({
@@ -236,7 +237,13 @@ const AddProduct = () => {
                     <CustomCollapsible
                         title="Product Images"
                         content={
-                            <div className="max-w-6xl sm:pt-2">
+                            <div className="max-w-6xl space-y-2 sm:pt-2">
+                                {form.formState.errors.photoURL && (
+                                    <p className="text-red-500">{form.formState.errors.photoURL.message}</p>
+                                )}
+                                {form.formState.errors.images && (
+                                    <p className="text-red-500">{form.formState.errors.images.message}</p>
+                                )}
                                 <PhotoGridUpload
                                     photoURL={form.watch("photoURL")}
                                     images={form.watch("images")}
@@ -378,15 +385,6 @@ const AddProduct = () => {
                                         <p className="text-red-500">{form.formState.errors.fullDescription.message}</p>
                                     )}
                                 </div>
-                                <CustomFormTextarea
-                                    label="Keywords ( For SEO )"
-                                    name="keywords"
-                                    rows={3}
-                                    control={form.control}
-                                    placeholder="Enter Your keywords"
-                                    required
-                                    className="col-span-2"
-                                />
                             </div>
                         }
                     />

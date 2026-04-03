@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { AboutSection } from "@/features/landing-builder/components/about-section";
 import { BasicInfoSection } from "@/features/landing-builder/components/basic-info-section";
 import { BuilderHeader } from "@/features/landing-builder/components/builder-header";
+import { DescriptionSection } from "@/features/landing-builder/components/description-section";
 import { FAQSection } from "@/features/landing-builder/components/faq-section";
 import { FeaturedProductsSection } from "@/features/landing-builder/components/featured-products-section";
 import { FeaturedProductsSelectionDialog } from "@/features/landing-builder/components/featured-products-selection-dialog";
+import { FeaturesListSection } from "@/features/landing-builder/components/features-list-section";
 import { FeaturesSection } from "@/features/landing-builder/components/features-section";
 import { PackageSection } from "@/features/landing-builder/components/package-section";
 import { TestimonialsSection } from "@/features/landing-builder/components/testimonials-section";
@@ -34,90 +36,6 @@ import {
 } from "@/types/landing-page-type";
 import { formatPhoneNumber } from "@/lib/format-number-utils";
 import { CustomButton } from "@/components/ui/custom-button";
-
-function getDefaultValuesFromLandingPage(landingPage?: LandingPageDemo): LandingPageFormValues {
-    const base = { ...defaultLandingPageFormValues };
-
-    if (!landingPage) return base;
-
-    base.name = landingPage.name || "";
-
-    const contactSection = landingPage.section?.find((s) => s.sectionType === EComponentType.CTA);
-    if (contactSection) {
-        base.contact = {
-            whatsappNumber: contactSection.title || "",
-            facebookPageId: contactSection.subTitle || "",
-            specialNote: contactSection.buttonText || "",
-            primaryColor: contactSection.imgURL || "",
-            secondaryColor: contactSection.bgURL || "",
-        };
-    }
-
-    const faqSection = landingPage.section?.find((s) => s.sectionType === EComponentType.FAQ);
-    if (faqSection?.sectionList?.length) {
-        base.faq = {
-            title: faqSection.title || "",
-            subTitle: faqSection.subTitle || "",
-            items: faqSection.sectionList.map((item, i) => ({
-                id: item.id || `${Date.now()}-${i}`,
-                question: item.title || "",
-                answer: item.description || "",
-            })),
-        };
-    } else {
-        base.faq.items = [{ id: crypto.randomUUID?.() ?? Date.now().toString(), question: "", answer: "" }];
-    }
-
-    const featuresSection = landingPage.section?.find((s) => s.sectionType === EComponentType.FEATURES);
-    if (featuresSection?.sectionList?.length) {
-        base.features = {
-            title: featuresSection.title || "",
-            subTitle: featuresSection.subTitle || "",
-            items: featuresSection.sectionList.map((item, i) => ({
-                id: item.id || `${Date.now()}-${i}`,
-                title: item.title || "",
-                description: item.description || "",
-            })),
-        };
-    }
-
-    const testimonialsSection = landingPage.section?.find((s) => s.sectionType === EComponentType.TESTIMONIALS);
-    if (testimonialsSection?.sectionList?.length) {
-        const imageUrls = testimonialsSection.sectionList.map((item) => item.imgURL).filter(Boolean) as string[];
-        if (imageUrls.length > 0) {
-            base.testimonials = {
-                title: testimonialsSection.title || "",
-                subTitle: testimonialsSection.subTitle || "",
-                images: imageUrls,
-            };
-        }
-    }
-
-    const aboutSection = landingPage.section?.find((s) => s.sectionType === EComponentType.HERO);
-    if (aboutSection?.sectionList?.length) {
-        base.about = {
-            title: aboutSection.title || "",
-            subTitle: aboutSection.subTitle || "",
-            imgURL: aboutSection.imgURL || "",
-            items: aboutSection.sectionList.map((item, i) => ({
-                id: item.id || `${Date.now()}-${i}`,
-                title: item.title || "",
-                description: item.description || "",
-            })),
-        };
-    }
-
-    const featureProducts = (landingPage as { featureProducts?: { productId?: string; product?: { id: string } }[] })
-        ?.featureProducts;
-    if (featureProducts && Array.isArray(featureProducts)) {
-        const ids = featureProducts
-            .map((fp) => fp.productId || fp.product?.id)
-            .filter((id): id is string => Boolean(id));
-        if (ids.length > 0) base.selectedProductIds = ids;
-    }
-
-    return base;
-}
 
 type EasyModeBuilderProps = {
     productId: string;
@@ -285,6 +203,46 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
             }
         }
 
+        const descItems = values.descriptionSection?.items ?? [];
+        const hasDescriptionData =
+            values.descriptionSection?.title?.trim() ||
+            values.descriptionSection?.description?.trim() ||
+            descItems.some((i) => i?.text?.trim());
+        if (hasDescriptionData) {
+            const validDescItems = descItems.filter((i) => i?.text?.trim());
+            const descSectionList: CreateSectionListPayload[] = validDescItems.map((item) => ({
+                title: item.text,
+            }));
+            sections.push({
+                index: sectionIndex++,
+                componentName: "Description",
+                sectionType: EComponentType.ABOUT,
+                title: values.descriptionSection?.title?.trim() || undefined,
+                subTitle: values.descriptionSection?.description?.trim() || undefined,
+                sectionList: descSectionList,
+            });
+        }
+
+        const featuresListItems = values.featuresListSection?.items ?? [];
+        const hasFeaturesListData =
+            values.featuresListSection?.title?.trim() ||
+            values.featuresListSection?.description?.trim() ||
+            featuresListItems.some((i) => i?.text?.trim());
+        if (hasFeaturesListData) {
+            const validFeaturesListItems = featuresListItems.filter((i) => i?.text?.trim());
+            const featuresListSectionList: CreateSectionListPayload[] = validFeaturesListItems.map((item) => ({
+                title: item.text,
+            }));
+            sections.push({
+                index: sectionIndex++,
+                componentName: "FeaturesList",
+                sectionType: EComponentType.BLOG,
+                title: values.featuresListSection?.title?.trim() || undefined,
+                subTitle: values.featuresListSection?.description?.trim() || undefined,
+                sectionList: featuresListSectionList,
+            });
+        }
+
         const data: CreateLandingPagePayload = {
             name: values.name.trim(),
             productId,
@@ -307,7 +265,7 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
 
     return (
         <FormProvider {...form}>
-            <div className="landing-width space-y-4 lg:space-y-6 lg:p-6">
+            <div className="landing-width space-y-4 lg:space-y-6 lg:px-4">
                 <BuilderHeader
                     title="Easy Landing Page Builder"
                     subtitle="Create your landing page in just a few simple steps"
@@ -325,6 +283,10 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
                     )}
 
                     <TestimonialsSection />
+
+                    <DescriptionSection />
+
+                    <FeaturesListSection />
 
                     <FAQSection landingPage={landingPage} />
 
@@ -361,3 +323,123 @@ export const EasyModeBuilder = ({ productId, mode, landingPage }: EasyModeBuilde
         </FormProvider>
     );
 };
+
+function getDefaultValuesFromLandingPage(landingPage?: LandingPageDemo): LandingPageFormValues {
+    const base = { ...defaultLandingPageFormValues };
+
+    if (!landingPage) return base;
+
+    base.name = landingPage.name || "";
+
+    const contactSection = landingPage.section?.find((s) => s.sectionType === EComponentType.CTA);
+    if (contactSection) {
+        base.contact = {
+            whatsappNumber: contactSection.title || "",
+            facebookPageId: contactSection.subTitle || "",
+            specialNote: contactSection.buttonText || "",
+            primaryColor: contactSection.imgURL || "",
+            secondaryColor: contactSection.bgURL || "",
+        };
+    }
+
+    const faqSection = landingPage.section?.find((s) => s.sectionType === EComponentType.FAQ);
+    if (faqSection?.sectionList?.length) {
+        base.faq = {
+            title: faqSection.title || "",
+            subTitle: faqSection.subTitle || "",
+            items: faqSection.sectionList.map((item, i) => ({
+                id: item.id || `${Date.now()}-${i}`,
+                question: item.title || "",
+                answer: item.description || "",
+            })),
+        };
+    } else {
+        base.faq.items = [{ id: crypto.randomUUID?.() ?? Date.now().toString(), question: "", answer: "" }];
+    }
+
+    const featuresSection = landingPage.section?.find((s) => s.sectionType === EComponentType.FEATURES);
+    if (featuresSection?.sectionList?.length) {
+        base.features = {
+            title: featuresSection.title || "",
+            subTitle: featuresSection.subTitle || "",
+            items: featuresSection.sectionList.map((item, i) => ({
+                id: item.id || `${Date.now()}-${i}`,
+                title: item.title || "",
+                description: item.description || "",
+            })),
+        };
+    }
+
+    const testimonialsSection = landingPage.section?.find((s) => s.sectionType === EComponentType.TESTIMONIALS);
+    if (testimonialsSection?.sectionList?.length) {
+        const imageUrls = testimonialsSection.sectionList.map((item) => item.imgURL).filter(Boolean) as string[];
+        if (imageUrls.length > 0) {
+            base.testimonials = {
+                title: testimonialsSection.title || "",
+                subTitle: testimonialsSection.subTitle || "",
+                images: imageUrls,
+            };
+        }
+    }
+
+    const aboutSection = landingPage.section?.find((s) => s.sectionType === EComponentType.HERO);
+    if (aboutSection?.sectionList?.length) {
+        base.about = {
+            title: aboutSection.title || "",
+            subTitle: aboutSection.subTitle || "",
+            imgURL: aboutSection.imgURL || "",
+            items: aboutSection.sectionList.map((item, i) => ({
+                id: item.id || `${Date.now()}-${i}`,
+                title: item.title || "",
+                description: item.description || "",
+            })),
+        };
+    }
+
+    const descriptionSection = landingPage.section?.find(
+        (s) => s.sectionType === EComponentType.ABOUT && s.componentName === "Description"
+    );
+    if (descriptionSection) {
+        const items =
+            descriptionSection.sectionList
+                ?.filter((item) => item.title?.trim())
+                .map((item, i) => ({
+                    id: item.id || `${Date.now()}-${i}`,
+                    text: item.title || "",
+                })) ?? [];
+        base.descriptionSection = {
+            title: descriptionSection.title || "",
+            description: descriptionSection.subTitle || "",
+            items: items.length > 0 ? items : [{ id: crypto.randomUUID?.() ?? Date.now().toString(), text: "" }],
+        };
+    }
+
+    const featuresListSection = landingPage.section?.find(
+        (s) => s.sectionType === EComponentType.BLOG && s.componentName === "FeaturesList"
+    );
+    if (featuresListSection) {
+        const items =
+            featuresListSection.sectionList
+                ?.filter((item) => item.title?.trim())
+                .map((item, i) => ({
+                    id: item.id || `${Date.now()}-${i}`,
+                    text: item.title || "",
+                })) ?? [];
+        base.featuresListSection = {
+            title: featuresListSection.title || "",
+            description: featuresListSection.subTitle || "",
+            items: items.length > 0 ? items : [{ id: crypto.randomUUID?.() ?? Date.now().toString(), text: "" }],
+        };
+    }
+
+    const featureProducts = (landingPage as { featureProducts?: { productId?: string; product?: { id: string } }[] })
+        ?.featureProducts;
+    if (featureProducts && Array.isArray(featureProducts)) {
+        const ids = featureProducts
+            .map((fp) => fp.productId || fp.product?.id)
+            .filter((id): id is string => Boolean(id));
+        if (ids.length > 0) base.selectedProductIds = ids;
+    }
+
+    return base;
+}

@@ -10,14 +10,15 @@ import { ProductPricing } from "@/features/product/components/product-pricing";
 import { ProductVideo } from "@/features/product/components/product-video";
 import { ProductWarranty } from "@/features/product/components/product-warranty";
 import { useOrderForm } from "@/features/product/hooks/use-order-form";
-import { FAQ01 } from "@/features/shop/landing-page/components/faq-1";
+import { DescriptionDisplay } from "@/features/shop/landing-page/components/description-display";
+import { FAQ02 } from "@/features/shop/landing-page/components/faq-2";
+import { FeaturesListDisplay } from "@/features/shop/landing-page/components/features-list-display";
 import { LandingFeaturedProducts } from "@/features/shop/landing-page/components/landing-featured-products";
 import { LandingFooter } from "@/features/shop/landing-page/components/landing-footer";
 import { Testimonials } from "@/features/shop/landing-page/components/testimonials";
 import { EComponentType } from "@workspace/ui/landing/types";
 
 import { LandingPage } from "@/types/landing-type";
-import { HtmlRenderer } from "@/components/shared/html-renderer";
 
 type Props = {
     landingPage: LandingPage;
@@ -41,6 +42,16 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
 
     // Find Contact section
     const contactSection = sections?.find((s) => s.sectionType === EComponentType.CTA);
+
+    // Find Description section (title + description text + bullet points)
+    const descriptionSection = sections?.find(
+        (s) => s.sectionType === EComponentType.ABOUT && s.componentName === "Description"
+    );
+
+    // Find Features List section (title + description + simple feature points)
+    const featuresListSection = sections?.find(
+        (s) => s.sectionType === EComponentType.BLOG && s.componentName === "FeaturesList"
+    );
 
     const discountPercent = useMemo(
         () =>
@@ -99,10 +110,7 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
 
                     <ProductPricing price={product.price} discountPrice={product.discountPrice} />
 
-                    <div className="mb-4 rounded-xl border-l-4 border-[var(--theme-primary)] bg-[var(--theme-secondary)] p-5 lg:border-l-6">
-                        <h3 className="mb-3 text-xl font-bold text-[var(--theme-primary)]">সংক্ষিপ্ত বিবরণ</h3>
-                        <HtmlRenderer html={product.description} />
-                    </div>
+                    {descriptionSection && <DescriptionDisplay section={descriptionSection} />}
 
                     {firstImage && (
                         <Image
@@ -122,10 +130,7 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
                         />
                     )}
 
-                    <div className="mb-4 rounded-xl border-l-4 border-gray-500 bg-gray-100 p-5 lg:border-l-6">
-                        <h3 className="mb-3 text-xl font-bold text-gray-700">বিস্তারিত বিবরণ</h3>
-                        <HtmlRenderer html={product.fullDescription} />
-                    </div>
+                    {featuresListSection && <FeaturesListDisplay section={featuresListSection} />}
                     {secondImage && (
                         <Image
                             src={secondImage}
@@ -151,7 +156,7 @@ export const LandingPage01 = ({ landingPage, domain }: Props) => {
 
                     {product.videoLink && <ProductVideo videoLink={product.videoLink} />}
 
-                    {faqSection && <FAQ01 section={faqSection} />}
+                    {faqSection && <FAQ02 section={faqSection} />}
 
                     <OrderSection
                         theme={{ primary: theme.primary, secondary: theme.secondary }}

@@ -87,7 +87,6 @@ export interface ProductCeratePayload {
     discountPrice?: number;
     photoURL: string;
     images: string[];
-    keywords: string;
     stock: number;
     activeStatus: "active" | "inactive";
     shopId: string;

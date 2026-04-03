@@ -1,4 +1,5 @@
 import { Shop } from "@/types/shop-type";
+import { SubscriptionPlan } from "@/types/subscription-plan-type";
 
 export enum ShopSubscriptionStatus {
     ACTIVE = "active",
@@ -15,6 +16,7 @@ export interface ShopSubscription {
     createdAt: string;
     updatedAt: string;
     shop?: Shop;
+    subscription?: SubscriptionPlan;
 }
 
 export interface ShopSubscriptionCreatePayload {

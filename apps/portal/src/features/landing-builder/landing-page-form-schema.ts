@@ -12,6 +12,11 @@ const featureItemSchema = z.object({
     description: z.string(),
 });
 
+const textListItemSchema = z.object({
+    id: z.string(),
+    text: z.string(),
+});
+
 export const landingPageFormSchema = z.object({
     name: z.string().min(1, "Please enter a landing page name"),
     contact: z.object({
@@ -41,6 +46,16 @@ export const landingPageFormSchema = z.object({
         subTitle: z.string().optional(),
         imgURL: z.string(), // video or thumbnail URL for right side
         items: z.array(featureItemSchema), // left side list: title + description
+    }),
+    descriptionSection: z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        items: z.array(textListItemSchema),
+    }),
+    featuresListSection: z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        items: z.array(textListItemSchema),
     }),
     selectedProductIds: z.array(z.string()),
 });
@@ -88,6 +103,16 @@ export const defaultLandingPageFormValues: LandingPageFormValues = {
                 description: "",
             },
         ],
+    },
+    descriptionSection: {
+        title: "",
+        description: "",
+        items: [{ id: crypto.randomUUID?.() ?? Date.now().toString(), text: "" }],
+    },
+    featuresListSection: {
+        title: "",
+        description: "",
+        items: [{ id: crypto.randomUUID?.() ?? Date.now().toString(), text: "" }],
     },
     selectedProductIds: [],
 };

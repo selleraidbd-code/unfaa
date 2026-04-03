@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
     useDeleteShopSubscriptionMutation,
     useGetShopSubscriptionsQuery,
@@ -25,9 +27,11 @@ const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
     const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
     const { fire } = useAlert();
+    const [searchTerm, setSearchTerm] = useState<string>("");
 
     const { data, isLoading, isError } = useGetShopSubscriptionsQuery({
         limit: PAGE_SIZE,
+        searchTerm: searchTerm || undefined,
     });
 
     const [updateStatus, { isLoading: isUpdating }] = useUpdateShopSubscriptionStatusMutation();
@@ -120,6 +124,11 @@ const Page = () => {
             ),
         },
         {
+            accessorKey: "subscription",
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Subscription" />,
+            cell: ({ row }) => <span className="font-mono text-xs">{row.original.subscription?.name}</span>,
+        },
+        {
             accessorKey: "shop",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Shop" />,
             cell: ({ row }) => <span className="font-mono text-xs">{row.original.shop?.name}</span>,
@@ -128,11 +137,6 @@ const Page = () => {
             accessorKey: "createdAt",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
             cell: ({ row }) => <span>{formatDateWithTime(row.original.createdAt)}</span>,
-        },
-        {
-            accessorKey: "updatedAt",
-            header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
-            cell: ({ row }) => <span>{formatDateWithTime(row.original.updatedAt)}</span>,
         },
         {
             id: "actions",
@@ -176,6 +180,10 @@ const Page = () => {
 
     const handlePaginationChange = (_state: PaginationState) => {};
 
+    const handleSearch = (search: string) => {
+        setSearchTerm(search);
+    };
+
     if (!isAdmin) {
         return (
             <div className="mx-auto max-w-5xl px-4 py-8">
@@ -193,7 +201,7 @@ const Page = () => {
                 data={subscriptions}
                 columns={columns}
                 showViewOptions={false}
-                onSearch={undefined}
+                onSearch={handleSearch}
                 pagination
                 paginationMeta={meta}
                 onPaginationChange={handlePaginationChange}

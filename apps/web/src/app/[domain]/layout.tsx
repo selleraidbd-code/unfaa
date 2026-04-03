@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getShopDetails, getShops } from "@/actions/shop-actions";
+import { getShopDetails } from "@/actions/shop-actions";
 import { ShopProvider } from "@/contexts/shop-context";
 
 import { ShopNotFound } from "@/components/shop-not-found";
@@ -8,20 +8,20 @@ import { TrackingPixels } from "@/components/tracking-pixels";
 
 // Enable ISR with revalidation time (300 seconds = 5 minutes)
 // Next.js requires a literal number, not a variable
-export const revalidate = 300;
+// export const revalidate = 300;
 
 // Generate static params for all shops at build time
-export async function generateStaticParams() {
-    const shops = await getShops();
+// export async function generateStaticParams() {
+//     const shops = await getShops();
 
-    if (!shops?.data) {
-        return [];
-    }
+//     if (!shops?.data) {
+//         return [];
+//     }
 
-    return shops.data.map((shop) => ({
-        domain: shop.slug,
-    }));
-}
+//     return shops.data.map((shop) => ({
+//         domain: shop.slug,
+//     }));
+// }
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
     const { domain } = await params;

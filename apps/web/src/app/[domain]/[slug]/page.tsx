@@ -13,25 +13,25 @@ type Props = {
 };
 
 // Function to fetch all available slugs for static generation
-// export async function generateStaticParams() {
-//     try {
-//         const response = await getLandingPages();
-//         if (!response?.data) {
-//             return [];
-//         }
-//         return response.data.map((layout: LandingPage) => ({
-//             slug: layout.slug,
-//         }));
-//     } catch (error) {
-//         console.error("Error fetching landing page layouts:", error);
-//         return [];
-//     }
-// }
+export async function generateStaticParams() {
+    try {
+        const response = await getLandingPages();
+        if (!response?.data) {
+            return [];
+        }
+        return response.data.map((layout: LandingPage) => ({
+            slug: layout.slug,
+        }));
+    } catch (error) {
+        console.error("Error fetching landing page layouts:", error);
+        return [];
+    }
+}
 
 async function getShopLayoutDetails(slug: string, shopSlug: string) {
     try {
         const response = await fetch(`${config.serverUrl}/landingPageLayout/details/${slug}/${shopSlug}`, {
-            // next: { revalidate: REVALIDATE_TIME },
+            next: { revalidate: REVALIDATE_TIME },
         });
         if (!response.ok) {
             throw new Error("Failed to fetch shop layout details");

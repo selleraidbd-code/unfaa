@@ -68,7 +68,6 @@ const EditProduct = () => {
                   discountPrice: product.data.discountPrice || 0,
                   photoURL: product.data.photoURL || "",
                   images: product.data.images || [],
-                  keywords: product.data.keywords || "",
                   stock: product.data.stock || 0,
                   categoryIds: product?.data?.categories?.map((category) => category.categoryId) || [],
                   description: product.data.description || "",
@@ -139,7 +138,6 @@ const EditProduct = () => {
             discountPrice: product.data.discountPrice || 0,
             photoURL: product.data.photoURL || "",
             images: product.data.images || [],
-            keywords: product.data.keywords || "",
             stock: product.data.stock || 0,
             categoryIds: product?.data?.categories?.map((category) => category.categoryId) || [],
             description: product.data.description || "",
@@ -431,15 +429,6 @@ const EditProduct = () => {
                                         }}
                                     />
                                 </div>
-
-                                <CustomFormTextarea
-                                    label="Keywords ( For SEO )"
-                                    name="keywords"
-                                    rows={3}
-                                    control={form.control}
-                                    placeholder="Enter Your keywords"
-                                    required
-                                />
                             </div>
                         }
                     />

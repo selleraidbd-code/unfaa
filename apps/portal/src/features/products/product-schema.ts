@@ -35,7 +35,6 @@ const productBaseSchema = z.object({
     discountPrice: z.number({ invalid_type_error: "Discount price must be a number" }).optional(),
     photoURL: z.string().min(1, { message: "Product image is required" }),
     images: z.array(z.string()),
-    keywords: z.string().min(1, { message: "Keywords are required" }),
     stock: z.number({ invalid_type_error: "Stock must be a number" }).min(1, { message: "Stock must be positive" }),
     sku: z.string().optional(),
     unitName: z.string().optional(),

@@ -73,7 +73,6 @@ export const ProductBulkCreator = () => {
             discountPrice: product.price || undefined, // Current/discount price
             photoURL: product.thumbnailImg || "",
             images: images,
-            keywords: product.name, // Using product name as keywords
             stock: product.stock,
             activeStatus: product.activeStatus,
             shopId: product.shopId,

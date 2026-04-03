@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { SubscriptionCard, type SubscriptionCardPlan } from "@/features/subscription/subscription-card";
 import { SubscriptionLoadingCard } from "@/features/subscription/subscription-loading-card";
@@ -12,6 +12,21 @@ import { formatDateWithTime } from "@workspace/ui/lib/formateDate";
 
 import { ShopSubscriptionStatus, type ShopSubscription } from "@/types/shop-subscription-type";
 import type { SubscriptionPlan } from "@/types/subscription-plan-type";
+
+function pickShopSubscriptionForPlan(items: ShopSubscription[], planId: string): ShopSubscription | null {
+    const forPlan = items.filter((s) => s.subscriptionId === planId);
+    if (!forPlan.length) return null;
+    const byDate = (a: ShopSubscription, b: ShopSubscription) =>
+        +new Date(b.createdAt) - +new Date(a.createdAt);
+    const pickLatest = (status: ShopSubscriptionStatus) =>
+        forPlan.filter((s) => s.status === status).sort(byDate)[0];
+    return (
+        pickLatest(ShopSubscriptionStatus.ACTIVE) ??
+        pickLatest(ShopSubscriptionStatus.UNDER_REVIEW) ??
+        pickLatest(ShopSubscriptionStatus.EXPIRED) ??
+        null
+    );
+}
 
 function planToCard(plan: SubscriptionPlan & { discountPrice?: number }): SubscriptionCardPlan {
     const originalPrice = plan.discountPrice ?? plan.price;
@@ -41,44 +56,14 @@ const SubscriptionsPage = () => {
         isActive: "true",
     });
 
-    const { data: shopSubscriptions } = useGetShopSubscriptionsQuery(
-        {
-            shopId,
-            status: ShopSubscriptionStatus.ACTIVE,
-        },
-        { skip: !shopId }
-    );
+    const { data: shopSubscriptions } = useGetShopSubscriptionsQuery({ shopId }, { skip: !shopId });
 
     const [selectedPlan, setSelectedPlan] = useState<SubscriptionCardPlan | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
 
     const plansFromApi = data?.data ?? [];
 
-    const activeSubscription = useMemo<ShopSubscription | null>(() => {
-        const items = shopSubscriptions?.data ?? [];
-        if (!items.length) return null;
-        const latest = items.slice().sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))[0];
-        return latest ?? null;
-    }, [shopSubscriptions]);
-
-    let highlightedPlanId: string | null = null;
-    let remainingDays: number | null = null;
-    let expiryDateText: string | null = null;
-
-    if (activeSubscription && plansFromApi.length) {
-        const matchedPlan = plansFromApi.find((p) => p.id === activeSubscription.subscriptionId);
-        if (matchedPlan && matchedPlan.duration) {
-            const createdAt = new Date(activeSubscription.createdAt);
-            const expiryDate = new Date(createdAt);
-            expiryDate.setDate(expiryDate.getDate() + matchedPlan.duration);
-
-            const now = new Date();
-            const diffMs = expiryDate.getTime() - now.getTime();
-            remainingDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
-            expiryDateText = formatDateWithTime(expiryDate.toISOString());
-            highlightedPlanId = matchedPlan.id;
-        }
-    }
+    const shopSubItems = shopSubscriptions?.data ?? [];
 
     const plans: SubscriptionCardPlan[] =
         plansFromApi.length > 0
@@ -86,15 +71,28 @@ const SubscriptionsPage = () => {
                   .filter((p) => p.price > 0)
                   .map((p) => {
                       const base = planToCard({ ...p, discountPrice: p.discountPrice });
-                      if (p.id && p.id === highlightedPlanId) {
-                          return {
-                              ...base,
-                              isActive: true,
-                              remainingDays,
-                              expiryDateText,
-                          };
+                      if (!p.id) return base;
+
+                      const matched = pickShopSubscriptionForPlan(shopSubItems, p.id);
+                      if (!matched) return base;
+
+                      const next: SubscriptionCardPlan = {
+                          ...base,
+                          subscriptionStatus: matched.status,
+                          isActive: matched.status === ShopSubscriptionStatus.ACTIVE,
+                      };
+
+                      if (matched.status === ShopSubscriptionStatus.ACTIVE && p.duration) {
+                          const createdAt = new Date(matched.createdAt);
+                          const expiryDate = new Date(createdAt);
+                          expiryDate.setDate(expiryDate.getDate() + p.duration);
+                          const now = new Date();
+                          const diffMs = expiryDate.getTime() - now.getTime();
+                          next.remainingDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+                          next.expiryDateText = formatDateWithTime(expiryDate.toISOString());
                       }
-                      return base;
+
+                      return next;
                   })
             : [];
 

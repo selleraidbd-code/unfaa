@@ -67,11 +67,6 @@ const AdminNavData = [
                 icon: PanelTop,
             },
             {
-                title: "Shop Subscriptions",
-                url: "/shop-subscriptions",
-                icon: ShoppingCart,
-            },
-            {
                 title: "Manage Courses",
                 url: "/manage-courses",
                 icon: MonitorUp,

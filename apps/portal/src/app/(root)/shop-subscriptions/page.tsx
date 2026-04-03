@@ -5,7 +5,6 @@ import {
     useGetShopSubscriptionsQuery,
     useUpdateShopSubscriptionStatusMutation,
 } from "@/redux/api/shop-subscription-api";
-import { useAlert } from "@/hooks/useAlert";
 import { useAppSelector } from "@/redux/store/hook";
 import { UserRole } from "@/types";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
@@ -16,15 +15,20 @@ import { toast } from "@workspace/ui/components/sonner";
 import { formatDateWithTime } from "@workspace/ui/lib/formateDate";
 
 import { ShopSubscriptionStatus, type ShopSubscription } from "@/types/shop-subscription-type";
+import { useAlert } from "@/hooks/useAlert";
 import { DataTable, Meta } from "@/components/table/data-table";
 import { DataTableColumnHeader } from "@/components/table/data-table-column-header";
+
+const PAGE_SIZE = 20;
 
 const Page = () => {
     const user = useAppSelector((state) => state.auth.user);
     const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
     const { fire } = useAlert();
 
-    const { data, isLoading, isError } = useGetShopSubscriptionsQuery({});
+    const { data, isLoading, isError } = useGetShopSubscriptionsQuery({
+        limit: PAGE_SIZE,
+    });
 
     const [updateStatus, { isLoading: isUpdating }] = useUpdateShopSubscriptionStatusMutation();
     const [deleteShopSubscription, { isLoading: isDeleting }] = useDeleteShopSubscriptionMutation();
@@ -62,8 +66,7 @@ const Page = () => {
     const handleDelete = (item: ShopSubscription) => {
         fire({
             title: "Delete shop subscription?",
-            description:
-                "This will permanently remove this shop subscription record. This action cannot be undone.",
+            description: "This will permanently remove this shop subscription record. This action cannot be undone.",
             onConfirm: async () => {
                 await deleteShopSubscription(item.id)
                     .unwrap()
@@ -117,6 +120,11 @@ const Page = () => {
             ),
         },
         {
+            accessorKey: "shop",
+            header: ({ column }) => <DataTableColumnHeader column={column} title="Shop" />,
+            cell: ({ row }) => <span className="font-mono text-xs">{row.original.shop?.name}</span>,
+        },
+        {
             accessorKey: "createdAt",
             header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
             cell: ({ row }) => <span>{formatDateWithTime(row.original.createdAt)}</span>,
@@ -141,12 +149,7 @@ const Page = () => {
                             </Button>
                         )}
                         {item.status === ShopSubscriptionStatus.ACTIVE && (
-                            <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleExpire(item)}
-                                disabled={busy}
-                            >
+                            <Button size="sm" variant="destructive" onClick={() => handleExpire(item)} disabled={busy}>
                                 Mark as Expired
                             </Button>
                         )}
@@ -168,7 +171,7 @@ const Page = () => {
     const meta: Meta = {
         total: data?.meta?.total ?? 0,
         page: 1,
-        limit: data?.meta?.limit ?? subscriptions.length ?? 10,
+        limit: data?.meta?.limit ?? subscriptions.length ?? PAGE_SIZE,
     };
 
     const handlePaginationChange = (_state: PaginationState) => {};

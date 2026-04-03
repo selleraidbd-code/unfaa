@@ -1,3 +1,5 @@
+import { Shop } from "@/types/shop-type";
+
 export enum ShopSubscriptionStatus {
     ACTIVE = "active",
     UNDER_REVIEW = "underReview",
@@ -12,6 +14,7 @@ export interface ShopSubscription {
     status: ShopSubscriptionStatus;
     createdAt: string;
     updatedAt: string;
+    shop?: Shop;
 }
 
 export interface ShopSubscriptionCreatePayload {
